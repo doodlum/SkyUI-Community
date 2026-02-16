@@ -1,0 +1,45 @@
+{
+	"version": 6,
+	"cmakeMinimumRequired": {
+		"major": 3,
+		"minor": 24,
+		"patch": 0
+	},
+	"configurePresets": [
+		{
+			"name": "build",
+			"displayName": "Build",
+			"binaryDir": "${sourceDir}/build",
+			"cacheVariables": {
+				"SkyrimSE_PATH": {
+					"type": "PATH",
+					"value": "$env{SkyrimSE_PATH}"
+				}
+			}
+		},
+		{
+			"name": "build-caprica",
+			"displayName": "Build (Caprica)",
+			"description": "Use the standalone Caprica compiler instead of the game's compiler",
+			"binaryDir": "${sourceDir}/build",
+			"cacheVariables": {
+				"SkyrimSE_PATH": {
+					"type": "PATH",
+					"value": ""
+				}
+			}
+		}
+	],
+	"buildPresets": [
+		{
+			"name": "release",
+			"displayName": "Release",
+			"configurePreset": "build"
+		},
+		{
+			"name": "release-caprica",
+			"displayName": "Release (Caprica)",
+			"configurePreset": "build-caprica"
+		}
+	]
+}
