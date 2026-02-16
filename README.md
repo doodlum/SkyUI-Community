@@ -11,6 +11,18 @@
 
 ### Setup
 
+Clone the repository with submodules:
+
+```
+git clone --recursive https://github.com/AceVenturi/SkyUI-Community.git
+```
+
+If you already cloned without `--recursive`, initialize the submodules with:
+
+```
+git submodule update --init
+```
+
 Set the `SkyrimSE_PATH` environment variable to your Skyrim SE installation directory:
 
 ```

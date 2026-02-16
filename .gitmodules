@@ -1,0 +1,3 @@
+[submodule "external/BethesdaCMakeModules"]
+	path = external/BethesdaCMakeModules
+	url = https://github.com/Exit-9B/BethesdaCMakeModules.git
