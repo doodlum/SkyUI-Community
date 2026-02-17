@@ -1,195 +1,235 @@
 class InventoryListEntry extends skyui.components.list.TabularListEntry
 {
-   var _iconColor;
-   var _iconLabel;
-   var bestIcon;
-   var enchIcon;
-   var equipIcon;
-   var favoriteIcon;
-   var itemIcon;
-   var poisonIcon;
-   var readIcon;
-   var stolenIcon;
-   static var STATES = ["None","Equipped","LeftEquip","RightEquip","LeftAndRightEquip"];
-   function InventoryListEntry()
-   {
-      super();
-   }
-   function initialize(a_index, a_state)
-   {
-      super.initialize();
-      var _loc4_ = new MovieClipLoader();
-      _loc4_.addListener(this);
-      _loc4_.loadClip(a_state.iconSource,this.itemIcon);
-      this.itemIcon._visible = false;
-      this.equipIcon._visible = false;
-      var _loc3_ = 0;
-      while(this["textField" + _loc3_] != undefined)
-      {
-         this["textField" + _loc3_]._visible = false;
-         _loc3_ = _loc3_ + 1;
-      }
-   }
-   function setSpecificEntryLayout(a_entryObject, a_state)
-   {
-      var _loc2_ = skyui.components.list.TabularList(a_state.list).layout.entryHeight * 0.25;
-      var _loc3_ = skyui.components.list.TabularList(a_state.list).layout.entryHeight * 0.5;
-      this.bestIcon._height = this.bestIcon._width = _loc3_;
-      this.favoriteIcon._height = this.favoriteIcon._width = _loc3_;
-      this.poisonIcon._height = this.poisonIcon._width = _loc3_;
-      this.stolenIcon._height = this.stolenIcon._width = _loc3_;
-      this.enchIcon._height = this.enchIcon._width = _loc3_;
-      this.readIcon._height = this.readIcon._width = _loc3_;
-      this.bestIcon._y = _loc2_;
-      this.favoriteIcon._y = _loc2_;
-      this.poisonIcon._y = _loc2_;
-      this.stolenIcon._y = _loc2_;
-      this.enchIcon._y = _loc2_;
-      this.readIcon._y = _loc2_;
-   }
-   function formatEquipIcon(a_entryField, a_entryObject, a_state)
-   {
-      if(a_entryObject != undefined && a_entryObject.equipState != undefined)
-      {
-         a_entryField.gotoAndStop(InventoryListEntry.STATES[a_entryObject.equipState]);
-      }
-      else
-      {
-         a_entryField.gotoAndStop("None");
-      }
-   }
-   function formatItemIcon(a_entryField, a_entryObject, a_state)
-   {
-      this._iconLabel = a_entryObject.iconLabel == undefined ? "default_misc" : a_entryObject.iconLabel;
-      this._iconColor = a_entryObject.iconColor;
-      a_entryField.gotoAndStop(this._iconLabel);
-      this.changeIconColor(MovieClip(a_entryField),this._iconColor);
-   }
-   function formatName(a_entryField, a_entryObject, a_state)
-   {
-      if(a_entryObject.text == undefined)
-      {
-         a_entryField.SetText(" ");
-         return undefined;
-      }
-      var _loc4_ = a_entryObject.text;
-      if(a_entryObject.soulLVL != undefined)
-      {
-         _loc4_ = _loc4_ + " (" + a_entryObject.soulLVL + ")";
-      }
-      if(a_entryObject.count > 1)
-      {
-         _loc4_ = _loc4_ + " (" + a_entryObject.count.toString() + ")";
-      }
-      if(_loc4_.length > a_state.maxTextLength)
-      {
-         _loc4_ = _loc4_.substr(0,a_state.maxTextLength - 3) + "...";
-      }
-      a_entryField.autoSize = "left";
-      a_entryField.SetText(_loc4_);
-      this.formatColor(a_entryField,a_entryObject,a_state);
-      var _loc2_ = a_entryField._x + a_entryField._width + 5;
-      var _loc5_ = this.bestIcon._width * 1.25;
-      if(a_entryObject.bestInClass == true)
-      {
-         this.bestIcon._x = _loc2_;
-         _loc2_ += _loc5_;
-         this.bestIcon.gotoAndStop("show");
-      }
-      else
-      {
-         this.bestIcon.gotoAndStop("hide");
-      }
-      if(a_entryObject.favorite == true)
-      {
-         this.favoriteIcon._x = _loc2_;
-         _loc2_ += _loc5_;
-         this.favoriteIcon.gotoAndStop("show");
-      }
-      else
-      {
-         this.favoriteIcon.gotoAndStop("hide");
-      }
-      if(a_entryObject.isPoisoned == true)
-      {
-         this.poisonIcon._x = _loc2_;
-         _loc2_ += _loc5_;
-         this.poisonIcon.gotoAndStop("show");
-      }
-      else
-      {
-         this.poisonIcon.gotoAndStop("hide");
-      }
-      if((a_entryObject.isStolen == true || a_entryObject.isStealing == true) && a_state.showStolenIcon == true)
-      {
-         this.stolenIcon._x = _loc2_;
-         _loc2_ += _loc5_;
-         this.stolenIcon.gotoAndStop("show");
-      }
-      else
-      {
-         this.stolenIcon.gotoAndStop("hide");
-      }
-      if(a_entryObject.isEnchanted == true)
-      {
-         this.enchIcon._x = _loc2_;
-         _loc2_ += _loc5_;
-         this.enchIcon.gotoAndStop("show");
-      }
-      else
-      {
-         this.enchIcon.gotoAndStop("hide");
-      }
-      if(a_entryObject.isRead == true)
-      {
-         this.readIcon._x = _loc2_;
-         _loc2_ += _loc5_;
-         this.readIcon.gotoAndStop("show");
-      }
-      else
-      {
-         this.readIcon.gotoAndStop("hide");
-      }
-   }
-   function formatText(a_entryField, a_entryObject, a_state)
-   {
-      this.formatColor(a_entryField,a_entryObject,a_state);
-   }
-   function onLoadInit(a_icon)
-   {
-      a_icon.gotoAndStop(this._iconLabel);
-      this.changeIconColor(a_icon,this._iconColor);
-   }
-   function formatColor(a_entryField, a_entryObject, a_state)
-   {
-      if(a_entryObject.negativeEffect == true)
-      {
-         a_entryField.textColor = a_entryObject.enabled != false ? a_state.negativeEnabledColor : a_state.negativeDisabledColor;
-      }
-      else if(a_entryObject.infoIsStolen == true || a_entryObject.isStealing == true)
-      {
-         a_entryField.textColor = a_entryObject.enabled != false ? a_state.stolenEnabledColor : a_state.stolenDisabledColor;
-      }
-      else
-      {
-         a_entryField.textColor = a_entryObject.enabled != false ? a_state.defaultEnabledColor : a_state.defaultDisabledColor;
-      }
-   }
-   function changeIconColor(a_icon, a_rgb)
-   {
-      var _loc2_;
-      var _loc1_;
-      var _loc3_;
-      for(var _loc6_ in a_icon)
-      {
-         _loc2_ = a_icon[_loc6_];
-         if(_loc2_ instanceof MovieClip)
-         {
-            _loc1_ = new flash.geom.ColorTransform();
-            _loc3_ = new flash.geom.Transform(MovieClip(_loc2_));
-            _loc1_.rgb = a_rgb != undefined ? a_rgb : 16777215;
-            _loc3_.colorTransform = _loc1_;
-         }
-      }
-   }
+  /* CONSTANTS */
+
+	private static var STATES = ["None", "Equipped", "LeftEquip", "RightEquip", "LeftAndRightEquip"];
+
+
+  /* PRIVATE VARIABLES */
+
+	private var _iconLabel;
+	private var _iconColor;
+
+
+  /* STAGE ELEMENTS */
+
+	public var itemIcon;
+	public var equipIcon;
+
+	public var bestIcon;
+	public var favoriteIcon;
+	public var poisonIcon;
+	public var stolenIcon;
+	public var enchIcon;
+	public var readIcon;
+
+
+  /* INITIALIZATION */
+
+	public function InventoryListEntry()
+	{
+		super();
+	}
+
+	// @override TabularListEntry
+	public function initialize(a_index, a_state)
+	{
+		super.initialize();
+
+		var iconLoader = new MovieClipLoader();
+		iconLoader.addListener(this);
+		iconLoader.loadClip(a_state.iconSource, itemIcon);
+
+		itemIcon._visible = false;
+		equipIcon._visible = false;
+
+		for (var i = 0; this["textField" + i] != undefined; i++) {
+			this["textField" + i]._visible = false;
+		}
+	}
+
+
+  /* PUBLIC FUNCTIONS */
+
+	// @override TabularListEntry
+	public function setSpecificEntryLayout(a_entryObject, a_state)
+	{
+		var iconY = skyui.components.list.TabularList(a_state.list).layout.entryHeight * 0.25;
+		var iconSize = skyui.components.list.TabularList(a_state.list).layout.entryHeight * 0.5;
+
+		bestIcon._height = bestIcon._width = iconSize;
+		favoriteIcon._height = favoriteIcon._width = iconSize;
+		poisonIcon._height = poisonIcon._width = iconSize;
+		stolenIcon._height = stolenIcon._width = iconSize;
+		enchIcon._height = enchIcon._width = iconSize;
+		readIcon._height = readIcon._width = iconSize;
+
+		bestIcon._y = iconY;
+		favoriteIcon._y = iconY;
+		poisonIcon._y = iconY;
+		stolenIcon._y = iconY;
+		enchIcon._y = iconY;
+		readIcon._y = iconY;
+	}
+
+	// @override TabularListEntry
+	public function formatEquipIcon(a_entryField, a_entryObject, a_state)
+	{
+		if (a_entryObject != undefined && a_entryObject.equipState != undefined) {
+			a_entryField.gotoAndStop(InventoryListEntry.STATES[a_entryObject.equipState]);
+		} else {
+			a_entryField.gotoAndStop("None");
+		}
+	}
+
+	// @override TabularListEntry
+	public function formatItemIcon(a_entryField, a_entryObject, a_state)
+	{
+		_iconLabel = a_entryObject.iconLabel == undefined ? "default_misc" : a_entryObject.iconLabel;
+		_iconColor = a_entryObject.iconColor;
+
+		// Could return here if _iconLoaded is false
+		a_entryField.gotoAndStop(_iconLabel);
+		changeIconColor(MovieClip(a_entryField), _iconColor);
+	}
+
+	// @override TabularListEntry
+	public function formatName(a_entryField, a_entryObject, a_state)
+	{
+		if (a_entryObject.text == undefined) {
+			a_entryField.SetText(" ");
+			return undefined;
+		}
+
+		// Text
+		var text = a_entryObject.text;
+
+		if (a_entryObject.soulLVL != undefined) {
+			text = text + " (" + a_entryObject.soulLVL + ")";
+		}
+
+		if (a_entryObject.count > 1) {
+			text = text + " (" + a_entryObject.count.toString() + ")";
+		}
+
+		if (text.length > a_state.maxTextLength) {
+			text = text.substr(0, a_state.maxTextLength - 3) + "...";
+		}
+
+		a_entryField.autoSize = "left";
+		a_entryField.SetText(text);
+
+		formatColor(a_entryField, a_entryObject, a_state);
+
+		// BestInClass icon
+		var iconPos = a_entryField._x + a_entryField._width + 5;
+
+		// All icons have the same size
+		var iconSpace = bestIcon._width * 1.25;
+
+		if (a_entryObject.bestInClass == true) {
+			bestIcon._x = iconPos;
+			iconPos += iconSpace;
+			bestIcon.gotoAndStop("show");
+		} else {
+			bestIcon.gotoAndStop("hide");
+		}
+
+		// Fav icon
+		if (a_entryObject.favorite == true) {
+			favoriteIcon._x = iconPos;
+			iconPos += iconSpace;
+			favoriteIcon.gotoAndStop("show");
+		} else {
+			favoriteIcon.gotoAndStop("hide");
+		}
+
+		// Poisoned Icon
+		if (a_entryObject.isPoisoned == true) {
+			poisonIcon._x = iconPos;
+			iconPos += iconSpace;
+			poisonIcon.gotoAndStop("show");
+		} else {
+			poisonIcon.gotoAndStop("hide");
+		}
+
+		// Stolen Icon
+		if ((a_entryObject.isStolen == true || a_entryObject.isStealing == true) && a_state.showStolenIcon == true) {
+			stolenIcon._x = iconPos;
+			iconPos += iconSpace;
+			stolenIcon.gotoAndStop("show");
+		} else {
+			stolenIcon.gotoAndStop("hide");
+		}
+
+		// Enchanted Icon
+		if (a_entryObject.isEnchanted == true) {
+			enchIcon._x = iconPos;
+			iconPos += iconSpace;
+			enchIcon.gotoAndStop("show");
+		} else {
+			enchIcon.gotoAndStop("hide");
+		}
+
+		// Read Icon
+		if (a_entryObject.isRead == true) {
+			readIcon._x = iconPos;
+			iconPos += iconSpace;
+			readIcon.gotoAndStop("show");
+		} else {
+			readIcon.gotoAndStop("hide");
+		}
+	}
+
+	// @override TabularEntry
+	public function formatText(a_entryField, a_entryObject, a_state)
+	{
+		formatColor(a_entryField, a_entryObject, a_state);
+	}
+
+
+  /* PRIVATE FUNCTIONS */
+
+	// @implements MovieClipLoader
+	private function onLoadInit(a_icon)
+	{
+		a_icon.gotoAndStop(_iconLabel);
+		changeIconColor(a_icon, _iconColor);
+	}
+
+	private function formatColor(a_entryField, a_entryObject, a_state)
+	{
+		// Negative Effect
+		if (a_entryObject.negativeEffect == true) {
+			a_entryField.textColor = a_entryObject.enabled != false ? a_state.negativeEnabledColor : a_state.negativeDisabledColor;
+
+		// Stolen
+		} else if (a_entryObject.infoIsStolen == true || a_entryObject.isStealing == true) {
+			a_entryField.textColor = a_entryObject.enabled != false ? a_state.stolenEnabledColor : a_state.stolenDisabledColor;
+
+		// Default
+		} else {
+			a_entryField.textColor = a_entryObject.enabled != false ? a_state.defaultEnabledColor : a_state.defaultDisabledColor;
+		}
+	}
+
+	private function changeIconColor(a_icon, a_rgb)
+	{
+		var element;
+		var ct;
+		var tf;
+
+		for (var e in a_icon) {
+			element = a_icon[e];
+			if (element instanceof MovieClip) {
+				//Note: Could check if all values of RGBA mult and .rgb are all the same then skip
+				ct = new flash.geom.ColorTransform();
+				tf = new flash.geom.Transform(MovieClip(element));
+				// Could return here if (a_rgb == tf.colorTransform.rgb && a_rgb != undefined)
+				ct.rgb = a_rgb != undefined ? a_rgb : 16777215;
+				tf.colorTransform = ct;
+				// Shouldn't be necessary to recurse since we don't expect multiple clip depths for an icon
+			}
+		}
+	}
 }

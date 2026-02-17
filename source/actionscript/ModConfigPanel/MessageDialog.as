@@ -1,100 +1,134 @@
 class MessageDialog extends OptionDialog
 {
-   var _acceptControls;
-   var _cancelControls;
-   var acceptLabel;
-   var background;
-   var buttonPanel;
-   var cancelLabel;
-   var messageText;
-   var platform;
-   var seperator;
-   var textField;
-   var _bWithCancel = true;
-   function MessageDialog()
-   {
-      super();
-   }
-   function onLoad()
-   {
-      this.buttonPanel.setPlatform(this.platform,false);
-      this._bWithCancel = this.cancelLabel != "";
-      this.initButtons();
-      this.textField.wordWrap = true;
-      this.messageText = skyui.util.Translator.translateNested(this.messageText);
-      this.textField.SetText(skyui.util.GlobalFunctions.unescape(this.messageText));
-      this.textField.verticalAutoSize = "top";
-      this.positionElements();
-   }
-   function initButtons()
-   {
-      if(this.platform == 0)
-      {
-         this._acceptControls = skyui.defines.Input.Enter;
-         this._cancelControls = skyui.defines.Input.Tab;
-      }
-      else
-      {
-         this._acceptControls = skyui.defines.Input.Accept;
-         this._cancelControls = skyui.defines.Input.Cancel;
-      }
-      this.buttonPanel.clearButtons();
-      var _loc3_;
-      if(this._bWithCancel)
-      {
-         _loc3_ = this.buttonPanel.addButton({text:this.cancelLabel,controls:this._cancelControls});
-         _loc3_.addEventListener("press",this,"onCancelPress");
-      }
-      var _loc2_ = this.buttonPanel.addButton({text:this.acceptLabel,controls:this._acceptControls});
-      _loc2_.addEventListener("press",this,"onAcceptPress");
-      this.buttonPanel.updateButtons();
-   }
-   function handleInput(details, pathToFocus)
-   {
-      var _loc3_ = pathToFocus.shift();
-      if(_loc3_.handleInput(details,pathToFocus))
-      {
-         return true;
-      }
-      if(Shared.GlobalFunc.IsKeyPressed(details,false))
-      {
-         if(details.navEquivalent == gfx.ui.NavigationCode.TAB)
-         {
-            if(this._bWithCancel)
-            {
-               this.onCancelPress();
-            }
-            else
-            {
-               this.onAcceptPress();
-            }
-            return true;
-         }
-         if(details.navEquivalent == gfx.ui.NavigationCode.ENTER)
-         {
-            this.onAcceptPress();
-            return true;
-         }
-      }
-      return true;
-   }
-   function onAcceptPress()
-   {
-      skse.SendModEvent("SKICP_messageDialogClosed",null,1);
-      skyui.util.DialogManager.close();
-   }
-   function onCancelPress()
-   {
-      skse.SendModEvent("SKICP_messageDialogClosed",null,0);
-      skyui.util.DialogManager.close();
-   }
-   function positionElements()
-   {
-      var _loc3_ = Math.max(75,this.textField.textHeight);
-      this.background._height = _loc3_ + 78;
-      var _loc2_ = - this.background._height / 2;
-      this.seperator._y = _loc2_ + this.background._height - 50;
-      this.buttonPanel._y = _loc2_ + this.background._height - 42;
-      this.textField._y = _loc2_ + 14 + (_loc3_ - this.textField.textHeight) / 2;
-   }
+	/* PRIVATE VARIABLES */
+
+	private var _acceptControls;
+	private var _cancelControls;
+
+	private var _bWithCancel = true;
+
+
+	/* STAGE ELEMENTS */
+
+	public var background;
+	public var buttonPanel;
+
+	public var textField;
+
+	public var seperator;
+
+
+	/* PROPERTIES */
+
+	public var messageText;
+	public var acceptLabel;
+	public var cancelLabel;
+
+
+	/* INITIALIZATION */
+
+	public function MessageDialog()
+	{
+		super();
+	}
+
+	// @override MovieClip
+	private function onLoad()
+	{
+		this.buttonPanel.setPlatform(this.platform,false);
+		this._bWithCancel = this.cancelLabel != "";
+		this.initButtons();
+		this.textField.wordWrap = true;
+		this.messageText = skyui.util.Translator.translateNested(this.messageText);
+		this.textField.SetText(skyui.util.GlobalFunctions.unescape(this.messageText));
+		this.textField.verticalAutoSize = "top";
+		this.positionElements();
+	}
+
+
+	/* PUBLIC FUNCTIONS */
+
+	public function initButtons()
+	{
+		if(this.platform == 0)
+		{
+			this._acceptControls = skyui.defines.Input.Enter;
+			this._cancelControls = skyui.defines.Input.Tab;
+		}
+		else
+		{
+			this._acceptControls = skyui.defines.Input.Accept;
+			this._cancelControls = skyui.defines.Input.Cancel;
+		}
+
+		this.buttonPanel.clearButtons();
+		var cancelButton;
+		if(this._bWithCancel)
+		{
+			var cancelButton = buttonPanel.addButton({text: cancelLabel, controls: _cancelControls});
+			cancelButton.addEventListener("press",this,"onCancelPress");
+		}
+		var acceptButton = buttonPanel.addButton({text: acceptLabel, controls: _acceptControls});
+		acceptButton.addEventListener("press",this,"onAcceptPress");
+		this.buttonPanel.updateButtons();
+	}
+
+	// @GFx
+	public function handleInput(details, pathToFocus)
+	{
+		var nextClip = pathToFocus.shift();
+		if(nextClip.handleInput(details,pathToFocus))
+		{
+			return true;
+		}
+
+		if(Shared.GlobalFunc.IsKeyPressed(details,false))
+		{
+			if(details.navEquivalent == gfx.ui.NavigationCode.TAB)
+			{
+				if(this._bWithCancel)
+				{
+					this.onCancelPress();
+				}
+				else
+				{
+					this.onAcceptPress();
+				}
+				return true;
+			}
+			if(details.navEquivalent == gfx.ui.NavigationCode.ENTER)
+			{
+				this.onAcceptPress();
+				return true;
+			}
+		}
+
+		// Don't forward to higher level
+		return true;
+	}
+
+
+	/* PRIVATE FUNCTIONS */
+
+	private function onAcceptPress()
+	{
+		skse.SendModEvent("SKICP_messageDialogClosed",null,1);
+		skyui.util.DialogManager.close();
+	}
+
+	private function onCancelPress()
+	{
+		skse.SendModEvent("SKICP_messageDialogClosed",null,0);
+		skyui.util.DialogManager.close();
+	}
+
+	private function positionElements()
+	{
+		var contentHeight = Math.max(75,this.textField.textHeight);
+		this.background._height = contentHeight + 78;
+		var yOffset = - this.background._height / 2;
+		this.seperator._y = yOffset + this.background._height - 50;
+		this.buttonPanel._y = yOffset + this.background._height - 42;
+		this.textField._y = yOffset + 14 + (contentHeight - this.textField.textHeight) / 2;
+	}
 }

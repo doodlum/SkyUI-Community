@@ -1,243 +1,295 @@
 class ModListPanel extends MovieClip
 {
-   var _modList;
-   var _subList;
-   var _titleText;
-   var decorBottom;
-   var decorTitle;
-   var decorTop;
-   var dispatchEvent;
-   var modListFader;
-   var subListFader;
-   var sublistIndicator;
-   var INIT = 0;
-   var LIST_ACTIVE = 1;
-   var SUBLIST_ACTIVE = 2;
-   var TRANSITION_TO_SUBLIST = 3;
-   var TRANSITION_TO_LIST = 4;
-   var ANIM_LIST_FADE_OUT = 0;
-   var ANIM_LIST_FADE_IN = 1;
-   var ANIM_SUBLIST_FADE_OUT = 2;
-   var ANIM_SUBLIST_FADE_IN = 3;
-   var ANIM_DECORTITLE_FADE_OUT = 4;
-   var ANIM_DECORTITLE_FADE_IN = 5;
-   var ANIM_DECORTITLE_TWEEN = 6;
-   var _state = ModListPanel.prototype.INIT;
-   var _bDisabled = false;
-   function ModListPanel()
-   {
-      super();
-      this._modList = this.modListFader.list;
-      this._subList = this.subListFader.list;
-      gfx.events.EventDispatcher.initialize(this);
-   }
-   function onLoad()
-   {
-      this.hideDecorTitle(true);
-      this.modListFader.gotoAndStop("show");
-      this.subListFader.gotoAndStop("hide");
-      this.sublistIndicator._visible = false;
-      this._state = this.LIST_ACTIVE;
-      this._subList.addEventListener("itemPress",this,"onSubListPress");
-   }
-   function get selectedEntry()
-   {
-      if(this._state == this.LIST_ACTIVE)
-      {
-         return this._modList.selectedEntry;
-      }
-      if(this._state == this.SUBLIST_ACTIVE)
-      {
-         return this._subList.selectedEntry;
-      }
-      return null;
-   }
-   function get isDisabled()
-   {
-      return this._bDisabled;
-   }
-   function set isDisabled(a_bDisabled)
-   {
-      this._bDisabled = a_bDisabled;
-      this._subList.disableSelection = this._subList.disableInput = a_bDisabled;
-      this._modList.disableSelection = this._modList.disableInput = a_bDisabled;
-   }
-   function isSublistActive()
-   {
-      return this._state == this.SUBLIST_ACTIVE;
-   }
-   function isListActive()
-   {
-      return this._state == this.LIST_ACTIVE;
-   }
-   function showList()
-   {
-      this.setState(this.TRANSITION_TO_LIST);
-   }
-   function showSublist()
-   {
-      if(this._modList.selectedClip == null || this._modList.selectedEntry == null)
-      {
-         return undefined;
-      }
-      this.setState(this.TRANSITION_TO_SUBLIST);
-   }
-   function handleInput(details, pathToFocus)
-   {
-      var _loc4_ = pathToFocus.shift();
-      if(_loc4_ && _loc4_.handleInput(details,pathToFocus))
-      {
-         return true;
-      }
-      if(this._bDisabled)
-      {
-         return false;
-      }
-      if(this._state == this.LIST_ACTIVE)
-      {
-         if(this._modList.handleInput(details,pathToFocus))
-         {
-            return true;
-         }
-      }
-      else if(this._state == this.SUBLIST_ACTIVE)
-      {
-         if(Shared.GlobalFunc.IsKeyPressed(details,false))
-         {
-            if(details.navEquivalent == gfx.ui.NavigationCode.TAB)
-            {
-               this.showList();
-               return true;
-            }
-         }
-         if(this._subList.handleInput(details,pathToFocus))
-         {
-            return true;
-         }
-      }
-      return false;
-   }
-   function setState(a_state)
-   {
-      var _loc2_;
-      switch(a_state)
-      {
-         case this.LIST_ACTIVE:
-            this.modListFader.gotoAndStop("show");
-            this._modList.disableInput = false;
-            this._modList.disableSelection = false;
-            _loc2_ = this._modList.listState.savedIndex;
-            this._modList.selectedIndex = _loc2_ <= -1 ? 0 : _loc2_;
-            if(this.modListFader.getDepth() < this.subListFader.getDepth())
-            {
-               this.modListFader.swapDepths(this.subListFader);
-            }
-            this.dispatchEvent({type:"modListEnter"});
-            break;
-         case this.SUBLIST_ACTIVE:
-            this.subListFader.gotoAndStop("show");
-            this._subList.disableInput = false;
-            this._subList.disableSelection = false;
-            this._subList.selectedIndex = -1;
-            if(this.subListFader.getDepth() < this.modListFader.getDepth())
-            {
-               this.subListFader.swapDepths(this.modListFader);
-            }
-            this.decorTitle.onPress = function()
-            {
-               if(!this._parent.isDisabled)
-               {
-                  this._parent.showList();
-               }
-            };
-            this.dispatchEvent({type:"subListEnter"});
-            break;
-         case this.TRANSITION_TO_SUBLIST:
-            this._titleText = this._modList.selectedEntry.text;
-            this.decorTitle._y = this._modList.selectedClip._y;
-            this.hideDecorTitle(false);
-            this.decorTitle.gotoAndPlay("fadeIn");
-            this.decorTitle.textHolder.textField.text = this._titleText;
-            this.modListFader.gotoAndPlay("fadeOut");
-            this._modList.listState.savedIndex = this._modList.selectedIndex;
-            this._modList.disableInput = true;
-            this._modList.disableSelection = true;
-            this.sublistIndicator._visible = false;
-            this.dispatchEvent({type:"modListExit"});
-            break;
-         case this.TRANSITION_TO_LIST:
-            this.decorTitle.gotoAndPlay("fadeOut");
-            this.subListFader.gotoAndPlay("fadeOut");
-            delete this.decorTitle.onPress;
-            this._subList.disableInput = true;
-            this._subList.disableSelection = true;
-            this.dispatchEvent({type:"subListExit"});
-            break;
-         default:
-            return undefined;
-      }
-      this._state = a_state;
-   }
-   function onAnimFinish(a_animID)
-   {
-      var _loc2_;
-      switch(a_animID)
-      {
-         case this.ANIM_DECORTITLE_FADE_IN:
-            _loc2_ = new mx.transitions.Tween(this.decorTitle,"_y",mx.transitions.easing.Strong.easeOut,this.decorTitle._y,this._modList._x + this._modList.topBorder,0.75,true);
-            _loc2_.FPS = 60;
-            _loc2_.onMotionFinished = mx.utils.Delegate.create(this,this.decorMotionFinishedFunc);
-            _loc2_.onMotionChanged = mx.utils.Delegate.create(this,this.decorMotionUpdateFunc);
-            break;
-         case this.ANIM_DECORTITLE_TWEEN:
-            this.subListFader.gotoAndPlay("fadeIn");
-            break;
-         case this.ANIM_SUBLIST_FADE_IN:
-            this.setState(this.SUBLIST_ACTIVE);
-            break;
-         case this.ANIM_SUBLIST_FADE_OUT:
-            this.modListFader.gotoAndPlay("fadeIn");
-            this.hideDecorTitle(true);
-            break;
-         case this.ANIM_LIST_FADE_IN:
-            this.setState(this.LIST_ACTIVE);
-         default:
-            return;
-      }
-   }
-   function onSubListPress(a_event)
-   {
-   }
-   function decorMotionFinishedFunc()
-   {
-      this.onAnimFinish(this.ANIM_DECORTITLE_TWEEN);
-   }
-   function decorMotionUpdateFunc()
-   {
-      this.decorTop._y = this._modList._y;
-      this.decorTop._height = this.decorTitle._y - this.decorTop._y;
-      this.decorBottom._y = this.decorTitle._y + this.decorTitle._height;
-      this.decorBottom._height = this.decorBottom._y - this._modList._height;
-   }
-   function hideDecorTitle(a_hide)
-   {
-      if(a_hide)
-      {
-         this.decorTop._visible = true;
-         this.decorTop._y = this._modList._y;
-         this.decorTop._height = this._modList._height;
-         this.decorTitle._visible = false;
-         this.decorBottom._visible = false;
-      }
-      else
-      {
-         this.decorTitle._visible = true;
-         this.decorTop._visible = true;
-         this.decorTop._y = this._modList._y;
-         this.decorTop._height = this.decorTitle._y - this.decorTop._y;
-         this.decorBottom._visible = true;
-         this.decorBottom._y = this.decorTitle._y + this.decorTitle._height;
-         this.decorBottom._height = this.decorBottom._y - this._modList._height;
-      }
-   }
+	/* CONSTANTS */
+
+	private var INIT = 0;
+	private var LIST_ACTIVE = 1;
+	private var SUBLIST_ACTIVE = 2;
+	private var TRANSITION_TO_SUBLIST = 3;
+	private var TRANSITION_TO_LIST = 4;
+
+	private var ANIM_LIST_FADE_OUT = 0;
+	private var ANIM_LIST_FADE_IN = 1;
+	private var ANIM_SUBLIST_FADE_OUT = 2;
+	private var ANIM_SUBLIST_FADE_IN = 3;
+	private var ANIM_DECORTITLE_FADE_OUT = 4;
+	private var ANIM_DECORTITLE_FADE_IN = 5;
+	private var ANIM_DECORTITLE_TWEEN = 6;
+
+
+	/* PRIVATE VARIABLES */
+
+	private var _state = ModListPanel.prototype.INIT;
+
+	private var _titleText;
+
+	private var _modList;
+	private var _subList;
+
+	private var _bDisabled = false;
+
+
+	/* STAGE ELEMENTS */
+
+	public var decorTop;
+	public var decorTitle;
+	public var decorBottom;
+
+	public var modListFader;
+	public var subListFader;
+
+	public var sublistIndicator;
+
+
+	/* INITIALIZATION */
+
+	public function ModListPanel()
+	{
+		super();
+		_modList = modListFader.list;
+		_subList = subListFader.list;
+
+		gfx.events.EventDispatcher.initialize(this);
+	}
+
+	// @override MovieClip
+	private function onLoad()
+	{
+		// Init state
+		hideDecorTitle(true);
+		modListFader.gotoAndStop("show");
+		subListFader.gotoAndStop("hide");
+		sublistIndicator._visible = false;
+
+		_state = LIST_ACTIVE;
+
+		_subList.addEventListener("itemPress", this, "onSubListPress");
+	}
+
+
+	/* PROPERTIES */
+
+	public function get selectedEntry()
+	{
+		if (_state == LIST_ACTIVE)
+			return _modList.selectedEntry;
+		else if (_state == SUBLIST_ACTIVE)
+			return _subList.selectedEntry;
+		else
+			return null;
+	}
+
+	public function get isDisabled()
+	{
+		return _bDisabled;
+	}
+
+	public function set isDisabled(a_bDisabled)
+	{
+		_bDisabled = a_bDisabled;
+		_subList.disableSelection = _subList.disableInput = a_bDisabled;
+		_modList.disableSelection = _modList.disableInput = a_bDisabled;
+	}
+
+
+	/* PUBLIC FUNCTIONS */
+
+	// @mixin by gfx.events.EventDispatcher
+	public var dispatchEvent;
+
+	public function isSublistActive()
+	{
+		return (_state == SUBLIST_ACTIVE);
+	}
+
+	public function isListActive()
+	{
+		return (_state == LIST_ACTIVE);
+	}
+
+	public function showList()
+	{
+		setState(TRANSITION_TO_LIST);
+	}
+
+	public function showSublist()
+	{
+		if (_modList.selectedClip == null || _modList.selectedEntry == null)
+			return;
+
+		setState(TRANSITION_TO_SUBLIST);
+	}
+
+	// @GFx
+	public function handleInput(details, pathToFocus)
+	{
+		var nextClip = pathToFocus.shift();
+		if (nextClip && nextClip.handleInput(details, pathToFocus))
+			return true;
+
+		if (_bDisabled)
+			return false;
+
+		if (_state == LIST_ACTIVE) {
+			if (_modList.handleInput(details, pathToFocus))
+				return true;
+		} else if (_state == SUBLIST_ACTIVE) {
+			if (Shared.GlobalFunc.IsKeyPressed(details, false)) {
+				if (details.navEquivalent == gfx.ui.NavigationCode.TAB) {
+					showList();
+					return true;
+				}
+			}
+
+			if (_subList.handleInput(details, pathToFocus))
+				return true;
+		}
+
+		return false;
+	}
+
+
+	/* PRIVATE FUNCTIONS */
+
+	private function setState(a_state)
+	{
+		var restored;
+		switch (a_state) {
+			case LIST_ACTIVE:
+				modListFader.gotoAndStop("show");
+				_modList.disableInput = false;
+				_modList.disableSelection = false;
+				restored = _modList.listState.savedIndex;
+				_modList.selectedIndex = (restored > -1) ? restored : 0;
+
+				if (modListFader.getDepth() < subListFader.getDepth())
+					modListFader.swapDepths(subListFader);
+
+				dispatchEvent({type: "modListEnter"});
+				break;
+
+			case SUBLIST_ACTIVE:
+				subListFader.gotoAndStop("show");
+				_subList.disableInput = false;
+				_subList.disableSelection = false;
+				_subList.selectedIndex = -1;
+
+				if (subListFader.getDepth() < modListFader.getDepth())
+					subListFader.swapDepths(modListFader);
+
+				decorTitle.onPress = function()
+				{
+					if (!this._parent.isDisabled)
+						this._parent.showList();
+				};
+
+				dispatchEvent({type: "subListEnter"});
+				break;
+
+			case TRANSITION_TO_SUBLIST:
+				_titleText = _modList.selectedEntry.text;
+				decorTitle._y = _modList.selectedClip._y;
+				hideDecorTitle(false);
+				decorTitle.gotoAndPlay("fadeIn");
+				decorTitle.textHolder.textField.text = _titleText;
+				modListFader.gotoAndPlay("fadeOut");
+
+				_modList.listState.savedIndex = _modList.selectedIndex;
+				_modList.disableInput = true;
+				_modList.disableSelection = true;
+
+				sublistIndicator._visible = false;
+
+				dispatchEvent({type: "modListExit"});
+				break;
+
+			case TRANSITION_TO_LIST:
+				decorTitle.gotoAndPlay("fadeOut");
+				subListFader.gotoAndPlay("fadeOut");
+
+				delete decorTitle.onPress;
+
+				_subList.disableInput = true;
+				_subList.disableSelection = true;
+
+				dispatchEvent({type: "subListExit"});
+				break;
+
+			default:
+				return;
+		}
+
+		_state = a_state;
+	}
+
+	private function onAnimFinish(a_animID)
+	{
+		var tween;
+		switch (a_animID) {
+			case ANIM_DECORTITLE_FADE_IN:
+				// Should happen at the same time as ANIM_LIST_FADE_OUT, we just need to handle one of them.
+				tween = new mx.transitions.Tween(decorTitle, "_y", mx.transitions.easing.Strong.easeOut, decorTitle._y, _modList._x + _modList.topBorder, 0.75, true);
+				tween.FPS = 60;
+				tween.onMotionFinished = mx.utils.Delegate.create(this, decorMotionFinishedFunc);
+				tween.onMotionChanged = mx.utils.Delegate.create(this, decorMotionUpdateFunc);
+				break;
+
+			case ANIM_DECORTITLE_TWEEN:
+				subListFader.gotoAndPlay("fadeIn");
+				break;
+
+			case ANIM_SUBLIST_FADE_IN:
+				setState(SUBLIST_ACTIVE);
+				break;
+
+			case ANIM_SUBLIST_FADE_OUT:
+				// Should happen at the same time as ANIM_DECORTITLE_FADE_OUT, we just need to handle one of them.
+				modListFader.gotoAndPlay("fadeIn");
+				hideDecorTitle(true);
+				break;
+
+			case ANIM_LIST_FADE_IN:
+				setState(LIST_ACTIVE);
+
+			default:
+				return;
+		}
+	}
+
+	private function onSubListPress(a_event)
+	{
+	}
+
+	private function decorMotionFinishedFunc()
+	{
+		onAnimFinish(ANIM_DECORTITLE_TWEEN);
+	}
+
+	private function decorMotionUpdateFunc()
+	{
+		decorTop._y = _modList._y;
+		decorTop._height = decorTitle._y - decorTop._y;
+
+		decorBottom._y = decorTitle._y + decorTitle._height;
+		decorBottom._height = decorBottom._y - _modList._height;
+	}
+
+	private function hideDecorTitle(a_hide)
+	{
+		if (a_hide) {
+			decorTop._visible = true;
+			decorTop._y = _modList._y;
+			decorTop._height = _modList._height;
+			decorTitle._visible = false;
+			decorBottom._visible = false;
+		} else {
+			decorTitle._visible = true;
+			decorTop._visible = true;
+			decorTop._y = _modList._y;
+			decorTop._height = decorTitle._y - decorTop._y;
+			decorBottom._visible = true;
+			decorBottom._y = decorTitle._y + decorTitle._height;
+			decorBottom._height = decorBottom._y - _modList._height;
+		}
+	}
 }

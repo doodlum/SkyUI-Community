@@ -1,269 +1,265 @@
 class SettingsOptionItem extends MovieClip
 {
-   var CheckBox_mc;
-   var OptionStepper_mc;
-   var ScrollBar_mc;
-   var bSendChangeEvent;
-   var checkBox;
-   var iID;
-   var iMovieType;
-   var optionStepper;
-   var scrollBar;
-   var textField;
-   function SettingsOptionItem()
-   {
-      super();
-      Mouse.addListener(this);
-      this.ScrollBar_mc = this.scrollBar;
-      this.OptionStepper_mc = this.optionStepper;
-      this.CheckBox_mc = this.checkBox;
-      this.bSendChangeEvent = true;
-      this.textField.textAutoSize = "shrink";
-   }
-   function onLoad()
-   {
-      this.ScrollBar_mc.setScrollProperties(0.7,0,20);
-      this.ScrollBar_mc.addEventListener("scroll",this,"onScroll");
-      this.OptionStepper_mc.addEventListener("change",this,"onStepperChange");
-      this.bSendChangeEvent = true;
-   }
-   function get movieType()
-   {
-      return this.iMovieType;
-   }
-   function set movieType(aiMovieType)
-   {
-      this.iMovieType = aiMovieType;
-      this.ScrollBar_mc.disabled = true;
-      this.ScrollBar_mc.visible = false;
-      this.OptionStepper_mc.disabled = true;
-      this.OptionStepper_mc.visible = false;
-      this.CheckBox_mc._visible = false;
-      switch(this.iMovieType)
-      {
-         case 0:
-            this.ScrollBar_mc.disabled = false;
-            this.ScrollBar_mc.visible = true;
-            break;
-         case 1:
-            this.OptionStepper_mc.disabled = false;
-            this.OptionStepper_mc.visible = true;
-            break;
-         case 2:
-            this.CheckBox_mc._visible = true;
-      }
-   }
-   function get ID()
-   {
-      return this.iID;
-   }
-   function set ID(aiNewValue)
-   {
-      this.iID = aiNewValue;
-   }
-   function get value()
-   {
-      var _loc2_;
-      switch(this.iMovieType)
-      {
-         case 0:
-            _loc2_ = this.ScrollBar_mc.position / 20;
-            break;
-         case 1:
-            _loc2_ = this.OptionStepper_mc.selectedIndex;
-            break;
-         case 2:
-            _loc2_ = this.CheckBox_mc._currentframe - 1;
-      }
-      return _loc2_;
-   }
-   function set value(afNewValue)
-   {
-      switch(this.iMovieType)
-      {
-         case 0:
-            this.bSendChangeEvent = false;
-            this.ScrollBar_mc.position = afNewValue * 20;
-            this.bSendChangeEvent = true;
-            break;
-         case 1:
-            this.bSendChangeEvent = false;
-            this.OptionStepper_mc.selectedIndex = afNewValue;
-            this.bSendChangeEvent = true;
-            break;
-         case 2:
-            this.CheckBox_mc.gotoAndStop(afNewValue + 1);
-      }
-   }
-   function get text()
-   {
-      return this.textField.text;
-   }
-   function set text(astrNew)
-   {
-      this.textField.SetText(astrNew);
-   }
-   function get selected()
-   {
-      return this.textField._alpha == 100;
-   }
-   function set selected(abSelected)
-   {
-      this.textField._alpha = !abSelected ? 30 : 100;
-      this.ScrollBar_mc._alpha = !abSelected ? 30 : 100;
-      this.OptionStepper_mc._alpha = !abSelected ? 30 : 100;
-      this.CheckBox_mc._alpha = !abSelected ? 30 : 100;
-   }
-   function handleInput(details, pathToFocus)
-   {
-      var _loc3_ = false;
-      if(Shared.GlobalFunc.IsKeyPressed(details))
-      {
-         switch(this.iMovieType)
-         {
-            case 0:
-               if(details.navEquivalent == gfx.ui.NavigationCode.LEFT)
-               {
-                  this.ScrollBar_mc.position -= 1;
-                  _loc3_ = true;
-                  break;
-               }
-               if(details.navEquivalent == gfx.ui.NavigationCode.RIGHT)
-               {
-                  this.ScrollBar_mc.position += 1;
-                  _loc3_ = true;
-               }
-               break;
-            case 1:
-               if(details.navEquivalent == gfx.ui.NavigationCode.LEFT || details.navEquivalent == gfx.ui.NavigationCode.RIGHT)
-               {
-                  _loc3_ = this.OptionStepper_mc.handleInput(details,pathToFocus);
-               }
-               break;
-            case 2:
-               if(details.navEquivalent == gfx.ui.NavigationCode.ENTER)
-               {
-                  this.ToggleCheckbox();
-                  _loc3_ = true;
-               }
-         }
-      }
-      return _loc3_;
-   }
-   function SetOptionStepperOptions(aOptions)
-   {
-      this.bSendChangeEvent = false;
-      this.OptionStepper_mc.dataProvider = aOptions;
-      this.bSendChangeEvent = true;
-   }
-   function onMousePress()
-   {
-      var _loc2_ = Mouse.getTopMostEntity();
-      switch(this.iMovieType)
-      {
-         case 0:
-            if(_loc2_ == this.ScrollBar_mc.thumb)
-            {
-               this.ScrollBar_mc.thumb.onPress();
-            }
-            else if(_loc2_._parent == this.ScrollBar_mc.upArrow)
-            {
-               this.ScrollBar_mc.upArrow.onPress();
-            }
-            else if(_loc2_._parent == this.ScrollBar_mc.downArrow)
-            {
-               this.ScrollBar_mc.downArrow.onPress();
-            }
-            else if(_loc2_ == this.ScrollBar_mc.track)
-            {
-               this.ScrollBar_mc.track.onPress();
-            }
-            break;
-         case 1:
-            if(_loc2_ == this.OptionStepper_mc.nextBtn || _loc2_ == this.OptionStepper_mc.textField)
-            {
-               this.OptionStepper_mc.nextBtn.onPress();
-            }
-            else if(_loc2_ == this.OptionStepper_mc.prevBtn)
-            {
-               this.OptionStepper_mc.prevBtn.onPress();
-            }
-         default:
-            return;
-      }
-   }
-   function onRelease()
-   {
-      var _loc2_ = Mouse.getTopMostEntity();
-      switch(this.iMovieType)
-      {
-         case 0:
-            if(_loc2_ == this.ScrollBar_mc.thumb)
-            {
-               this.ScrollBar_mc.thumb.onRelease();
-            }
-            else if(_loc2_._parent == this.ScrollBar_mc.upArrow)
-            {
-               this.ScrollBar_mc.upArrow.onRelease();
-            }
-            else if(_loc2_._parent == this.ScrollBar_mc.downArrow)
-            {
-               this.ScrollBar_mc.downArrow.onRelease();
-            }
-            else if(_loc2_ == this.ScrollBar_mc.track)
-            {
-               this.ScrollBar_mc.track.onRelease();
-            }
-            break;
-         case 1:
-            if(_loc2_ == this.OptionStepper_mc.nextBtn || _loc2_ == this.OptionStepper_mc.textField)
-            {
-               this.OptionStepper_mc.nextBtn.onRelease();
-            }
-            else if(_loc2_ == this.OptionStepper_mc.prevBtn)
-            {
-               this.OptionStepper_mc.prevBtn.onRelease();
-            }
-            break;
-         case 2:
-            if(_loc2_._parent == this.CheckBox_mc)
-            {
-               this.ToggleCheckbox();
-            }
-         default:
-            return;
-      }
-   }
-   function ToggleCheckbox()
-   {
-      if(this.CheckBox_mc._currentframe == 1)
-      {
-         this.CheckBox_mc.gotoAndStop(2);
-      }
-      else if(this.CheckBox_mc._currentframe == 2)
-      {
-         this.CheckBox_mc.gotoAndStop(1);
-      }
-      this.DoOptionChange();
-   }
-   function onStepperChange(event)
-   {
-      if(this.bSendChangeEvent)
-      {
-         this.DoOptionChange();
-      }
-   }
-   function onScroll(event)
-   {
-      if(this.bSendChangeEvent)
-      {
-         this.DoOptionChange();
-      }
-   }
-   function DoOptionChange()
-   {
-      gfx.io.GameDelegate.call("OptionChange",[this.ID,this.value]);
-      gfx.io.GameDelegate.call("PlaySound",["UIMenuPrevNext"]);
-      this._parent.onValueChange(MovieClip(this).itemIndex,this.value);
-   }
+	/* STAGE ELEMENTS */
+
+	var CheckBox_mc;
+	var OptionStepper_mc;
+	var ScrollBar_mc;
+	var checkBox;
+	var optionStepper;
+	var scrollBar;
+	var textField;
+
+	/* PRIVATE VARIABLES */
+
+	var bSendChangeEvent;
+	var iID;
+	var iMovieType;
+
+	/* CONSTRUCTOR */
+
+	public function SettingsOptionItem()
+	{
+		super();
+		Mouse.addListener(this);
+		ScrollBar_mc = scrollBar;
+		OptionStepper_mc = optionStepper;
+		CheckBox_mc = checkBox;
+		bSendChangeEvent = true;
+		textField.textAutoSize = "shrink";
+	}
+
+	/* PUBLIC FUNCTIONS */
+
+	public function onLoad()
+	{
+		ScrollBar_mc.setScrollProperties(0.7, 0, 20);
+		ScrollBar_mc.addEventListener("scroll", this, "onScroll");
+		OptionStepper_mc.addEventListener("change", this, "onStepperChange");
+		bSendChangeEvent = true;
+	}
+
+	public function get movieType()
+	{
+		return iMovieType;
+	}
+
+	public function set movieType(aiMovieType)
+	{
+		iMovieType = aiMovieType;
+
+		ScrollBar_mc.disabled = true;
+		ScrollBar_mc.visible = false;
+
+		OptionStepper_mc.disabled = true;
+		OptionStepper_mc.visible = false;
+
+		CheckBox_mc._visible = false;
+
+		switch (iMovieType) {
+			case 0:
+				ScrollBar_mc.disabled = false;
+				ScrollBar_mc.visible = true;
+				break;
+			case 1:
+				OptionStepper_mc.disabled = false;
+				OptionStepper_mc.visible = true;
+				break;
+			case 2:
+				CheckBox_mc._visible = true;
+		}
+	}
+
+	public function get ID()
+	{
+		return iID;
+	}
+
+	public function set ID(aiNewValue)
+	{
+		iID = aiNewValue;
+	}
+
+	public function get value()
+	{
+		var iFrameValue;
+		switch (iMovieType) {
+			case 0:
+				iFrameValue = ScrollBar_mc.position / 20;
+				break;
+			case 1:
+				iFrameValue = OptionStepper_mc.selectedIndex;
+				break;
+			case 2:
+				iFrameValue = CheckBox_mc._currentframe - 1;
+		}
+		return iFrameValue;
+	}
+
+	public function set value(afNewValue)
+	{
+		switch (iMovieType) {
+			case 0:
+				bSendChangeEvent = false;
+				ScrollBar_mc.position = afNewValue * 20;
+				bSendChangeEvent = true;
+				break;
+			case 1:
+				bSendChangeEvent = false;
+				OptionStepper_mc.selectedIndex = afNewValue;
+				bSendChangeEvent = true;
+				break;
+			case 2:
+				CheckBox_mc.gotoAndStop(afNewValue + 1);
+		}
+	}
+
+	public function get text()
+	{
+		return textField.text;
+	}
+
+	public function set text(astrNew)
+	{
+		textField.SetText(astrNew);
+	}
+
+	public function get selected()
+	{
+		return textField._alpha == 100;
+	}
+
+	public function set selected(abSelected)
+	{
+		textField._alpha = !abSelected ? 30 : 100;
+		ScrollBar_mc._alpha = !abSelected ? 30 : 100;
+		OptionStepper_mc._alpha = !abSelected ? 30 : 100;
+		CheckBox_mc._alpha = !abSelected ? 30 : 100;
+	}
+
+	public function handleInput(details, pathToFocus)
+	{
+		var bHandledInput = false;
+		if (Shared.GlobalFunc.IsKeyPressed(details)) {
+			switch (iMovieType) {
+				case 0:
+					if (details.navEquivalent == gfx.ui.NavigationCode.LEFT) {
+						ScrollBar_mc.position -= 1;
+						bHandledInput = true;
+						break;
+					}
+					if (details.navEquivalent == gfx.ui.NavigationCode.RIGHT) {
+						ScrollBar_mc.position += 1;
+						bHandledInput = true;
+					}
+					break;
+				case 1:
+					if (details.navEquivalent == gfx.ui.NavigationCode.LEFT || details.navEquivalent == gfx.ui.NavigationCode.RIGHT) {
+						bHandledInput = OptionStepper_mc.handleInput(details, pathToFocus);
+					}
+					break;
+				case 2:
+					if (details.navEquivalent == gfx.ui.NavigationCode.ENTER) {
+						ToggleCheckbox();
+						bHandledInput = true;
+					}
+			}
+		}
+		return bHandledInput;
+	}
+
+	public function SetOptionStepperOptions(aOptions)
+	{
+		bSendChangeEvent = false;
+		OptionStepper_mc.dataProvider = aOptions;
+		bSendChangeEvent = true;
+	}
+
+	public function onMousePress()
+	{
+		var topMostEntity = Mouse.getTopMostEntity();
+		switch (iMovieType) {
+			case 0:
+				if (topMostEntity == ScrollBar_mc.thumb) {
+					ScrollBar_mc.thumb.onPress();
+				} else if (topMostEntity._parent == ScrollBar_mc.upArrow) {
+					ScrollBar_mc.upArrow.onPress();
+				} else if (topMostEntity._parent == ScrollBar_mc.downArrow) {
+					ScrollBar_mc.downArrow.onPress();
+				} else if (topMostEntity == ScrollBar_mc.track) {
+					ScrollBar_mc.track.onPress();
+				}
+				break;
+			case 1:
+				if (topMostEntity == OptionStepper_mc.nextBtn || topMostEntity == OptionStepper_mc.textField) {
+					OptionStepper_mc.nextBtn.onPress();
+				} else if (topMostEntity == OptionStepper_mc.prevBtn) {
+					OptionStepper_mc.prevBtn.onPress();
+				}
+			default:
+				return;
+		}
+	}
+
+	public function onRelease()
+	{
+		var topMostEntity = Mouse.getTopMostEntity();
+		switch (iMovieType) {
+			case 0:
+				if (topMostEntity == ScrollBar_mc.thumb) {
+					ScrollBar_mc.thumb.onRelease();
+				} else if (topMostEntity._parent == ScrollBar_mc.upArrow) {
+					ScrollBar_mc.upArrow.onRelease();
+				} else if (topMostEntity._parent == ScrollBar_mc.downArrow) {
+					ScrollBar_mc.downArrow.onRelease();
+				} else if (topMostEntity == ScrollBar_mc.track) {
+					ScrollBar_mc.track.onRelease();
+				}
+				break;
+			case 1:
+				if (topMostEntity == OptionStepper_mc.nextBtn || topMostEntity == OptionStepper_mc.textField) {
+					OptionStepper_mc.nextBtn.onRelease();
+				} else if (topMostEntity == OptionStepper_mc.prevBtn) {
+					OptionStepper_mc.prevBtn.onRelease();
+				}
+				break;
+			case 2:
+				if (topMostEntity._parent == CheckBox_mc) {
+					ToggleCheckbox();
+				}
+			default:
+				return;
+		}
+	}
+
+	public function ToggleCheckbox()
+	{
+		if (CheckBox_mc._currentframe == 1) {
+			CheckBox_mc.gotoAndStop(2);
+		} else if (CheckBox_mc._currentframe == 2) {
+			CheckBox_mc.gotoAndStop(1);
+		}
+		DoOptionChange();
+	}
+
+	public function onStepperChange(event)
+	{
+		if (bSendChangeEvent) {
+			DoOptionChange();
+		}
+	}
+
+	public function onScroll(event)
+	{
+		if (bSendChangeEvent) {
+			DoOptionChange();
+		}
+	}
+
+	public function DoOptionChange()
+	{
+		gfx.io.GameDelegate.call("OptionChange", [ID, value]);
+		gfx.io.GameDelegate.call("PlaySound", ["UIMenuPrevNext"]);
+		_parent.onValueChange(MovieClip(this).itemIndex, value);
+	}
 }

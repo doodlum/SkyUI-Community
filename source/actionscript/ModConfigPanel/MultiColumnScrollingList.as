@@ -1,218 +1,212 @@
 class MultiColumnScrollingList extends skyui.components.list.ScrollingList
 {
-   var _listIndex;
-   var _maxListIndex;
-   var _scrollPosition;
-   var _selectedIndex;
-   var _separators;
-   var attachMovie;
-   var background;
-   var disableInput;
-   var disableSelection;
-   var doSetSelectedIndex;
-   var entryHeight;
-   var getClipByIndex;
-   var getListEnumEntry;
-   var getListEnumRelativeIndex;
-   var getListEnumSize;
-   var getNextHighestDepth;
-   var getSelectedListEnumIndex;
-   var isMouseDrivenNav;
-   var leftBorder;
-   var listState;
-   var rightBorder;
-   var scrollDelta;
-   var scrollbar;
-   var selectDefaultIndex;
-   var separatorRenderer;
-   var setClipCount;
-   var topBorder;
-   var columnSpacing = 0;
-   var _columnCount = 1;
-   function MultiColumnScrollingList()
-   {
-      super();
-      this.scrollDelta = this.columnCount;
-      this._maxListIndex *= this.columnCount;
-      if(this._separators == null)
-      {
-         this._separators = [];
-      }
-   }
-   function get columnCount()
-   {
-      return this._columnCount;
-   }
-   function set columnCount(a_value)
-   {
-      this._columnCount = a_value;
-      this.refreshSeparators();
-   }
-   function onLoad()
-   {
-      super.onLoad();
-      if(this.scrollbar != undefined)
-      {
-         this.scrollbar.scrollDelta = this.scrollDelta;
-      }
-   }
-   function UpdateList()
-   {
-      this.setClipCount(this._maxListIndex);
-      var _loc12_ = this.background._x + this.leftBorder;
-      var _loc10_ = this.background._y + this.topBorder;
-      var _loc7_ = 0;
-      var _loc6_ = 0;
-      var _loc11_ = this.columnCount - 1;
-      var _loc8_ = (this.background._width - this.leftBorder - this.rightBorder - (this.columnCount - 1) * this.columnSpacing) / this.columnCount;
-      var _loc5_ = 0;
-      while(_loc5_ < this.getListEnumSize() && _loc5_ < this._scrollPosition)
-      {
-         this.getListEnumEntry(_loc5_).clipIndex = undefined;
-         _loc5_ = _loc5_ + 1;
-      }
-      this._listIndex = 0;
-      _loc5_ = this._scrollPosition;
-      var _loc3_;
-      var _loc4_;
-      while(_loc5_ < this.getListEnumSize() && this._listIndex < this._maxListIndex)
-      {
-         _loc3_ = this.getClipByIndex(this._listIndex);
-         _loc4_ = this.getListEnumEntry(_loc5_);
-         _loc3_.itemIndex = _loc4_.itemIndex;
-         _loc4_.clipIndex = this._listIndex;
-         _loc3_.width = _loc8_;
-         _loc3_.setEntry(_loc4_,this.listState);
-         _loc3_._x = _loc12_ + _loc6_;
-         _loc3_._y = _loc10_ + _loc7_;
-         _loc3_._visible = true;
-         if(_loc5_ % this.columnCount == _loc11_)
-         {
-            _loc6_ = 0;
-            _loc7_ += this.entryHeight;
-         }
-         else
-         {
-            _loc6_ = _loc6_ + _loc8_ + this.columnSpacing;
-         }
-         this._listIndex = this._listIndex + 1;
-         _loc5_ = _loc5_ + 1;
-      }
-      _loc5_ = this._scrollPosition + this._listIndex;
-      while(_loc5_ < this.getListEnumSize())
-      {
-         this.getListEnumEntry(_loc5_).clipIndex = undefined;
-         _loc5_ = _loc5_ + 1;
-      }
-      var _loc2_;
-      if(this.isMouseDrivenNav)
-      {
-         _loc2_ = Mouse.getTopMostEntity();
-         while(_loc2_ != undefined)
-         {
-            if(_loc2_._parent == this && _loc2_._visible && _loc2_.itemIndex != undefined)
-            {
-               this.doSetSelectedIndex(_loc2_.itemIndex,skyui.components.list.BasicList.SELECT_MOUSE);
-            }
-            _loc2_ = _loc2_._parent;
-         }
-      }
-      var _loc9_ = this._listIndex > 0;
-      _loc5_ = 0;
-      while(_loc5_ < this._separators.length)
-      {
-         this._separators[_loc5_]._visible = _loc9_;
-         _loc5_ = _loc5_ + 1;
-      }
-   }
-   function handleInput(details, pathToFocus)
-   {
-      if(this.disableInput)
-      {
-         return false;
-      }
-      if(super.handleInput(details,pathToFocus))
-      {
-         return true;
-      }
-      if(Shared.GlobalFunc.IsKeyPressed(details))
-      {
-         if(details.navEquivalent == gfx.ui.NavigationCode.LEFT)
-         {
-            this.moveSelectionLeft();
-            return true;
-         }
-         if(details.navEquivalent == gfx.ui.NavigationCode.RIGHT)
-         {
-            this.moveSelectionRight();
-            return true;
-         }
-      }
-      return false;
-   }
-   function moveSelectionLeft()
-   {
-      if(this.disableSelection)
-      {
-         return undefined;
-      }
-      if(this._selectedIndex == -1)
-      {
-         this.selectDefaultIndex(false);
-      }
-      else if(this.getSelectedListEnumIndex() % this.columnCount > 0)
-      {
-         this.doSetSelectedIndex(this.getListEnumRelativeIndex(-1),skyui.components.list.BasicList.SELECT_KEYBOARD);
-         this.isMouseDrivenNav = false;
-      }
-   }
-   function moveSelectionRight()
-   {
-      if(this.disableSelection)
-      {
-         return undefined;
-      }
-      if(this._selectedIndex == -1)
-      {
-         this.selectDefaultIndex(false);
-      }
-      else if(this.getSelectedListEnumIndex() % this.columnCount < this.columnCount - 1)
-      {
-         this.doSetSelectedIndex(this.getListEnumRelativeIndex(1),skyui.components.list.BasicList.SELECT_KEYBOARD);
-         this.isMouseDrivenNav = false;
-      }
-   }
-   function refreshSeparators()
-   {
-      if(this._separators == null)
-      {
-         this._separators = [];
-      }
-      var _loc2_;
-      while(this._separators.length > 0)
-      {
-         _loc2_ = this._separators.pop();
-         _loc2_.removeMovieClip();
-      }
-      if(!this.separatorRenderer)
-      {
-         return undefined;
-      }
-      var _loc6_ = (this.background._width - this.leftBorder - this.rightBorder - (this.columnCount - 1) * this.columnSpacing) / this.columnCount;
-      var _loc4_ = this.background._x + this.leftBorder;
-      var _loc5_ = this.columnSpacing / 2;
-      var _loc3_ = 0;
-      while(_loc3_ < this.columnCount - 1)
-      {
-         _loc2_ = this.attachMovie(this.separatorRenderer,this.separatorRenderer + _loc3_,this.getNextHighestDepth());
-         _loc4_ += _loc6_ + _loc5_;
-         _loc2_._x = _loc4_;
-         _loc2_._y = this.background._y;
-         _loc2_._height = this.background._height;
-         _loc2_._alpha = 50;
-         this._separators.push(_loc2_);
-         _loc4_ += _loc5_;
-         _loc3_ = _loc3_ + 1;
-      }
-   }
+	/* PRIVATE VARIABLES */
+
+	private var _separators;
+
+
+	/* PROPERTIES */
+
+	public var columnSpacing = 0;
+
+	public var separatorRenderer;
+
+	private var _columnCount = 1;
+
+	public function get columnCount()
+	{
+		return _columnCount;
+	}
+
+	public function set columnCount(a_value)
+	{
+		_columnCount = a_value;
+		refreshSeparators();
+	}
+
+
+	/* INITIALIZATION */
+
+	public function MultiColumnScrollingList()
+	{
+		super();
+
+		scrollDelta = columnCount;
+		_maxListIndex *= columnCount;
+
+		if (_separators == null)
+			_separators = [];
+	}
+
+	public function onLoad()
+	{
+		super.onLoad();
+
+		if (scrollbar != undefined) {
+			scrollbar.scrollDelta = scrollDelta;
+		}
+	}
+
+
+	/* PUBLIC FUNCTIONS */
+
+	// @override ScrollingList
+	public function UpdateList()
+	{
+		// Prepare clips
+		setClipCount(_maxListIndex);
+
+		var xStart = background._x + leftBorder;
+		var yStart = background._y + topBorder;
+		var h = 0;
+		var w = 0;
+		var lastColumnIndex = columnCount - 1;
+		var columnWidth = (background._width - leftBorder - rightBorder - (columnCount - 1) * columnSpacing) / columnCount;
+
+		// Clear clipIndex for everything before the selected list part
+		var i = 0;
+		while (i < getListEnumSize() && i < _scrollPosition) {
+			getListEnumEntry(i).clipIndex = undefined;
+			i = i + 1;
+		}
+
+		_listIndex = 0;
+
+		// Display the selected part of the list
+		i = _scrollPosition;
+		var entryClip;
+		var entryItem;
+		while (i < getListEnumSize() && _listIndex < _maxListIndex) {
+			entryClip = getClipByIndex(_listIndex);
+			entryItem = getListEnumEntry(i);
+
+			entryClip.itemIndex = entryItem.itemIndex;
+			entryItem.clipIndex = _listIndex;
+
+			entryClip.width = columnWidth;
+			entryClip.setEntry(entryItem, listState);
+
+			entryClip._x = xStart + w;
+			entryClip._y = yStart + h;
+			entryClip._visible = true;
+
+			if (i % columnCount == lastColumnIndex) {
+				w = 0;
+				h += entryHeight;
+			} else {
+				w = w + columnWidth + columnSpacing;
+			}
+
+			_listIndex = _listIndex + 1;
+			i = i + 1;
+		}
+
+		// Clear clipIndex for everything after the selected list part
+		i = _scrollPosition + _listIndex;
+		while (i < getListEnumSize()) {
+			getListEnumEntry(i).clipIndex = undefined;
+			i = i + 1;
+		}
+
+		// Select entry under the cursor for mouse-driven navigation
+		var e;
+		if (isMouseDrivenNav) {
+			e = Mouse.getTopMostEntity();
+			while (e != undefined) {
+				if (e._parent == this && e._visible && e.itemIndex != undefined)
+					doSetSelectedIndex(e.itemIndex, skyui.components.list.BasicList.SELECT_MOUSE);
+				e = e._parent;
+			}
+		}
+
+		var bShowSeparators = _listIndex > 0;
+		i = 0;
+		while (i < _separators.length) {
+			_separators[i]._visible = bShowSeparators;
+			i = i + 1;
+		}
+	}
+
+	// @GFx
+	public function handleInput(details, pathToFocus)
+	{
+		if (disableInput)
+			return false;
+
+		if (super.handleInput(details, pathToFocus))
+			return true;
+
+		if (Shared.GlobalFunc.IsKeyPressed(details)) {
+			if (details.navEquivalent == gfx.ui.NavigationCode.LEFT) {
+				moveSelectionLeft();
+				return true;
+			} else if (details.navEquivalent == gfx.ui.NavigationCode.RIGHT) {
+				moveSelectionRight();
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public function moveSelectionLeft()
+	{
+		if (disableSelection)
+			return;
+
+		if (_selectedIndex == -1) {
+			selectDefaultIndex(false);
+		} else if ((getSelectedListEnumIndex() % columnCount) > 0) {
+			doSetSelectedIndex(getListEnumRelativeIndex(-1), skyui.components.list.BasicList.SELECT_KEYBOARD);
+			isMouseDrivenNav = false;
+		}
+	}
+
+	public function moveSelectionRight()
+	{
+		if (disableSelection)
+			return;
+
+		if (_selectedIndex == -1) {
+			selectDefaultIndex(false);
+		} else if ((getSelectedListEnumIndex() % columnCount) < (columnCount - 1)) {
+			doSetSelectedIndex(getListEnumRelativeIndex(1), skyui.components.list.BasicList.SELECT_KEYBOARD);
+			isMouseDrivenNav = false;
+		}
+	}
+
+
+	/* PRIVATE FUNCTIONS */
+
+	private function refreshSeparators()
+	{
+		if (_separators == null)
+			_separators = [];
+
+		var e;
+		while (_separators.length > 0) {
+			e = _separators.pop();
+			e.removeMovieClip();
+		}
+
+		// Create separators
+		if (!separatorRenderer)
+			return;
+
+		var columnWidth = (background._width - leftBorder - rightBorder - (columnCount - 1) * columnSpacing) / columnCount;
+		var t = background._x + leftBorder;
+		var d = columnSpacing / 2;
+
+		var i = 0;
+		while (i < columnCount - 1) {
+			e = attachMovie(separatorRenderer, separatorRenderer + i, getNextHighestDepth());
+			t += columnWidth + d;
+			e._x = t;
+			e._y = background._y;
+			e._height = background._height;
+			e._alpha = 50;
+			_separators.push(e);
+			t += d;
+			i = i + 1;
+		}
+	}
 }

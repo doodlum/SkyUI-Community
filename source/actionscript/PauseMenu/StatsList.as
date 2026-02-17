@@ -1,20 +1,27 @@
 class StatsList extends Shared.BSScrollingList
 {
-   var scrollbar;
-   function StatsList()
-   {
-      super();
-      this.scrollbar.focusTarget = this;
-   }
-   function SetEntryText(aEntryClip, aEntryObject)
-   {
-      super.SetEntryText(aEntryClip,aEntryObject);
-      aEntryClip.valueText.textAutoSize = "shrink";
-      if(aEntryObject.text != undefined)
-      {
-         aEntryClip.valueText.SetText(aEntryObject.value.toString());
-         return undefined;
-      }
-      aEntryClip.valueText.SetText(" ");
-   }
+	/* STAGE ELEMENTS */
+
+	var scrollbar;
+
+	/* CONSTRUCTOR */
+
+	public function StatsList()
+	{
+		super();
+		scrollbar.focusTarget = this;
+	}
+
+	/* PUBLIC FUNCTIONS */
+
+	public function SetEntryText(aEntryClip, aEntryObject)
+	{
+		super.SetEntryText(aEntryClip, aEntryObject);
+		aEntryClip.valueText.textAutoSize = "shrink";
+		if (aEntryObject.text != undefined) {
+			aEntryClip.valueText.SetText(aEntryObject.value.toString());
+			return undefined;
+		}
+		aEntryClip.valueText.SetText(" ");
+	}
 }

@@ -1,115 +1,131 @@
 class StatsPage extends MovieClip
 {
-   var CategoryList;
-   var CategoryList_mc;
-   var StatsList_mc;
-   var _StatsList;
-   var bUpdated;
-   function StatsPage()
-   {
-      super();
-      this.CategoryList = this.CategoryList_mc.List_mc;
-      this._StatsList = this.StatsList_mc;
-      this.bUpdated = false;
-   }
-   function onLoad()
-   {
-      this.CategoryList.entryList.push({text:"$GENERAL",stats:new Array(),savedHighlight:0});
-      this.CategoryList.entryList.push({text:"$QUEST",stats:new Array(),savedHighlight:0});
-      this.CategoryList.entryList.push({text:"$COMBAT",stats:new Array(),savedHighlight:0});
-      this.CategoryList.entryList.push({text:"$MAGIC",stats:new Array(),savedHighlight:0});
-      this.CategoryList.entryList.push({text:"$CRAFTING",stats:new Array(),savedHighlight:0});
-      this.CategoryList.entryList.push({text:"$CRIME",stats:new Array(),savedHighlight:0});
-      this.CategoryList.InvalidateData();
-      this.CategoryList.addEventListener("listMovedUp",this,"onCategoryListMoveUp");
-      this.CategoryList.addEventListener("listMovedDown",this,"onCategoryListMoveDown");
-      this.CategoryList.addEventListener("selectionChange",this,"onCategoryListMouseSelectionChange");
-      this.CategoryList.disableInput = true;
-      this._StatsList.disableSelection = true;
-   }
-   function startPage()
-   {
-      this.CategoryList.disableInput = false;
-      gfx.managers.FocusHandler.instance.setFocus(this.CategoryList,0);
-      if(this.bUpdated)
-      {
-         return undefined;
-      }
-      gfx.io.GameDelegate.call("updateStats",[],this,"PopulateStatsList");
-      this.bUpdated = true;
-   }
-   function endPage()
-   {
-      this.CategoryList.disableInput = true;
-   }
-   function PopulateStatsList()
-   {
-      var _loc10_ = 0;
-      var _loc9_ = 1;
-      var _loc7_ = 2;
-      var _loc11_ = 3;
-      var _loc8_ = 4;
-      var _loc3_ = 0;
-      var _loc4_;
-      while(_loc3_ < arguments.length)
-      {
-         _loc4_ = {text:"$" + arguments[_loc3_ + _loc10_],value:arguments[_loc3_ + _loc9_]};
-         this.CategoryList.entryList[arguments[_loc3_ + _loc7_]].stats.push(_loc4_);
-         _loc3_ += _loc8_;
-      }
-      this.onCategoryHighlight();
-   }
-   function onCategoryHighlight()
-   {
-      var _loc3_ = this.CategoryList.selectedEntry.stats;
-      this._StatsList.ClearList();
-      this._StatsList.scrollPosition = 0;
-      var _loc2_ = 0;
-      while(_loc2_ < _loc3_.length)
-      {
-         this._StatsList.entryList.push(_loc3_[_loc2_]);
-         _loc2_ = _loc2_ + 1;
-      }
-      this._StatsList.InvalidateData();
-   }
-   function onCategoryListMoveUp(event)
-   {
-      this.onCategoryHighlight();
-      gfx.io.GameDelegate.call("PlaySound",["UIMenuFocus"]);
-      if(event.scrollChanged == true)
-      {
-         this.CategoryList._parent.gotoAndPlay("moveUp");
-      }
-   }
-   function onCategoryListMoveDown(event)
-   {
-      this.onCategoryHighlight();
-      gfx.io.GameDelegate.call("PlaySound",["UIMenuFocus"]);
-      if(event.scrollChanged == true)
-      {
-         this.CategoryList._parent.gotoAndPlay("moveDown");
-      }
-   }
-   function onCategoryListMouseSelectionChange(event)
-   {
-      if(event.keyboardOrMouse == 0 && event.index != -1)
-      {
-         this.onCategoryHighlight();
-         gfx.io.GameDelegate.call("PlaySound",["UIMenuFocus"]);
-      }
-   }
-   function onRightStickInput(afX, afY)
-   {
-      if(afY < 0)
-      {
-         this._StatsList.moveSelectionDown();
-         return undefined;
-      }
-      this._StatsList.moveSelectionUp();
-   }
-   function SetPlatform(aiPlatform, abPS3Switch)
-   {
-      this.CategoryList.SetPlatform(aiPlatform,abPS3Switch);
-      this._StatsList.SetPlatform(aiPlatform,abPS3Switch);
-   }
+	/* STAGE ELEMENTS */
+
+	var CategoryList;
+	var CategoryList_mc;
+	var StatsList_mc;
+
+	/* PRIVATE VARIABLES */
+
+	var _StatsList;
+	var bUpdated;
+
+	/* CONSTRUCTOR */
+
+	public function StatsPage()
+	{
+		super();
+		CategoryList = CategoryList_mc.List_mc;
+		_StatsList = StatsList_mc;
+		bUpdated = false;
+	}
+
+	/* PUBLIC FUNCTIONS */
+
+	public function onLoad()
+	{
+		CategoryList.entryList.push({text: "$GENERAL", stats: new Array(), savedHighlight: 0});
+		CategoryList.entryList.push({text: "$QUEST", stats: new Array(), savedHighlight: 0});
+		CategoryList.entryList.push({text: "$COMBAT", stats: new Array(), savedHighlight: 0});
+		CategoryList.entryList.push({text: "$MAGIC", stats: new Array(), savedHighlight: 0});
+		CategoryList.entryList.push({text: "$CRAFTING", stats: new Array(), savedHighlight: 0});
+		CategoryList.entryList.push({text: "$CRIME", stats: new Array(), savedHighlight: 0});
+		CategoryList.InvalidateData();
+		CategoryList.addEventListener("listMovedUp", this, "onCategoryListMoveUp");
+		CategoryList.addEventListener("listMovedDown", this, "onCategoryListMoveDown");
+		CategoryList.addEventListener("selectionChange", this, "onCategoryListMouseSelectionChange");
+		CategoryList.disableInput = true;
+		_StatsList.disableSelection = true;
+	}
+
+	public function startPage()
+	{
+		CategoryList.disableInput = false;
+		gfx.managers.FocusHandler.instance.setFocus(CategoryList, 0);
+		if (bUpdated) {
+			return undefined;
+		}
+		gfx.io.GameDelegate.call("updateStats", [], this, "PopulateStatsList");
+		bUpdated = true;
+	}
+
+	public function endPage()
+	{
+		CategoryList.disableInput = true;
+	}
+
+	public function PopulateStatsList()
+	{
+		var STAT_TEXT = 0;
+		var STAT_VALUE = 1;
+		var STAT_ENTRYLISTINDEX = 2;
+		var STAT_UNKNOWN = 3;
+		var STAT_STRIDE = 4;
+
+		var i = 0;
+		var stat;
+		while (i < arguments.length) {
+			stat = {text: "$" + arguments[i + STAT_TEXT], value: arguments[i + STAT_VALUE]};
+			CategoryList.entryList[arguments[i + STAT_ENTRYLISTINDEX]].stats.push(stat);
+			i += STAT_STRIDE;
+		}
+		onCategoryHighlight();
+	}
+
+	public function onRightStickInput(afX, afY)
+	{
+		if (afY < 0) {
+			_StatsList.moveSelectionDown();
+			return undefined;
+		}
+		_StatsList.moveSelectionUp();
+	}
+
+	public function SetPlatform(aiPlatform, abPS3Switch)
+	{
+		CategoryList.SetPlatform(aiPlatform, abPS3Switch);
+		_StatsList.SetPlatform(aiPlatform, abPS3Switch);
+	}
+
+	/* PRIVATE FUNCTIONS */
+
+	private function onCategoryHighlight()
+	{
+		var stats = CategoryList.selectedEntry.stats;
+		_StatsList.ClearList();
+		_StatsList.scrollPosition = 0;
+		var i = 0;
+		while (i < stats.length) {
+			_StatsList.entryList.push(stats[i]);
+			i = i + 1;
+		}
+		_StatsList.InvalidateData();
+	}
+
+	private function onCategoryListMoveUp(event)
+	{
+		onCategoryHighlight();
+		gfx.io.GameDelegate.call("PlaySound", ["UIMenuFocus"]);
+		if (event.scrollChanged == true) {
+			CategoryList._parent.gotoAndPlay("moveUp");
+		}
+	}
+
+	private function onCategoryListMoveDown(event)
+	{
+		onCategoryHighlight();
+		gfx.io.GameDelegate.call("PlaySound", ["UIMenuFocus"]);
+		if (event.scrollChanged == true) {
+			CategoryList._parent.gotoAndPlay("moveDown");
+		}
+	}
+
+	private function onCategoryListMouseSelectionChange(event)
+	{
+		if (event.keyboardOrMouse == 0 && event.index != -1) {
+			onCategoryHighlight();
+			gfx.io.GameDelegate.call("PlaySound", ["UIMenuFocus"]);
+		}
+	}
 }

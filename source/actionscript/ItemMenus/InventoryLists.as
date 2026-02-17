@@ -289,7 +289,7 @@ class InventoryLists extends MovieClip
       }
       if(this.itemList.selectedIndex == -1)
       {
-         this.dispatchEvent({type:"showItemsList",index:-1});
+         this.dispatchEvent({type:"showItemsList",index: -1});
       }
       else
       {

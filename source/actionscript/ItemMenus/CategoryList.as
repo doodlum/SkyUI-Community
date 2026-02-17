@@ -235,7 +235,7 @@ class CategoryList extends skyui.components.list.BasicList
       }
       this.doSetSelectedIndex(a_index,a_keyboardOrMouse);
       this.updateSelector();
-      this.dispatchEvent({type:"itemPress",index:this._selectedIndex,entry:this.selectedEntry,keyboardOrMouse:a_keyboardOrMouse});
+      this.dispatchEvent({type:"itemPress", index:this._selectedIndex, entry:this.__get__selectedEntry(), keyboardOrMouse:a_keyboardOrMouse});
    }
    function onItemPressAux(a_index, a_keyboardOrMouse, a_buttonIndex)
    {
@@ -245,7 +245,7 @@ class CategoryList extends skyui.components.list.BasicList
       }
       this.doSetSelectedIndex(a_index,a_keyboardOrMouse);
       this.updateSelector();
-      this.dispatchEvent({type:"itemPressAux",index:this._selectedIndex,entry:this.selectedEntry,keyboardOrMouse:a_keyboardOrMouse});
+      this.dispatchEvent({type:"itemPressAux", index:this._selectedIndex, entry:this.__get__selectedEntry(), keyboardOrMouse:a_keyboardOrMouse});
    }
    function onItemRollOver(a_index)
    {

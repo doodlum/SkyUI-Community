@@ -1,112 +1,158 @@
 class ParticleEmitter extends MovieClip
 {
-   var _effectHeight;
-   var _effectWidth;
-   var _particleHolder;
-   var _particles;
-   var maxParticles;
-   var particleFrameLabel;
-   var particleLinkageName;
-   function ParticleEmitter()
-   {
-      super();
-      this._visible = false;
-      this._effectWidth = this._width;
-      this._effectHeight = this._height;
-      var _loc3_ = "_particleHolder";
-      while(this._parent[_loc3_] != undefined)
-      {
-         _loc3_ = "_" + _loc3_;
-      }
-      this._particleHolder = this._parent.createEmptyMovieClip(_loc3_,this._parent.getNextHighestDepth());
-      this._particleHolder.swapDepths(this);
-      this._particleHolder.setMask(this);
-      this._particles = new Array();
-   }
-   function set width(a_val)
-   {
-      this._width = a_val;
-      this._effectWidth = a_val * 100 / this._particleHolder._xscale;
-   }
-   function get width()
-   {
-      return this._width;
-   }
-   function set height(a_val)
-   {
-      this._height = a_val;
-      this._effectHeight = a_val * 100 / this._particleHolder._yscale;
-   }
-   function get height()
-   {
-      return this._height;
-   }
-   function set visible(a_val)
-   {
-      this._particleHolder._visible = a_val;
-   }
-   function get visible()
-   {
-      return this._particleHolder._visible;
-   }
-   function set alpha(a_val)
-   {
-      this._particleHolder._alpha = a_val;
-   }
-   function get alpha()
-   {
-      return this._particleHolder._alpha;
-   }
-   function set xscale(a_val)
-   {
-      this._particleHolder._xscale = a_val;
-      this._width = this._effectWidth * a_val / 100;
-   }
-   function get xscale()
-   {
-      return this._particleHolder._xscale;
-   }
-   function set yscale(a_val)
-   {
-      this._particleHolder._yscale = a_val;
-      this._height *= a_val / 100;
-   }
-   function get yscale()
-   {
-      return this._particleHolder._yscale;
-   }
-   function setParticleFrameLabel(a_frameLabel)
-   {
-      this.particleFrameLabel = a_frameLabel;
-      var _loc2_ = 0;
-      while(_loc2_ < this._particles.length)
-      {
-         if(this._particles[_loc2_].frameLabel != this.particleFrameLabel)
-         {
-            this._particles[_loc2_].frameLabel = this.particleFrameLabel;
-            this._particles[_loc2_].gotoAndStop(this.particleFrameLabel);
-         }
-         _loc2_ = _loc2_ + 1;
-      }
-   }
-   function addParticle(a_particleInitFunc, a_forceAdd)
-   {
-      if(this._particles.length >= this.maxParticles && !a_forceAdd)
-      {
-         return undefined;
-      }
-      var _loc3_ = a_particleInitFunc || this.initParticle;
-      var _loc2_ = this._particleHolder.attachMovie(this.particleLinkageName,"particle" + this._particles.length,this._particleHolder.getNextHighestDepth());
-      _loc2_.frameLabel = this.particleFrameLabel;
-      _loc2_.gotoAndStop(this.particleFrameLabel);
-      _loc2_ = _loc3_(_loc2_);
-      this._particles.push(_loc2_);
-      return _loc2_;
-   }
-   function initParticle(a_particle)
-   {
-      var _loc1_ = a_particle;
-      _loc1_._visible = false;
-      return _loc1_;
-   }
+	/* STAGE ELEMENTS */
+
+	private var _particleHolder;
+
+
+	/* COMPONENT DEFINITIONS */
+
+	public var particleLinkageName;
+	public var particleFrameLabel;
+	public var particleScaleFactor;
+
+	public var maxParticles;
+
+	public var effectBuffer;
+
+
+	/* PRIVATE VARIABLES */
+
+	private var _effectWidth;
+	private var _effectHeight;
+
+	private var _particles;
+
+
+	/* PROPERTIES */
+
+	public function set width(a_val)
+	{
+		_width = a_val;
+		_effectWidth = a_val * 100 / _particleHolder._xscale;
+	}
+
+	public function get width()
+	{
+		return _width;
+	}
+
+	public function set height(a_val)
+	{
+		_height = a_val;
+		_effectHeight = a_val * 100 / _particleHolder._yscale;
+	}
+
+	public function get height()
+	{
+		return _height;
+	}
+
+	public function set visible(a_val)
+	{
+		_particleHolder._visible = a_val;
+	}
+
+	public function get visible()
+	{
+		return _particleHolder._visible;
+	}
+
+	public function set alpha(a_val)
+	{
+		_particleHolder._alpha = a_val;
+	}
+
+	public function get alpha()
+	{
+		return _particleHolder._alpha;
+	}
+
+	public function set xscale(a_val)
+	{
+		_particleHolder._xscale = a_val;
+		_width = _effectWidth * a_val / 100;
+	}
+
+	public function get xscale()
+	{
+		return _particleHolder._xscale;
+	}
+
+	public function set yscale(a_val)
+	{
+		_particleHolder._yscale = a_val;
+		_height *= a_val / 100;
+	}
+
+	public function get yscale()
+	{
+		return _particleHolder._yscale;
+	}
+
+
+	/* INITIALIZATION */
+
+	public function ParticleEmitter()
+	{
+		super();
+
+		// The ParticleEmitter MovieClip(this) is actually a mask, the real magic happens in _particleHolder
+		_visible = false;
+
+		_effectWidth = _width;
+		_effectHeight = _height;
+
+		var particleHolderName = "_particleHolder";
+
+		while (_parent[particleHolderName] != undefined)
+			particleHolderName = "_" + particleHolderName;
+
+		_particleHolder = _parent.createEmptyMovieClip(particleHolderName, _parent.getNextHighestDepth());
+		_particleHolder.swapDepths(this); // Swap depths so the _particleHolder is on the correct "layer"
+		_particleHolder.setMask(this);
+
+		_particles = new Array();
+	}
+
+
+	/* PRIVATE FUNCTIONS */
+
+	private function setParticleFrameLabel(a_frameLabel)
+	{
+		particleFrameLabel = a_frameLabel;
+
+		var i = 0;
+		while (i < _particles.length) {
+			if (_particles[i].frameLabel != particleFrameLabel) {
+				_particles[i].frameLabel = particleFrameLabel;
+				_particles[i].gotoAndStop(particleFrameLabel);
+			}
+			i = i + 1;
+		}
+	}
+
+	private function addParticle(a_particleInitFunc, a_forceAdd)
+	{
+		if (_particles.length >= maxParticles && !a_forceAdd)
+			return undefined;
+
+		var initFunc = a_particleInitFunc || initParticle;
+		var particle = _particleHolder.attachMovie(particleLinkageName, "particle" + _particles.length, _particleHolder.getNextHighestDepth());
+		particle.frameLabel = particleFrameLabel;
+		particle.gotoAndStop(particleFrameLabel);
+
+		particle = initFunc(particle);
+
+		_particles.push(particle);
+
+		return particle;
+	}
+
+	private function initParticle(a_particle)
+	{
+		var particle = a_particle;
+		particle._visible = false;
+		return particle;
+	}
 }
