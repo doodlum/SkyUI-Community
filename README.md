@@ -6,6 +6,7 @@
 
 - [CMake 3.24+](https://cmake.org/download/)
 - [Visual Studio 2022](https://visualstudio.microsoft.com/) (or another CMake-supported generator)
+- [JPEXS Free Flash Decompiler](https://github.com/jindrapetrik/jpexs-decompiler) (windows installer)
 - A clean Skyrim Special Edition installation with:
   - The [Creation Kit](https://store.steampowered.com/app/1946180/Skyrim_Special_Edition_Creation_Kit/) installed and **run at least once** to unpack the base game script sources
   - The latest [SKSE64](https://skse.silverlock.org/) installed, including its script source files, overwriting the scripts included with the Creation Kit
