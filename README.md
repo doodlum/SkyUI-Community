@@ -8,7 +8,7 @@
 - [Visual Studio 2022](https://visualstudio.microsoft.com/) (or another CMake-supported generator)
 - A clean Skyrim Special Edition installation with:
   - The [Creation Kit](https://store.steampowered.com/app/1946180/Skyrim_Special_Edition_Creation_Kit/) installed and **run at least once** to unpack the base game script sources
-  - The latest [SKSE64](https://skse.silverlock.org/) installed, including its script source files
+  - The latest [SKSE64](https://skse.silverlock.org/) installed, including its script source files, overwriting the scripts included with the Creation Kit
   - No other mods or tools overwriting the base game or SKSE script sources
 
 ### Setup

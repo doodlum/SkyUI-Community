@@ -22,7 +22,6 @@ Papyrus_Add(
 	IMPORTS
 		"${CMAKE_CURRENT_SOURCE_DIR}/source/scripts"
 		"${SkyrimSE_PATH}/Data/Scripts/Source"
-		"${SkyrimSE_PATH}/Data/Source/Scripts"
 	SOURCES ${PAPYRUS_SOURCES}
 	OPTIMIZE
 	ANONYMIZE
