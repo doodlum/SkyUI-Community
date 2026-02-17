@@ -1,131 +1,148 @@
-scriptName SKI_ActiveEffectsWidget extends SKI_WidgetBase
+scriptname SKI_ActiveEffectsWidget extends SKI_WidgetBase
 
-;-- Properties --------------------------------------
-String property Orientation
-{The axis in which new effects will be added to after the total number of effects > GroupEffectCount}
-	String function get()
-
-		return _orientation
-	endFunction
-	function set(String a_val)
-
-		_orientation = a_val
-		if self.Ready
-			ui.InvokeString(self.HUD_MENU, self.WidgetRoot + ".setOrientation", _orientation)
-		endIf
-	endFunction
-endproperty
-Int property GroupEffectCount
-{Maximum number of widgets displayed until a new group (column, or row) is created}
-	Int function get()
-
-		return _groupEffectCount
-	endFunction
-	function set(Int a_val)
-
-		_groupEffectCount = a_val
-		if self.Ready
-			ui.InvokeInt(self.HUD_MENU, self.WidgetRoot + ".setGroupEffectCount", _groupEffectCount)
-		endIf
-	endFunction
-endproperty
-Int property MinimumTimeLeft
-{The minimum time left for an effect to be displayed}
-	Int function get()
-
-		return _minimumTimeLeft
-	endFunction
-	function set(Int a_val)
-
-		_minimumTimeLeft = a_val
-		if self.Ready
-			ui.InvokeInt(self.HUD_MENU, self.WidgetRoot + ".setMinTimeLeft", _minimumTimeLeft)
-		endIf
-	endFunction
-endproperty
-Float property EffectSize
-{Size of each effect icon in pixels at a resolution of 1280x720}
-	Float function get()
-
-		return _effectSize
-	endFunction
-	function set(Float a_val)
-
-		_effectSize = a_val
-		if self.Ready
-			ui.InvokeFloat(self.HUD_MENU, self.WidgetRoot + ".setEffectSize", _effectSize)
-		endIf
-	endFunction
-endproperty
-Bool property Enabled
-{Whether the active effects are displayed or not}
-	Bool function get()
-
-		return _enabled
-	endFunction
-	function set(Bool a_val)
-
-		_enabled = a_val
-		if self.Ready
-			ui.InvokeBool(self.HUD_MENU, self.WidgetRoot + ".setEnabled", _enabled)
-		endIf
-	endFunction
-endproperty
-
-;-- Variables ---------------------------------------
-Int _minimumTimeLeft = 180
-Bool _enabled = false
-Float _effectSize = 48.0000
-String _orientation = "vertical"
-Int _groupEffectCount = 8
-
-;-- Functions ---------------------------------------
-
-String function GetWidgetType()
-
-	return "SKI_ActiveEffectsWidget"
-endFunction
-
-; Skipped compiler generated GetState
-
-Int function GetVersion()
-
+int function GetVersion()
 	return 3
 endFunction
 
-function OnWidgetReset()
+; PRIVATE VARIABLES -------------------------------------------------------------------------------
 
-	parent.OnWidgetReset()
-	Float[] numberArgs = new Float[4]
-	numberArgs[0] = _enabled as Float
-	numberArgs[1] = _effectSize
-	numberArgs[2] = _groupEffectCount as Float
-	numberArgs[3] = _minimumTimeLeft as Float
-	ui.InvokeFloatA(self.HUD_MENU, self.WidgetRoot + ".initNumbers", numberArgs)
-	String[] stringArgs = new String[1]
-	stringArgs[0] = _orientation
-	ui.InvokeStringA(self.HUD_MENU, self.WidgetRoot + ".initStrings", stringArgs)
-	ui.Invoke(self.HUD_MENU, self.WidgetRoot + ".initCommit")
-endFunction
+; -- Version 1 --
 
-; Skipped compiler generated GotoState
+; Make sure defaults match those in ConfigMenuInstance
+bool	_enabled			= false
+float	_effectSize			= 48.0
+int		_groupEffectCount	= 8
+string	_orientation		= "vertical"
 
-function OnVersionUpdate(Int a_version)
+; -- Version 3 --
 
-	if a_version >= 2 && CurrentVersion < 2
-		debug.Trace(self as String + ": Updating to script version 2", 0)
-		String[] hudModes = new String[6]
+int		_minimumTimeLeft	= 180
+
+; PROPERTIES --------------------------------------------------------------------------------------
+
+bool Property Enabled
+	{Whether the active effects are displayed or not}
+	bool function get()
+		return _enabled
+	endFunction
+
+	function set(bool a_val)
+		_enabled = a_val
+		if (Ready)
+			UI.InvokeBool(HUD_MENU, WidgetRoot + ".setEnabled", _enabled)
+		endIf
+	endFunction
+endProperty
+
+float property EffectSize
+	{Size of each effect icon in pixels at a resolution of 1280x720}
+	float function get()
+		return _effectSize
+	endFunction
+
+	function set(float a_val)
+		_effectSize = a_val
+		if (Ready)
+			UI.InvokeFloat(HUD_MENU, WidgetRoot + ".setEffectSize", _effectSize)
+		endIf
+	endFunction
+endProperty
+
+int property GroupEffectCount
+	{Maximum number of widgets displayed until a new group (column, or row) is created}
+	int function get()
+		return _groupEffectCount
+	endFunction
+
+	function set(int a_val)
+		_groupEffectCount = a_val
+		if (Ready)
+			UI.InvokeInt(HUD_MENU, WidgetRoot + ".setGroupEffectCount", _groupEffectCount)
+		endIf
+	endFunction
+endProperty
+
+string property Orientation
+	{The axis in which new effects will be added to after the total number of effects > GroupEffectCount}
+	string function get()
+		return _orientation
+	endFunction
+
+	function set(string a_val)
+		_orientation = a_val
+		if (Ready)
+			UI.InvokeString(HUD_MENU, WidgetRoot + ".setOrientation", _orientation)
+		endIf
+	endFunction
+endProperty
+
+int property MinimumTimeLeft
+	{The minimum time left for an effect to be displayed}
+	int function get()
+		return _minimumTimeLeft
+	endFunction
+
+	function set(int a_val)
+		_minimumTimeLeft = a_val
+		if (Ready)
+			UI.InvokeInt(HUD_MENU, WidgetRoot + ".setMinTimeLeft", _minimumTimeLeft)
+		endIf
+	endFunction
+endProperty
+
+; INITIALIZATION ----------------------------------------------------------------------------------
+
+; @implements SKI_QuestBase
+event OnVersionUpdate(int a_version)
+
+	; Version 2
+	if (a_version >= 2 && CurrentVersion < 2)
+		Debug.Trace(self + ": Updating to script version 2")
+
+		string[] hudModes = new string[6]
 		hudModes[0] = "All"
 		hudModes[1] = "StealthMode"
 		hudModes[2] = "Favor"
 		hudModes[3] = "Swimming"
 		hudModes[4] = "HorseMode"
 		hudModes[5] = "WarHorseMode"
-		self.Modes = hudModes
+
+		Modes = hudModes
 	endIf
+endEvent
+
+; EVENTS ------------------------------------------------------------------------------------------
+
+; @override SKI_WidgetBase
+event OnWidgetReset()
+	parent.OnWidgetReset()
+
+	; Init numbers
+	float[] numberArgs = new float[4]
+	numberArgs[0] = _enabled as float
+	numberArgs[1] = _effectSize
+	numberArgs[2] = _groupEffectCount as float
+	numberArgs[3] = _minimumTimeLeft as float
+	UI.InvokeFloatA(HUD_MENU, WidgetRoot + ".initNumbers", numberArgs)
+
+	; Init strings
+	string[] stringArgs = new string[1]
+	stringArgs[0] = _orientation
+	UI.InvokeStringA(HUD_MENU, WidgetRoot + ".initStrings", stringArgs)
+
+	; Init commit
+	UI.Invoke(HUD_MENU, WidgetRoot + ".initCommit")
+endEvent
+
+
+; FUNCTIONS ---------------------------------------------------------------------------------------
+
+; @overrides SKI_WidgetBase
+string function GetWidgetSource()
+	return "skyui/activeeffects.swf"
 endFunction
 
-String function GetWidgetSource()
-
-	return "skyui/activeeffects.swf"
+; @overrides SKI_WidgetBase
+string function GetWidgetType()
+	return "SKI_ActiveEffectsWidget"
 endFunction

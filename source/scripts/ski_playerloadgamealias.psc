@@ -1,16 +1,7 @@
-scriptName SKI_PlayerLoadGameAlias extends ReferenceAlias
+scriptname SKI_PlayerLoadGameAlias extends ReferenceAlias
 
-;-- Properties --------------------------------------
+; EVENTS ------------------------------------------------------------------------------------------
 
-;-- Variables ---------------------------------------
-
-;-- Functions ---------------------------------------
-
-; Skipped compiler generated GetState
-
-function OnPlayerLoadGame()
-
-	(self.GetOwningQuest() as ski_questbase).OnGameReload()
-endFunction
-
-; Skipped compiler generated GotoState
+event OnPlayerLoadGame()
+	(GetOwningQuest() as SKI_QuestBase).OnGameReload()
+endEvent

@@ -1,159 +1,145 @@
-scriptName SKI_SettingsManager extends SKI_QuestBase
+scriptname SKI_SettingsManager extends SKI_QuestBase
 
-;-- Properties --------------------------------------
-String property CRAFTING_MENU
-	String function get()
+; CONSTANTS ---------------------------------------------------------------------------------------
 
-		return "Crafting Menu"
-	endFunction
-endproperty
-String property GIFT_MENU
-	String function get()
+string property		MENU_ROOT		= "_global.skyui.util.ConfigManager" autoReadonly
 
-		return "GiftMenu"
-	endFunction
-endproperty
-String property MAGIC_MENU
-	String function get()
+string property		INVENTORY_MENU	= "InventoryMenu" autoReadonly
+string property		MAGIC_MENU		= "MagicMenu" autoReadonly
+string property		CONTAINER_MENU	= "ContainerMenu" autoReadonly
+string property		BARTER_MENU		= "BarterMenu" autoReadonly
+string property		GIFT_MENU		= "GiftMenu" autoReadonly
+string property		CRAFTING_MENU	= "Crafting Menu" autoReadonly
 
-		return "MagicMenu"
-	endFunction
-endproperty
-String property MENU_ROOT
-	String function get()
 
-		return "_global.skyui.util.ConfigManager"
-	endFunction
-endproperty
-String property CONTAINER_MENU
-	String function get()
+; PRIVATE VARIABLES -------------------------------------------------------------------------------
 
-		return "ContainerMenu"
-	endFunction
-endproperty
-String property INVENTORY_MENU
-	String function get()
+int			_overrideCount	= 0
+string[]	_overrideKeys
+string[]	_overrideValues
 
-		return "InventoryMenu"
-	endFunction
-endproperty
-String property BARTER_MENU
-	String function get()
+string		_currentMenu
 
-		return "BarterMenu"
-	endFunction
-endproperty
 
-;-- Variables ---------------------------------------
-String[] _overrideValues
-Int _overrideCount = 0
-String[] _overrideKeys
-String _currentMenu
+; INITIALIZATION ----------------------------------------------------------------------------------
 
-;-- Functions ---------------------------------------
+event OnInit()
+	_overrideKeys	= new string[128]
+	_overrideValues	= new string[128]
 
-function OnGameReload()
-
-	self.RegisterForMenu(self.INVENTORY_MENU)
-	self.RegisterForMenu(self.MAGIC_MENU)
-	self.RegisterForMenu(self.CONTAINER_MENU)
-	self.RegisterForMenu(self.BARTER_MENU)
-	self.RegisterForMenu(self.GIFT_MENU)
-	self.RegisterForMenu(self.CRAFTING_MENU)
-	self.RegisterForModEvent("SKICO_setConfigOverride", "OnSetConfigOverride")
-endFunction
-
-; Skipped compiler generated GetState
-
-function OnMenuOpen(String a_menuName)
-
-	self.GotoState("LOCKED")
-	if ui.IsMenuOpen(a_menuName)
-		_currentMenu = a_menuName
-		ui.InvokeStringA(a_menuName, self.MENU_ROOT + ".setExternalOverrideKeys", _overrideKeys)
-		ui.InvokeStringA(a_menuName, self.MENU_ROOT + ".setExternalOverrideValues", _overrideValues)
-	endIf
-	self.GotoState("")
-endFunction
-
-function OnSetConfigOverride(String a_eventName, String a_strArg, Float a_numArg, Form a_sender)
-
-	String overrideKey = a_strArg
-	String overrideValue = ui.GetString(_currentMenu, self.MENU_ROOT + ".out_overrides." + overrideKey)
-	self.SetOverride(overrideKey, overrideValue)
-endFunction
-
-; Skipped compiler generated GotoState
-
-Int function NextFreeIndex()
-
-	Int i = 0
-	while i < _overrideKeys.length
-		if _overrideKeys[i] == ""
-			return i
-		endIf
-		i += 1
-	endWhile
-	return -1
-endFunction
-
-function OnInit()
-
-	_overrideKeys = new String[128]
-	_overrideValues = new String[128]
-	Int i = 0
-	while i < 128
+	int i = 0
+	while (i < 128)
 		_overrideKeys[i] = ""
 		_overrideValues[i] = ""
 		i += 1
 	endWhile
-	self.OnGameReload()
-endFunction
 
-Bool function SetOverride(String a_key, String a_value)
+	OnGameReload()
+endEvent
 
-	if a_key == ""
+; @implements SKI_QuestBase
+event OnGameReload()
+	RegisterForMenu(INVENTORY_MENU)
+	RegisterForMenu(MAGIC_MENU)
+	RegisterForMenu(CONTAINER_MENU)
+	RegisterForMenu(BARTER_MENU)
+	RegisterForMenu(GIFT_MENU)
+	RegisterForMenu(CRAFTING_MENU)
+	RegisterForModEvent("SKICO_setConfigOverride", "OnSetConfigOverride")
+endEvent
+
+
+; EVENTS ------------------------------------------------------------------------------------------
+
+event OnMenuOpen(string a_menuName)
+	GotoState("LOCKED")
+	; Check if it's still open
+	if (UI.IsMenuOpen(a_menuName))
+		_currentMenu = a_menuName
+		UI.InvokeStringA(a_menuName, MENU_ROOT + ".setExternalOverrideKeys", _overrideKeys)
+		UI.InvokeStringA(a_menuName, MENU_ROOT + ".setExternalOverrideValues", _overrideValues)
+	endIf
+	GotoState("")
+endEvent
+
+event OnSetConfigOverride(string a_eventName, string a_strArg, float a_numArg, Form a_sender)
+	string overrideKey = a_strArg
+	string overrideValue = UI.GetString(_currentMenu, MENU_ROOT + ".out_overrides." + overrideKey)
+
+	SetOverride(overrideKey, overrideValue)
+endEvent
+
+; ----------------------------------------------
+state LOCKED
+
+event OnMenuOpen(string a_menuName)
+endEvent
+
+endState
+
+
+; FUNCTIONS ---------------------------------------------------------------------------------------
+
+; @interface
+bool function SetOverride(string a_key, string a_value)
+	if (a_key == "")
 		return false
 	endIf
-	Int index = _overrideKeys.find(a_key, 0)
-	if index != -1
+
+	; Existing override?
+	int index = _overrideKeys.Find(a_key)
+	if (index != -1)
 		_overrideValues[index] = a_value
+
 		return true
+
+	; New override
 	else
-		if _overrideCount >= 128
+		if (_overrideCount >= 128)
 			return false
 		endIf
-		index = self.NextFreeIndex()
-		if index == -1
+
+		index = NextFreeIndex()
+		if (index == -1)
 			return false
 		endIf
+
 		_overrideKeys[index] = a_key
 		_overrideValues[index] = a_value
 		_overrideCount += 1
+
 		return true
 	endIf
+
 endFunction
 
-Bool function ClearOverride(String a_key)
+; @interface
+bool function ClearOverride(string a_key)
+	if (a_key == "")
+		return false
+	endIf
 
-	if a_key == ""
+	int index = _overrideKeys.Find(a_key)
+	if (index == -1)
 		return false
 	endIf
-	Int index = _overrideKeys.find(a_key, 0)
-	if index == -1
-		return false
-	endIf
+
 	_overrideKeys[index] = ""
 	_overrideValues[index] = ""
 	_overrideCount -= 1
+
 	return true
 endFunction
 
-;-- State -------------------------------------------
-state LOCKED
+int function NextFreeIndex()
+	int i = 0
 
-	function OnMenuOpen(String a_menuName)
+	while (i < _overrideKeys.length)
+		if (_overrideKeys[i] == "")
+			return i
+		endIf
+		i += 1
+	endWhile
 
-		; Empty function
-	endFunction
-endState
+	return -1
+endFunction

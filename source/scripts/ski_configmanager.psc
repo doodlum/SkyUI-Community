@@ -1,347 +1,376 @@
-scriptName SKI_ConfigManager extends SKI_QuestBase hidden
+scriptname SKI_ConfigManager extends SKI_QuestBase hidden
 
-;-- Properties --------------------------------------
-String property JOURNAL_MENU
-	String function get()
+; CONSTANTS ---------------------------------------------------------------------------------------
 
-		return "Journal Menu"
-	endFunction
-endproperty
-String property MENU_ROOT
-	String function get()
+string property		JOURNAL_MENU	= "Journal Menu" autoReadonly
+string property		MENU_ROOT		= "_root.ConfigPanelFader.configPanel" autoReadonly
 
-		return "_root.ConfigPanelFader.configPanel"
-	endFunction
-endproperty
 
-;-- Variables ---------------------------------------
-String[] _modNames
-Bool _locked = false
-Bool _lockInit = false
-Int _updateCounter = 0
-Bool _cleanupFlag = false
-Int _configCount = 0
-SKI_ConfigBase[] _modConfigs
-SKI_ConfigBase _activeConfig
-Int _curConfigID = 0
-Int _addCounter = 0
+; PRIVATE VARIABLES -------------------------------------------------------------------------------
 
-;-- Functions ---------------------------------------
+; -- Version 1 --
 
-function Log(String a_msg)
+SKI_ConfigBase[]	_modConfigs
+string[]			_modNames
+int					_curConfigID	= 0
+int					_configCount	= 0
 
-	debug.Trace(self as String + ": " + a_msg, 0)
-endFunction
+SKI_ConfigBase		_activeConfig
 
-function OnGameReload()
+; -- Version 2 --
 
-	self.RegisterForModEvent("SKICP_modSelected", "OnModSelect")
-	self.RegisterForModEvent("SKICP_pageSelected", "OnPageSelect")
-	self.RegisterForModEvent("SKICP_optionHighlighted", "OnOptionHighlight")
-	self.RegisterForModEvent("SKICP_optionSelected", "OnOptionSelect")
-	self.RegisterForModEvent("SKICP_optionDefaulted", "OnOptionDefault")
-	self.RegisterForModEvent("SKICP_keymapChanged", "OnKeymapChange")
-	self.RegisterForModEvent("SKICP_sliderSelected", "OnSliderSelect")
-	self.RegisterForModEvent("SKICP_sliderAccepted", "OnSliderAccept")
-	self.RegisterForModEvent("SKICP_menuSelected", "OnMenuSelect")
-	self.RegisterForModEvent("SKICP_menuAccepted", "OnMenuAccept")
-	self.RegisterForModEvent("SKICP_colorSelected", "OnColorSelect")
-	self.RegisterForModEvent("SKICP_colorAccepted", "OnColorAccept")
-	self.RegisterForModEvent("SKICP_inputSelected", "OnInputSelect")
-	self.RegisterForModEvent("SKICP_inputAccepted", "OnInputAccept")
-	self.RegisterForModEvent("SKICP_dialogCanceled", "OnDialogCancel")
-	self.RegisterForMenu(self.JOURNAL_MENU)
+; keep those for now
+bool				_lockInit		= false
+bool				_locked			= false
+
+; -- Version 4 --
+
+bool				_cleanupFlag	= false
+int					_addCounter		= 0
+int					_updateCounter	= 0
+
+
+; INITIALIZATION ----------------------------------------------------------------------------------
+
+event OnInit()
+	_modConfigs	= new SKI_ConfigBase[128]
+	_modNames	= new string[128]
+
+	OnGameReload()
+endEvent
+
+; @implements SKI_QuestBase
+event OnGameReload()
+	RegisterForModEvent("SKICP_modSelected", "OnModSelect")
+	RegisterForModEvent("SKICP_pageSelected", "OnPageSelect")
+	RegisterForModEvent("SKICP_optionHighlighted", "OnOptionHighlight")
+	RegisterForModEvent("SKICP_optionSelected", "OnOptionSelect")
+	RegisterForModEvent("SKICP_optionDefaulted", "OnOptionDefault")
+	RegisterForModEvent("SKICP_keymapChanged", "OnKeymapChange")
+	RegisterForModEvent("SKICP_sliderSelected", "OnSliderSelect")
+	RegisterForModEvent("SKICP_sliderAccepted", "OnSliderAccept")
+	RegisterForModEvent("SKICP_menuSelected", "OnMenuSelect")
+	RegisterForModEvent("SKICP_menuAccepted", "OnMenuAccept")
+	RegisterForModEvent("SKICP_colorSelected", "OnColorSelect")
+	RegisterForModEvent("SKICP_colorAccepted", "OnColorAccept")
+	RegisterForModEvent("SKICP_inputSelected", "OnInputSelect")
+	RegisterForModEvent("SKICP_inputAccepted", "OnInputAccept")
+	RegisterForModEvent("SKICP_dialogCanceled", "OnDialogCancel")
+
+	RegisterForMenu(JOURNAL_MENU)
+
+	; no longer used but better safe than sorry
 	_lockInit = true
+
 	_cleanupFlag = true
-	self.CleanUp()
-	self.SendModEvent("SKICP_configManagerReady", "", 0.000000)
+
+	CleanUp()
+	SendModEvent("SKICP_configManagerReady")
+
 	_updateCounter = 0
-	self.RegisterForSingleUpdate(5 as Float)
+	RegisterForSingleUpdate(5)
+endEvent
+
+
+; EVENTS ------------------------------------------------------------------------------------------
+
+event OnUpdate()
+
+	if (_cleanupFlag)
+		CleanUp()
+	endIf
+
+	if (_addCounter > 0)
+		Debug.Notification("MCM: Registered " + _addCounter + " new menu(s).")
+		_addCounter = 0
+	endIf
+
+	SendModEvent("SKICP_configManagerReady")
+
+	if (_updateCounter < 6)
+		_updateCounter += 1
+		RegisterForSingleUpdate(5)
+	else
+		RegisterForSingleUpdate(30)
+	endIf
+endEvent
+
+event OnMenuOpen(string a_menuName)
+	GotoState("BUSY")
+	_activeConfig = none
+	UI.InvokeStringA(JOURNAL_MENU, MENU_ROOT + ".setModNames", _modNames);
+endEvent
+
+event OnMenuClose(string a_menuName)
+	GotoState("")
+	if (_activeConfig)
+		_activeConfig.CloseConfig()
+	endIf
+
+	_activeConfig = none
+endEvent
+
+event OnModSelect(string a_eventName, string a_strArg, float a_numArg, Form a_sender)
+	int configIndex = a_numArg as int
+	if (configIndex > -1)
+
+		; We can clean the buffers of the previous menu now
+		if (_activeConfig)
+			_activeConfig.CloseConfig()
+		endIf
+
+		_activeConfig = _modConfigs[configIndex]
+		_activeConfig.OpenConfig()
+	endIf
+	UI.InvokeBool(JOURNAL_MENU, MENU_ROOT + ".unlock", true)
+endEvent
+
+event OnPageSelect(string a_eventName, string a_strArg, float a_numArg, Form a_sender)
+	string page = a_strArg
+	int index = a_numArg as int
+	_activeConfig.SetPage(page, index)
+	UI.InvokeBool(JOURNAL_MENU, MENU_ROOT + ".unlock", true)
+endEvent
+
+event OnOptionHighlight(string a_eventName, string a_strArg, float a_numArg, Form a_sender)
+	int optionIndex = a_numArg as int
+	_activeConfig.HighlightOption(optionIndex)
+endEvent
+
+event OnOptionSelect(string a_eventName, string a_strArg, float a_numArg, Form a_sender)
+	int optionIndex = a_numArg as int
+	_activeConfig.SelectOption(optionIndex)
+	UI.InvokeBool(JOURNAL_MENU, MENU_ROOT + ".unlock", true)
+endEvent
+
+event OnOptionDefault(string a_eventName, string a_strArg, float a_numArg, Form a_sender)
+	int optionIndex = a_numArg as int
+	_activeConfig.ResetOption(optionIndex)
+	UI.InvokeBool(JOURNAL_MENU, MENU_ROOT + ".unlock", true)
+endEvent
+
+event OnKeymapChange(string a_eventName, string a_strArg, float a_numArg, Form a_sender)
+	int optionIndex = a_numArg as int
+	int keyCode = UI.GetInt(JOURNAL_MENU, MENU_ROOT + ".selectedKeyCode")
+
+	; First test vanilla controls
+	string conflictControl = Input.GetMappedControl(keyCode)
+	string conflictName = ""
+
+	; Then test mod controls
+	int i = 0
+	while (conflictControl == "" && i < _modConfigs.length)
+		if (_modConfigs[i] != none)
+			conflictControl = _modConfigs[i].GetCustomControl(keyCode)
+			if (conflictControl != "")
+				conflictName = _modNames[i]
+			endIf
+		endIf
+
+		i += 1
+	endWhile
+
+	_activeConfig.RemapKey(optionIndex, keyCode, conflictControl, conflictName)
+	UI.InvokeBool(JOURNAL_MENU, MENU_ROOT + ".unlock", true)
+endEvent
+
+event OnSliderSelect(string a_eventName, string a_strArg, float a_numArg, Form a_sender)
+	int optionIndex = a_numArg as int
+	_activeConfig.RequestSliderDialogData(optionIndex)
+endEvent
+
+event OnSliderAccept(string a_eventName, string a_strArg, float a_numArg, Form a_sender)
+	float value = a_numArg
+	_activeConfig.SetSliderValue(value)
+	UI.InvokeBool(JOURNAL_MENU, MENU_ROOT + ".unlock", true)
+endEvent
+
+event OnMenuSelect(string a_eventName, string a_strArg, float a_numArg, Form a_sender)
+	int optionIndex = a_numArg as int
+	_activeConfig.RequestMenuDialogData(optionIndex)
+endEvent
+
+event OnMenuAccept(string a_eventName, string a_strArg, float a_numArg, Form a_sender)
+	int value = a_numArg as int
+	_activeConfig.SetMenuIndex(value)
+	UI.InvokeBool(JOURNAL_MENU, MENU_ROOT + ".unlock", true)
+endEvent
+
+event OnColorSelect(string a_eventName, string a_strArg, float a_numArg, Form a_sender)
+	int optionIndex = a_numArg as int
+	_activeConfig.RequestColorDialogData(optionIndex)
+endEvent
+
+event OnColorAccept(string a_eventName, string a_strArg, float a_numArg, Form a_sender)
+	int color = a_numArg as int
+	_activeConfig.SetColorValue(color)
+	UI.InvokeBool(JOURNAL_MENU, MENU_ROOT + ".unlock", true)
+endEvent
+
+event OnInputSelect(string a_eventName, string a_strArg, float a_numArg, Form a_sender)
+	int optionIndex = a_numArg as int
+	_activeConfig.RequestInputDialogData(optionIndex)
+endEvent
+
+event OnInputAccept(string a_eventName, string a_strArg, float a_numArg, Form a_sender)
+	_activeConfig.SetInputText(a_strArg)
+	UI.InvokeBool(JOURNAL_MENU, MENU_ROOT + ".unlock", true)
+endEvent
+
+event OnDialogCancel(string a_eventName, string a_strArg, float a_numArg, Form a_sender)
+	UI.InvokeBool(JOURNAL_MENU, MENU_ROOT + ".unlock", true)
+endEvent
+
+
+; FUNCTIONS ---------------------------------------------------------------------------------------
+
+int function GetVersion()
+	return 4
 endFunction
 
-function OnSliderSelect(String a_eventName, String a_strArg, Float a_numArg, Form a_sender)
+; @interface
+int function RegisterMod(SKI_ConfigBase a_menu, string a_modName)
+	GotoState("BUSY")
+	;Log("Registering config menu: " + a_menu + "(" + a_modName + ")")
 
-	Int optionIndex = a_numArg as Int
-	_activeConfig.RequestSliderDialogData(optionIndex)
+	if (_configCount >= 128)
+		GotoState("")
+		return -1
+	endIf
+
+	; Already registered?
+	int i = 0
+	while (i < _modConfigs.length)
+		if (_modConfigs[i] == a_menu)
+			GotoState("")
+			return i
+		endIf
+
+		i += 1
+	endWhile
+
+	; New registration
+	int configID = NextID()
+
+	if (configID == -1)
+		GotoState("")
+		return -1
+	endIf
+
+	_modConfigs[configID] = a_menu
+	_modNames[configID] = a_modName
+
+	_configCount += 1
+
+	; Track mods added in the current cycle so we don't have to display one message per mod
+	_addCounter += 1
+
+	GotoState("")
+
+	return configID
+endFunction
+
+; @interface
+int function UnregisterMod(SKI_ConfigBase a_menu)
+	GotoState("BUSY")
+	;Log("Unregistering config menu: " + a_menu)
+
+	int i = 0
+	while (i < _modConfigs.length)
+		if (_modConfigs[i] == a_menu)
+			_modConfigs[i] = none
+			_modNames[i] = ""
+			_configCount -= 1
+
+			GotoState("")
+			return i
+		endIf
+
+		i += 1
+	endWhile
+
+	GotoState("")
+	return -1
+endFunction
+
+; @interface
+function ForceReset()
+	Log("Forcing config manager reset...")
+	SendModEvent("SKICP_configManagerReset")
+
+	GotoState("BUSY")
+
+	int i = 0
+	while (i < _modConfigs.length)
+		_modConfigs[i] = none
+		_modNames[i] = ""
+		i += 1
+	endWhile
+
+	_curConfigID = 0
+	_configCount = 0
+
+	GotoState("")
+
+	SendModEvent("SKICP_configManagerReady")
 endFunction
 
 function CleanUp()
+	GotoState("BUSY")
 
-	self.GotoState("BUSY")
 	_cleanupFlag = false
+
 	_configCount = 0
-	Int i = 0
-	while i < _modConfigs.length
-		if _modConfigs[i] == none || _modConfigs[i].GetFormID() == 0
+	int i = 0
+	while (i < _modConfigs.length)
+		if (_modConfigs[i] == none || _modConfigs[i].GetFormID() == 0)
 			_modConfigs[i] = none
 			_modNames[i] = ""
 		else
 			_configCount += 1
 		endIf
+
 		i += 1
 	endWhile
-	self.GotoState("")
+
+	GotoState("")
 endFunction
 
-function OnMenuClose(String a_menuName)
+int function NextID()
+	int startIdx = _curConfigID
 
-	self.GotoState("")
-	if _activeConfig
-		_activeConfig.CloseConfig()
-	endIf
-	_activeConfig = none
-endFunction
-
-function ForceReset()
-
-	self.Log("Forcing config manager reset...")
-	self.SendModEvent("SKICP_configManagerReset", "", 0.000000)
-	self.GotoState("BUSY")
-	Int i = 0
-	while i < _modConfigs.length
-		_modConfigs[i] = none
-		_modNames[i] = ""
-		i += 1
-	endWhile
-	_curConfigID = 0
-	_configCount = 0
-	self.GotoState("")
-	self.SendModEvent("SKICP_configManagerReady", "", 0.000000)
-endFunction
-
-function OnKeymapChange(String a_eventName, String a_strArg, Float a_numArg, Form a_sender)
-
-	Int optionIndex = a_numArg as Int
-	Int keyCode = ui.GetInt(self.JOURNAL_MENU, self.MENU_ROOT + ".selectedKeyCode")
-	String conflictControl = input.GetMappedControl(keyCode)
-	String conflictName = ""
-	Int i = 0
-	while conflictControl == "" && i < _modConfigs.length
-		if _modConfigs[i] != none
-			conflictControl = _modConfigs[i].GetCustomControl(keyCode)
-			if conflictControl != ""
-				conflictName = _modNames[i]
-			endIf
-		endIf
-		i += 1
-	endWhile
-	_activeConfig.RemapKey(optionIndex, keyCode, conflictControl, conflictName)
-	ui.InvokeBool(self.JOURNAL_MENU, self.MENU_ROOT + ".unlock", true)
-endFunction
-
-function OnMenuSelect(String a_eventName, String a_strArg, Float a_numArg, Form a_sender)
-
-	Int optionIndex = a_numArg as Int
-	_activeConfig.RequestMenuDialogData(optionIndex)
-endFunction
-
-function OnUpdate()
-
-	if _cleanupFlag
-		self.CleanUp()
-	endIf
-	if _addCounter > 0
-		debug.Notification("MCM: Registered " + _addCounter as String + " new menu(s).")
-		_addCounter = 0
-	endIf
-	self.SendModEvent("SKICP_configManagerReady", "", 0.000000)
-	if _updateCounter < 6
-		_updateCounter += 1
-		self.RegisterForSingleUpdate(5 as Float)
-	else
-		self.RegisterForSingleUpdate(30 as Float)
-	endIf
-endFunction
-
-Int function GetVersion()
-
-	return 4
-endFunction
-
-function OnOptionDefault(String a_eventName, String a_strArg, Float a_numArg, Form a_sender)
-
-	Int optionIndex = a_numArg as Int
-	_activeConfig.ResetOption(optionIndex)
-	ui.InvokeBool(self.JOURNAL_MENU, self.MENU_ROOT + ".unlock", true)
-endFunction
-
-function OnOptionSelect(String a_eventName, String a_strArg, Float a_numArg, Form a_sender)
-
-	Int optionIndex = a_numArg as Int
-	_activeConfig.SelectOption(optionIndex)
-	ui.InvokeBool(self.JOURNAL_MENU, self.MENU_ROOT + ".unlock", true)
-endFunction
-
-Int function NextID()
-
-	Int startIdx = _curConfigID
-	while _modConfigs[_curConfigID] != none
+	while (_modConfigs[_curConfigID] != none)
 		_curConfigID += 1
-		if _curConfigID >= 128
+		if (_curConfigID >= 128)
 			_curConfigID = 0
 		endIf
-		if _curConfigID == startIdx
-			return -1
+		if (_curConfigID == startIdx)
+			return -1 ; Just to be sure.
 		endIf
 	endWhile
+
 	return _curConfigID
 endFunction
 
-function OnDialogCancel(String a_eventName, String a_strArg, Float a_numArg, Form a_sender)
-
-	ui.InvokeBool(self.JOURNAL_MENU, self.MENU_ROOT + ".unlock", true)
+function Log(string a_msg)
+	Debug.Trace(self + ": " + a_msg)
 endFunction
 
-function OnSliderAccept(String a_eventName, String a_strArg, Float a_numArg, Form a_sender)
 
-	Float value = a_numArg
-	_activeConfig.SetSliderValue(value)
-	ui.InvokeBool(self.JOURNAL_MENU, self.MENU_ROOT + ".unlock", true)
-endFunction
+; STATES ---------------------------------------------------------------------------------------
 
-Int function RegisterMod(SKI_ConfigBase a_menu, String a_modName)
-
-	self.GotoState("BUSY")
-	if _configCount >= 128
-		self.GotoState("")
-		return -1
-	endIf
-	Int i = 0
-	while i < _modConfigs.length
-		if _modConfigs[i] == a_menu
-			self.GotoState("")
-			return i
-		endIf
-		i += 1
-	endWhile
-	Int configID = self.NextID()
-	if configID == -1
-		self.GotoState("")
-		return -1
-	endIf
-	_modConfigs[configID] = a_menu
-	_modNames[configID] = a_modName
-	_configCount += 1
-	_addCounter += 1
-	self.GotoState("")
-	return configID
-endFunction
-
-Int function UnregisterMod(SKI_ConfigBase a_menu)
-
-	self.GotoState("BUSY")
-	Int i = 0
-	while i < _modConfigs.length
-		if _modConfigs[i] == a_menu
-			_modConfigs[i] = none
-			_modNames[i] = ""
-			_configCount -= 1
-			self.GotoState("")
-			return i
-		endIf
-		i += 1
-	endWhile
-	self.GotoState("")
-	return -1
-endFunction
-
-function OnInit()
-
-	_modConfigs = new SKI_ConfigBase[128]
-	_modNames = new String[128]
-	self.OnGameReload()
-endFunction
-
-function OnMenuAccept(String a_eventName, String a_strArg, Float a_numArg, Form a_sender)
-
-	Int value = a_numArg as Int
-	_activeConfig.SetMenuIndex(value)
-	ui.InvokeBool(self.JOURNAL_MENU, self.MENU_ROOT + ".unlock", true)
-endFunction
-
-function OnInputSelect(String a_eventName, String a_strArg, Float a_numArg, Form a_sender)
-
-	Int optionIndex = a_numArg as Int
-	_activeConfig.RequestInputDialogData(optionIndex)
-endFunction
-
-function OnMenuOpen(String a_menuName)
-
-	self.GotoState("BUSY")
-	_activeConfig = none
-	ui.InvokeStringA(self.JOURNAL_MENU, self.MENU_ROOT + ".setModNames", _modNames)
-endFunction
-
-function OnModSelect(String a_eventName, String a_strArg, Float a_numArg, Form a_sender)
-
-	Int configIndex = a_numArg as Int
-	if configIndex > -1
-		if _activeConfig
-			_activeConfig.CloseConfig()
-		endIf
-		_activeConfig = _modConfigs[configIndex]
-		_activeConfig.OpenConfig()
-	endIf
-	ui.InvokeBool(self.JOURNAL_MENU, self.MENU_ROOT + ".unlock", true)
-endFunction
-
-function OnColorAccept(String a_eventName, String a_strArg, Float a_numArg, Form a_sender)
-
-	Int color = a_numArg as Int
-	_activeConfig.SetColorValue(color)
-	ui.InvokeBool(self.JOURNAL_MENU, self.MENU_ROOT + ".unlock", true)
-endFunction
-
-function OnInputAccept(String a_eventName, String a_strArg, Float a_numArg, Form a_sender)
-
-	_activeConfig.SetInputText(a_strArg)
-	ui.InvokeBool(self.JOURNAL_MENU, self.MENU_ROOT + ".unlock", true)
-endFunction
-
-function OnOptionHighlight(String a_eventName, String a_strArg, Float a_numArg, Form a_sender)
-
-	Int optionIndex = a_numArg as Int
-	_activeConfig.HighlightOption(optionIndex)
-endFunction
-
-; Skipped compiler generated GotoState
-
-; Skipped compiler generated GetState
-
-function OnColorSelect(String a_eventName, String a_strArg, Float a_numArg, Form a_sender)
-
-	Int optionIndex = a_numArg as Int
-	_activeConfig.RequestColorDialogData(optionIndex)
-endFunction
-
-function OnPageSelect(String a_eventName, String a_strArg, Float a_numArg, Form a_sender)
-
-	String page = a_strArg
-	Int index = a_numArg as Int
-	_activeConfig.SetPage(page, index)
-	ui.InvokeBool(self.JOURNAL_MENU, self.MENU_ROOT + ".unlock", true)
-endFunction
-
-;-- State -------------------------------------------
 state BUSY
-
-	Int function RegisterMod(SKI_ConfigBase a_menu, String a_modName)
-
+	int function RegisterMod(SKI_ConfigBase a_menu, string a_modName)
 		return -2
 	endFunction
 
-	function CleanUp()
-
-		; Empty function
+	int function UnregisterMod(SKI_ConfigBase a_menu)
+		return -2
 	endFunction
 
 	function ForceReset()
-
-		; Empty function
 	endFunction
 
-	Int function UnregisterMod(SKI_ConfigBase a_menu)
-
-		return -2
+	function CleanUp()
 	endFunction
 endState

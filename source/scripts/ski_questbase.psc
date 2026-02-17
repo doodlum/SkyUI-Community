@@ -1,42 +1,42 @@
-scriptName SKI_QuestBase extends Quest hidden
+scriptname SKI_QuestBase extends Quest hidden
 
-;-- Properties --------------------------------------
-Int property CurrentVersion auto hidden
+; -------------------------------------------------------------------------------------------------
+; Version Tracking
+;
+; Quest implements
+;	GetVersion, to return the static version number
+;	OnVersionUpdate to handle the updating
+; Update process is triggered by calling CheckVersion()
 
-;-- Variables ---------------------------------------
-
-;-- Functions ---------------------------------------
-
-function OnGameReload()
-
-	; Empty function
-endFunction
-
-; Skipped compiler generated GetState
-
-function OnVersionUpdateBase(Int a_version)
-
-	; Empty function
-endFunction
-
-Int function GetVersion()
-
-	return 1
-endFunction
-
-; Skipped compiler generated GotoState
-
-function OnVersionUpdate(Int a_version)
-
-	; Empty function
-endFunction
+int property CurrentVersion auto hidden
 
 function CheckVersion()
-
-	Int version = self.GetVersion()
-	if CurrentVersion < version
-		self.OnVersionUpdateBase(version)
-		self.OnVersionUpdate(version)
+	int version = GetVersion()
+	if (CurrentVersion < version)
+		OnVersionUpdateBase(version)
+		OnVersionUpdate(version)
 		CurrentVersion = version
 	endIf
 endFunction
+
+int function GetVersion()
+	return 1
+endFunction
+
+event OnVersionUpdateBase(int a_version)
+endEvent
+
+event OnVersionUpdate(int a_version)
+endEvent
+
+
+; -------------------------------------------------------------------------------------------------
+; Reload Events
+;
+; Helper to add reload event to quest script.
+; 1. Create quest
+; 2. Add player alias to quest
+; 3. Attach SKI_PlayerLoadGameAlias to player alias
+
+event OnGameReload()
+endEvent

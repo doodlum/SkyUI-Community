@@ -1,385 +1,336 @@
-scriptName SKI_Main extends SKI_QuestBase
+scriptname SKI_Main extends SKI_QuestBase
 
-;-- Properties --------------------------------------
-String property INVENTORY_MENU
-	String function get()
+; CONSTANTS ---------------------------------------------------------------------------------------
 
-		return "InventoryMenu"
-	endFunction
-endproperty
-Int property ERR_SKSE_VERSION_SCPT
-	Int function get()
+string property		HUD_MENU		= "HUD Menu" autoReadOnly
+string property		INVENTORY_MENU	= "InventoryMenu" autoReadonly
+string property		MAGIC_MENU		= "MagicMenu" autoReadonly
+string property		CONTAINER_MENU	= "ContainerMenu" autoReadonly
+string property		BARTER_MENU		= "BarterMenu" autoReadonly
+string property		GIFT_MENU		= "GiftMenu" autoReadonly
+string property		JOURNAL_MENU	= "Journal Menu" autoReadonly
+string property		MAP_MENU		= "MapMenu" autoReadonly
+string property		FAVORITES_MENU	= "FavoritesMenu" autoReadonly
+string property		CRAFTING_MENU	= "Crafting Menu" autoReadonly
 
-		return 3
-	endFunction
-endproperty
-Bool property CraftingMenuCheckEnabled
-	Bool function get()
+int property		ERR_SKSE_MISSING		= 1 autoReadonly
+int property		ERR_SKSE_VERSION_RT		= 2 autoReadonly
+int property		ERR_SKSE_VERSION_SCPT	= 3 autoReadonly
+int property		ERR_INI_PAPYRUS			= 4 autoReadonly
+int property		ERR_SWF_INVALID			= 5 autoReadonly
+int property		ERR_SWF_VERSION			= 6 autoReadonly
+int property		ERR_SKSE_BROKEN			= 7 autoReadonly
 
-		return _craftingMenuCheckEnabled
-	endFunction
-	function set(Bool a_val)
 
-		_craftingMenuCheckEnabled = a_val
-		if a_val
-			self.RegisterForMenu(self.CRAFTING_MENU)
-		else
-			self.UnregisterForMenu(self.CRAFTING_MENU)
-		endIf
-	endFunction
-endproperty
-String property CONTAINER_MENU
-	String function get()
+; PRIVATE VARIABLES -------------------------------------------------------------------------------
 
-		return "ContainerMenu"
-	endFunction
-endproperty
-Bool property FavoritesMenuCheckEnabled
-	Bool function get()
+bool _inventoryMenuCheckEnabled		= true
+bool _magicMenuCheckEnabled			= true
+bool _barterMenuCheckEnabled		= true
+bool _containerMenuCheckEnabled		= true
+bool _giftMenuCheckEnabled			= true
+bool _mapMenuCheckEnabled			= true
+bool _favoritesMenuCheckEnabled		= true
+bool _craftingMenuCheckEnabled		= true
 
-		return _favoritesMenuCheckEnabled
-	endFunction
-	function set(Bool a_val)
 
-		_favoritesMenuCheckEnabled = a_val
-		if a_val
-			self.RegisterForMenu(self.FAVORITES_MENU)
-		else
-			self.UnregisterForMenu(self.FAVORITES_MENU)
-		endIf
-	endFunction
-endproperty
-Bool property MapMenuCheckEnabled
-	Bool function get()
+; PROPERTIES --------------------------------------------------------------------------------------
 
-		return _mapMenuCheckEnabled
-	endFunction
-	function set(Bool a_val)
+int property		MinSKSERelease	= 53		autoReadonly
+string property		MinSKSEVersion	= "2.0.4"	autoReadonly
 
-		_mapMenuCheckEnabled = a_val
-		if a_val
-			self.RegisterForMenu(self.MAP_MENU)
-		else
-			self.UnregisterForMenu(self.MAP_MENU)
-		endIf
-	endFunction
-endproperty
-String property BARTER_MENU
-	String function get()
+int property		ReqSWFRelease	= 2018		autoReadonly
+string property		ReqSWFVersion	= "5.2 SE"	autoReadonly
 
-		return "BarterMenu"
-	endFunction
-endproperty
-Bool property ErrorDetected = false auto
-Bool property ContainerMenuCheckEnabled
-	Bool function get()
+bool property		ErrorDetected	= false auto
 
-		return _containerMenuCheckEnabled
-	endFunction
-	function set(Bool a_val)
 
-		_containerMenuCheckEnabled = a_val
-		if a_val
-			self.RegisterForMenu(self.CONTAINER_MENU)
-		else
-			self.UnregisterForMenu(self.CONTAINER_MENU)
-		endIf
-	endFunction
-endproperty
-Bool property BarterMenuCheckEnabled
-	Bool function get()
-
-		return _barterMenuCheckEnabled
-	endFunction
-	function set(Bool a_val)
-
-		_barterMenuCheckEnabled = a_val
-		if a_val
-			self.RegisterForMenu(self.BARTER_MENU)
-		else
-			self.UnregisterForMenu(self.BARTER_MENU)
-		endIf
-	endFunction
-endproperty
-String property MinSKSEVersion
-	String function get()
-
-		return "2.0.4"
-	endFunction
-endproperty
-Int property ERR_SWF_VERSION
-	Int function get()
-
-		return 6
-	endFunction
-endproperty
-String property ReqSWFVersion
-	String function get()
-
-		return "5.2 SE"
-	endFunction
-endproperty
-Bool property InventoryMenuCheckEnabled
-	Bool function get()
-
+bool property InventoryMenuCheckEnabled
+	bool function get()
 		return _inventoryMenuCheckEnabled
 	endFunction
-	function set(Bool a_val)
 
+	function set(bool a_val)
 		_inventoryMenuCheckEnabled = a_val
-		if a_val
-			self.RegisterForMenu(self.INVENTORY_MENU)
+		if (a_val)
+			RegisterForMenu(INVENTORY_MENU)
 		else
-			self.UnregisterForMenu(self.INVENTORY_MENU)
+			UnregisterForMenu(INVENTORY_MENU)
 		endIf
 	endFunction
-endproperty
-String property HUD_MENU
-	String function get()
+endProperty
 
-		return "HUD Menu"
-	endFunction
-endproperty
-Bool property GiftMenuCheckEnabled
-	Bool function get()
-
-		return _giftMenuCheckEnabled
-	endFunction
-	function set(Bool a_val)
-
-		_giftMenuCheckEnabled = a_val
-		if a_val
-			self.RegisterForMenu(self.GIFT_MENU)
-		else
-			self.UnregisterForMenu(self.GIFT_MENU)
-		endIf
-	endFunction
-endproperty
-String property MAGIC_MENU
-	String function get()
-
-		return "MagicMenu"
-	endFunction
-endproperty
-Int property ReqSWFRelease
-	Int function get()
-
-		return 2018
-	endFunction
-endproperty
-Bool property MagicMenuCheckEnabled
-	Bool function get()
-
+bool property MagicMenuCheckEnabled
+	bool function get()
 		return _magicMenuCheckEnabled
 	endFunction
-	function set(Bool a_val)
 
+	function set(bool a_val)
 		_magicMenuCheckEnabled = a_val
-		if a_val
-			self.RegisterForMenu(self.MAGIC_MENU)
+		if (a_val)
+			RegisterForMenu(MAGIC_MENU)
 		else
-			self.UnregisterForMenu(self.MAGIC_MENU)
+			UnregisterForMenu(MAGIC_MENU)
 		endIf
 	endFunction
-endproperty
-String property CRAFTING_MENU
-	String function get()
+endProperty
 
-		return "Crafting Menu"
+bool property BarterMenuCheckEnabled
+	bool function get()
+		return _barterMenuCheckEnabled
 	endFunction
-endproperty
-Int property ERR_SWF_INVALID
-	Int function get()
 
-		return 5
+	function set(bool a_val)
+		_barterMenuCheckEnabled = a_val
+		if (a_val)
+			RegisterForMenu(BARTER_MENU)
+		else
+			UnregisterForMenu(BARTER_MENU)
+		endIf
 	endFunction
-endproperty
-Int property MinSKSERelease
-	Int function get()
+endProperty
 
-		return 53
+bool property ContainerMenuCheckEnabled
+	bool function get()
+		return _containerMenuCheckEnabled
 	endFunction
-endproperty
-String property MAP_MENU
-	String function get()
 
-		return "MapMenu"
+	function set(bool a_val)
+		_containerMenuCheckEnabled = a_val
+		if (a_val)
+			RegisterForMenu(CONTAINER_MENU)
+		else
+			UnregisterForMenu(CONTAINER_MENU)
+		endIf
 	endFunction
-endproperty
-Int property ERR_SKSE_MISSING
-	Int function get()
+endProperty
 
-		return 1
+bool property GiftMenuCheckEnabled
+	bool function get()
+		return _giftMenuCheckEnabled
 	endFunction
-endproperty
-Int property ERR_SKSE_BROKEN
-	Int function get()
 
-		return 7
+	function set(bool a_val)
+		_giftMenuCheckEnabled = a_val
+		if (a_val)
+			RegisterForMenu(GIFT_MENU)
+		else
+			UnregisterForMenu(GIFT_MENU)
+		endIf
 	endFunction
-endproperty
-String property FAVORITES_MENU
-	String function get()
+endProperty
 
-		return "FavoritesMenu"
+bool property MapMenuCheckEnabled
+	bool function get()
+		return _mapMenuCheckEnabled
 	endFunction
-endproperty
-String property GIFT_MENU
-	String function get()
 
-		return "GiftMenu"
+	function set(bool a_val)
+		_mapMenuCheckEnabled = a_val
+		if (a_val)
+			RegisterForMenu(MAP_MENU)
+		else
+			UnregisterForMenu(MAP_MENU)
+		endIf
 	endFunction
-endproperty
-Int property ERR_SKSE_VERSION_RT
-	Int function get()
+endProperty
 
-		return 2
+bool property FavoritesMenuCheckEnabled
+	bool function get()
+		return _favoritesMenuCheckEnabled
 	endFunction
-endproperty
-String property JOURNAL_MENU
-	String function get()
 
-		return "Journal Menu"
+	function set(bool a_val)
+		_favoritesMenuCheckEnabled = a_val
+		if (a_val)
+			RegisterForMenu(FAVORITES_MENU)
+		else
+			UnregisterForMenu(FAVORITES_MENU)
+		endIf
 	endFunction
-endproperty
-Int property ERR_INI_PAPYRUS
-	Int function get()
+endProperty
 
-		return 4
+bool property CraftingMenuCheckEnabled
+	bool function get()
+		return _craftingMenuCheckEnabled
 	endFunction
-endproperty
 
-;-- Variables ---------------------------------------
-Bool _giftMenuCheckEnabled = true
-Bool _inventoryMenuCheckEnabled = true
-Bool _mapMenuCheckEnabled = true
-Bool _favoritesMenuCheckEnabled = true
-Bool _magicMenuCheckEnabled = true
-Bool _containerMenuCheckEnabled = true
-Bool _craftingMenuCheckEnabled = true
-Bool _barterMenuCheckEnabled = true
+	function set(bool a_val)
+		_craftingMenuCheckEnabled = a_val
+		if (a_val)
+			RegisterForMenu(CRAFTING_MENU)
+		else
+			UnregisterForMenu(CRAFTING_MENU)
+		endIf
+	endFunction
+endProperty
 
-;-- Functions ---------------------------------------
 
-; Skipped compiler generated GetState
+; INITIALIZATION ----------------------------------------------------------------------------------
 
-function Error(Int a_errId, String a_msg)
+event OnInit()
+	OnGameReload()
+endEvent
 
-	debug.MessageBox("SKYUI ERROR CODE " + a_errId as String + "\n\n" + a_msg + "\n\nFor more help, visit the SkyUI SE Nexus or Workshop pages.")
+; @implements SKI_QuestBase
+event OnGameReload()
+	ErrorDetected = false
+
+	if (SKSE.GetVersionRelease() == 0)
+		Error(ERR_SKSE_MISSING, "The Skyrim Script Extender (SKSE64) is not running.\nSkyUI will not work correctly!\n\n" \
+			+ "This message may also appear if a new Skyrim Patch has been released. In this case, wait until SKSE64 has been updated, then install the new version.")
+		return
+
+	elseIf (GetType() == 0)
+		Error(ERR_SKSE_BROKEN, "The SKSE64 scripts have been overwritten or are not properly loaded.\nReinstalling SKSE64 might fix this.")
+		return
+
+	elseIf (SKSE.GetVersionRelease() < MinSKSERelease)
+		Error(ERR_SKSE_VERSION_RT, "SKSE64 is outdated.\nSkyUI will not work correctly!\n" \
+			+ "Required version: " + MinSKSEVersion + " or newer\n" \
+			+ "Detected version: " + SKSE.GetVersion() + "." + SKSE.GetVersionMinor() + "." + SKSE.GetVersionBeta())
+		return
+
+	elseIf (SKSE.GetScriptVersionRelease() < MinSKSERelease)
+		Error(ERR_SKSE_VERSION_SCPT, "SKSE64 scripts are outdated.\nYou probably forgot to install/update them with the rest of SKSE64.\nSkyUI will not work correctly!")
+		return
+	endIf
+
+	if (Utility.GetINIInt("iMinMemoryPageSize:Papyrus") <= 0 || Utility.GetINIInt("iMaxMemoryPageSize:Papyrus") <= 0 || Utility.GetINIInt("iMaxAllocatedMemoryBytes:Papyrus") <= 0)
+		Error(ERR_INI_PAPYRUS, "Your Papyrus INI settings are invalid. Please fix this, otherwise SkyUI will stop working at some point.")
+		return
+	endIf
+
+	; Check menus, when they're opened
+	if (InventoryMenuCheckEnabled)
+		RegisterForMenu(INVENTORY_MENU)
+	endIf
+
+	if (MagicMenuCheckEnabled)
+		RegisterForMenu(MAGIC_MENU)
+	endIf
+
+	if (ContainerMenuCheckEnabled)
+		RegisterForMenu(CONTAINER_MENU)
+	endIf
+
+	if (BarterMenuCheckEnabled)
+		RegisterForMenu(BARTER_MENU)
+	endIf
+
+	if (GiftMenuCheckEnabled)
+		RegisterForMenu(GIFT_MENU)
+	endIf
+
+	if (MapMenuCheckEnabled)
+		RegisterForMenu(MAP_MENU)
+	endIf
+
+	if (FavoritesMenuCheckEnabled)
+		RegisterForMenu(FAVORITES_MENU)
+	endIf
+
+	if (CraftingMenuCheckEnabled)
+		RegisterForMenu(CRAFTING_MENU)
+	endIf
+
+	RegisterForMenu(JOURNAL_MENU)
+endEvent
+
+
+; EVENTS ------------------------------------------------------------------------------------------
+
+event OnMenuOpen(string a_menuName)
+	if (a_menuName == INVENTORY_MENU)
+		if (CheckMenuVersion("inventorymenu.swf", a_menuName, "_global.InventoryMenu") && \
+			CheckItemMenuComponents(a_menuName))
+			; Only unregister if all checks have been performed (regardless of check result)
+			UnregisterForMenu(a_menuName)
+		endIf
+
+	elseIf (a_menuName == MAGIC_MENU)
+		if (CheckMenuVersion("magicmenu.swf", a_menuName, "_global.MagicMenu") && \
+			CheckItemMenuComponents(a_menuName))
+			UnregisterForMenu(a_menuName)
+		endIf
+
+	elseIf (a_menuName == CONTAINER_MENU)
+		if (CheckMenuVersion("containermenu.swf", a_menuName, "_global.ContainerMenu") && \
+			CheckItemMenuComponents(a_menuName))
+			UnregisterForMenu(a_menuName)
+		endIf
+
+	elseIf (a_menuName == BARTER_MENU)
+		if (CheckMenuVersion("bartermenu.swf", a_menuName, "_global.BarterMenu") && \
+			CheckItemMenuComponents(a_menuName))
+			UnregisterForMenu(a_menuName)
+		endIf
+
+	elseIf (a_menuName == GIFT_MENU)
+		if (CheckMenuVersion("giftmenu.swf", a_menuName, "_global.GiftMenu") && \
+			CheckItemMenuComponents(a_menuName))
+			UnregisterForMenu(a_menuName)
+		endIf
+
+	elseIf (a_menuName == JOURNAL_MENU)
+		if (CheckMenuVersion("quest_journal.swf", a_menuName, "_global.Quest_Journal") && \
+			CheckMenuVersion("skyui/configpanel.swf", a_menuName, "_global.ConfigPanel"))
+			UnregisterForMenu(a_menuName)
+		endIf
+
+	elseIf (a_menuName == MAP_MENU)
+		if (CheckMenuVersion("map.swf", a_menuName, "_global.Map.MapMenu"))
+			UnregisterForMenu(a_menuName)
+		endIf
+
+	elseIf (a_menuName == FAVORITES_MENU)
+		if (CheckMenuVersion("favoritesmenu.swf", a_menuName, "_global.FavoritesMenu"))
+			UnregisterForMenu(a_menuName)
+		endIf
+
+	elseIf (a_menuName == CRAFTING_MENU)
+		if (CheckMenuVersion("craftingmenu.swf", a_menuName, "_global.CraftingMenu"))
+			UnregisterForMenu(a_menuName)
+		endIf
+	endIf
+endEvent
+
+
+; FUNCTIONS ---------------------------------------------------------------------------------------
+
+function Error(int a_errId, string a_msg)
+	Debug.MessageBox("SKYUI ERROR CODE " + a_errId + "\n\n" + a_msg + "\n\nFor more help, visit the SkyUI SE Nexus or Workshop pages.")
 	ErrorDetected = true
 endFunction
 
-function OnMenuOpen(String a_menuName)
+bool function CheckMenuVersion(string a_swfName, string a_menu, string a_class)
+	; Returns false if the menu is closed before UI.Get* receive their value
 
-	if a_menuName == self.INVENTORY_MENU
-		if self.CheckMenuVersion("inventorymenu.swf", a_menuName, "_global.InventoryMenu") && self.CheckItemMenuComponents(a_menuName)
-			self.UnregisterForMenu(a_menuName)
-		endIf
-	elseIf a_menuName == self.MAGIC_MENU
-		if self.CheckMenuVersion("magicmenu.swf", a_menuName, "_global.MagicMenu") && self.CheckItemMenuComponents(a_menuName)
-			self.UnregisterForMenu(a_menuName)
-		endIf
-	elseIf a_menuName == self.CONTAINER_MENU
-		if self.CheckMenuVersion("containermenu.swf", a_menuName, "_global.ContainerMenu") && self.CheckItemMenuComponents(a_menuName)
-			self.UnregisterForMenu(a_menuName)
-		endIf
-	elseIf a_menuName == self.BARTER_MENU
-		if self.CheckMenuVersion("bartermenu.swf", a_menuName, "_global.BarterMenu") && self.CheckItemMenuComponents(a_menuName)
-			self.UnregisterForMenu(a_menuName)
-		endIf
-	elseIf a_menuName == self.GIFT_MENU
-		if self.CheckMenuVersion("giftmenu.swf", a_menuName, "_global.GiftMenu") && self.CheckItemMenuComponents(a_menuName)
-			self.UnregisterForMenu(a_menuName)
-		endIf
-	elseIf a_menuName == self.JOURNAL_MENU
-		if self.CheckMenuVersion("quest_journal.swf", a_menuName, "_global.Quest_Journal") && self.CheckMenuVersion("skyui/configpanel.swf", a_menuName, "_global.ConfigPanel")
-			self.UnregisterForMenu(a_menuName)
-		endIf
-	elseIf a_menuName == self.MAP_MENU
-		if self.CheckMenuVersion("map.swf", a_menuName, "_global.Map.MapMenu")
-			self.UnregisterForMenu(a_menuName)
-		endIf
-	elseIf a_menuName == self.FAVORITES_MENU
-		if self.CheckMenuVersion("favoritesmenu.swf", a_menuName, "_global.FavoritesMenu")
-			self.UnregisterForMenu(a_menuName)
-		endIf
-	elseIf a_menuName == self.CRAFTING_MENU
-		if self.CheckMenuVersion("craftingmenu.swf", a_menuName, "_global.CraftingMenu")
-			self.UnregisterForMenu(a_menuName)
-		endIf
-	endIf
-endFunction
+	int releaseIdx = UI.GetInt(a_menu, a_class + ".SKYUI_RELEASE_IDX")
+	string version = UI.GetString(a_menu, a_class + ".SKYUI_VERSION_STRING")
 
-Bool function CheckMenuVersion(String a_swfName, String a_menu, String a_class)
-
-	Int releaseIdx = ui.GetInt(a_menu, a_class + ".SKYUI_RELEASE_IDX")
-	String version = ui.GetString(a_menu, a_class + ".SKYUI_VERSION_STRING")
-	if !ui.IsMenuOpen(a_menu)
+	if (!UI.IsMenuOpen(a_menu))
 		return false
 	endIf
-	if releaseIdx == 0
-		self.Error(self.ERR_SWF_INVALID, "Incompatible menu file (" + a_swfName + ").\nPlease make sure you installed everything correctly and no other mod has overwritten this file.\n" + "If you were using an older SkyUI version, un-install it and re-install the latest version.")
-	elseIf releaseIdx != self.ReqSWFRelease
-		self.Error(self.ERR_SWF_VERSION, "Menu file version mismatch for " + a_swfName + ".\n" + "Required version: " + self.ReqSWFVersion + "\n" + "Detected version: " + version)
+
+	if (releaseIdx == 0)
+		Error(ERR_SWF_INVALID, "Incompatible menu file (" + a_swfName + ").\nPlease make sure you installed everything correctly and no other mod has overwritten this file.\n" \
+			+ "If you were using an older SkyUI version, un-install it and re-install the latest version.")
+
+	elseIf (releaseIdx != ReqSWFRelease)
+		Error(ERR_SWF_VERSION, "Menu file version mismatch for " + a_swfName + ".\n" \
+			+ "Required version: " + ReqSWFVersion + "\n" \
+			+ "Detected version: " + version)
+
 	endIf
+
 	return true
 endFunction
 
-function OnGameReload()
+bool function CheckItemMenuComponents(string a_menu)
+	; Returns false if the menu is closed before all checks have finished
 
-	ErrorDetected = false
-	if skse.GetVersionRelease() == 0
-		self.Error(self.ERR_SKSE_MISSING, "The Skyrim Script Extender (SKSE64) is not running.\nSkyUI will not work correctly!\n\n" + "This message may also appear if a new Skyrim Patch has been released. In this case, wait until SKSE64 has been updated, then install the new version.")
-		return 
-	elseIf self.GetType() == 0
-		self.Error(self.ERR_SKSE_BROKEN, "The SKSE64 scripts have been overwritten or are not properly loaded.\nReinstalling SKSE64 might fix this.")
-		return 
-	elseIf skse.GetVersionRelease() < self.MinSKSERelease
-		self.Error(self.ERR_SKSE_VERSION_RT, "SKSE64 is outdated.\nSkyUI will not work correctly!\n" + "Required version: " + self.MinSKSEVersion + " or newer\n" + "Detected version: " + skse.GetVersion() as String + "." + skse.GetVersionMinor() as String + "." + skse.GetVersionBeta() as String)
-		return 
-	elseIf skse.GetScriptVersionRelease() < self.MinSKSERelease
-		self.Error(self.ERR_SKSE_VERSION_SCPT, "SKSE64 scripts are outdated.\nYou probably forgot to install/update them with the rest of SKSE64.\nSkyUI will not work correctly!")
-		return 
-	endIf
-	if utility.GetINIInt("iMinMemoryPageSize:Papyrus") <= 0 || utility.GetINIInt("iMaxMemoryPageSize:Papyrus") <= 0 || utility.GetINIInt("iMaxAllocatedMemoryBytes:Papyrus") <= 0
-		self.Error(self.ERR_INI_PAPYRUS, "Your Papyrus INI settings are invalid. Please fix this, otherwise SkyUI will stop working at some point.")
-		return 
-	endIf
-	if self.InventoryMenuCheckEnabled
-		self.RegisterForMenu(self.INVENTORY_MENU)
-	endIf
-	if self.MagicMenuCheckEnabled
-		self.RegisterForMenu(self.MAGIC_MENU)
-	endIf
-	if self.ContainerMenuCheckEnabled
-		self.RegisterForMenu(self.CONTAINER_MENU)
-	endIf
-	if self.BarterMenuCheckEnabled
-		self.RegisterForMenu(self.BARTER_MENU)
-	endIf
-	if self.GiftMenuCheckEnabled
-		self.RegisterForMenu(self.GIFT_MENU)
-	endIf
-	if self.MapMenuCheckEnabled
-		self.RegisterForMenu(self.MAP_MENU)
-	endIf
-	if self.FavoritesMenuCheckEnabled
-		self.RegisterForMenu(self.FAVORITES_MENU)
-	endIf
-	if self.CraftingMenuCheckEnabled
-		self.RegisterForMenu(self.CRAFTING_MENU)
-	endIf
-	self.RegisterForMenu(self.JOURNAL_MENU)
+	return CheckMenuVersion("skyui/itemcard.swf", a_menu, "_global.ItemCard") && \
+			CheckMenuVersion("skyui/bottombar.swf", a_menu, "_global.BottomBar") && \
+			CheckMenuVersion("skyui/inventorylists.swf", a_menu, "_global.InventoryLists")
 endFunction
-
-function OnInit()
-
-	self.OnGameReload()
-endFunction
-
-Bool function CheckItemMenuComponents(String a_menu)
-
-	return self.CheckMenuVersion("skyui/itemcard.swf", a_menu, "_global.ItemCard") && self.CheckMenuVersion("skyui/bottombar.swf", a_menu, "_global.BottomBar") && self.CheckMenuVersion("skyui/inventorylists.swf", a_menu, "_global.InventoryLists")
-endFunction
-
-; Skipped compiler generated GotoState
