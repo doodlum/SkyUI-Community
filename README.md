@@ -16,7 +16,7 @@
 Clone the repository with submodules:
 
 ```
-git clone --recursive https://github.com/AceVenturi/SkyUI-Community.git
+git clone --recursive https://github.com/doodlum/SkyUI-Community.git
 ```
 
 If you already cloned without `--recursive`, initialize the submodules with:
