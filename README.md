@@ -23,13 +23,7 @@ If you already cloned without `--recursive`, initialize the submodules with:
 git submodule update --init
 ```
 
-Set the `SkyrimSE_PATH` environment variable to your Skyrim SE installation directory:
-
-```
-set SkyrimSE_PATH=C:\Program Files (x86)\Steam\steamapps\common\Skyrim Special Edition
-```
-
-The build system expects Papyrus script sources at the following locations within your game directory:
+The build system expects Papyrus script sources at the following locations within your Skyrim SE game directory:
 
 | Path | Contents |
 |------|----------|
@@ -38,7 +32,13 @@ The build system expects Papyrus script sources at the following locations withi
 
 ### Building
 
-The easiest way to build is to double-click `Build.bat` after setting the environment variable.
+The easiest way to build is to double-click `Build.bat`. It will automatically detect your Skyrim SE installation via the Steam registry. If auto-detection fails, it will prompt you to enter the path manually.
+
+You can also set the `SkyrimSE_PATH` environment variable beforehand to skip the prompt:
+
+```
+set SkyrimSE_PATH=C:\Program Files (x86)\Steam\steamapps\common\Skyrim Special Edition
+```
 
 Alternatively, from the command line:
 
