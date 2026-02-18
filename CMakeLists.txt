@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.24)
 
 project(
 	SkyUI
-	VERSION 6.0.0
+	VERSION 6.0
 	LANGUAGES NONE
 )
 
@@ -85,6 +85,8 @@ if(FFDEC_CLI)
 					"-DSTAGING_DIR=${AS_STAGING}"
 					"-DSOURCES_FILE=${SOURCES_FILE}"
 					"-DAS_SOURCE_DIR=${AS_SOURCE_DIR}"
+					"-DPROJECT_VERSION_MAJOR=${PROJECT_VERSION_MAJOR}"
+					"-DPROJECT_VERSION_MINOR=${PROJECT_VERSION_MINOR}"
 					-P "${ASSEMBLE_SCRIPT}"
 				COMMAND "${FFDEC_CLI}" -importScript "${SWF_INPUT}" "${SWF_OUT}" "${AS_STAGING}"
 				COMMENT "Importing ActionScript files into ${SWF_REL}"

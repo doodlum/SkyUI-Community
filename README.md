@@ -68,30 +68,4 @@ Contributions are welcome! If you'd like to submit a bug fix or add new function
 
 ### Commit Messages
 
-This project uses [Conventional Commits](https://www.conventionalcommits.org/). Each commit message should be structured as:
-
-```
-<type>: <description>
-```
-
-Common types used in this project:
-
-| Type | Description |
-|------|-------------|
-| `fix` | A bug fix (correlates with a **patch** version bump) |
-| `feat` | A new feature or addition (correlates with a **minor** version bump) |
-| `build` | Changes to the build system or dependencies |
-| `docs` | Documentation-only changes |
-| `refactor` | Code changes that neither fix a bug nor add a feature |
-
-A commit with a breaking change should append `!` after the type (e.g., `fix!: ...` or `feat!: ...`), which correlates with a **major** version bump.
-
-### Versioning
-
-This project follows [Semantic Versioning](https://semver.org/). The version is defined in `CMakeLists.txt` under the `VERSION` field (currently `6.0.0`).
-
-When submitting a PR, update the version according to the type of change:
-
-- **Patch** (`6.0.0` → `6.0.1`) — Bug fixes and minor corrections that don't change existing behavior.
-- **Minor** (`6.0.0` → `6.1.0`) — New features or additions that are backward-compatible.
-- **Major** (`6.0.0` → `7.0.0`) — Breaking changes that alter existing behavior or remove functionality.
+This project uses [Conventional Commits](https://www.conventionalcommits.org/).
