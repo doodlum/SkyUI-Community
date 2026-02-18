@@ -11,6 +11,7 @@ set(quest_journal_SOURCES
     ${AS_SOURCE_DIR}/PauseMenu/QuestCenteredList.as
     ${AS_SOURCE_DIR}/PauseMenu/Quest_Journal.as
     ${AS_SOURCE_DIR}/PauseMenu/QuestsPage.as
+    ${AS_SOURCE_DIR}/PauseMenu/SaveLoadPanel.as
     ${AS_SOURCE_DIR}/PauseMenu/SettingsOptionItem.as
     ${AS_SOURCE_DIR}/PauseMenu/StatsList.as
     ${AS_SOURCE_DIR}/PauseMenu/StatsPage.as
