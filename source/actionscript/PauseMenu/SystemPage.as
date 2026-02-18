@@ -161,15 +161,17 @@ class SystemPage extends MovieClip
    function startPage()
    {
       this.CategoryList.disableInput = false;
+         
+      gfx.io.GameDelegate.call("SetVersionText",[this.VersionText]);
+      _loc2_ = this.VersionText.text.split(".");
+      this._skyrimVersion = _loc2_[0];
+      this._skyrimVersionMinor = _loc2_[1];
+      this._skyrimVersionBuild = _loc2_[2];
+
       var _loc2_;
       if(!this.bUpdated)
       {
          this.currentState = SystemPage.MAIN_STATE;
-         gfx.io.GameDelegate.call("SetVersionText",[this.VersionText]);
-         _loc2_ = this.VersionText.text.split(".");
-         this._skyrimVersion = _loc2_[0];
-         this._skyrimVersionMinor = _loc2_[1];
-         this._skyrimVersionBuild = _loc2_[2];
          gfx.io.GameDelegate.call("ShouldShowKinectTunerOption",[],this,"SetShouldShowKinectTunerOption");
          this.UpdatePermissions();
          this.bUpdated = true;
