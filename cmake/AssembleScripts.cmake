@@ -31,6 +31,23 @@ foreach(SRC ${SOURCES})
 		get_filename_component(DST_DIR "${DST}" DIRECTORY)
 		file(MAKE_DIRECTORY "${DST_DIR}")
 		file(COPY_FILE "${SRC}" "${DST}")
+
+		# Patch version numbers in SkyUISplash.as to match the project version
+		get_filename_component(DST_NAME "${DST}" NAME)
+		if(DST_NAME STREQUAL "SkyUISplash.as"
+				AND DEFINED PROJECT_VERSION_MAJOR
+				AND DEFINED PROJECT_VERSION_MINOR)
+			file(READ "${DST}" _SPLASH_CONTENT)
+			string(REGEX REPLACE
+				"(SKYUI_VERSION_MAJOR[ \t]*=[ \t]*)[0-9]+"
+				"\\1${PROJECT_VERSION_MAJOR}"
+				_SPLASH_CONTENT "${_SPLASH_CONTENT}")
+			string(REGEX REPLACE
+				"(SKYUI_VERSION_MINOR[ \t]*=[ \t]*)[0-9]+"
+				"\\1${PROJECT_VERSION_MINOR}"
+				_SPLASH_CONTENT "${_SPLASH_CONTENT}")
+			file(WRITE "${DST}" "${_SPLASH_CONTENT}")
+		endif()
 	else()
 		message(WARNING "Source not found: ${SRC}")
 	endif()
