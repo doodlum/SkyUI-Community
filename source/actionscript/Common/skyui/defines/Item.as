@@ -1,0 +1,66 @@
+class skyui.defines.Item
+{
+   static var OTHER = undefined;
+   static var POTION_HEALTH = 0;
+   static var POTION_HEALRATE = 1;
+   static var POTION_HEALRATEMULT = 2;
+   static var POTION_MAGICKA = 3;
+   static var POTION_MAGICKARATE = 4;
+   static var POTION_MAGICKARATEMULT = 5;
+   static var POTION_STAMINA = 6;
+   static var POTION_STAMINARATE = 7;
+   static var POTION_STAMINARATEMULT = 8;
+   static var POTION_FIRERESIST = 9;
+   static var POTION_ELECTRICRESIST = 10;
+   static var POTION_FROSTRESIST = 11;
+   static var POTION_POTION = 12;
+   static var POTION_DRINK = 13;
+   static var POTION_FOOD = 14;
+   static var POTION_POISON = 15;
+   static var MISC_GEM = 0;
+   static var MISC_DRAGONCLAW = 1;
+   static var MISC_ARTIFACT = 2;
+   static var MISC_LEATHER = 3;
+   static var MISC_LEATHERSTRIPS = 4;
+   static var MISC_HIDE = 5;
+   static var MISC_REMAINS = 6;
+   static var MISC_INGOT = 7;
+   static var MISC_TOOL = 8;
+   static var MISC_CHILDRENSCLOTHES = 9;
+   static var MISC_TOY = 10;
+   static var MISC_FIREWOOD = 11;
+   static var MISC_FASTENER = 12;
+   static var MISC_WEAPONRACK = 13;
+   static var MISC_SHELF = 14;
+   static var MISC_FURNITURE = 15;
+   static var MISC_EXTERIOR = 16;
+   static var MISC_CONTAINER = 17;
+   static var MISC_HOUSEPART = 18;
+   static var MISC_CLUTTER = 19;
+   static var MISC_LOCKPICK = 20;
+   static var MISC_GOLD = 21;
+   static var BOOK_SPELLTOME = 0;
+   static var BOOK_NOTE = 1;
+   static var BOOK_RECIPE = 2;
+   static var BOOKFLAG_SPELL = 1;
+   static var BOOKFLAG_SKILL = 4;
+   static var BOOKFLAG_READ = 8;
+   static var BOOKTYPE_NOTE = 255;
+   static var ALCHFLAG_MANUALCALC = 1;
+   static var ALCHFLAG_FOOD = 2;
+   static var ALCHFLAG_MEDICINE = 65536;
+   static var ALCHFLAG_POISON = 131072;
+   static var SOULGEMSTATUS_EMPTY = 0;
+   static var SOULGEMSTATUS_PARTIAL = 1;
+   static var SOULGEMSTATUS_FULL = 2;
+   static var SOULGEM_NONE = 0;
+   static var SOULGEM_PETTY = 1;
+   static var SOULGEM_LESSER = 2;
+   static var SOULGEM_COMMON = 3;
+   static var SOULGEM_GREATER = 4;
+   static var SOULGEM_GRAND = 5;
+   static var SOULGEM_AZURA = 6;
+   function Item()
+   {
+   }
+}

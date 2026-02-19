@@ -2,6 +2,39 @@
 # Auto-generated from SWF decompilation
 
 set(skyui_inventorylists_SOURCES
+    ${AS_SOURCE_DIR}/Common/Components/CrossPlatformButtons.as
+    ${AS_SOURCE_DIR}/Common/Shared/ButtonChange.as
+    ${AS_SOURCE_DIR}/Common/Shared/GlobalFunc.as
+    ${AS_SOURCE_DIR}/Common/skyui/components/SearchWidget.as
+    ${AS_SOURCE_DIR}/Common/skyui/components/TabBar.as
+    ${AS_SOURCE_DIR}/Common/skyui/components/dialog/BasicDialog.as
+    ${AS_SOURCE_DIR}/Common/skyui/components/dialog/ColumnSelectDialog.as
+    ${AS_SOURCE_DIR}/Common/skyui/components/list/BSList.as
+    ${AS_SOURCE_DIR}/Common/skyui/components/list/BasicEnumeration.as
+    ${AS_SOURCE_DIR}/Common/skyui/components/list/BasicList.as
+    ${AS_SOURCE_DIR}/Common/skyui/components/list/BasicListEntry.as
+    ${AS_SOURCE_DIR}/Common/skyui/components/list/ButtonList.as
+    ${AS_SOURCE_DIR}/Common/skyui/components/list/ButtonListEntry.as
+    ${AS_SOURCE_DIR}/Common/skyui/components/list/ColumnDescriptor.as
+    ${AS_SOURCE_DIR}/Common/skyui/components/list/ColumnLayoutData.as
+    ${AS_SOURCE_DIR}/Common/skyui/components/list/EntryClipManager.as
+    ${AS_SOURCE_DIR}/Common/skyui/components/list/FilteredEnumeration.as
+    ${AS_SOURCE_DIR}/Common/skyui/components/list/IEntryEnumeration.as
+    ${AS_SOURCE_DIR}/Common/skyui/components/list/IListProcessor.as
+    ${AS_SOURCE_DIR}/Common/skyui/components/list/ListLayout.as
+    ${AS_SOURCE_DIR}/Common/skyui/components/list/ListState.as
+    ${AS_SOURCE_DIR}/Common/skyui/components/list/ScrollingList.as
+    ${AS_SOURCE_DIR}/Common/skyui/components/list/SortedListHeader.as
+    ${AS_SOURCE_DIR}/Common/skyui/components/list/TabularList.as
+    ${AS_SOURCE_DIR}/Common/skyui/components/list/TabularListEntry.as
+    ${AS_SOURCE_DIR}/Common/skyui/defines/Input.as
+    ${AS_SOURCE_DIR}/Common/skyui/filter/IFilter.as
+    ${AS_SOURCE_DIR}/Common/skyui/filter/ItemTypeFilter.as
+    ${AS_SOURCE_DIR}/Common/skyui/filter/NameFilter.as
+    ${AS_SOURCE_DIR}/Common/skyui/filter/SortFilter.as
+    ${AS_SOURCE_DIR}/Common/skyui/util/ConfigManager.as
+    ${AS_SOURCE_DIR}/Common/skyui/util/DialogManager.as
+    ${AS_SOURCE_DIR}/Common/skyui/util/GlobalFunctions.as
     ${AS_SOURCE_DIR}/ItemMenus/CategoryList.as
     ${AS_SOURCE_DIR}/ItemMenus/CategoryListEntry.as
     ${AS_SOURCE_DIR}/ItemMenus/InventoryListEntry.as

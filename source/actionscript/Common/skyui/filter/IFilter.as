@@ -1,0 +1,3 @@
+interface skyui.filter.IFilter
+{
+}
