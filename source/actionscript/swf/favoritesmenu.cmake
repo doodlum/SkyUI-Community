@@ -21,6 +21,7 @@ set(favoritesmenu_SOURCES
     ${AS_SOURCE_DIR}/Common/skyui/components/list/BSList.as
     ${AS_SOURCE_DIR}/Common/skyui/components/list/BasicEnumeration.as
     ${AS_SOURCE_DIR}/Common/skyui/components/list/BasicList.as
+    # ${AS_SOURCE_DIR}/Common/skyui/components/list/BasicListEntry.as
     ${AS_SOURCE_DIR}/Common/skyui/components/list/EntryClipManager.as
     ${AS_SOURCE_DIR}/Common/skyui/components/list/FilteredEnumeration.as
     ${AS_SOURCE_DIR}/Common/skyui/components/list/IEntryEnumeration.as

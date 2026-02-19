@@ -57,6 +57,12 @@ The build produces `release/SkyUI_SE-<version>.zip` containing:
 - `SkyUI_SE.esp` - Plugin file
 - `SkyUI_SE.bsa` - Archive containing compiled Papyrus scripts and all interface files
 
+## Known Issues
+
+### `Common/skyui/components/list/BasicListEntry.as`
+
+This file has been intentionally excluded from all SWF build targets. Including it causes the Mod Configuration Menu to break. It is present in the source tree for reference only and should not be added back to any `.cmake` source list.
+
 ## Contributing
 
 Contributions are welcome! If you'd like to submit a bug fix or add new functionality, please follow these steps:
