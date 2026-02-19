@@ -146,6 +146,7 @@ def main():
         596: 358,  # DefineEditTextTag (TitleText)
         597: 359,  # DefineSpriteTag  (CreationTextPanel content)
         598: 360,  # DefineSpriteTag  (CreationTextPanel wrapper, 20-frame animated)
+        668: 361,  # DefineSpriteTag  (ButtonMapping 0-frame class sprite)
         # Characters already in SkyUI (remap references to SkyUI's versions)
         471: 161,  # JournalScrollBar -> SkyUI's ScrollBar
         520: 202,  # ButtonArtHolder  -> SkyUI's ButtonArtHolder
@@ -158,14 +159,31 @@ def main():
         438: 204,  # $EverywhereMediumFont
     }
 
-    # Characters to copy from the before SWF (original IDs)
-    chars_to_copy = {137, 138, 510, 511, 512, 513, 514, 515, 591, 595, 596, 597, 598}
+    # Character definition tags to copy from the before SWF (original IDs)
+    chars_to_copy = {137, 138, 510, 511, 512, 513, 514, 515, 591, 595, 596, 597, 598, 668}
     def_id_attribs = ('shapeId', 'spriteId', 'characterID')
 
-    # Collect tags to copy from before.xml (skip DoInitActionTag - handled by ffdec importScript)
+    # DoInitActionTag sprite IDs to copy from the before SWF:
+    #   511 -> 351  Object.registerClass("cScrollableText", gfx.controls.TextArea)
+    #   515 -> 355  Object.registerClass("CreationList", Shared.BSScrollingList)
+    #   668 -> 361  Shared.ButtonMapping class implementation
+    # ffdec importScript will update these with our compiled ActionScript source.
+    init_actions_to_copy = {511, 515, 668}
+
+    # Collect tags to copy from before.xml
     tags_to_insert = []
     for item in before_tags:
         if item.get('type') == 'DoInitActionTag':
+            # Selectively copy DoInitActionTag entries needed for class registration
+            sid = item.get('spriteId')
+            if sid is not None:
+                try:
+                    if int(sid) in init_actions_to_copy:
+                        new_item = copy.deepcopy(item)
+                        remap_element(new_item, id_remap, font_remap)
+                        tags_to_insert.append(new_item)
+                except ValueError:
+                    pass
             continue
         for attr in def_id_attribs:
             val = item.get(attr)
@@ -179,7 +197,7 @@ def main():
                 except ValueError:
                     pass
 
-    print(f"Copying {len(tags_to_insert)} character tags from before SWF...")
+    print(f"Copying {len(tags_to_insert)} tags from before SWF...")
 
     # Find insertion point: before the first __Packages ExportAssetsTag
     # (which marks the start of the AS2 class definitions section)
@@ -200,12 +218,16 @@ def main():
     for j, new_item in enumerate(tags_to_insert):
         input_tags.insert(insert_idx + j, new_item)
 
-    # Insert ExportAssetsTag entries for the two new exported sprites
+    # Insert ExportAssetsTag entries:
+    #   "cScrollableText" and "CreationList" are sprite-level exports (matched by name at root)
+    #   "__Packages.Shared.ButtonMapping" is a class-level export (matched by __Packages path)
     export_offset = insert_idx + len(tags_to_insert)
     input_tags.insert(export_offset,     make_export_assets(351, 'cScrollableText'))
     input_tags.insert(export_offset + 1, make_export_assets(355, 'CreationList'))
+    input_tags.insert(export_offset + 2, make_export_assets(361, '__Packages.Shared.ButtonMapping'))
 
-    print("Added ExportAssets for cScrollableText (351) and CreationList (355)...")
+    print("Added ExportAssets for cScrollableText (351), CreationList (355), "
+          "and __Packages.Shared.ButtonMapping (361)...")
 
     # Add PlaceObject2 entries to SystemPage sprite (spriteId=275)
     system_page = None
