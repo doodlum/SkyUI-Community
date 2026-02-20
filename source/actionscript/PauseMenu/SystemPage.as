@@ -115,7 +115,30 @@ class SystemPage extends MovieClip
       this.CategoryList.entryList.push({text:"$QUICKSAVE"});
       this.CategoryList.entryList.push({text:"$SAVE"});
       this.CategoryList.entryList.push({text:"$LOAD"});
-      this.CategoryList.entryList.push({text:"$INSTALLED CONTENT"});
+
+      gfx.io.GameDelegate.call("SetVersionText",[this.VersionText]);
+
+      var _loc2_;
+      var _loc3_;
+      var _loc4_;
+      var _loc5_;
+
+      _loc2_ = this.VersionText.text.split(".");
+      this._skyrimVersion = _loc2_[0];
+      this._skyrimVersionMinor = _loc2_[1];
+      this._skyrimVersionBuild = _loc2_[2];
+
+      _loc3_ = parseInt(this._skyrimVersion);
+      _loc4_ = parseInt(this._skyrimVersionMinor);
+      _loc5_ = parseInt(this._skyrimVersionBuild);
+      
+      if(_loc3_ > 1 || _loc3_ == 1 && _loc4_ > 6 || _loc3_ == 1 && _loc4_ == 6 && _loc5_ > 1130)
+      {
+         this.CategoryList.entryList.push({text:"$INSTALLED CONTENT"});
+      } else {
+         this.CategoryList.entryList.push({text:"$INSTALLED CONTENT", disabled: true});
+      }
+
       this.CategoryList.entryList.push({text:"$SETTINGS"});
       this.CategoryList.entryList.push({text:"$MOD CONFIGURATION"});
       this.CategoryList.entryList.push({text:"$CONTROLS"});
