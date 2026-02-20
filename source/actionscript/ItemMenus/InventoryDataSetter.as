@@ -121,15 +121,10 @@ class InventoryDataSetter extends ItemcardDataExtender
          a_entryObject.material = skyui.defines.Material.DAEDRIC;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Daedric");
       }
-      else if(a_entryObject.keywords.ArmorMaterialDragonplate != undefined)
+      else if(a_entryObject.keywords.ArmorMaterialDragonplate != undefined || a_entryObject.keywords.ArmorMaterialDragonscale != undefined)
       {
-         a_entryObject.material = skyui.defines.Material.DRAGONPLATE;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Dragonplate");
-      }
-      else if(a_entryObject.keywords.ArmorMaterialDragonscale != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.DRAGONSCALE;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Dragonscale");
+         a_entryObject.material = skyui.defines.Material.DRAGON;
+         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Dragon");
       }
       else if(a_entryObject.keywords.ArmorMaterialDwarven != undefined || a_entryObject.keywords.WeapMaterialDwarven != undefined)
       {
