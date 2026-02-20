@@ -2,6 +2,7 @@
 # Auto-generated from SWF decompilation
 
 set(map_SOURCES
+    ${AS_SOURCE_DIR}/Common/skyui/defines/Input.as
     ${AS_SOURCE_DIR}/MapMenu/Map/LocalMap.as
     ${AS_SOURCE_DIR}/MapMenu/Map/LocationFinder.as
     ${AS_SOURCE_DIR}/MapMenu/Map/LocationListEntry.as

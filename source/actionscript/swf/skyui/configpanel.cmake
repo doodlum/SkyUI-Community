@@ -2,6 +2,7 @@
 # Auto-generated from SWF decompilation
 
 set(skyui_configpanel_SOURCES
+    ${AS_SOURCE_DIR}/Common/skyui/defines/Input.as
     ${AS_SOURCE_DIR}/ModConfigPanel/ColorDialog.as
     ${AS_SOURCE_DIR}/ModConfigPanel/ConfigPanel.as
     ${AS_SOURCE_DIR}/ModConfigPanel/MenuDialog.as

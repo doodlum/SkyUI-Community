@@ -2,6 +2,15 @@
 # Auto-generated from SWF decompilation
 
 set(bartermenu_SOURCES
+    ${AS_SOURCE_DIR}/Common/skyui/defines/Actor.as
+    ${AS_SOURCE_DIR}/Common/skyui/defines/Armor.as
+    ${AS_SOURCE_DIR}/Common/skyui/defines/Form.as
+    ${AS_SOURCE_DIR}/Common/skyui/defines/Input.as
+    ${AS_SOURCE_DIR}/Common/skyui/defines/Inventory.as
+    ${AS_SOURCE_DIR}/Common/skyui/defines/Item.as
+    ${AS_SOURCE_DIR}/Common/skyui/defines/Magic.as
+    ${AS_SOURCE_DIR}/Common/skyui/defines/Material.as
+    ${AS_SOURCE_DIR}/Common/skyui/defines/Weapon.as
     ${AS_SOURCE_DIR}/ItemMenus/BarterDataSetter.as
     ${AS_SOURCE_DIR}/ItemMenus/BarterMenu.as
     ${AS_SOURCE_DIR}/ItemMenus/BottomBar.as

@@ -2,6 +2,7 @@
 # Auto-generated from SWF decompilation
 
 set(quest_journal_SOURCES
+    ${AS_SOURCE_DIR}/Common/skyui/defines/Input.as
     ${AS_SOURCE_DIR}/PauseMenu/InputMappingArt.as
     ${AS_SOURCE_DIR}/PauseMenu/InputMappingList.as
     ${AS_SOURCE_DIR}/PauseMenu/JournalBottomBar.as
