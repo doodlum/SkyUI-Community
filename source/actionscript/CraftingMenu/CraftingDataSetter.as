@@ -127,7 +127,7 @@ class CraftingDataSetter implements skyui.components.list.IListProcessor
       {
          return undefined;
       }
-      if(a_entryObject.keywords.ArmorMaterialDaedric != undefined || a_entryObject.keywords.WeapMaterialDaedric != undefined)
+      if(a_entryObject.keywords.ArmorMaterialDaedric != undefined || a_entryObject.keywords.WeapMaterialDaedric != undefined || a_entryObject.keywords.ccBGSSSE025_ArmorMaterialDark != undefined || a_entryObject.keywords.ccBGSSSE025_WeapMaterialDark != undefined || a_entryObject.keywords.ccBGSSSE025_ArmorMaterialGolden != undefined || a_entryObject.keywords.ccBGSSSE025_WeapMaterialGolden != undefined)
       {
          a_entryObject.material = skyui.defines.Material.DAEDRIC;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Daedric");
@@ -202,7 +202,7 @@ class CraftingDataSetter implements skyui.components.list.IListProcessor
          a_entryObject.material = skyui.defines.Material.LEATHER;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Leather");
       }
-      else if(a_entryObject.keywords.ArmorMaterialOrcish != undefined || a_entryObject.keywords.WeapMaterialOrcish != undefined)
+      else if(a_entryObject.keywords.ArmorMaterialOrcish != undefined || a_entryObject.keywords.WeapMaterialOrcish != undefined || a_entryObject.keywords.ccBGSSSE055_ArmorMaterialOrcishLight != undefined)
       {
          a_entryObject.material = skyui.defines.Material.ORCISH;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Orcish");
@@ -317,20 +317,15 @@ class CraftingDataSetter implements skyui.components.list.IListProcessor
          a_entryObject.material = skyui.defines.Material.WOOD;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Wood");
       }
+      else if(a_entryObject.keywords.ccASVSSE001_ArmorOrdinator != undefined || a_entryObject.keywords.ccASVSSE001_ArmorOrdinatorIndoril != undefined)
+      {
+         a_entryObject.material = skyui.defines.Material.ORDINATOR;
+         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Ordinator");
+      }
       else if(a_entryObject.keywords.ccBGSSSE025_ArmorMaterialAmber != undefined || a_entryObject.keywords.ccBGSSSE025_WeapMaterialAmber != undefined)
       {
          a_entryObject.material = skyui.defines.Material.AMBER;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Amber");
-      }
-      else if(a_entryObject.keywords.ccBGSSSE025_ArmorMaterialDark != undefined || a_entryObject.keywords.ccBGSSSE025_WeapMaterialDark != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.DARK;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Dark");
-      }
-      else if(a_entryObject.keywords.ccBGSSSE025_ArmorMaterialGolden != undefined || a_entryObject.keywords.ccBGSSSE025_WeapMaterialGolden != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.GOLDEN;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Golden");
       }
       else if(a_entryObject.keywords.ccBGSSSE025_ArmorMaterialMadness != undefined || a_entryObject.keywords.ccBGSSSE025_WeapMaterialMadness != undefined)
       {

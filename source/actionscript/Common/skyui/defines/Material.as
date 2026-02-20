@@ -48,6 +48,7 @@ class skyui.defines.Material
    static var DARK = 45;
    static var GOLDEN = 46;
    static var MADNESS = 47;
+   static var ORDINATOR = 48;
    function Material()
    {
    }
