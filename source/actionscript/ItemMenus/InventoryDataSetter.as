@@ -517,6 +517,12 @@ class InventoryDataSetter extends ItemcardDataExtender
          case skyui.defines.Form.BASEID_DLC1CLOTHESVAMPIRELORDARMOR:
             a_entryObject.subType = skyui.defines.Armor.EQUIP_BODY;
             a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Body");
+            break;
+         case skyui.defines.Form.BASEID_CC025ADVDSGSRING:
+            a_entryObject.weightClass = skyui.defines.Armor.WEIGHT_JEWELRY;
+            a_entryObject.weightClassDisplay = skyui.util.Translator.translate("$Jewelry");
+            a_entryObject.subType = skyui.defines.Armor.EQUIP_RING;
+            a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Ring");
          default:
             return;
       }
