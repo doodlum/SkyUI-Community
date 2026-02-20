@@ -133,25 +133,24 @@ def main():
     # New characters are assigned IDs starting at 348 (after SkyUI's max of 347)
     id_remap = {
         # New characters (copied from before SWF, assigned new IDs)
+        510: 350,  # DefineEditTextTag (cScrollableText text field)
         511: 351,  # DefineSpriteTag  (cScrollableText) -> exported as "cScrollableText"
                #                    charId=251 has "Normal" (A=83, dim) and "Selected" (A=255, bright)
                #                    frame labels with a plain textField child, matching the
                #                    alpha-dimming pattern used throughout this SWF for list highlights.
         515: 355,  # DefineSpriteTag  (CreationList) -> exported as "CreationList"
         595: 357,  # DefineSpriteTag  (CreationListPanel, 20-frame animated)
+        597: 359,  # DefineSpriteTag  (CreationTextPanel content)
         598: 360,  # DefineSpriteTag  (CreationTextPanel wrapper, 20-frame animated)
         668: 361,  # DefineSpriteTag  (ButtonMapping 0-frame class sprite)
-
         # Characters already in SkyUI (remap references to SkyUI's versions)
         471: 161,  # JournalScrollBar -> SkyUI's ScrollBar
         520: 202,  # ButtonArtHolder  -> SkyUI's ButtonArtHolder
         137: 129,  # DefineShape4Tag  (background rect shape)
         138: 130,  # DefineSpriteTag  (background rect sprite wrapper)
-        596: 272,  # DefineEditTextTag (TitleText)
-        510: 198,  # DefineEditTextTag (cScrollableText text field)
         591: 271,  # DefineShapeTag   (decorative shape)
-        597: 273,  # DefineSpriteTag  (CreationTextPanel content)
         514: 206,  # DefineSpriteTag  (list entry) -> use SkyUI's SettingsCategoryList item renderer
+        596: 272,  # DefineEditTextTag (TitleText)
     }
 
     # Font ID remapping: before font IDs -> SkyUI's _sans font (ID 204)
@@ -168,7 +167,7 @@ def main():
     # "Normal" (A=83, dimmed) and "Selected" (A=255, bright) frame labels plus
     # a plain textField child — the same alpha-dimming highlight pattern used
     # throughout the SWF, matching Bethesda's original mechanism.
-    chars_to_copy = {511, 515, 595, 598, 668} 
+    chars_to_copy = {510, 511, 515, 595, 597, 598, 668}
     def_id_attribs = ('shapeId', 'spriteId', 'characterID')
 
     # DoInitActionTag sprite IDs to copy from the before SWF:
