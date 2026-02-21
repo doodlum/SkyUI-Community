@@ -543,10 +543,6 @@ class InventoryDataSetter extends ItemcardDataExtender
          case skyui.defines.Form.BASEID_DWARVENSPHEREBOLT01:
          case skyui.defines.Form.BASEID_DWARVENSPHEREBOLT02:
          case skyui.defines.Form.BASEID_DLC2DWARVENBALLISTABOLT:
-         case skyui.defines.Form.BASEID_DLC1BOLTDWARVEN:
-         case skyui.defines.Form.BASEID_DLC1BOLTDWARVENEXPLODINGFIRE:
-         case skyui.defines.Form.BASEID_DLC1BOLTDWARVENEXPLODINGICE:
-         case skyui.defines.Form.BASEID_DLC1BOLTDWARVENEXPLODINGSHOCK:
             a_entryObject.material = skyui.defines.Material.DWARVEN;
             a_entryObject.materialDisplay = skyui.util.Translator.translate("$Dwarven");
             break;
@@ -555,7 +551,6 @@ class InventoryDataSetter extends ItemcardDataExtender
             a_entryObject.materialDisplay = skyui.util.Translator.translate("$Orcish");
             break;
          case skyui.defines.Form.BASEID_NORDHEROARROW:
-         case skyui.defines.Form.BASEID_DLC2NORDICARROW:
             a_entryObject.material = skyui.defines.Material.NORDIC;
             a_entryObject.materialDisplay = skyui.util.Translator.translate("$Nordic");
             break;
@@ -566,21 +561,9 @@ class InventoryDataSetter extends ItemcardDataExtender
          case skyui.defines.Form.BASEID_STEELARROW:
          case skyui.defines.Form.BASEID_MQ101STEELARROW:
          case skyui.defines.Form.BASEID_DRAUGRARROW:
-         case skyui.defines.Form.BASEID_DLC1BOLTSTEEL:
-         case skyui.defines.Form.BASEID_DLC1BOLTSTEELEXPLODINGFIRE:
-         case skyui.defines.Form.BASEID_DLC1BOLTSTEELEXPLODINGICE:
-         case skyui.defines.Form.BASEID_DLC1BOLTSTEELEXPLODINGSHOCK:
          case skyui.defines.Form.BASEID_DUNGEIRMUNDSIGDISARROWSILLUSION:
             a_entryObject.material = skyui.defines.Material.STEEL;
             a_entryObject.materialDisplay = skyui.util.Translator.translate("$Steel");
-            break;
-         case skyui.defines.Form.BASEID_DLC2STALHRIMARROW:
-            a_entryObject.material = skyui.defines.Material.STALHRIM;
-            a_entryObject.materialDisplay = skyui.util.Translator.translate("$Stalhrim");
-            break;
-         case skyui.defines.Form.BASEID_DLC1DRAGONBONEARROW:
-            a_entryObject.material = skyui.defines.Material.DRAGON;
-            a_entryObject.materialDisplay = skyui.util.Translator.translate("$Dragon");
             break;
          case skyui.defines.Form.BASEID_IRONARROW:
          case skyui.defines.Form.BASEID_CWARROW:
