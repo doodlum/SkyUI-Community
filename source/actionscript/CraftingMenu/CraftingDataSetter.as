@@ -177,11 +177,6 @@ class CraftingDataSetter implements skyui.components.list.IListProcessor
          a_entryObject.material = skyui.defines.Material.LEATHER;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Leather");
       }
-      else if(a_entryObject.keywords.ArmorClothing != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.CLOTHING;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Clothing");
-      }
       else if(a_entryObject.keywords.ArmorJewelry != undefined)
       {
          a_entryObject.material = skyui.defines.Material.JEWELRY;
@@ -246,6 +241,11 @@ class CraftingDataSetter implements skyui.components.list.IListProcessor
       {
          a_entryObject.material = skyui.defines.Material.MADNESS;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Madness");
+      }
+      else if(a_entryObject.keywords.ArmorClothing != undefined)
+      {
+         a_entryObject.material = skyui.defines.Material.CLOTHING;
+         a_entryObject.materialDisplay = null;
       }
    }
    function processWeaponType(a_entryObject)
