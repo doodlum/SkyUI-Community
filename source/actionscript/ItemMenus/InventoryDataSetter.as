@@ -161,11 +161,6 @@ class InventoryDataSetter extends ItemcardDataExtender
          a_entryObject.material = skyui.defines.Material.IRON;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Iron");
       }
-      else if(a_entryObject.keywords.DLC1ArmorMaterialVampire != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.VAMPIRE;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Vampire");
-      }
       else if(a_entryObject.keywords.ArmorMaterialLeather != undefined)
       {
          a_entryObject.material = skyui.defines.Material.LEATHER;
@@ -405,6 +400,10 @@ class InventoryDataSetter extends ItemcardDataExtender
             a_entryObject.subType = skyui.defines.Armor.EQUIP_TAIL;
             a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Tail");
             return;
+         case skyui.defines.Armor.PARTMASK_BACKPACK:
+            a_entryObject.subType = skyui.defines.Armor.EQUIP_BACKPACK;
+            a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Backpack");
+            return;
          default:
             a_entryObject.subType = a_entryObject.mainPartMask;
             return;
@@ -428,6 +427,7 @@ class InventoryDataSetter extends ItemcardDataExtender
          case skyui.defines.Armor.PARTMASK_CALVES:
          case skyui.defines.Armor.PARTMASK_SHIELD:
          case skyui.defines.Armor.PARTMASK_TAIL:
+         case skyui.defines.Armor.PARTMASK_BACKPACK:
             a_entryObject.weightClass = skyui.defines.Armor.WEIGHT_CLOTHING;
             a_entryObject.weightClassDisplay = skyui.util.Translator.translate("$Clothing");
             break;

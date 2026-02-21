@@ -22,7 +22,7 @@ class skyui.defines.Armor
    static var PARTMASK_UNNAMED14 = 16384;
    static var PARTMASK_UNNAMED15 = 32768;
    static var PARTMASK_UNNAMED16 = 65536;
-   static var PARTMASK_UNNAMED17 = 131072;
+   static var PARTMASK_BACKPACK = 131072;
    static var PARTMASK_UNNAMED18 = 262144;
    static var PARTMASK_UNNAMED19 = 524288;
    static var PARTMASK_DECAPITATEHEAD = 1048576;
@@ -37,7 +37,7 @@ class skyui.defines.Armor
    static var PARTMASK_UNNAMED29 = 536870912;
    static var PARTMASK_UNNAMED30 = 1073741824;
    static var PARTMASK_FX01 = 2147483648;
-   static var PARTMASK_PRECEDENCE = [skyui.defines.Armor.PARTMASK_BODY,skyui.defines.Armor.PARTMASK_HAIR,skyui.defines.Armor.PARTMASK_HANDS,skyui.defines.Armor.PARTMASK_FOREARMS,skyui.defines.Armor.PARTMASK_FEET,skyui.defines.Armor.PARTMASK_CALVES,skyui.defines.Armor.PARTMASK_SHIELD,skyui.defines.Armor.PARTMASK_AMULET,skyui.defines.Armor.PARTMASK_RING,skyui.defines.Armor.PARTMASK_LONGHAIR,skyui.defines.Armor.PARTMASK_EARS,skyui.defines.Armor.PARTMASK_HEAD,skyui.defines.Armor.PARTMASK_CIRCLET,skyui.defines.Armor.PARTMASK_TAIL,skyui.defines.Armor.PARTMASK_UNNAMED14,skyui.defines.Armor.PARTMASK_UNNAMED15,skyui.defines.Armor.PARTMASK_UNNAMED16,skyui.defines.Armor.PARTMASK_UNNAMED17,skyui.defines.Armor.PARTMASK_UNNAMED18,skyui.defines.Armor.PARTMASK_UNNAMED19,skyui.defines.Armor.PARTMASK_DECAPITATEHEAD,skyui.defines.Armor.PARTMASK_DECAPITATE,skyui.defines.Armor.PARTMASK_UNNAMED22,skyui.defines.Armor.PARTMASK_UNNAMED23,skyui.defines.Armor.PARTMASK_UNNAMED24,skyui.defines.Armor.PARTMASK_UNNAMED25,skyui
+   static var PARTMASK_PRECEDENCE = [skyui.defines.Armor.PARTMASK_BODY,skyui.defines.Armor.PARTMASK_HAIR,skyui.defines.Armor.PARTMASK_HANDS,skyui.defines.Armor.PARTMASK_FOREARMS,skyui.defines.Armor.PARTMASK_FEET,skyui.defines.Armor.PARTMASK_CALVES,skyui.defines.Armor.PARTMASK_SHIELD,skyui.defines.Armor.PARTMASK_AMULET,skyui.defines.Armor.PARTMASK_RING,skyui.defines.Armor.PARTMASK_LONGHAIR,skyui.defines.Armor.PARTMASK_EARS,skyui.defines.Armor.PARTMASK_HEAD,skyui.defines.Armor.PARTMASK_CIRCLET,skyui.defines.Armor.PARTMASK_TAIL,skyui.defines.Armor.PARTMASK_UNNAMED14,skyui.defines.Armor.PARTMASK_UNNAMED15,skyui.defines.Armor.PARTMASK_UNNAMED16,skyui.defines.Armor.PARTMASK_BACKPACK,skyui.defines.Armor.PARTMASK_UNNAMED18,skyui.defines.Armor.PARTMASK_UNNAMED19,skyui.defines.Armor.PARTMASK_DECAPITATEHEAD,skyui.defines.Armor.PARTMASK_DECAPITATE,skyui.defines.Armor.PARTMASK_UNNAMED22,skyui.defines.Armor.PARTMASK_UNNAMED23,skyui.defines.Armor.PARTMASK_UNNAMED24,skyui.defines.Armor.PARTMASK_UNNAMED25,skyui
    .defines.Armor.PARTMASK_UNNAMED26,skyui.defines.Armor.PARTMASK_UNNAMED27,skyui.defines.Armor.PARTMASK_UNNAMED28,skyui.defines.Armor.PARTMASK_UNNAMED29,skyui.defines.Armor.PARTMASK_UNNAMED30,skyui.defines.Armor.PARTMASK_FX01];
    static var EQUIP_HEAD = 0;
    static var EQUIP_HAIR = 1;
@@ -53,6 +53,7 @@ class skyui.defines.Armor
    static var EQUIP_EARS = 11;
    static var EQUIP_RING = 12;
    static var EQUIP_TAIL = 13;
+   static var EQUIP_BACKPACK = 14;
    function Armor()
    {
    }
