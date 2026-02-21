@@ -1,0 +1,2194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+	<id>com.jpexs.decompiler.flash</id>
+	<name>JPEXS Free Flash Decompiler</name>
+	<developer id="com.jpexs">
+		<name>Jindra Petřík and contributors</name>
+	</developer>
+	<summary>Decompile and edit SWF files</summary>
+	<launchable type="desktop-id">com.jpexs.decompiler.flash.desktop</launchable>
+	<metadata_license>CC0-1.0</metadata_license>
+	<project_license>GPL-3.0-or-later</project_license>
+	<url type="homepage">https://github.com/jindrapetrik/jpexs-decompiler/wiki</url>
+	<url type="bugtracker">https://www.free-decompiler.com/flash/issues</url>
+	<url type="vcs-browser">https://github.com/jindrapetrik/jpexs-decompiler</url>
+	<url type="contribute">https://github.com/jindrapetrik/jpexs-decompiler/blob/master/CONTRIBUTING.md</url>
+	<description>
+		<p>Open Source Flash SWF decompiler and editor. Extract resources, convert SWF to FLA, edit ActionScript, replace images, sounds, texts or fonts. Various output formats available. Works with Java on Linux, Windows and macOS.</p>
+	</description>
+	<screenshots>
+		<screenshot type="default">
+			<caption>ActionScript 2 decompilation and its P-code view</caption>
+			<image width="1423" height="843">https://raw.githubusercontent.com/jindrapetrik/jpexs-decompiler/master/graphics/screenshots/version14.4.0/01_as2.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>ActionScript 3 decompilation and its P-code view</caption>
+			<image width="1423" height="843">https://raw.githubusercontent.com/jindrapetrik/jpexs-decompiler/master/graphics/screenshots/version14.4.0/02_as3.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>Viewing a shape using internal viewer without Flash Player</caption>
+			<image width="1217" height="876">https://raw.githubusercontent.com/jindrapetrik/jpexs-decompiler/master/graphics/screenshots/version14.4.0/03_shape.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>Viewing a code flow graph using GraphViz tool</caption>
+			<image width="1676" height="950">https://raw.githubusercontent.com/jindrapetrik/jpexs-decompiler/master/graphics/screenshots/version14.4.0/04_graph.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>Hexadecimal view of the SWF structure</caption>
+			<image width="1345" height="950">https://raw.githubusercontent.com/jindrapetrik/jpexs-decompiler/master/graphics/screenshots/version14.4.0/05_hexview.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>Program allows many export types</caption>
+			<image width="1523" height="927">https://raw.githubusercontent.com/jindrapetrik/jpexs-decompiler/master/graphics/screenshots/version14.4.0/06_export.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>Searching text in ActionScript</caption>
+			<image width="1521" height="931">https://raw.githubusercontent.com/jindrapetrik/jpexs-decompiler/master/graphics/screenshots/version14.4.0/07_search.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>Text fields editation, search and replace text</caption>
+			<image width="1521" height="932">https://raw.githubusercontent.com/jindrapetrik/jpexs-decompiler/master/graphics/screenshots/version14.4.0/08_text.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>Timeline viewer</caption>
+			<image width="1318" height="950">https://raw.githubusercontent.com/jindrapetrik/jpexs-decompiler/master/graphics/screenshots/version14.4.0/09_timeline.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>Adding new AS1/2 script to the SWF file</caption>
+			<image width="1526" height="932">https://raw.githubusercontent.com/jindrapetrik/jpexs-decompiler/master/graphics/screenshots/version14.4.0/10_add_script.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>Debugging ActionScript 3 source code</caption>
+			<image width="1311" height="950">https://raw.githubusercontent.com/jindrapetrik/jpexs-decompiler/master/graphics/screenshots/version14.4.0/11_debug_as3.png</image>
+		</screenshot>
+		<screenshot>
+			<caption>Debugging P-code</caption>
+			<image width="1527" height="935">https://raw.githubusercontent.com/jindrapetrik/jpexs-decompiler/master/graphics/screenshots/version14.4.0/12_debug_pcode.png</image>
+		</screenshot>
+	</screenshots>
+	<releases>
+		<release version="25.1.1" date="2026-02-19">
+			<description>
+				<p>Fixed</p>
+				<ul>
+					<li>#2636 ActionScript - Incorrect always-break detection causing insertion of while(true)</li>
+					<li>#2636 ActionScript 3 - Incorrect switch detection</li>
+					<li>AS3 property resolving for KIND_NAMESPACE (like builtin for Strings, etc.)</li>
+					<li>#2636 ActionScript - switches vs loop breaks</li>
+					<li>#2636 ActionScript 3 - type coercion / convert, local registers type propagation</li>
+					<li>Using public/private/protected/internal keywords on ambiguous namespace references and compiling such keywords with `::` suffix.</li>
+				</ul>
+			</description>
+		</release>
+		<release version="25.1.0" date="2026-02-17">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#1209, #1850, #2619 Debugging SWF in the web browser (Debug listening capability - only for SWFs previously prepared by FFDec)</li>
+					<li>TTF export - setting italic / bold flags in the font</li>
+					<li>ffdec-cli.exe is signed</li>
+					<li>#2636 AS3 QName properties with nonvalid identifiers handled as strings in brackets (Can be turned on in advanced settings)</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>Metadata formatting</li>
+					<li>#2632 TTF export - non-zero italic angle</li>
+					<li>Improper standalone player termination, not cleaning temp files</li>
+					<li>#2636 ActionScript - Incorrect always-break detection causing insertion of while(true)</li>
+					<li>ActionScript - newline after do..while</li>
+					<li>StackOverflow on cyclic characters</li>
+					<li>ConcurrentModification in abc indexing</li>
+				</ul>
+			</description>
+		</release>
+		<release version="25.0.0" date="2026-02-09">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#2610 Export morphshapes - export individual frames, setting of morph duration and/or number of morph frames</li>
+					<li>Export morphshapes to GIF and AVI</li>
+					<li>Animated WEBP export for frames, sprites and morphshapes</li>
+					<li>Export dialog - Icons per export type and arrow symbol</li>
+					<li>Updated German translation (AI used)</li>
+					<li>Slovak translation (AI used)</li>
+					<li>APNG (animated PNG) export for frames, sprites and morphshapes</li>
+					<li>Context menu association icon</li>
+					<li>Windows installer (MSI) and ffdec.exe are signed</li>
+					<li>ffdec.exe contains version information (+ on SplashScreen)</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2603 Export Sprite as SWF - sprite frames as timeline frames, without sprite itself</li>
+					<li>HTML5 Canvas morphshape export</li>
+					<li>Slovenian translation</li>
+					<li>#2626 AS1/2 direct editation - function calls inside `with` statement</li>
+					<li>#2618 AS1/2 increment/decrement/compound using PushDuplicate</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>#2610 Export as SWF - take SWF bounds from the exported item bounds</li>
+					<li>MSI installer instead of setup.exe on Windows</li>
+				</ul>
+			</description>
+		</release>
+		<release version="24.1.2" date="2026-01-31">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#2581 Save as SWC through context menu of SWF files (previously only in CLI)</li>
+					<li>Save as EXE through context menu of SWF files (previously only in toolbar)</li>
+					<li>Slovenian translation</li>
+					<li>SVG export - video frames</li>
+					<li>#2592, #2154, #2591, #2596 - Better handling of antialias conflation artifacts (by scaling), can be enabled in Advanced Settings / Display and Export.</li>
+					<li>#2608 Updated WEBP image library so now it supports macOS x64</li>
+					<li>PR228 Association with `.swc` extension</li>
+					<li>Association of file extensions in Windows setup (again)</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2570 NullpointerException on SVG export of DefineEditText</li>
+					<li>#2570 ClassCastException on exporting sound head (export all command)</li>
+					<li>#2571 SVG export - StackOverflow for DefineVideoStream</li>
+					<li>#2575 dumpSWF CLI command displayed import assets GUI dialog</li>
+					<li>#2573 AS3 - Incorrect uint/int/Number coercion</li>
+					<li>AS3 local registers type propagation</li>
+					<li>#2566, #2594 Export bounds of sprites and buttons not containing filter offsets</li>
+					<li>#2582 Font normalizer setting small texts when no assigned glyph found</li>
+					<li>PDF export - not rendering video stream frames</li>
+					<li>#2585 AS1/2 direct editation - continue and break in for..in loop</li>
+					<li>#2589 SVG export - subsprite animation, sprite offsets</li>
+					<li>#1893 Video - incorrect frame size</li>
+					<li>#2572 SVG import - incorrect stroke width when transform contains rotation/shear</li>
+					<li>#2595 FLA export - incorrect handling of imported fonts</li>
+					<li>FLA export - incorrect handling of imported sprites</li>
+					<li>#2586 AS3 direct editation + decompilation - XML escape sequences and other XML problems</li>
+					<li>#2600 Sprite/button outline incorrect calculation caused by clipping</li>
+					<li>#2612 SVG export - handle incorrect surrogate pairs in text</li>
+					<li>#2612 SVG export - problems with retain shape bounds setting</li>
+					<li>#2609 JDK 25+ warnings on console about native access</li>
+					<li>#2473, #2530 Always-break loops containing breaks (forward gotos)</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>#2575 dumpSWF CLI command only allows single SWF dump (no imports, etc.)</li>
+				</ul>
+			</description>
+		</release>
+		<release version="24.1.1" date="2025-11-17">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>AS3 Document class is underlined and has different icon</li>
+					<li>#2556 CLI subsprite animation export (`-sublength &lt;length&gt;` option for export)</li>
+					<li>#2556 CLI option to select arbitrary frames of sprites export via `-select`. Check `--help -select` for details.</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2536 AS3 switches detection incorrectly replaces basic ifs with strict equals</li>
+					<li>#2536 AS3 switches detection not handling loops</li>
+					<li>#2536 AS3 regexp highlighting / compilation</li>
+					<li>#2537 AS1/2/3 direct editation - partial object literal causing lag</li>
+					<li>#2540 AS3 getlocal after inclocal with different registers incorrectly merged</li>
+					<li>PR224 Font CLI replace throwing NullPointer</li>
+					<li>#2546 AS3 findProperty vs temporary registers</li>
+					<li>#2547 SVG import - improper linearGradient with userSpaceOnUse gradient units</li>
+					<li>#2545 FLA export - normalize font em square</li>
+					<li>#2552 Open with FFDec explorer menu shrinking sidebar</li>
+					<li>#2551 Showing too wide video tags in Flash player producing ValueTooLarge exception. Also truncated video length.</li>
+					<li>#2550 FLV video import - incorrect frame position caused by wrong FLV tag sort</li>
+					<li>Mac package problems related to BOM file (updated jbomutils library)</li>
+					<li>#2561 Cannot set filter strength to 128 or above</li>
+					<li>#2562 ABC explorer not working in some obfuscated code</li>
+					<li>#2562 P-code not showing in some obfuscated code (NumberContext related)</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>Simple editor uses percent as units for filter strength</li>
+				</ul>
+				<p>Removed</p>
+				<ul>
+					<li>Resampling from CLI and all source code</li>
+					<li>#2541, #2564 Antialias conflation fixer</li>
+				</ul>
+			</description>
+		</release>
+		<release version="24.1.0" date="2025-09-28">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#2477 Option to disable AS2 detection of uninitialized class fields</li>
+					<li>AS2 detection of uninitialized class fields is cancellable, faster (parallel) and shows its progress</li>
+					<li>AS2 - show deobfuscated class/package names in the class tree</li>
+					<li>Allow obfuscated DefineEditText variable identifiers</li>
+					<li>Selectable text (DefineEditTexts with noselect=0), copy to clipboard, select all</li>
+					<li>AS1/2 P-code curly braces pair highlighting</li>
+					<li>#2478 Simple editor - editing texts (not WYSIWYG, textual as in classic editor)</li>
+					<li>#2478 Simple editor - remembering last frame / timeline</li>
+					<li>Optional heap memory status widget in the titlebar</li>
+					<li>#2485 Show variable name in the text tree node label</li>
+					<li>Deobfuscate identifiers option - non destructible renaming identifiers for display purposes</li>
+					<li>Unknown and errored tags moved to special folders</li>
+					<li>AS3 docs generator - reorganized to distinguish float and float 4 instructions, hilight float instruction blue</li>
+					<li>Icons for every tag type</li>
+					<li>#2499 Information about frames which do not have ShowFrame tag</li>
+					<li>#2504 WebP image format for export/import (not animated) Limitation: It's not available on Mac x86-64 platform</li>
+					<li>#2519 AS1/2 Direct editation + P-code - better handling of "too large" error messages - highlight actual problematic structure</li>
+					<li>AS1/2 Debugging - _global variable accessible</li>
+					<li>AS Debugging - Variables with flag DontEnumerate are hidden by default (can be changed in Advanced Settings)</li>
+					<li>Basic support for PlaceImagePrivate tag</li>
+					<li>Generator Templates (.swt) files support and related tags (Flash 3-5) (CharacterSet, GenCommand, NameCharacter, DefineTextFormat, FontRef)</li>
+					<li>DefineVideo tag support (Flash 4)</li>
+					<li>SerialNumber tag support (before Flash 7)</li>
+					<li>FreeCharacter tag support</li>
+					<li>SyncFrame tag support</li>
+					<li>Hex dump improvements: - view bit count in SB, UB fields - view tagIDTagLength field parts - show type after colon, not in parenthesis - view bytes length in bytes fields</li>
+					<li>#2526 Option to disable drag &amp; drop from Resources view to avoid problems on Mac OS</li>
+					<li>#2497 AS3 - temp variables for better handling swap/dup instructions</li>
+					<li>#2529, #2471 Font normalization - available as context menu command on SWFs - automatically executed on PDF/SVG export - shrinks oversized fonts to 1024 em - fixes vertically flipped fonts / texts - fixes zero/1unit spaces font glyph advance - fixes zero last glyph advance in texts</li>
+					<li>PR222 Replace fonts from commandline</li>
+					<li>#2534 Create new GFX tags of type DefineExternalGradient, DefineGradientMap, ExporterInfo, FontTextureInfo, DefineExternalStreamSound</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2474 Gotos incorrectly decompiled</li>
+					<li>AS1/2/3 highlighter - brackets parsing error causing memory leak / crash</li>
+					<li>Comments color highlighting</li>
+					<li>AS1/2 Obfuscated registers names not resolving because of trimming</li>
+					<li>Escaping HTML in raw tag editor</li>
+					<li>Flash player preview not stripping scripts from DefineSprites</li>
+					<li>Not clearing selected depth after timelined change</li>
+					<li>#2480 AS1/2 P-code decompilation of try..catch with empty catch body at the end of function</li>
+					<li>#2477 AS1/2 deobfuscation - and/or operators, jumps before function start, jumps to function end, jumps in for..in return/break</li>
+					<li>#2477 AS1/2 Switch in last statement of switch break labels</li>
+					<li>#2338 AS1/2/3 Obfuscated code - jump to jump handling</li>
+					<li>#1277 AS1/2 Propagate break/continue to avoid loop/switch labels</li>
+					<li>#2483 Editing shape gradient records - RGB vs RGBA</li>
+					<li>#2486 AS Loop in loop producing gotos in some cases</li>
+					<li>#2486 AS1/2 Switch after function, problem with labels</li>
+					<li>#2486 AS ifs with direct breaks (in obfuscated code)</li>
+					<li>#2486 AS3 skipping label instruction</li>
+					<li>Highlighter nullpointer</li>
+					<li>AS3 search slot name Index out of bounds</li>
+					<li>AS text search - not being able to cancel search over multiple swf files</li>
+					<li>#2486 AS3 switches detection in some cases</li>
+					<li>AS1/2 Hide icons panel when editing</li>
+					<li>AS1/2 both pcode and AS editable at the same time</li>
+					<li>AS3 direct editation - Allow some special words (like `override`) as identifiers</li>
+					<li>#2486 AS1/2 if jump to function end as return</li>
+					<li>#2493 Incorrect placement of §§push instructions</li>
+					<li>AS3 direct editation/highlighter §§pop in class traits</li>
+					<li>AS direct editation/highlighter §§pop and §§dup can have getmember or call</li>
+					<li>#1295, #116 AS3 dynamic construction via MultinameL</li>
+					<li>ABC cleaner not properly fixing namespace sets</li>
+					<li>The hex view does not display bytes if there are too few of them</li>
+					<li>SymbolClass export/import did not support obfuscated names</li>
+					<li>Configuration TOML file encoding (UTF-8)</li>
+					<li>#2496 Fonts - adding characters - truncating too wide advance widths</li>
+					<li>#2498 Public traits with same name were not distinguishable</li>
+					<li>#2503 Exporting sound streams as FLV</li>
+					<li>#2507 FLA export - Button hit test frame placing morphshapes</li>
+					<li>#2507 FLA export - Place characters over multiple button frames</li>
+					<li>#2508 AS1/2 direct editation - first command in for loop header not compiled</li>
+					<li>#2510 AS direct editation - popped value</li>
+					<li>#2511 Allowing to search or to jump from search window while in editation mode</li>
+					<li>#2515 AS1/2 direct editation - getURL incorrect casing, generating ActionGetURL2 when not needed</li>
+					<li>AS1/2 actions must use SWF charset when writing its length</li>
+					<li>#2515 AS1/2 Most of built-in global functions must be case in-sensitive</li>
+					<li>AS1/2 ActionStringExtract incorrectly decompiled as String.substr instead of substring global function</li>
+					<li>#2516 AS1/2 Renaming of identifiers not setting function length correctly</li>
+					<li>AS1/2 Renaming of identifiers must not rename integer array offsets</li>
+					<li>#2517 Loop break detection problems in some cases</li>
+					<li>#2519 AS1/2 avoid multi-level loops in cases where possible</li>
+					<li>#2522 Hex view - resetting view when mouse over panel bottom</li>
+					<li>#2519 AS1/2 direct editation - generating too large ConstantPool</li>
+					<li>Hex View - incorrect table height when switching tags</li>
+					<li>#2525 AMF editor (like in Sol cookie editor) - saving empty standard array `[]`</li>
+					<li>AS3 - names with custom namespaces not being deobfuscated</li>
+					<li>AS Debugger - order of trace commands</li>
+					<li>AS1/2 print/printNum/printAsBitmap/printAsBitmapNum not correctly handling bmovie boundingBox parameter</li>
+					<li>Font export - not setting ascent and descent</li>
+					<li>#2471 PDF export - ignore control characters</li>
+					<li>#2471 SVG export with typeface - white-space:pre style</li>
+					<li>#1826, #2416 FLA export - shapes - missing fills when fillStyle0/1 has incorrect orientation</li>
+					<li>#2532, #1011, #2165 FLA export - shapes - missing fills on path crossings, small shapes, Optimized speed of Shape fixer ### Changed</li>
+					<li>Icon of "Deobfuscation options" menu from pile of pills to medkit</li>
+					<li>Error log window shows last 100 log entries (instead of first 100)</li>
+					<li>AS1/2 P-code double Push values have suffix ".0" to properly distinguish them</li>
+					<li>AS1/2 P-code float Push values have suffix "f" to properly distinguish them</li>
+					<li>AS1/2: Export names are deobfuscated only when start with `__Packages.`, if not, then classical escaping is performed</li>
+					<li>Quotes in tree node parameter values that need them</li>
+					<li>The label of option "automatic deobfuscation" changed to "deobfuscate code"</li>
+					<li>SetTabIndex tag moved from others to frames folder</li>
+					<li>SWF3 actions split into SWF1, SWF2 and SWF3 actions (in FFDec source code, docs, etc.)</li>
+					<li>Serial form of AS3 search results changed so the decompiler is unable to read saved AS3 search result from older versions and vice-versa</li>
+					<li>CSMTextSettings tag renamed to CSMSettings</li>
+				</ul>
+				<p>Removed</p>
+				<ul>
+					<li>Resample wav to 44kHz feature from GUI</li>
+				</ul>
+			</description>
+		</release>
+		<release version="24.0.1" date="2025-06-27">
+			<description>
+				<p>Fixed</p>
+				<ul>
+					<li>#2476 Dark interface skins identifiers highlighter visibility</li>
+				</ul>
+			</description>
+		</release>
+		<release version="24.0.0" date="2025-06-24">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>"Starting Flash content debugger" in status bar when debugging starts</li>
+					<li>Simple editor - edit parameters of items inside buttons</li>
+					<li>Simple editor - add/remove frames in buttons, button timeline header</li>
+					<li>Configuration is now stored in easily readable/editable textual format (TOML) (saved also to older binary format, but loading is preferred from the new TOML file, when exists)</li>
+					<li>`-configFile` and `-storeConfigFile` commandline parameters for loading/storing configuration file</li>
+					<li>Option to .bat and .sh file to enable J2D_D3D_NO_HWCHECK</li>
+					<li>#2404 Quick find in text/script editors - show number of occurrences</li>
+					<li>#1418 Option to make main window Always on top</li>
+					<li>#289 Support for Aero Snap on Windows</li>
+					<li>#2412 Show coordinates on stage mouse move for up to 2 decimal places</li>
+					<li>"Show detail" context menu item for items in folder preview</li>
+					<li>#1682 AS2 - Adding class by context menu on packages</li>
+					<li>Simple editor - detection of english color name (based on CSS names)</li>
+					<li>#2050 AS1/2/3 - highlight variable definition and all its instances on cursor place (also in edit mode)</li>
+					<li>AS1/2/3 - underline errors in the code (also in edit mode)</li>
+					<li>AS1/2/3 - highlight variables and errors on panel next to vertical scrollbar</li>
+					<li>AS1/2 direct editation - hide P-code panel when editing</li>
+					<li>Disable AS1/2/3 direct editation when editing P-code</li>
+					<li>AS3 - navigation to definition in other SWF file and also player/airglobal</li>
+					<li>#2463 Export subsprites animation context menu on frames</li>
+					<li>Open in the Flash Player context menu on graphic/sound tags and frames</li>
+					<li>#2236, #2451 Replacing sound stream block ranges</li>
+					<li>Importing sound stream block ranges</li>
+					<li>Commandline replacing sound stream block ranges</li>
+					<li>#1625 Error log frame - Save all to file button</li>
+					<li>#2467 Show ImportAssets name/characterId in the title when there is only single one item</li>
+					<li>#2468 Option for `-dumpas2` CLI command to use export names (`-exportNames` option)</li>
+					<li>AS3 - code completion (properties and methods)</li>
+					<li>#2470 Transformation - Copy individual transforms to clipboard, load/apply from clipboard buttons</li>
+					<li>Option to turn off code completion on dot(.) key</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>AS1/2 - Single DoAction tag inside frame is now displayed directly as frame node so there is no longer need to expand frame nodes (useful for fast switching scripts)</li>
+					<li>AS1/2 - Scripts from default package (not these inside `__Packages`) are now exported/imported to/from main scripts folder instead of localized `&lt;default package&gt;` before. (Only happened when package flattening was on) This may break backwards compatibility. For importing scripts from older versions of FFDec, you should move the scripts from `&lt;default package&gt;` to main scripts folder.</li>
+					<li>SWF to XML export in GUI dialog selects a XML file instead of directory (and directory when multiple SWFs are selected)</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2456 FLA export - NullPointer exception while exporting to CS4 or lower via commandline</li>
+					<li>Touch point, snap align and snap to objects incorrect position when editing nested layers</li>
+					<li>Resize export dialogs labels to match localized strings</li>
+					<li>AS1/2 debugger - deletion of SWD file after debugging</li>
+					<li>Proper freeing memory after SWF close</li>
+					<li>AS1/2 improper selection of search result</li>
+					<li>#2459 AS1/2 StoreRegister improper declaration position</li>
+					<li>AS2 Class names not showing in Folder list view</li>
+					<li>AS1/2 - Incorrect DefineFunction2 parameter names when parameter name is empty</li>
+					<li>#2460 SVG export - incorrect caching colorTransform and ratio for the same tag</li>
+					<li>#2461 SVG export - incorrect clipping / missing shapes</li>
+					<li>AS1/2 direct editation - Position in the code should stay same after clicking Edit button</li>
+					<li>AS3 direct editation - Allow internal keyword on script traits (e.g. classes)</li>
+					<li>AS3 direct editation - NaN can be used as identifier</li>
+					<li>Pin header for AS2 script in the Resources view should show Class name in the title instead of tag full description</li>
+					<li>AS1/2/3 for decompilation with multiple variables</li>
+					<li>AS3 native functions outside class allowed</li>
+					<li>AS3 difference between namespace keyword and const of type Namespace</li>
+					<li>#2462 AS3 debugger - incorrect line info injected</li>
+					<li>#2464 SVG export - minimum stroke width of 1 px</li>
+					<li>#2405 Incorrect saving tags after Cloning / Copy-pasting</li>
+					<li>#1646 Scrolling in Error log frame inside log texts</li>
+					<li>JLayer stripping last byte of MP3 data</li>
+					<li>#2469 Converting shape type did not convert gradient colors transparency</li>
+					<li>#2470 Transform - paste matrix, edit current matrix not working</li>
+					<li>Do not allow to switch PlaceObjects in transform mode</li>
+					<li>#2471 Clipping - multiple clips handling, in display and also SVG export</li>
+					<li>#2471 SVG Export - exporting with font-face - text tags with multiple texts, fix invalid family names, incorrect text size</li>
+					<li>Replacing existing characters in a font which has character codes unsorted</li>
+					<li>#2475 SVG Import - ignoring gradients caused by missing offset attribute of stop element</li>
+					<li>Not saving library type (airglobal/playerglobal) when switching SWFs</li>
+				</ul>
+			</description>
+		</release>
+		<release version="23.0.1" date="2025-05-16">
+			<description>
+				<p>Fixed</p>
+				<ul>
+					<li>Nullpointer exception during SWF opening when Simple editor is active</li>
+				</ul>
+			</description>
+		</release>
+		<release version="23.0.0" date="2025-05-15">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#2427 Commandline export with use of imported SWFs (importAssets tag)</li>
+					<li>Auto detect scale factor on Hi-dpi displays</li>
+					<li>#1826 Option to extend shape area by half pixel to fix antialias conflation artifacts</li>
+					<li>Icons for Simple editor library folders</li>
+					<li>#2448 Simple editor - Option to turn off half transparent parent layers</li>
+					<li>Localized "Open with FFDec" context menu (switch association off/on to apply if already installed)</li>
+					<li>#2370 Objects display - Option to show horizontal and vertical rulers</li>
+					<li>#2370 Objects display - Create guides by dragging from a ruler</li>
+					<li>Objects dragging - show touch point and snap it to 9 important points around object rectangle</li>
+					<li>#2370 Snap to guides, objects and pixels, Snap align, toggle with magnet icon</li>
+					<li>#2370 Show/Hide guides, lock guides, clear guides actions from icon menu</li>
+					<li>Display grid, snap to grid</li>
+					<li>#2370 Snap align border space, object spacing, center alignment</li>
+					<li>#2370 Setting for color and snap accuracy for guides, grid</li>
+					<li>#2370 Dialogs for editing grid, guides and snapping</li>
+					<li>#2453 SVG export/import - use image-rendering attribute for image smoothing</li>
+					<li>Option to enter custom zoom level by clicking on zoom percentage label</li>
+					<li>Show in Simple editor context menu item for timelined items (sprites, buttons, swfs)</li>
+					<li>Simple editor - change background color</li>
+					<li>Simple editor - filters</li>
+					<li>Simple editor - convolution filter presets</li>
+					<li>Simple editor - ratio (shape tweens, video)</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2424 DefineEditText handling of letterSpacing, font size on incorrect values</li>
+					<li>#2391 Double not operator in ternar operator expression</li>
+					<li>#2436 PDF export clipping - missing colors / text</li>
+					<li>#2437 AS1 P-code - do not group pushes automatically</li>
+					<li>#2437 AS1 - use Constant pool only on FP5+</li>
+					<li>#2430 AS1/2/3 - Missing syntax hilighting of "new" keyword and few others</li>
+					<li>#2428 Charset setting on FLA export in format MX and below</li>
+					<li>#2428 Default charset for SWFS v5 and lower is WINDOWS-1252</li>
+					<li>#2418 AS3 - initialization of class static vars in script initializer (Haxe)</li>
+					<li>#2397 DefineScalingGrid - improper scaling on negative Xmin, Ymin</li>
+					<li>#2425 ZIP/SWC reading - "Only DEFLATED entries can have EXT descriptor" message</li>
+					<li>Drawing points and shape paths highlighting did not respect UI scale factor</li>
+					<li>#2416 FLA export - shape fixing in some cases</li>
+					<li>#2394 FLA export - shape tweens in some cases</li>
+					<li>Not resetting timeline after shape tag type conversion</li>
+					<li>#2400 Transforming - buttons must use hit test frame outline</li>
+					<li>#2413 AS3 direct editation - try/catch clause in instance initializer</li>
+					<li>#2386 Editor mode - not able to save shape/morphshape points</li>
+					<li>Loading icon did not respect UI scale factor</li>
+					<li>Editor (JSyntaxPane) incorrectly draws line numbers panel on Hi-dpi displays</li>
+					<li>Substance LAF - Shadow in text (mostly in window titles) drawn incorrectly</li>
+					<li>Incorrect icons for `New empty` action - with dashed borders</li>
+					<li>#2443 SVG importer - converting cubic bezier curves to quadratic</li>
+					<li>#2444 SVG importer - improper stroke width when using width/height with viewBox</li>
+					<li>#2444 SVG importer - stroke width not respecting transforms</li>
+					<li>#2415 AS3 direct editation - nested functions - prefer callstack variables over prototype chain</li>
+					<li>AS3 - AIR float support - incorrect writing float values to output stream</li>
+					<li>AS3 - AIR float support - ABC Explorer incorrectly calculating float usages (For clean action, etc.)</li>
+					<li>#2446 Nightly version asked for update to previous stable</li>
+					<li>#2447 SVG import - gradients can inherit (href) from other gradient types (radial vs linear)</li>
+					<li>#2450 Morphshape replace button/menu is not working (throws exception due to missing icon)</li>
+					<li>#2355 AS1/2/3 Simplify expressions feature colliding with some other features like hex values</li>
+					<li>Exception on FFDec start when simple editor is on</li>
+					<li>#2419 AS3 - There should be empty line after class header</li>
+					<li>AS 1/2/3 - Fast switching of scripts causing incorrect caret position remembered</li>
+					<li>AS 1/2 - Remembering caret position for frames</li>
+					<li>Cleaner file association</li>
+					<li>Editing shape points / transform when first edge has no moveTo flag (coordinates 0, 0)</li>
+					<li>Exceptions when closing non-ribbon window</li>
+					<li>PR215 ffdec.sh - Ignore all java options when checking version</li>
+					<li>Text search was not available as context menu option for AS3 scripts folder</li>
+					<li>#2454 SVG export - color matrix not applied to images</li>
+					<li>PR216 ffdec.sh - Support BSD version of sed in java version checks</li>
+					<li>Simple editor - adding a library item to the last frame adds a frame</li>
+					<li>Simple editor - white square on top left corner of the timeline</li>
+					<li>Bevel and Glow filters incorrect rendering</li>
+					<li>Incorrect cursor handling when placed object has filters</li>
+					<li>FLA export - Rounding errors on COLORMATRIXFILTER contrast</li>
+					<li>Filters - image bounds</li>
+					<li>Simple editor - Exceptions caused by not setting timelined when modifying PlaceObject</li>
+					<li>#2455 Commandline export ConcurrentModificationException</li>
+					<li>#1962 Close button could close more than one file at once</li>
+					<li>Simple editor - Selecting previous SWF when swf close</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>An item selected in the tag tree is needed for actions to be available. Also SWF node is selected by default on first SWF opening.</li>
+				</ul>
+				<p>Removed</p>
+				<ul>
+					<li>Option to preview flash items via ActiveX component is no longer available. FFDec now supports its internal flash viewer only.</li>
+					<li>Windows installer does not associate SWF files anymore as it caused false positives on some AVs. You can associate them later in FFDec settings.</li>
+				</ul>
+			</description>
+		</release>
+		<release version="22.0.2" date="2025-01-17">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>FLA export - accessibility for AS3 files</li>
+					<li>#2375 Sound sync event/start/stop handling (for playback in FFDec)</li>
+					<li>#2374 Quick filter by folder type (Ctrl+F on Resources view tag tree)</li>
+					<li>#2389 Support for SPL file extension (Flash version 1 - Future Splash Animator)</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2375 Added limit of simultaneously played sounds</li>
+					<li>AS1/2 - Push action hilighting, GetProperty, Call action hilighting</li>
+					<li>#2381 Font color values with alpha allowed in html edittext, but alpha ignored</li>
+					<li>#2384 Vanishing pins on AS3 code editing save, on script deletion and few other cases</li>
+					<li>#2394 Broken AS1/2 deobfuscation on incorrect length of ActionStrictMode,</li>
+					<li>#2394 AS1/2 ActionStrictMode with mode larger than 1 now ignored</li>
+					<li>#2393 AS1/2 ActionGotoFrame2 P-code trailing comma</li>
+				</ul>
+			</description>
+		</release>
+		<release version="22.0.1" date="2024-11-20">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>AS3.1 null-conditional operator `?.` (air - swf version 50)</li>
+					<li>AS3.1 nullish coalescing operator `??` (air - swf version 50)</li>
+					<li>AS3 direct editation - verbatim strings `@"`</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2366, #2367, #2372 Running simple editor on background slowing down other views</li>
+					<li>Rendering now does not slow down UI elements</li>
+					<li>Using faster variant of blur</li>
+				</ul>
+			</description>
+		</release>
+		<release version="22.0.0" date="2024-11-10">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>Simple editor view - new simplified UI based on timeline view, which resembles Flash Pro UI. Easier moving objects, resizing, adding frames, adding objects to stage. Instance property editation. Undo / redo feature. Double click movie clips to edit sub-objects.</li>
+					<li>#1619 Option to set thread count to 0 for auto setting processor count - 1</li>
+					<li>#2360 SOL file (Flash Local Shared Object - flash cookie) editor</li>
+					<li>Cookies folder to easy edit NPAPI SOL files (only cookies in the swf root directory)</li>
+					<li>Link to FFDec Wiki on the Help menu</li>
+					<li>On Run/Debug SWF file in FFDec, Flash cookies (SOL files) are synced from temporary SWF directory to actual SWF SOL directory</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2357 AS3 instance var/const initialization</li>
+					<li>#2361 Transform tool for PlaceObject tags</li>
+					<li>#2357 FLA export letterspacing on two character texts</li>
+					<li>#2357 FLA export to CS4 and lower - files exceeding 0x7FFF objects limit</li>
+					<li>#2357 FLA export to CS4 and lower - speed optimization</li>
+					<li>#2362 Generating error log ExecutionException - InterruptedException log on switching flash/air swc</li>
+					<li>Buttons were not active where they should be</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>#1619 Default thread count is set to 0 ( = auto)</li>
+					<li>AMF3 (new AMF0 aswell) references and "undefined" values written as JSON objects</li>
+				</ul>
+			</description>
+		</release>
+		<release version="21.1.3" date="2024-10-29">
+			<description>
+				<p>Fixed</p>
+				<ul>
+					<li>Java 8 compatibility</li>
+				</ul>
+			</description>
+		</release>
+		<release version="21.1.2" date="2024-10-29">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>Cache as bitmap background color support (rendering, image and FLA export)</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2344, #2348 Export to FLA CS4 and below with more than 255 library items, instances, bitmap fills or frame duration</li>
+					<li>#2341 FLA export - linkage and imported fonts did not work correctly</li>
+					<li>#2345 items smaller than 20 twips were not drawn - caused PDF problems - now ceil is used</li>
+					<li>#2341 FLA export - DefineEditText - use its default text color on HTML enabled inputs</li>
+					<li>FLA export - DefineEditText default text color alpha</li>
+					<li>Text display - Alpha channel should not be supported for texts using device fonts</li>
+					<li>#2192 Long script lines are now wrapped (1000 chars limit by default) to avoid problems on Linux</li>
+					<li>#2354 Simplify expressions problems in some cases</li>
+					<li>#2353 AS1/2 - fscommand and other dynamic GetURL related calls (decompilation + editation)</li>
+					<li>FFDec source code typos</li>
+					<li>#2353 AS1/2 incorrect declaration propagation causing null assignments to registers</li>
+				</ul>
+				<p>Removed</p>
+				<ul>
+					<li>Timeline view in favor of new Simple view which is in development (not part of this version)</li>
+				</ul>
+			</description>
+		</release>
+		<release version="21.1.1" date="2024-10-13">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#2321 Commandline option to generate HTML docs for AS1/2 Actions</li>
+					<li>Chinese translation update</li>
+					<li>#2305 Saving recent colors in the color selection dialog</li>
+					<li>#2328 Searching/replacing in texts now supports selection / all files scope</li>
+					<li>Texts spacing is now separated where possible - does not use `[space xx]`, but new `spacing "x" NN` and `spacingpair "x" "y" NN` prefix so now texts are more readable and searchable</li>
+					<li>#2333 Changing Shape tag type (DefineShape, DefineShape2, ...)</li>
+					<li>Changing PlaceObject tag type (PlaceObject, PlaceObject2, ...)</li>
+					<li>AS2 - Information about need of decompiling all scripts to detect uninitialized class fields</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2319 AS3 Compound assignments problems in some cases</li>
+					<li>#2319 AS3 direct editation - class gets removed after pressing cancel</li>
+					<li>#2320 AS3 direct editation - modified flag of scripts vanishes after editing other script with and having error</li>
+					<li>#2272 Filters strength attribute caps at 100%</li>
+					<li>#2322 AS3 Construct property name formatting</li>
+					<li>#2322 AS3 Assignment position when using dup</li>
+					<li>#2323 AS3 direct editation - Number class traits are duplicated in constructor</li>
+					<li>#2324 AS3 direct editation - nested loop continue/break (with labels)</li>
+					<li>#2325 AS3 direct editation - allow single quoted attributes in XML</li>
+					<li>#2329 AS3 - imports for standalone functions</li>
+					<li>#2331 AS1/2 lite - support for fscommand2, `#strict` directive</li>
+					<li>#2332 Imported fonts by class name not available in texts</li>
+					<li>#2330 Windows EXE launcher (+ CLI) does not respect current working directory</li>
+					<li>#2335 AS3 direct editation - Type coercion of `&amp;&amp;` and `||` operators</li>
+					<li>#2334 AS1/2 P-code export - Do not export on(xxx) header</li>
+					<li>#2338 AS decompiling threads got stuck after cancelling / timeout</li>
+					<li>#2338 AS2 class detection in some minor cases</li>
+					<li>#2337, #2339 Replace shape update bounds - allow selecting multiple shapes</li>
+				</ul>
+			</description>
+		</release>
+		<release version="21.1.0" date="2024-09-23">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>FLA export - generating bin/*.dat files for movies and images</li>
+					<li>#943, #1812, #2287 Export to older binary FLA formats (CS4, CS3, Flash 8, MX 2004, MX, Flash 5)</li>
+					<li>#2286 Set SWF version in FlashDevelop project</li>
+					<li>#2306 Export to VS Code project</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>#1644 Swapped Save all and Save buttons - Save is bigger</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2309 XML export/import - Decimal support</li>
+					<li>#2300, #2303 ShellFolder Comparator Windows Java error</li>
+					<li>#2302 AS3 Class linkage - changes did not save</li>
+					<li>PR203 AS1/2 extreme lagging</li>
+					<li>#2310 Text search history showing as null</li>
+					<li>#2295, #2311 AS1/2 p-code freezing on highlighting ConstantPool</li>
+					<li>#2304 GFX files truncated</li>
+					<li>#2297 AS direct editation - if..else clause broken when using continue/break</li>
+					<li>#2291 AS1/2 Incorrect var keyword placement causing registers to compile wrong</li>
+					<li>#2290 FLA export - not generating sound bin files causing sound compression setting to be ignored</li>
+					<li>#2296 AS decompilation - goto problems</li>
+					<li>AS3 - displaying imports of class parent chain</li>
+					<li>AS3 - imports for script slot/const traits</li>
+					<li>AS3 direct editation - script slot/const traits assignments</li>
+					<li>AS3 direct editation - double returnvoid on script initializer</li>
+					<li>AS3 empty interface indentation</li>
+					<li>#2313 AS3 direct editation - parsing class traits metadata</li>
+					<li>#2314 AS3 direct editation - cannot save class initializer in some cases</li>
+					<li>#2315 AS3 direct editation - switching scripts during editation causing missing scripts</li>
+					<li>#2316 AS3 direct editation - private classes</li>
+					<li>#2317 AS3 direct editation - local register names colliding with parameter names</li>
+				</ul>
+			</description>
+		</release>
+		<release version="21.0.5" date="2024-09-05">
+			<description>
+				<p>Fixed</p>
+				<ul>
+					<li>#2293 FLA export - stackoverflow on multilevel clips extraction, clipping</li>
+					<li>#2294, #2300 AS3 export - Nullpointer on SWFs without document class</li>
+					<li>#2299 AS1/2 - Nullpointer on loadMovie with register as parameter</li>
+					<li>#2301 AS3 direct editing - instance variables assignments producing additional static assignments</li>
+				</ul>
+			</description>
+		</release>
+		<release version="21.0.4" date="2024-08-27">
+			<description>
+				<p>Fixed</p>
+				<ul>
+					<li>Java 8 compatibility</li>
+				</ul>
+			</description>
+		</release>
+		<release version="21.0.3" date="2024-08-27">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>Updated Flash player to SWF version map</li>
+					<li>Harman AIR 51 float support compatibility</li>
+					<li>FlashDevelop project export - option to export AIR project (select correct type in the file save dialog)</li>
+					<li>FLA/FlashDevelop/IDEA export - option to add link to all classes (sound, font, images) so no class is missed during compilation</li>
+					<li>Harman AIR 51 unpacker for binarydata with custom key</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2266 StartSound/2 and VideoFrame tags, classNames not taken as dependencies (needed chars)</li>
+					<li>#2275 Export to FlashDevelop - framerate setting</li>
+					<li>#2276 Protected namespaces do not use fully qualified names</li>
+					<li>Target flash player version in FlashDevelop and IDEA projects</li>
+					<li>Script/Class initializers order of assignment</li>
+					<li>#2277 Return statement in initializer</li>
+					<li>Imports in script initializer</li>
+					<li>#2279 AS3 Decompilation - assignments on the right side of `&amp;&amp;` and `||` operators</li>
+					<li>#2279 Embed assets with file base name ending with a space</li>
+					<li>Embed tag - Wav files need to be embedded in assets.swf</li>
+					<li>#2282 FLA export - visible flag</li>
+					<li>Opening loaded files while playing even if not a valid SWF file - like images</li>
+					<li>#2284 FLA export - sounds should be WAV or MP3, not FLV</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>Compound script has slot/const traits inside main script initializer</li>
+					<li>Export to FlashDevelop and IntelliJ IDEA is available only for SWFs without main timeline</li>
+				</ul>
+			</description>
+		</release>
+		<release version="21.0.2" date="2024-08-12">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>Better decimal values support (for ABCs minor 17, not standard FP)</li>
+					<li>Better float values support (for ABCs major 47, minor 16 +, not standard FP)</li>
+					<li>Non-nullable classes support (not standard FP)</li>
+					<li>AS3 direct editation - unary plus support</li>
+					<li>Go to document class context menu item</li>
+					<li>Updated go to document class icon</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>Hex view for unknown tags was not scrollable</li>
+					<li>#2269 Nullpointer on importing (ImportAssets) a character that does not exists</li>
+					<li>Asking more than once for the same imported (ImportAssets) URL</li>
+					<li>ABC Explorer problems when index out of bounds (Usually in obfuscated code)</li>
+					<li>Go to document class for classes with obfuscated name</li>
+					<li>#2270 AS3 decompilation - unnecessary local registers assignments as part of expressions when using optimization like `dup, setlocal N` instead of `setlocal N, getlocal N`</li>
+					<li>Movies (DefineVideoStream) preview not working</li>
+				</ul>
+			</description>
+		</release>
+		<release version="21.0.1" date="2024-08-08">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#2221 AS3 P-code - add new function button (creates methodinfo, methodbody)</li>
+					<li>Javadoc HTML documentation for library (Separate download)</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2267 Script decompilation - Loop detection causing `§§goto` instructions in some cases</li>
+					<li>#2268 AS3 script export with embedded assets fails (_assets dir not exists) when no other than sprite assets exist</li>
+				</ul>
+			</description>
+		</release>
+		<release version="21.0.0" date="2024-08-05">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>StartSound and StartSound2 show characterId/class in the tag tree</li>
+					<li>Folder preview for sounds</li>
+					<li>#2176 Ignoring letter spacing on text search (only applies to global search, not to search inside text)</li>
+					<li>#2179 Collapse all option for tree items</li>
+					<li>#2185 16bit MochiCrypt packer support</li>
+					<li>Windows commandline executable</li>
+					<li>New organized commandline help</li>
+					<li>Ansi colors in commandline help</li>
+					<li>Linux ffdec script without extension</li>
+					<li>PR190 Collect depth as sprites</li>
+					<li>Updated Dutch translation</li>
+					<li>#2259 Optional resampling sound to 44kHz on playback and on export</li>
+					<li>#1566, #1742, #1783, #1787, #2205, #2210, #2246, #2263 Set AS1/2 linkage and AS3 class linkage dialog (uses SymbolClass and ExportAssets tags) in the context menu for characters</li>
+					<li>#2189 Search bar in replace character (+ replace references) window</li>
+					<li>#2011, #2215 Option to ignore frame background color when exporting (make transparent)</li>
+					<li>ABC Explorer - list of usages of all items</li>
+					<li>ABC Explorer - items with zero usages are semi-transparent</li>
+					<li>ABC Explorer - copy path to clipboard</li>
+					<li>ABC Explorer - Go to path via `Ctrl + G`</li>
+					<li>#2243 Clean ABC action (remove unused items) available through context menu on ABC, ABCContainers, SWFs and in the ABC Explorer, `-abcclean` command on CLI</li>
+					<li>GFX - better fileformat detection</li>
+					<li>GFX - DefineExternalImage2, FontTextureInfo - IdType field recognition</li>
+					<li>PR194 Support for XDG base directory specification (env variable `XDG_CONFIG_HOME`)</li>
+					<li>FLA export - ImportAssets/2 tag support</li>
+					<li>FLA export - export in frame 1 flag support</li>
+					<li>#2260 GFX - Configure path resolving dialog for file paths that use prefixes like `data:`</li>
+					<li>#2263 Expand one level more (`+` sign) for needed/dependent characters in tag info panel to show full tag name as in tree</li>
+					<li>#1290, #1809 Export to FlashDevelop project</li>
+					<li>#1290 Export to IntelliJ IDEA project</li>
+					<li>Export FLA context menu on SWFs</li>
+					<li>Window icons for various dialogs including save/open/export/import</li>
+					<li>#873 Context menu items are organized with separators and the order is more intuitive</li>
+					<li>#1644 Save all button - has priority over standard Save button</li>
+					<li>Exe export mode can be selected in in Save EXE dialog (select filetype) - wrapper or projectors</li>
+					<li>Optimized (faster) context menu for large SWF trees</li>
+					<li>Optimized (faster) deleting items for large SWF trees</li>
+					<li>AS debugger - More variable flags</li>
+					<li>AS3 direct editation - edit files with native keyword</li>
+					<li>#1383 AS Debugger - debugging nested SWFs (enable "Open loaded SWFs while playing")</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>Debugger - getting children of top level variables</li>
+					<li>#2149 FLA Export - compressed sound streams in some cases</li>
+					<li>#2172 Wrong year in error log window (week year)</li>
+					<li>#2174 Removing frames, removing also FrameLabels, StartSounds, SoundStreamBlocks, DoAction</li>
+					<li>Folder preview - GFX image identifiers not shown</li>
+					<li>Hide zooming buttons in fonts display</li>
+					<li>#2174 Ignoring PlaceObjects with flagMove on empty depth</li>
+					<li>#2175 Removing DefineButtonSound, warning about incorrect sound character type in FLA export</li>
+					<li>#2175 FLA Export - exporting 320kbps MP3s as 160kbps</li>
+					<li>#2178 Undo on sprites</li>
+					<li>#2176 Reset letterspacing on text import</li>
+					<li>Nullpointer on recent searches loader</li>
+					<li>#2177 Leftover process when invalid SWF opened - now main window is shown</li>
+					<li>Opening files with "Open with FFDec" on windows did not use same instance</li>
+					<li>#2183 AS1/2 Direct editation - case-sensitive identifiers since SWF version 7</li>
+					<li>#2203 GFX - DefineSubImage with TGA bitmapFormat</li>
+					<li>#2207 AS - Index -2 out of bounds for some of the switches</li>
+					<li>#2190 AS1/2 - for..in inside switch before break</li>
+					<li>Raw edit of fonts - shape table was not visible</li>
+					<li>#2211 PDF export, Font export - glyphs with no contours (advance only)</li>
+					<li>#2212 GFX - Allow loading (DDS) images despite of set bitmapFormat</li>
+					<li>#2202 AS2 detection of uninitialized class fields colliding with setters/getters</li>
+					<li>#2202 AS2 return in constructor does not take a value</li>
+					<li>#2222 Missing shapes when gradient fillstyle has only two gradrecords with the same ratio</li>
+					<li>#2224 Exporting Embed assets - handling DefineBits(+JPEGTables) - convert to DefineBitsJPEG2</li>
+					<li>PR191 Saving class name during AS3 P-code class trait editation</li>
+					<li>#2231 AS3 coercion to String as convert</li>
+					<li>#2257 Shape SVG Importer - Linear gradient matrix</li>
+					<li>#2253 Drawing 0,0 grid in transform tool on Linux causing sun internal errors</li>
+					<li>#2239 Default font name detection</li>
+					<li>#2239 Exporting TTF font on Linux</li>
+					<li>PR193 Quoting JAR file in ffdec.sh</li>
+					<li>Refreshing class/exportname association on SymbolClass/ExportAssets deletion</li>
+					<li>Outputstreams position calculation (ABCOutputStream, ...)</li>
+					<li>#2260 Reading end of file on old GFX format (1.x)</li>
+					<li>#2260 DefineExternalImage on old GFX format (1.x)</li>
+					<li>Font face html attribute in DefineEditText can be also an exportName</li>
+					<li>BUTTONRECORD preview not showing in situations like GFX or importAssets</li>
+					<li>FreeTransform not showing in situations like GFX or importAssets</li>
+					<li>#2237 AS3 direct editation - usages of import colliding with toplevel classes must be fully qualified</li>
+					<li>#2234 AS1/2 postincrement/decrement inside DefineFunction2</li>
+					<li>AS3 PCode - pushbyte operand docs - signed byte</li>
+					<li>#2226 Incorrect decompilation of continue statements in some cases</li>
+					<li>AS3 Embedded assets export - assets.swf not working, incorrect binary data extension for swfs</li>
+					<li>Duplicate pack path message on compound scripts</li>
+					<li>AS1/2 debugger not getting variable details properly</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>#2185 MochiCrypt no longer offered for auto decrypt, user needs to choose variant from "Use unpacker" menu</li>
+					<li>#2206 FB values in MATRIX (scale/rotate) as floats instead of int, -f suffixed parameters in text editor</li>
+					<li>Information in the tag node title now has abbreviated prefix of type for each bit of info. Example: `DefineSprite (chid: 27, cls: pkg.MySprite)` instead of `DefineSprite (27, pkg.MySprite)`</li>
+					<li>Information in the tag node title - separated exportName from assigned class</li>
+					<li>ImportAssets tag reorganized - now imported items are not in the tag tree, but when referenced it works</li>
+					<li>PR194 Default directory for storing config on Linux changed to `~/.config/FFDec`, when `~/.FFDec` does not exist yet</li>
+					<li>Run/Debug command - executed SWF temp files (`~ffdec_run...swf` etc.) are now generated in the directory where original SWF resides to allow loading relative assets</li>
+					<li>#2228 AS1/2/3 bitwise operations use hexadecimal operands</li>
+					<li>Save to EXE moved to tools tab</li>
+					<li>Save (not save as) button is now available only when there's anything to save when the selected SWF is modified. Similar for Save all button.</li>
+				</ul>
+				<p>Removed</p>
+				<ul>
+					<li>Proxy feature. It was not working since today almost every page uses HTTPS. Also Flash is limited in browsers.</li>
+				</ul>
+			</description>
+		</release>
+		<release version="20.1.0" date="2023-12-30">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>Configurable tab size (formatting must be set to use tabs) - default matches indent size of 3</li>
+					<li>#2100 Copy/paste frames (same SWF only)</li>
+					<li>Updated portugese-brasil translation</li>
+					<li>AS3 Debugging - export/import ByteArray variable data</li>
+					<li>#2123 FLA export - show some progress info</li>
+					<li>Label that flex compiler is used (when it's enabled in settings)</li>
+					<li>#2119 Option to export assets with names like their assigned classes via SymbolClass, without character id</li>
+					<li>#2119 Bulk imported assets can also match filenames based on assigned classname, not just character id prefix</li>
+					<li>Debugger shows (logs) unhandled exceptions</li>
+					<li>#2129 MEMORY and STACK_SIZE parameters now can be set via external variables FFDEC_MEMORY, FFDEC_STACK_SIZE</li>
+					<li>Saving Harman encrypted SWFs</li>
+					<li>Editing encrypted flag on header panel</li>
+					<li>`-encrypt` command on CLI for Harman encryption</li>
+					<li>Apply unpacker menu on binary data</li>
+					<li>Harman unpacker for binary data</li>
+					<li>Multilevel binary data unpacking is possible</li>
+					<li>#2131 AS1/2 Debugger - show _root variable</li>
+					<li>#2124 Copy tags to other SWFs and replace same classes / export names</li>
+					<li>Remembering breakpoints</li>
+					<li>#2131 Breakpoint list dialog</li>
+					<li>ExportAssets tag - show first item as description in the tree when there is only single item</li>
+					<li>#2134 FLA Export - split main timeline into scenes when DefineSceneAndFrameLabelData tag is present</li>
+					<li>#2132 Show and export streamed sound (SoundStreamHead/SoundStreamBlock) in frame ranges (+ take scenes into account)</li>
+					<li>FLA export - show export time</li>
+					<li>#2138 Morphshapes - detect classic easing</li>
+					<li>FLA export - option to disable fixing of shapes</li>
+					<li>Scenes folder with (readonly) display of scene frames</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2021, #2000 Caret position in editors when using tabs and / or unicode</li>
+					<li>#2021 Indent continuation when using tabs</li>
+					<li>#2116 DefineEditText display - correct getting fonts</li>
+					<li>#2116 DefineEditText display - apostrophe decoding</li>
+					<li>#2116 Apply colortransform after filters</li>
+					<li>#2116 Limit maximum number of box blur pixels</li>
+					<li>#2122 `-header` command did not support negative integers for displayrect</li>
+					<li>AS3 direct editation - namespaces were initialized in class initializers</li>
+					<li>Debugging - do not invoke getter when there is none - avoid freezing</li>
+					<li>Debugging - properly getting variable value through getter</li>
+					<li>#2123 FLA export - IndexOutOfBounds in shape fixer</li>
+					<li>#2123 FLA export - morphshapes fixer</li>
+					<li>#2111 AS3 direct editation - access class in class initializer</li>
+					<li>#2111 Flex AS3 editation - use SWF dependencies defined in GUI</li>
+					<li>SWF dependencies label was not updated on startup</li>
+					<li>#2127 Wrong parameter order in AS1/2 P-code Action GetURL2 documentation</li>
+					<li>#2025, #2078, #2053 Problems starting the app on Windows when the username has unicode characters</li>
+					<li>Incorrect debugger line numbers when "Open loaded while playing" is enabled</li>
+					<li>AS3 debugger - Slow injecting debug info - now faster</li>
+					<li>AS3 debugger - obfuscated classes debugging</li>
+					<li>Delayed open loaded SWFs while playing</li>
+					<li>AS3 Direct editation - script initializer for main document class</li>
+					<li>AS3 Debugging - activation object was not visible in locals</li>
+					<li>Linenumbers are visible even if debug markers are used</li>
+					<li>Marker of stack frames not properly cleared</li>
+					<li>Retain AS3 script selection in the tree after its editation and saving whole SWF</li>
+					<li>#2131 AS1/2 Debugger - Breakpoint handling - incorrect script names</li>
+					<li>#2131 Debugger - Correct walking variables tree</li>
+					<li>#2131 Debugger - Breakpoints can be added while SWF is running (not just on pause)</li>
+					<li>AS3 Direct editation - types on instance variable values not properly resolved</li>
+					<li>AS1/2 Debugger - script was cleared on stop button</li>
+					<li>AS1/2 Vanishing source code in some cases</li>
+					<li>AS1/2 Debugger tooltips exception</li>
+					<li>#2131 UseOutline flag for DefineEditText</li>
+					<li>Wordwrapping long words in DefineEditText</li>
+					<li>#2133 Linux/Mac - ffdec.sh not correctly parsing java build number on javas without it</li>
+					<li>#2135 FLA Export - framescripts handling when addFrameScript uses Multinames instead of QNames</li>
+					<li>#1194 FLA Export - stream sound export</li>
+					<li>#2136 FLA Export - optimized Shape fixer speed, repeated shape on timeline not exported twice</li>
+					<li>#2139 FLA Export - labels layer not counted as layer index causing masked layer parentindex wrong</li>
+					<li>#2138 Nested clipping (masks) display</li>
+					<li>#2138, #2156 FLA Export - Missing morphshapes (incorrect holes calculation)</li>
+					<li>#2138 FLA Export - Mask layer was visible when did not contain a masked layer</li>
+					<li>FLA Export - frame numbering problem</li>
+					<li>#2145 FLA Export - missing frames, clipping layers order, nullpointer, empty sound layers</li>
+					<li>#2142 XML Export - string values containing only spaces</li>
+					<li>AS3 - Nullpointer in MethodBody when no ABC set</li>
+					<li>#2148 AS2 Uninitialized class fields detector</li>
+					<li>#2148 AS1/2 callmethod by register value</li>
+					<li>#2148 AS2 Do not return undefined for setters</li>
+					<li>#2143 FLA Export / Sound playback - taking MP3 initial latency into account</li>
+					<li>#2153 FLA Export - sound streams were limited to first stream block</li>
+					<li>#2163 FLA Export - maintain sound export settings for streams</li>
+					<li>#2162 Debugger - ignore (warn) invalid jumps when injecting debug info</li>
+					<li>AS3 - extra newlines on methods which use activation</li>
+					<li>#2162 AS3 switch inside foreach</li>
+					<li>#2162 AS3 try inside foreach</li>
+					<li>#2152 FLA Export - wrong nonlibrary shapes detection</li>
+					<li>#2147 Display of empty video</li>
+					<li>Saving SWFs opened by "Open loaded while playing" feature</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>#2120 Exported assets no longer take names from assigned classes if there is more than 1 assigned class</li>
+					<li>#2127 AS1/2 P-code Action GetURL2 switched parameters back - correct order is (loadVariablesFlag, loadTargetFlag, sendVarsMethod), code from 19.1.x to 20.0.0 is still accepted</li>
+					<li>Wrong unicode escape `{invalid_utf8:xxx}` changed to `{invalid_utf8=xxx}` for compatibility with file names</li>
+				</ul>
+			</description>
+		</release>
+		<release version="20.0.0" date="2023-11-05">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#1130, #1220 Remembering last used screen (monitor), opening dialogs on same screen as the main window, do not restore window size to larger value that actual screen size</li>
+					<li>#1717 AS1/2/3 Option to hide P-code panel</li>
+					<li>#2005 Export files to directories by bundle names on multiple bundle (zips, etc.) selection</li>
+					<li>ActionScript Debugger - Call stack frames switching - view variables around call stack</li>
+					<li>ActionScript Debugger - Highlight lines of callstack</li>
+					<li>#2105 GFX - Basic tag info</li>
+					<li>Context menu items to create new tags (shape, morphshape, sprite, image, movie, sound, binaryData) from files and using font embed dialog for fonts</li>
+					<li>Replacing morphshapes (either from previously exported animated SVG or from two shape files)</li>
+					<li>SVG Export - stroke-bitmapId, fill-bitmapId attribute</li>
+					<li>Morphshape SVG Export - bitmap fill strokes</li>
+					<li>SVG Export/Import - retain bitmap fill smoothed attribute</li>
+					<li>Export Morphshape as start and end shape (SVG, PNG, BMP)</li>
+					<li>Directory selection dialog in directory configs in advanced settings</li>
+					<li>Status bar with info about edges on walking shaperecords</li>
+					<li>#1799 Text tags editor has new parameter `[space xxx]` specifying exact letter advance value (add to the font advance + calculated letterspacing)</li>
+					<li>DefineEditText display - letterspacing, kerning, indent, relative font size</li>
+					<li>FLA export - DefineEditText autokern attribute</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#1306, #1768 Maximizing window on other than main monitor</li>
+					<li>AS3 Cast exception when used tree filter and then direct editing</li>
+					<li>#2013 AS3 Multiname renaming - closing the script when renaming the class, nullpointer exception</li>
+					<li>GFX - FontTextureInfo tag reading</li>
+					<li>GFX - Fonts with stripped shapes</li>
+					<li>#2104 Empty texts import</li>
+					<li>Centered start playing triangle (Playing on demand)</li>
+					<li>miterLimitFactor is FIXED8 value in MORPHLINESTYLE2</li>
+					<li>Display of morphshape end shape to be exactly at 65535 ratio</li>
+					<li>SVG import - duplicated image on bitmap fill style</li>
+					<li>Generic tag editor - morphshape fill - show bitmapId for repeating bitmap fill, gradient matrix for focal gradient</li>
+					<li>Morphshape SVG export - focalPoint animation</li>
+					<li>Do not display lines with zero width</li>
+					<li>Not updating Morphshape end bounds</li>
+					<li>SVG import - linear gradients</li>
+					<li>SVG import - Do not use fill winding nonzero when only stroking</li>
+					<li>Morphshape SVG export - closing the stroke</li>
+					<li>#2031 FLA export - morphshapes with duplicated strokes, timelines with multiple shape tweens</li>
+					<li>#1866 FLA export - multilevel clipping handling</li>
+					<li>#1866 FLA export - morphshape rounding fix</li>
+					<li>#1866 FLA export - multiple usage of morphshapes</li>
+					<li>#503, #1011, #1257, #1902, #1903, #2048 FLA export - shapes with overlapping edges</li>
+					<li>#2108 Cannot change text when ShiftJIS flag is set on font</li>
+					<li>#2074, #2074 Use mxmlc.bat file when exe not available for Flex SDK compilation</li>
+					<li>FLA export - DefineEditText - allow negative letterspacing</li>
+					<li>#2112 GFX - new image types in DefineExternalImage</li>
+					<li>#1193 FLA export - DefineEditText position and size</li>
+					<li>FLA export - allow float frame rate</li>
+					<li>FLA export - font export - allow dot as character</li>
+					<li>AS3 Debugging P-code inside nested functions</li>
+					<li>AS3 Debugging - show (and click through) proper call stack</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>Basic tag info panel always visible even when nothing to display (to avoid flickering)</li>
+					<li>SVG export - attributes like data-characterId and data-characterName moved under `ffdec:` namespace</li>
+					<li>#802 - FLA export - calculating letterspacing on text with fonts without layout is now optional and turned off by default</li>
+					<li>#2113 Commandline `-importScript` command aborts import on first error, can be changed with `-onerror ignore` argument</li>
+				</ul>
+			</description>
+		</release>
+		<release version="19.1.2" date="2023-10-16">
+			<description>
+				<p>Fixed</p>
+				<ul>
+					<li>#2099 Smart number formatting always on</li>
+				</ul>
+			</description>
+		</release>
+		<release version="19.1.1" date="2023-10-16">
+			<description>
+				<p>Fixed</p>
+				<ul>
+					<li>Linux/Mac script (ffdec.sh) incorrect quotes avoiding FFDec to start</li>
+				</ul>
+			</description>
+		</release>
+		<release version="19.1.0" date="2023-10-16">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#2090 Support for Mochicrypt packed binarydata tags - loading SWF as subtree</li>
+					<li>#2079 Replace DefineSprite with GIF, Bulk import sprites from GIFs, also from commandline</li>
+					<li>#116 Show invalid utf-8 bytes in Strings as `{invalid_utf8:xxx}`</li>
+					<li>#2097 Commandline command `-header` to modify SWF header values</li>
+					<li>SVG Frames export - blend modes</li>
+					<li>SVG Frames export - filter</li>
+					<li>SVG Shapes export - non-scaling strokes</li>
+					<li>SVG Shapes import - non-scaling strokes</li>
+					<li>Support for DefineShape4 nonzero winding rule - display, svg (import, export), canvas export</li>
+					<li>Generic tag editor - MORPHLINESTYLE2 has enum selection for cap and join style</li>
+					<li>Generic tag editor - Default values for filters</li>
+					<li>AS1/2 P-code actions inline documentation</li>
+					<li>P-code hilight currently selected instruction argument in the documentation (both AS1/2 and AS3)</li>
+					<li>#2098 Shape points editation, transform - Protection against saving too large edges/rects</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>Close action on SWF inside DefineBinaryData</li>
+					<li>#2093 AS3 Unnecessary use of fully qualified names for classes in same package</li>
+					<li>#1678 Shapes - Miter clip join style</li>
+					<li>#2094 AS3 do not show body trait variables as FQN</li>
+					<li>#2094 AS3 Missing use namespace</li>
+					<li>#2094 AS3 missing star type on var and const</li>
+					<li>#2094 AS3 Getting register names from debug info - do not allow assigning `_locX_` name to other register than X</li>
+					<li>#2094 Embed font name taken from the fontTag, not DefineFontName</li>
+					<li>AS3 Simplify expressions - Do not convert this to {} when coerced</li>
+					<li>AS3 incorrect private modifier on internal namespaced traits of private class inside script</li>
+					<li>#2095 AS3 Changing script when debugging</li>
+					<li>#223 AS2 Detecting uninitialized class fields</li>
+					<li>Embed tag not properly escaped on obfuscated files</li>
+					<li>#116 AS3 Cyclic typenames</li>
+					<li>#116 AS3 Do not parse DoABC tags inside sprites</li>
+					<li>#116 Cyclic buttons</li>
+					<li>AS1/2 new keyword on empty method name</li>
+					<li>AS2 getters and setters decoding</li>
+					<li>#116 §§push at the end of switch branches</li>
+					<li>Convolution matrix filter display and editing</li>
+					<li>Generic tag editor - Disallow add before/after or remove on parent field with indices</li>
+					<li>Calculating fillBits, lineBits on SHAPE structure (storing morphshapes, fonts)</li>
+					<li>Generic tag editor - COLORMATRIXFILTER has fixed number of float values</li>
+					<li>Filters display - ymin value</li>
+					<li>Box blur display rounding errors</li>
+					<li>Generic tag editor - display of color values in arrays (filters, etc.)</li>
+					<li>Generic tag editor - display of array brackets</li>
+					<li>Generic tag editor - GRADIENT filters fields</li>
+					<li>#2099 Smart number formatting precedence</li>
+					<li>AS3 Direct editation - Cannot save code after switching deobfuscation</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>AS1/2 P-code action parameters are now separated by commas, code without commas is still accepted</li>
+					<li>AS1/2 P-code Action GetURL2 has switched parameters - sendVarsMethod is first, older code is still accepted</li>
+				</ul>
+			</description>
+		</release>
+		<release version="19.0.0" date="2023-10-01">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#1449 Updated Turkish translation</li>
+					<li>#2070 SWF to XML format has new meta fields describing XML export major/minor version (major = uncompatible change)</li>
+					<li>#2070 forceWriteAsLong Tag internal attribute is now visible and editable (including XML export), allows decide whether to write length in tag header as long</li>
+					<li>#2073 Editing of frame count in SWF header (with warning that it won't update ShowFrame count)</li>
+					<li>Show font AS linkage class in its name in the tree (besides font name)</li>
+					<li>#2057 Show all assigned AS linkage classes in the item name (instead just one)</li>
+					<li>Exporting ByteArrayRange in the raw editor with the Export button</li>
+					<li>Export DefineFont4 to OpenType CFF file</li>
+					<li>AS3 - Show `Embed` tag over asset classes (readonly)</li>
+					<li>AS3 - Checkbox for exporting assets embedded using `Embed` (-exportembed in commandline)</li>
+					<li>FLA export - AS3 - Using `Embed` tag for DefineBinaryData, images not extending BitmapData</li>
+					<li>#2066 AS3 Support for api-versioned SWFs</li>
+					<li>AS3 compound scripts (scripts containing multiple external definitions like compiled C code, etc.) have special node per script (script_0, script_1, ...) which contains included classes and script initializer</li>
+					<li>Show "Renaming identifiers" status on file opening with auto rename identifiers on</li>
+					<li>#2010 word wrapping in the translation tool</li>
+					<li>ABC Explorer tool</li>
+					<li>FLA export - remember last selected FLA version/compression</li>
+					<li>AS3 Natural sorting of packages and script</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2043 StartSound2 tag handling</li>
+					<li>PR176 - slow loading of allowed charsets - now lazy loaded</li>
+					<li>PR178 - infinite recursion when getter/setter calls same property of superclass</li>
+					<li>#2070 Handling newlines and tabs in string values inside SWF to XML export</li>
+					<li>#2017, PR179 Classes in same package displayed as fully qualified</li>
+					<li>PR177 AS3 direct editation - Vector literal</li>
+					<li>#2052, #2058 Adding new script placing class to incorrect DoABC tag</li>
+					<li>#2072 AS3 direct editation - incorrectly using trait names of top level classes</li>
+					<li>#2029 Simplify expressions stripping getlex and also ignoring some types of expressions</li>
+					<li>#2052 Detection of switches based on notequal operator</li>
+					<li>#2073 Recalculating frameCount field in SWF header and DefineSprite after deleting frame</li>
+					<li>Handling currently selected tags when using folder preview selection (Not working Replace button, etc.)</li>
+					<li>FLA export - Sprites which do not end with ShowFrame tag</li>
+					<li>PR109 FLA export - large font size of DefineEditText</li>
+					<li>PR110 FLA export - image instances</li>
+					<li>FLA export - missing AS linkage class for fonts</li>
+					<li>#2077 Switch detection problems producing §§goto</li>
+					<li>#2077 AS3 recursion of deleting method with newfunction instruction</li>
+					<li>#2077 AS3 direct editation - incorrect slot names</li>
+					<li>#2077 AS3 direct editation - switch statement missing offset</li>
+					<li>#2077 AS3 allow star string as property name (XML access)</li>
+					<li>#2077 AS3 try..catch parts outside block</li>
+					<li>AS3 try..catch inside loop unnecessary continue</li>
+					<li>#2077 AS3 colliding types in current package with trait names</li>
+					<li>NullPointer on reload / uncache</li>
+					<li>#2076 Auto rename identifiers infinite loop caused by renaming in playerglobal library</li>
+					<li>Not working "Show in Projector" button for DefineFont4 (hide)</li>
+					<li>Proper error message when there is no room for new characters in the font (DefineFont1)</li>
+					<li>Synchronization problems when adding characters to the font vs its display</li>
+					<li>#2086 AS3 direct editation - Correct class order (instanceinfo,classinfo) respecting extends/implements</li>
+					<li>#2086 AS3 direct editation - not deleting old nested methods when they have multiple usages</li>
+					<li>#2009 Missing images in MacOs icon</li>
+					<li>AS3 Initialization of var in script initializer</li>
+					<li>AS3 Nullpointer on getting multiname which is out of bounds</li>
+					<li>Exceptions on cancelling file loading</li>
+					<li>Switching between openables on session load and on view type change</li>
+					<li>Float/Float4 ABC format support</li>
+					<li>AS3 Hilighting (go to) scripts when script has obfuscated name</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>#2070 String values inside SWF to XML export are backslash escaped to properly handle newlines and tabs. Older versions of FFDec can read this new format wrong and corrupt SWFs. Major version of SWF to XML export changed to 2.</li>
+					<li>AS3 Compound scripts (scripts containing multiple external definitions like compiled C code, etc.) cannot be directly edited or imported (due to problems with script initializers)</li>
+					<li>#2022 - AS3 - Make script initializer always visible and available instead of config</li>
+					<li>#1355 Import panel moved to separate tab</li>
+				</ul>
+				<p>Removed</p>
+				<ul>
+					<li>Removed AS3 Constants list (tab on navigator) in favor of new ABC Explorer</li>
+				</ul>
+			</description>
+		</release>
+		<release version="18.5.0" date="2023-06-25">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#1998 Setting for maximum number of items in the cache - allows less memory consumption (Defaults to 500 per cache)</li>
+					<li>#2038, #2028, #2034, #2036 Support for Harman AIR encrypted SWFs (Read-only)</li>
+					<li>Decrypt Harman AIR SWFs via commandline</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#2004 Freezing when a shape has nonimage character set as fill</li>
+					<li>#2004 Nonrepeating fill border</li>
+					<li>#2008 AS3 P-code editing optional Double value when it has no fractional part</li>
+					<li>AS3 P-code editation - zero line number on error</li>
+					<li>#2007 AS3 renaming invalid identifiers - not refreshing AbcIndex afterwards</li>
+					<li>AS1/2 - loadMovie / loadVariables / loadMovieNum / loadVariablesNum editation incorrectly setting GET as method</li>
+				</ul>
+			</description>
+		</release>
+		<release version="18.4.1" date="2023-04-05">
+			<description>
+				<p>Fixed</p>
+				<ul>
+					<li>#1993 Incorrect scroll position causing shapes to be hidden</li>
+					<li>#1994 Replace command in commandline with three argument causing replacements file load</li>
+					<li>#1477 Open file (Context menu) with unicode characters, unicode in paths, on Windows</li>
+					<li>Starting app with parameters causing wrong GUI init</li>
+					<li>#1991 ConcurrentModificationException on clearing cache thread</li>
+					<li>#1999 AS3 decompilation - XML constructor call with other than string argument</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>#1996 Items are now exported in order of appearance in the tag tree (usually SWF order), previously was it in order of selection</li>
+				</ul>
+			</description>
+		</release>
+		<release version="18.4.0" date="2023-03-19">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>AS3 support for logical AND/OR compound operator</li>
+					<li>AS3 Display missing namespaces along traits as §§namespace("url")</li>
+					<li>#1888, #1892 AS3 option to select SWF dependencies to properly resolve namespaces, types, etc. (currently in GUI only)</li>
+					<li>FileAttributes tag - SWF relative Urls flag</li>
+					<li>AS3 P-code editing class trait</li>
+					<li>#355 Updated Chinese translation</li>
+					<li>FLA Export - AS2 - Sprite linkage to class</li>
+					<li>#1682 AS1/2 Context menu add script on frames/buttons/placeObjects</li>
+					<li>Allow adding second DoAction to a frame</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#1981 AS3 fully qualified (colliding) types in submethods</li>
+					<li>AS3 direct editation - Allow member or call for doubles</li>
+					<li>AS3 direct editation - Allow comma operator in XML filter operation</li>
+					<li>AS3 direct editation - Allow comma operator in switch expressions</li>
+					<li>AS3 XML embedded variables display and direct edit</li>
+					<li>AS3 Metadata values order</li>
+					<li>AS3 Metadata in P-code formatting</li>
+					<li>AS3 Metadata single value (null item key)</li>
+					<li>#1981 AS3 star import collisions</li>
+					<li>#1982 Slow calculation of large shape outlines - now use only rectangles for large shapes</li>
+					<li>#1986 AS2 Class detection - NullPointerException on certain classes</li>
+					<li>AS3 P-code ValueKind namespaces handling</li>
+					<li>AS3 direct editation - namespace definition without explicit value</li>
+					<li>AS3 direct editation - var/const outside package</li>
+					<li>AS3 interfaces - internal modifier on methods</li>
+					<li>AS3 direct editation - interface method namespace</li>
+					<li>AS3 p-code docs - deldescendants, negate_p operands</li>
+					<li>AS3 p-code - IGNORE_REST method flag incorrectly shown as EXPLICIT</li>
+					<li>#1989 AS3 - Slow deobfuscation (AVM2DeobfuscatorSimpleOld)</li>
+					<li>AS3 - getouterscope instruction support</li>
+					<li>#1990 Cloning DefineSprite causing incorrect tags written</li>
+					<li>Do not display fonts added to stage (for example in testdata/as2.swf, the vertical text - sprite 10)</li>
+					<li>AS2 Class detection - TemporaryRegisterMark handling</li>
+					<li>FLA export scripts location</li>
+					<li>FLA export shape tweens (morphshapes)</li>
+					<li>AS1/2 adding CLIPACTIONRECORD to PlaceObject which already has a record</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>AS1/2/3 P-code - format Number values with EcmaScript toString function</li>
+					<li>AS3 p-code - EXPLICIT method flag renamed to NATIVE</li>
+				</ul>
+			</description>
+		</release>
+		<release version="18.3.6" date="2023-02-25">
+			<description>
+				<p>Fixed</p>
+				<ul>
+					<li>#1970 FLA export - do not strip empty frames at the end of timeline</li>
+					<li>#1970 AS2 Renaming invalid identifiers for direct strings (no constant indices)</li>
+					<li>#1970 AS2 Renaming invalid identifiers IndexOutOfBounds on invalid constant index (obfuscated code, etc.)</li>
+					<li>#1972 AS3 Renaming invalid identifiers - '#' character</li>
+					<li>#1972 AS3 Renaming invalid identifiers - various fixes</li>
+					<li>#1972 AS3 imports taken only from packages, not package internal</li>
+					<li>Unresponsive status bar and its icon</li>
+					<li>#1973 FLA export - improper calculation of shape instance count</li>
+					<li>FLA export - XML formatting with blank lines on Java9+</li>
+					<li>#1974 DefineBits image reading problem</li>
+					<li>#1963 AS2 properly decompile/direct edit long classes</li>
+					<li>#1977 AS3 Find usages - class and function usages, various fixes</li>
+					<li>IllegalArgumentException: JSplitPane weight must be between 0 and 1</li>
+					<li>#1979 SVG import - autoclosing fill paths (without closing stroke paths)</li>
+				</ul>
+			</description>
+		</release>		
+		<release version="18.3.5" date="2023-02-12">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#1959 Display frame labels along frames and FrameLabel tags</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#1960 Hide tag tree root handles as it was in previous versions</li>
+					<li>#1964 Freezing on releasing mouse while shape transforming (deadlock)</li>
+					<li>#1961 Characters can use characterId 0, PlaceObject can use depth 0</li>
+					<li>#1963 Reading CLIPEVENTFLAGS ClipActionEndFlag on SWF versions >= 6</li>
+					<li>#1968, #1971, #1957 Cannot start FFDec due to large stack size on some configurations</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>#1960 Quick search does not search in SWF name or folder names</li>
+					<li>#1961 SoundStreamHead on main timeline is exported/imported with identifier "-1"</li>
+					<li>#1957 Larger stack size (when needed) must be configured manually in ffdec.bat or ffdec.sh</li>
+				</ul>
+			</description>
+		</release>
+		<release version="18.3.4" date="2023-01-30">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#1029 Better separation of library and main app, dependencies inside library zip, library readme</li>
+					<li>Remembering script+folder scroll/caret position when switching between items, saving for pinned items</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#1948 Timeout while deobfuscation did not skip method</li>
+					<li>#1948 NullPointerException on Simplify expressions on increment/decrement</li>
+					<li>#1941 Export when no node is selected after SWF opening</li>
+					<li>Exception handling in cache clearing thread</li>
+					<li>DottedChain.PathPart NoSerializable exception</li>
+					<li>#1951 Clearing Namespace/Multiname cache after renaming identifiers</li>
+					<li>#1951 Renaming invalid identifiers with existing string collisions</li>
+					<li>#1888 String casts - ConvertS on XML, XMLList</li>
+					<li>#1953 Save as EXE - add file extension when missing</li>
+					<li>#1954 Incorrect calculation of empty button bounds causing OutOfMemory</li>
+					<li>#1944 Scroll position not retained on Ctrl+click in the tag tree</li>
+					<li>#1940 AS3 decompilation - wrong assignment</li>
+					<li>AS3 - incorrect switching P-code causing empty text</li>
+					<li>AS3 - Select the trait after adding new</li>
+					<li>#1955 AS3 - Exception during removing trait</li>
+					<li>#688 AS3 Direct editation - construction (new keyword) converted to call when result not used</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>#1957 Increased maximum stack size to avoid StackOverflowErrors on unusual scripts</li>
+				</ul>
+			</description>
+		</release>
+		<release version="18.3.3" date="2023-01-22">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#1913 Option to retain shape exact position(bounds) in SVG export</li>
+					<li>#1913 Option to disable bitmap smoothing for display</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#1888 AS3 - missing casts in declarations</li>
+					<li>#1894 Switch inside loop</li>
+					<li>#1801 AS3 - AIR/Flash switching</li>
+					<li>#1892 AS3 - internal modifier after implicit namespace</li>
+					<li>#1888 AS3 - Coerce to string</li>
+					<li>AS3 - local registers type declarations vs for..in clause</li>
+					<li>#1888 AS3 - Coerce to int when Number</li>
+					<li>AS3 - super properties resolving</li>
+					<li>AS3 - line numbering on pushback string on regexp</li>
+					<li>AS3 Direct editation - removing method bodies after unsuccessful edit</li>
+					<li>#1936 AS3 - Parentheses around function definition call</li>
+					<li>#1936 AS3 - Scope stack in second pass</li>
+					<li>#1936 AS3 Direct editation - handling undefined variables</li>
+					<li>#1936 AS3 Direct editation - colliding try..catch variable</li>
+					<li>#1936 AS3 Direct editation - missing pop after call</li>
+					<li>#1936 AS3 Direct editation - slots increment, decrement</li>
+					<li>#1936 AS3 Direct editation - scope of nested functions</li>
+					<li>AS3 - empty P-code shown on clicking script</li>
+					<li>#1888 AS3 - Coerces, module operator</li>
+					<li>#1937 AS3 - declarations vs null</li>
+					<li>#1458 Quick find bar overlaying horizontal scrollbar</li>
+					<li>#1842 AS1/2 Better handling obfuscated code, for..in</li>
+					<li>#1842 AS1/2 use parenthesis when initObject has nonstring keys</li>
+					<li>#1842 AS - Do not display §§dup when the value has no sideeffect</li>
+					<li>Deobfuscation icon on script toolbar did not match the deobfuscation status</li>
+					<li>#1938 AS3 Direct editation - implied this instead of findprop</li>
+					<li>#1938 AS3 Direct editation - local registers coerce/convert</li>
+					<li>#1938 AS3 Direct editation - setting default values for slots</li>
+					<li>AS3 Direct editation - using local classes as types</li>
+					<li>#1938 AS3 - coercion call type</li>
+					<li>#1938 AS3 - shortening + 1 to increment</li>
+					<li>#1938 AS3 - implicit coercion of operations</li>
+					<li>#1938 AS3 - initproperty compound operators, increment/decrement</li>
+					<li>#1938 "Open loaded during play" Loader injection for Multiname types</li>
+					<li>AS3 - not using visitCode when not needed => faster decompilation</li>
+					<li>Cache thread as daemon</li>
+					<li>#1949 Incorrect reading FIXED and FIXED8 SWF values causing wrong Filters size and OutOfMemory</li>
+				</ul>
+			</description>
+		</release>
+		<release version="18.3.2" date="2023-01-10">
+			<description>
+				<p>Removed</p>
+				<ul>
+					<li>#1935, #1913 Retaining shape exact position(bounds) in SVG export/import</li>
+				</ul>
+			</description>
+		</release>
+		<release version="18.3.1" date="2023-01-09">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>GFX - support for TGA external images</li>
+					<li>GFX - DefineExternalGradient tag has gradientId in its name</li>
+					<li>GFX - DefineExternalSound and DefineExternalStreamSound playback</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>GFX - DefineExternalImage2 display and correct handling if standalone</li>
+					<li>#1931, #1934 DefineSprite rectangle calculation (incorrect export dimensions)</li>
+					<li>#1929, #1932 Wrong subsprite frames display</li>
+					<li>#1933 AS3 - Detection of variable names from debug info on multiple debug ins with same regindex</li>
+					<li>GFX - ExporterInfo prefix is NetString</li>
+					<li>Scrollbars on sound playback</li>
+					<li>Clear preview on raw edit to stop sound playback</li>
+					<li>CXFORM and GRADRECORD causing NotSerializableException</li>
+					<li>Scrollbars</li>
+					<li>Incorrect frame counting</li>
+					<li>Save as does not change file title upon reload</li>
+				</ul>
+			</description>
+		</release>
+		<release version="18.3.0" date="2023-01-01">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#1913 Shape transforming, point editation</li>
+					<li>Hilighting currently selected shape edge in the raw edit</li>
+					<li>#1905 Key strokes on folder preview panel</li>
+					<li>Scrollbars</li>
+					<li>Morphshape transforming, point editation</li>
+					<li>Raw edit - (MORPH)GRADIENT spreadMode,interpolationMode as enums</li>
+					<li>Unit selection (pixels/twips) in header editation</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#1915 SVG import - gradient when it has two final stops</li>
+					<li>Native sound export format for ADPCM compression is FLV</li>
+					<li>#1923 Wrong cyclic tag detection causing hidden sprites</li>
+					<li>Ctrl + G shortcut for tag list view</li>
+					<li>Uncompressed FLA (XFL) export creates a directory</li>
+					<li>#1827 Video replacing VP6 reading</li>
+					<li>#1926 Constructors namespace taken from class - should be always public</li>
+					<li>#1772 AS1/2 decompilation - StackOverflow during getVariables function</li>
+					<li>#1890 AS3 - Removing first assignment in for in loop</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>#1913 SVG export/import of shapes - shape exact position (bounds) is retained</li>
+				</ul>
+			</description>
+		</release>
+		<release version="18.2.1" date="2022-12-28">
+			<description>
+				<p>Fixed</p>
+				<ul>
+					<li>Copy/Move/Cut with dependencies did not handle original tag when not charactertag</li>
+					<li>#1922 FLA/XFL/Canvas/SVG export - exporting DefineBitsJPEG3/4 with alpha as JPEG with PNG extension</li>
+					<li>#1921 AS3 direct editation - exception on code save - wrong selected ABC</li>
+				</ul>
+			</description>
+		</release>
+		<release version="18.2.0" date="2022-12-27">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#1917 Better error message for sound import on unsupported sampling rate</li>
+					<li>#1827 Replacing and bulk import of DefineVideoStream</li>
+					<li>Movie FLV export - writing simple onMetadata tag</li>
+					<li>#1424, #1473, #1835, #1852 Replacing sound streams (SoundStreamHead, SoundStreamBlock)</li>
+					<li>Bulk import sounds and sound streams</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#1914 DropShadow filter</li>
+					<li>#1916 Translation tool did not load up</li>
+					<li>PlaceObject preview not cleared causing sound to repeat</li>
+					<li>#1920 AS3 - Slower decompilation (returnType method optimization)</li>
+				</ul>
+			</description>
+		</release>
+		<release version="18.1.0" date="2022-12-23">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>Deobfuscation and its options as icons on script panel toolbar</li>
+					<li>Warning before switching auto rename identifiers on</li>
+					<li>#1231 Button transforming</li>
+					<li>#1690 Deobfuscation tool dialog for script level (not just current method / all classes)</li>
+					<li>#1460 Commandline import of text, images, shapes, symbol-class</li>
+					<li>#1909 Export/import DefineBitsJPEG3/4s alpha channel to/from separate file
+					("PNG/GIF/JPEG+alpha" option in GUI, "-format image:png_gif_jpeg_alpha" for commandline)</li>
+					<li>#1910 Copy/paste transform matrix to/from the clipboard</li>
+					<li>#1912 Persist selected item in the tree upon quick search (Ctrl+F)</li>
+					<li>#1901 Editor mode and autosave feature for header, raw editor, transform</li>
+					<li>#583 FlashPaper SWF to PDF with selectable text (commandline)</li>
+					<li>#1858 PDF export - JPEG with alpha channel exported as is</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#1904 NullPointerException when renaming invalid identifiers in AS1/2 files caused by missing charset</li>
+					<li>#1904 NullPointerException when fast switching items</li>
+					<li>#1904 NullPointerException on ErrorLog frame</li>
+					<li>#1904 NullPointerException on decompiler pool</li>
+					<li>#1904 AS1/2 Simplify expressions breaks registers, functions</li>
+					<li>#1904 AS1/2 Throw is an ExitItem to properly handle continues vs ifs</li>
+					<li>#595 AS3 direct editation - protected property resolving</li>
+					<li>AS3 direct editation and decompiler share same AbcIndex</li>
+					<li>BUTTONRECORD display does not use its Matrix</li>
+					<li>Editation status not cleared after Sprite transforming</li>
+					<li>Image flickering</li>
+					<li>Show Hex dump for AS1/2 script tags</li>
+					<li>Speaker image when sound selected not in the center</li>
+					<li>#1908 Slow commandline opening SWF</li>
+					<li>#1908 Shape/image import must accept also filenames in the form "CHARID_xxx.ext" instead of just "CHARID.ext"</li>
+					<li>Exporting DefineJPEG3/4 with alpha channel to PNG produced JPEG instead</li>
+					<li>AS3 package level const with function value - separate P-code for trait and method</li>
+					<li>Slot/const trait proper p-code indentation</li>
+					<li>#1858 PDF export - Adding same ExtGState multiple times,</li>
+					<li>#1858 PDF export - Applying same alpha/blendmode multiple times</li>
+					<li>#1858 PDF export - Applying same color multiple times</li>
+					<li>#1907 Crashing on memory search</li>
+					<li>#1906 Memory search - byte align opens wrong SWFs</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>Warning before switching deobfuscation is now optional</li>
+					<li>#1690 Redesigned Deobfuscation tool dialog.</li>
+					<li>Shape/image/script/text import does not require specific folder name inside (but still prefers it when exists)</li>
+				</ul>
+				<p>Removed</p>
+				<ul>
+					<li>"Restore control flow" deobfuscation level as it was the same as "Remove traps"</li>
+				</ul>
+			</description>
+		</release>
+		<release version="18.0.0" date="2022-12-18">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#1898 Keyboard shortcut to remove tags (DEL, SHIFT+DEL)</li>
+					<li>#1511, #1765 Quick search tree (Ctrl+F) for everything, not just AS3 classes</li>
+					<li>Quick search (Ctrl+F) for tag list view</li>
+					<li>#1884 Memory search - show size and address in hex, show only aligned to N bytes</li>
+					<li>AS3 - "internal" keyword support</li>
+					<li>ProductInfo tag information display</li>
+					<li>DebugId tag proper display and editation</li>
+					<li>#1564, #1676, #1697, #1893 Display of DefineVideoStream tags with VLC player</li>
+					<li>List of treenode subitems on otherwise empty panel (with 32x32 icons)</li>
+					<li>DefineVideoStream codecId and videoFlagsDeblocking handled as enums in raw editation</li>
+					<li>Option to mute frame sounds</li>
+					<li>Experimental option to fix conflation artifacts in antialiasing (slow)</li>
+					<li>Option to disable autoplay of sounds (DefineSound)</li>
+					<li>#1181 Remembering choice of loading assets via importassets tag</li>
+					<li>#1900 Free transform whole sprites</li>
+					<li>Show axis as dashed line in Free transform of sprites</li>
+					<li>#1900 Transformation panel with flip/move/scale/rotate/skew/matrix options</li>
+					<li>#1900 Move object around with arrow keys (in transform mode)</li>
+					<li>Alt + click selects PlaceObjectTag under cursor</li>
+					<li>#1901 Double click tree node to start edit (can be enabled in settings)</li>
+					<li>Info about editation in status bar</li>
+					<li>AS3 P-code keyword "Unknown(N)", where N is index. For constants out of bounds. (mostly in dead code)</li>
+					<li>AS3 P-code - Editing methods without body (interfaces / native methods)</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#1897 Close menu button without selecting specific item</li>
+					<li>Reading UI32 values</li>
+					<li>Parsing obfuscated namespaces with hash character "#"</li>
+					<li>Tag dependency checking</li>
+					<li>#1884 Memory search - Logged exception when cannot get page range</li>
+					<li>#1884 Memory search - Exception on sorting by pid</li>
+					<li>#1006 AS3 - Warning - Function value used where type Boolean was expected</li>
+					<li>AS3 - Resolving types on static protected namespaced properties</li>
+					<li>Hiding selection after raw editation save</li>
+					<li>Proper disabling switching items or other actions on editation</li>
+					<li>Raw editor item count and edit display</li>
+					<li>Warnings about invalid reflective access in color dialog on Java 9+</li>
+					<li>Folder preview tag names have indices when multiple with same name</li>
+					<li>ShapeImporter fillstyles shapenum</li>
+					<li>Reload button disabled after saving new file</li>
+					<li>PlaceObject tag - do not display export name twice</li>
+					<li>Loading nested characters when Importassets tag used</li>
+					<li>Hide various actions for imported tags</li>
+					<li>Clone tag</li>
+					<li>Hide freetransform button in readonly mode</li>
+					<li>Maintain export name/class on imported tags</li>
+					<li>Classnames in PlaceObject</li>
+					<li>#1828 AS1/2 deobfuscation removing variable declarations</li>
+					<li>Loaded SWFs using "Open loaded during play" feature have short filenames</li>
+					<li>#1796 Exception on closing multiple SWFs</li>
+					<li>AS3 Deobfuscation causing invalid jump offsets for files with constant indices out of bounds</li>
+					<li>AS3 - "native" modifier only for methods with EXPLICIT flag</li>
+					<li>AS3 - AS3 builtin namespace visibility</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>Quick search needs minimum of 3 characters</li>
+					<li>AS1/2 deobfuscation - removing obfuscated declarations is now optional (default: off)</li>
+					<li>AS3 - order of modifiers: final, override, access, static, native</li>
+				</ul>
+			</description>
+		</release>
+		<release version="17.0.4" date="2022-12-02">
+			<description>
+				<p>Fixed</p>
+				<ul>
+					<li>#1888 Casts for missing types, cast handling for script local classes</li>
+					<li>#1895 Handling of unstructured switch</li>
+					<li>#1896 NullPointer during deobfuscation</li>
+				</ul>
+			</description>
+		</release>
+		<release version="17.0.3" date="2022-11-30">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>Translator tool for easier localization</li>
+					<li>AS3 improved goto declaration for properties and methods</li>
+					<li>playerglobal.swc and airglobal.swf now part of FFDec bundle</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#1769 AS3 - Missing some body trait variable declaration</li>
+					<li>#1769, #1888 AS3 - Missing casts like int()</li>
+					<li>#1890 AS3 - Chained assignments in some special cases</li>
+					<li>#1810 AS3 Direct editation - XML attribute handling</li>
+					<li>#1810 AS3 Direct editation - Calls inside submethods using this</li>
+					<li>#1891 AS3 - duplicate variable declaration in some cases</li>
+					<li>All SWF classes inside DoABC tags in the taglist view</li>
+					<li>Exception on package selection inside DoABC tag on taglist view</li>
+					<li>#1892 AS3 - Package internal custom namespaces</li>
+					<li>Unpin all context menu not clearing pins properly</li>
+					<li>AS3 - RegExp escaping</li>
+					<li>AS3 - Avoid Error Implicit coercion of a value of type XXX to an unrelated type YYY</li>
+					<li>AS3 - XML - get descendants operator parenthesis</li>
+					<li>Switch decompilation in some corner cases</li>
+					<li>#1894 Switches vs loops decompilation (now with two passes)</li>
+					<li>#1894 AS3 - XML filters in some corner cases</li>
+					<li>#1887 AS3 - strict equals operator decompilation</li>
+				</ul>
+			</description>
+		</release>
+		<release version="17.0.2" date="2022-11-22">
+			<description>
+				<p>Fixed</p>
+				<ul>
+					<li>#1882 Close button on the menu toolbar</li>
+				</ul>
+			</description>
+		</release>
+		<release version="17.0.1" date="2022-11-21">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>PR119 Option to set scale factor in advanced settings (Set it to 2.0 on Mac retina displays)</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#1880 JPEG Fixer</li>
+					<li>Close action from menu not available on bundles (zip, etc...)</li>
+					<li>#1881 Wrong locale reference for invalid tag order</li>
+					<li>New file action</li>
+					<li>Moving tags to frames</li>
+				</ul>
+			</description>
+		</release>
+		<release version="17.0.0" date="2022-11-20">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#1870 AS3 Adding new class - Target DoABC tag or position can be selected to prevent Error 1014</li>
+					<li>#1871 Toggle buttons for disabling subsprite animation, display preview of sprites/frames</li>
+					<li>#1875 Remove no longer accessed items from cache after certain amount of time</li>
+					<li>#1280 AS3 Direct editation of traits with the same name</li>
+					<li>#1743 GFX - Adding DefineExternalImage2 and DefineSubImage tags</li>
+					<li>#1822, #1803 AS3 direct editation - optional using AIR (airglobal.swc) to compile</li>
+					<li>#1501 Bulk import shapes</li>
+					<li>#1680 Pinning items</li>
+					<li>Indices in brackets for items with same name (like two subsequent DoAction tags)</li>
+					<li>Flattened ActionScript packages (one row per package instead package tree), can be turned off in settings</li>
+					<li>#1820 Opening standalone ABC files (*.abc)</li>
+					<li>Classes tree inside DoABC tags in taglist view</li>
+					<li>Export ABC data from DoABC tags</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#1869 Replace references now replaces all references, not just PlaceObject</li>
+					<li>Handle StartSound tag as CharacterIdTag</li>
+					<li>Clearing shape export cache on changes</li>
+					<li>Preview of PlaceObject and frames on hex dump view</li>
+					<li>AS3 Direct editation - Top level classes do not use ":" in their namespace names</li>
+					<li>AS3 Direct editation - Using "/" separator for method names</li>
+					<li>Folder preview resizing (scrollbar too long)</li>
+					<li>#1872 Removing PlaceObject/RemoveObject with no characterid with Remove character action</li>
+					<li>#1692 Resolving use namespace</li>
+					<li>#1692 Properly distinguish obfuscated names vs namespace suffixes and attributes</li>
+					<li>#1757 Binary search - SWF files need to be sorted by file position</li>
+					<li>#1803 AS3 Direct editation - Colliding catch name with other variable names / arguments</li>
+					<li>AS3 Direct editation - slow property resolving (Now up to 10 times faster compilation)</li>
+					<li>#1875 Garbage collect SWF and its caches after closing it</li>
+					<li>#1807 Proper parenthesis around call inside another call</li>
+					<li>#1840 AS3 - Allow to compile object literal keys with nonstring/numbers in obfuscated code</li>
+					<li>#1840 AS3 Direct editation - Type mismatched for a trait</li>
+					<li>#1840 Proper if..continue..break handling</li>
+					<li>#1877 Recalculate dependent characters and frames on removing / editing item</li>
+					<li>DefineShape4 SVG import NullPointerException</li>
+					<li>List of objects under cursor and coordinates not showing</li>
+					<li>ConcurrentModificationException in getCharacters on exit</li>
+					<li>Header of display panel not visible on certain color schemes</li>
+					<li>Move tag to action did not remove original tag</li>
+					<li>Show in tag list from tag scripts</li>
+					<li>Move/Copy tag to action on tag scripts</li>
+					<li>#1879 False tag order error with SoundStreamHead</li>
+					<li>Error messages during SWF/ABC reading have correct error icon and title, are translatable</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>GFX - DefineExternalImage2 no longer handled as character</li>
+					<li>Raw editor does not show tag name in the tree (it's now in the new pinnable head)</li>
+					<li>DoInitAction is not shown in resources/sprites section, only in scripts</li>
+					<li>ActionScript packages are by default flattened (can be turned off in settings)</li>
+				</ul>
+			</description>
+		</release>
+		<release version="16.3.1" date="2022-11-14">
+			<description>
+				<p>Fixed</p>
+				<ul>
+					<li>#1867 AS3 - §§hasnext, §§nextvalue, §§nextname in some nonstandard compiled SWFs</li>
+					<li>#1868 Raw editation NullPointerException</li>
+				</ul>
+			</description>
+		</release>
+		<release version="16.3.0" date="2022-11-14">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>Allowed copy/cut tags to clipboard across multiple SWFs</li>
+					<li>Keyboard shortcuts for tag clipboard operations</li>
+					<li>Hilight clipboard panel on copy/cut action for a few seconds</li>
+					<li>Drag and drop to move/copy tags in the tag list view (Can be disabled in settings)</li>
+					<li>Setting for enabling placing Define tags into DefineSprite</li>
+					<li>Icons for tags in replace character dialog</li>
+					<li>Move tag with dependencies</li>
+					<li>Copy/Move tag operation has select position dialog</li>
+					<li>Select position dialog has target file in its title</li>
+					<li>#1649 Moving SWF files (and bundles) up and down (comtext menuitem + ALT up/down shortcut)</li>
+					<li>Moving tags up and down in the taglist view (context menuitem + ALT up/down shortcut)</li>
+					<li>#1701 Setting charset for SWF files with version 5 or lower (GUI, commandline)</li>
+					<li>#1864 Commandline: Allow to set special value "/dev/stdin" for input files to read from stdin (even on Windows)</li>
+					<li>Show button records in the tree, preview them</li>
+					<li>Show in Hex dump for BUTTONCONDACTION, BUTTONRECORD, CLIPACTIONRECORD</li>
+					<li>Alpha and Erase blend modes support</li>
+					<li>Raw editor - Edit blend modes as enum</li>
+					<li>Search in the advanced settings</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>Exception when bundle selected</li>
+					<li>File path in window title for SWFs inside DefineBinaryData</li>
+					<li>#1863 Export to PDF - cannot read fonts with long CMAP</li>
+					<li>Go to document class when switched to tag list view</li>
+					<li>Copy/Move with dependencies order of tags</li>
+					<li>#1865 ConcurrentModificationException on SWF close</li>
+					<li>NullPointerException on expanding needed/dependent characters on basic tag info</li>
+					<li>Copy/Move with dependencies should copy mapped tags too</li>
+					<li>Recalculating dependencies in the loop (now only on change)</li>
+					<li>Dependencies handling</li>
+					<li>Raw editing of DefineFontInfo/DefineFont2-3, KERNINGRECORD - proper switching wide codes</li>
+					<li>Storing SWF configuration for files inside bundles and/or binarydata</li>
+					<li>#1846 blend modes with alpha</li>
+					<li>Raw editor does not select item in enum list</li>
+					<li>Sound not played on frames</li>
+					<li>#1678 Miter clip join - can be enabled in Settings</li>
+					<li>Html label links visibility</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>Full path inside bundle is displayed as SWF name instead simple name</li>
+				</ul>
+			</description>
+		</release>
+		<release version="16.2.0" date="2022-11-08">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#1414 Cancelling in-progress exportation</li>
+					<li>#1755 Copy tags to tag clipboard and paste them elsewhere</li>
+					<li>#1460 Bulk importing images</li>
+					<li>Bulk importing scripts/text/images added to SWF context menu</li>
+					<li>#1465 Configuration option to disable SWF preview autoplay</li>
+					<li>Setting for disabling expanding first level of tree nodes on SWF load</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>FLA export printing xxx string on exporting character with id 320</li>
+					<li>Copy to with dependencies does not refresh timeline</li>
+					<li>Copy to with dependencies does not set the timelined, that can result to missing dependencies (red tags in the tree)</li>
+					<li>Double warning/error when copy to / move to and same character id already exists</li>
+					<li>#1862, #1735 Exporting selection to subfolders by SWFname when multiple SWFs selected</li>
+					<li>Java code export indentation</li>
+					<li>Java code does not export tags</li>
+					<li>On new SWF loading, do not expand all other SWFs nodes, only this one</li>
+				</ul>
+			</description>
+		</release>
+		<release version="16.1.0" date="2022-11-06">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>#1459, #1832, #1849 AS1/2 direct editation - Error dialog when saved value (UI16, SI16, ...) exceeds its limit and this code cannot be saved.</li>
+					<li>Attach tag menu (Like DefineScaling grid to DefineSprite, etc.)</li>
+					<li>Better tag error handling - these tags now got error icon</li>
+					<li>Show in Hex dump command from other views for tags</li>
+					<li>Show in Taglist command from dump view for tags</li>
+					<li>Create new empty SWF file</li>
+					<li>Checking missing needed character tags and their proper position (Marking them as red - with tooltip)</li>
+					<li>#1432 Save as EXE from commandline</li>
+					<li>#1232 Needed/dependent characters list in basic tag info can be expanded to show tag names</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>Flash viewer - subtract blend mode</li>
+					<li>#1712, #1857, #1455 JPEG images errors fixer</li>
+					<li>Ignore missing font on DefineEditText</li>
+					<li>GFX: Drawing missing DefineExternalImage/2, DefineSubImage as red instead of throwing exception</li>
+					<li>GFX: DefineExternalImage2 properly saving characterId</li>
+					<li>Hex view refreshing after selecting Unknown tag</li>
+					<li>#1818, #1727, #1666 GFX: Importing XML</li>
+					<li>GFX: Correct refreshing image when raw editing DefineExternalImage/2, DefineSubImage</li>
+					<li>GFX: DefineExternalImage/2, DefineSubImage disallow not working replace button in favor of raw editing</li>
+					<li>#1795 AS3 P-code - optional (default parameter values) saving</li>
+					<li>#1785 AS1/2 try..catch block in for..in</li>
+					<li>#1770 Links in basictag info (like needed/dependent characters) were barely visible on most themes</li>
+					<li>Show in Resource command from Hex dump not working for tags inside DefineSprite</li>
+					<li>File did not appear modified when only header was modified</li>
+					<li>Copy / Move to tag tree refreshing</li>
+					<li>Preview of PlaceObject and ShowFrame in the Dump view</li>
+					<li>FileAttributes tag exception in the Dump view</li>
+					<li>Adding new frames did not set correct timelined to ShowFrame</li>
+					<li>Computing dependent characters inside DefineSprite</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>#1455 All tag types are now allowed inside DefineSprite</li>
+				</ul>
+				<p>Removed</p>
+				<ul>
+					<li>Auto fixing character tags order based on dependencies during saving</li>
+				</ul>
+			</description>
+		</release>
+		<release version="16.0.4" date="2022-11-03">
+			<description>
+				<p>Fixed</p>
+				<ul>
+					<li>#1860 FLA export - EmptyStackException during exporting MorphShape</li>
+					<li>#1782 FLA export - exporting from SWF files inside bundles (like binarysearch)</li>
+					<li>Expand correct tree on SWF load</li>
+					<li>#1679 FLA export - MorphShapes (shape tween)</li>
+					<li>#1860, #1732, #1837 FLA export - AS3 - missing framescripts on the timeline</li>
+					<li>Flash viewer - dropshadow filter hideobject(compositeSource) parameter</li>
+				</ul>
+			</description>
+		</release>
+		<release version="16.0.3" date="2022-11-02">
+			<description>
+				<p>Fixed</p>
+				<ul>
+					<li>#1817 PDF export - now storing JPEG images without recompression to PNG</li>
+					<li>#1816 PDF export - leaking temporary files when frame has embedded texts</li>
+					<li>PDF export - reusing images when used as pattern vs standalone</li>
+					<li>#1859 AS3 P-code editing not working due to integer/long casting</li>
+				</ul>
+			</description>
+		</release>
+		<release version="16.0.2" date="2022-11-01">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>Copy/move tag to for SWFs inside bundles and/or DefineBinaryData</li>
+					<li>Replace button under shape and DefineSound display (previously, only context menu allowed that)</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>SWF Add tag before/after menuitem</li>
+					<li>Context menu on bundles (ZIP, SWC, binarysearch, etc...)</li>
+					<li>Reloading SWF inside DefineBinaryData</li>
+					<li>Working with byte ranges - caused problems when cloning tags</li>
+					<li>All "mapped" tags have character id in parenthesis in the tag tree</li>
+					<li>Raw editor now checks whether field value can be placed inside this kind of tag</li>
+					<li>Refreshing parent tags and/or timelines on raw editor save</li>
+					<li>Items could not be edited on taglist view (for example raw edit)</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>Do not show export name (class) in DoInitAction in Tag list view instead of tag name</li>
+				</ul>
+			</description>
+		</release>
+		<release version="16.0.1" date="2022-10-31">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>Allow add tag after header context menu</li>
+					<li>DefineScalingGrid has icon</li>
+					<li>Adding tag "inside" allows setting character id to original when possible</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>Do not show option to Show in taglist on resource view folders</li>
+					<li>Disallow add tag before header context menu</li>
+					<li>Context menu on tags mapped to other characters like DefineScalingGrid</li>
+					<li>Add tag before/after for frame selection position</li>
+					<li>Add tag (before/after/inside) refactored to more meaningful menus</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>Add tag renamed to Add tag inside</li>
+					<li>Clone tag menuitem renamed to just Clone as it clones both tags and frames</li>
+				</ul>
+			</description>
+		</release>
+		<release version="16.0.0" date="2022-10-30">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>Replace characters references</li>
+					<li>Replace commandline action allows to load replacements list from a textfile</li>
+					<li>SymbolClass export from commandline</li>
+					<li>data-characterId and data-characterName tags to SVG export</li>
+					<li>#1731 Image viewer zoom support</li>
+					<li>Cloning of tags and frames</li>
+					<li>Changing tag position</li>
+					<li>Tag list view</li>
+					<li>Inserting new tags before and after selection</li>
+					<li>#1825, #1737 Adding new frames</li>
+					<li>Context menu icons</li>
+					<li>Icon of tag in raw editor</li>
+					<li>#1845 Show warning on opening file in Read only mode (binary search, unknown extensions, etc.)</li>
+					<li>#1845 Show error message on saving in Read only mode, "Save As" must be used</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#1834 PlaceObject4 tags appear as Unresolved inside of DefineSprite</li>
+					<li>#1839 Sprite frames exported incorrectly and repeating</li>
+					<li>#1838 AS3 - Properly handling of long unsigned values, hex values, default uint values etc.</li>
+					<li>#1847 Shape viewer and PDF exporter - correct drawing of pure vertical/horizontal shapes (zero width/height)</li>
+					<li>Slow zooming/redrawing on action when SWF has low framerate</li>
+					<li>Correct debug info label position/content on the top of flash viewer to avoid unwanted initial scroll</li>
+					<li>#1829 Adding extra pixel to the width and height when rendering items (for example to AVI)</li>
+					<li>#1828 Zero scale layer matrices support</li>
+					<li>#1828 Incorrect stroke scaling (normal/none/vertical/horizontal)</li>
+					<li>#1771 DefineShape4 line filled using single color</li>
+					<li>Minimum stroke width should be 1 px</li>
+					<li>#1828 Closing path in shape strokes from last moveTo only</li>
+					<li>Shape not clipped when clip area outside of view</li>
+					<li>Sound tag player now uses less memory / threads - does not use Clip sound class</li>
+					<li>Freetransform tool dragging not always started on mousedown</li>
+					<li>#1695 Freetransform tool vs zooming</li>
+					<li>#1752 Freetransform tool on sprites with offset</li>
+					<li>#1711 DefineFont2-3 advance values need to be handled as unsigned (UI16)</li>
+					<li>Leading of the font can be set to negative value</li>
+					<li>Reset configuration button in advanced settings not working</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>AS3 integer values are internally (e.g. in the lib) handled as java int type instead of long.</li>
+				</ul>
+			</description>
+		</release>
+		<release version="15.1.1" date="2022-07-03">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>Support for loading external images in DefineExternalImage2, DefineSubImage</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>Updated pt_BR translation</li>
+					<li>XML import/export uses less memory</li>
+				</ul>
+				<p>Removed</p>
+				<ul>
+					<li>Auto downloading playerglobal.swf in the installer</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>No longer working link to adobe dev downloads changed to its web-archived version</li>
+				</ul>
+			</description>
+		</release>
+		<release version="15.1.0" date="2022-02-20">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>Display object depth in flash panel</li>
+					<li>Show imported files on script import, able to cancel import</li>
+					<li>#270 AS3 show progress on deobfuscating p-code</li>
+					<li>#1718 Show progress on injecting debug info / SWD generation (before Debugging)</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>#1801 - Flex SDK links to Apache Flex</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>#1761 AS3 - try..finally inside another structure like if</li>
+					<li>#1762 AS call on integer numbers parenthesis</li>
+					<li>#1762 S3 - Auto adding returnvoid/return undefined</li>
+					<li>#1762 S - switch detection (mostcommon pathpart)</li>
+					<li>#1763 AS3 - initialization of activation object in some cases</li>
+					<li>AS3 - direct editation - arguments object on method with activation</li>
+					<li>AS3 - direct editation - bit not</li>
+					<li>AS3 - direct editation - call on local register</li>
+					<li>AS3 - direct editation - resolve properties and local regs before types</li>
+					<li>AS3 - direct editation - call on index</li>
+					<li>Incorrect position in Flash Player preview and SWF export</li>
+					<li>AS1/2 actioncontainers (like try) inside ifs</li>
+					<li>AS1/2 switch detection</li>
+					<li>#1766 AS3 - direct editation - namespaces on global level without leading colon</li>
+					<li>#1763 AS3 - function with activation - param assignment is not a declaration</li>
+					<li>AS3 - insert debug instruction to mark register names even with activation</li>
+					<li>AS3 - debugging in inner functions</li>
+					<li>AS1/2 - debugger - rewinding playback to apply breakpoints</li>
+					<li>#1773 - Auto set flagWideCodes on FontInfo wide character adding</li>
+					<li>#1769 - Do not mark getter+setter as colliding (#xxx suffix)</li>
+					<li>#1801 - Flex SDK not required on commandline when Flex compilation is disabled</li>
+					<li>Multiname - performance issues</li>
+				</ul>
+			</description>
+		</release>
+		<release version="15.0.0" date="2021-11-29">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>Frame dependencies</li>
+				</ul>
+				<p>Changed</p>
+				<ul>
+					<li>AS1/2 direct editation no longer marked as experimental</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>AS1/2 - switch with getvariable decompilation</li>
+					<li>AS1/2 - call action parameters as string</li>
+					<li>AS1/2 - direct editation - use actionadd instead of add2 on swfver &lt; 5</li>
+					<li>AS1/2 - tellTarget when single</li>
+					<li>AS1/2 - use slash syntax in get/setvariable only in eval/set</li>
+					<li>AS1/2 - get/setProperty when propertyindex is string</li>
+					<li>DefineEditText - ampersand in link href</li>
+					<li>AS1/2 - cannot use globalfunc/const variable names</li>
+					<li>AS2 - class detection when no constructor found</li>
+					<li>AS1/2 - subtract precedence</li>
+					<li>AS2 - getters and setters decompilation and editing</li>
+					<li>AS1/2 - definefunction2 suppresssuper parameter</li>
+					<li>New version dialog error when no main window available</li>
+					<li>AS1/2 direct editation - commands as expressions</li>
+					<li>AS1/2 direct editation - delete operator on anything</li>
+					<li>AS2 - class detection of top level classes</li>
+					<li>AS2 - class detection - warning only if propertyname does not match getter/setter</li>
+					<li>AS2 - some minor cases in class detection</li>
+					<li>AS2 - class detection - ignore standalone directvalues</li>
+					<li>AS1/2 - obfuscated name in forin cannot use eval</li>
+					<li>AS1/2 - Ternar visit (can cause invalid reg declarations)</li>
+					<li>AS1/2 - typeof precedence / parenthesis</li>
+					<li>AS1/2 - switch detection</li>
+					<li>AS1/2 - nested tellTarget</li>
+					<li>AS1/2 - switch with nontrivial expressions like and/or,ternar (second pass)</li>
+					<li>AS1/2 - ifFrameLoaded with nontrivial items inside</li>
+					<li>AS1/2 - direct editation - (mb)length is expressioncommand, not a command</li>
+					<li>AS1/2 - get/set top level properties</li>
+					<li>AS1/2 - properties postincrement</li>
+					<li>AS1/2 - direct editation - allow call on numbers, boolean, etc.</li>
+					<li>AS1/2 - direct editation - try..finally without catch clause</li>
+					<li>AS1/2 - GotoFrame2 - scene bias is first</li>
+					<li>AS1/2 - direct editation - gotoAndPlay/Stop with scenebias</li>
+					<li>AS1/2 - parenthesis around callfunction</li>
+					<li>AS1/2 - deobfuscate function parameter names in registers</li>
+					<li>AS1/2 - direct editation - do..while</li>
+					<li>AS1/2 - newmethod proper brackets</li>
+					<li>AS1/2 - class detection with ternars</li>
+					<li>AS1/2 - empty tellTarget</li>
+					<li>AS1/2 - deobfuscate object literal names</li>
+					<li>AS1/2 - spacing in with statement</li>
+					<li>Playercontrols frame display incorrect frame</li>
+					<li>AS1/2 - direct editation - empty parenthesis nullpointer</li>
+					<li>AS1/2 - delete on nonmember</li>
+					<li>AS1/2 - direct editation - Infinity, NaN can be used as identifiers, are normal variables</li>
+					<li>AS2 - obfuscated class attribute names</li>
+					<li>AS1/2 - newobject deobfuscated name</li>
+					<li>AS2 - obfuscated extends, implements</li>
+					<li>AS1/2 - chained assignments with obfuscated/slash variables</li>
+					<li>AS - direct editation - long integer values</li>
+					<li>AS1/2 - on keypress key escaping</li>
+					<li>AS1/2 - stop/play/etc. can be used in expressions, pushing undefined</li>
+					<li>AS1/2 - startDrag constraint</li>
+					<li>AS1/2 - gotoAndStop/play with simple label compiled as gotolabel</li>
+				</ul>
+			</description>
+		</release>
+		<release version="14.6.0" date="2021-11-22">
+			<description>
+				<p>Added</p>
+				<ul>
+					<li>Information message before importing scripts, text, XML, Symbol-Class</li>
+				</ul>
+				<p>Fixed</p>
+				<ul>
+					<li>Japanese in english locales for Gotoaddress, addclass dialog</li>
+					<li>AS1/2 DefineFunction cleaner</li>
+					<li>AS1/2 direct editation - postincrement/decrement</li>
+					<li>Reload menu disabled when no SWF selected</li>
+					<li>AS2 - Do not detect classes inside functions</li>
+					<li>AS1/2 - Slash syntax colon vs ternar operator collision</li>
+					<li>AS1/2 - Allow nonstandard identifiers in object literal</li>
+					<li>AS1/2 - Allow globalfunc names as variable identifiers</li>
+					<li>AS1/2 - Registers in for..in clause, proper define</li>
+					<li>AS1/2 - loops and switch break/continue vs definefunction</li>
+					<li>AS1/2 - callmethod on register instead of callfunction on var</li>
+					<li>AS1/2 - delete operator correct localreg names</li>
+					<li>AS1/2 - temporary registers handling</li>
+				</ul>
+			</description>
+		</release>
+		<release version="14.5.2" date="2021-11-21">
+			<description>
+				<p>Fixed</p>
+				<ul>
+					<li>AS1/2 handle declaration of registers in certain cases</li>
+					<li>AS1/2 setProperty, getProperty handling</li>
+					<li>#1750 Application won't start when cannot access font file</li>
+					<li>AS2 direct editation of classes - missing _global prefix</li>
+				</ul>
+			</description>
+		</release>
+		<release version="14.5.1" date="2021-11-20">
+			<description>
+				<p>Fixed</p>
+				<ul>
+					<li>AS 1/2 - do not use eval function on obfuscated increment/decrement</li>
+					<li>AS 1/2 direct editation - newline as "
+", not "
+"</li>
+					<li>AS 1/2 allow various nonstandard names for definelocal</li>
+					<li>AS 1/2 use DefineLocal in function instead of registers when eval, set is used</li>
+					<li>AS 1/2 direct editation - delete operator parenthesis</li>
+					<li>AS 1/2 direct editation - call function on eval</li>
+					<li>AS 1/2 export selection of scripts in buttons, classes and similar</li>
+				</ul>
+			</description>
+		</release>
+		<release version="14.5.0" date="2021-11-19"/>
+		<release version="14.4.0" date="2021-04-05"/>
+	</releases>
+	<content_rating type="oars-1.1" />
+	<custom>
+		<value key="Purism::form_factor">workstation</value>
+	</custom>
+</component>

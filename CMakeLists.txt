@@ -31,7 +31,8 @@ Papyrus_Add(
 # --- ActionScript Compilation ---
 
 find_program(FFDEC_CLI NAMES ffdec-cli ffdec-cli.exe
-	PATHS "C:/Program Files (x86)/FFDec" "C:/Program Files/FFDec"
+	PATHS "${CMAKE_CURRENT_SOURCE_DIR}/tools"
+	NO_DEFAULT_PATH
 )
 
 if(FFDEC_CLI)
