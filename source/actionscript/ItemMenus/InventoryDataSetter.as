@@ -166,11 +166,6 @@ class InventoryDataSetter extends ItemcardDataExtender
          a_entryObject.material = skyui.defines.Material.LEATHER;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Leather");
       }
-      else if(a_entryObject.keywords.ArmorJewelry != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.JEWELRY;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Jewelry");
-      }
       else if(a_entryObject.keywords.ArmorMaterialOrcish != undefined || a_entryObject.keywords.WeapMaterialOrcish != undefined || a_entryObject.keywords.ccBGSSSE055_ArmorMaterialOrcishLight != undefined)
       {
          a_entryObject.material = skyui.defines.Material.ORCISH;
@@ -201,7 +196,7 @@ class InventoryDataSetter extends ItemcardDataExtender
          a_entryObject.material = skyui.defines.Material.CHITIN;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Chitin");
       }
-      else if(a_entryObject.keywords.DLC2ArmorMaterialNordicHeavy != undefined || a_entryObject.keywords.DLC2ArmorMaterialNordicLight != undefined || a_entryObject.keywords.DLC2WeaponMaterialNordic != undefined || a_entryObject.keywords.ccEDHSSE001_NordicJewelryKeyword != undefined)
+      else if(a_entryObject.keywords.DLC2ArmorMaterialNordicHeavy != undefined || a_entryObject.keywords.DLC2ArmorMaterialNordicLight != undefined || a_entryObject.keywords.DLC2WeaponMaterialNordic != undefined)
       {
          a_entryObject.material = skyui.defines.Material.NORDIC;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Nordic");
@@ -230,6 +225,11 @@ class InventoryDataSetter extends ItemcardDataExtender
       {
          a_entryObject.material = skyui.defines.Material.MADNESS;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Madness");
+      }
+      else if(a_entryObject.keywords.ArmorJewelry != undefined)
+      {
+         a_entryObject.material = skyui.defines.Material.JEWELRY;
+         a_entryObject.materialDisplay = null;
       }
       else if(a_entryObject.keywords.ArmorClothing != undefined)
       {

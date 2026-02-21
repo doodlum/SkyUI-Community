@@ -177,11 +177,6 @@ class CraftingDataSetter implements skyui.components.list.IListProcessor
          a_entryObject.material = skyui.defines.Material.LEATHER;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Leather");
       }
-      else if(a_entryObject.keywords.ArmorJewelry != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.JEWELRY;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Jewelry");
-      }
       else if(a_entryObject.keywords.ArmorMaterialOrcish != undefined || a_entryObject.keywords.WeapMaterialOrcish != undefined || a_entryObject.keywords.ccBGSSSE055_ArmorMaterialOrcishLight != undefined)
       {
          a_entryObject.material = skyui.defines.Material.ORCISH;
@@ -241,6 +236,11 @@ class CraftingDataSetter implements skyui.components.list.IListProcessor
       {
          a_entryObject.material = skyui.defines.Material.MADNESS;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Madness");
+      }
+      else if(a_entryObject.keywords.ArmorJewelry != undefined)
+      {
+         a_entryObject.material = skyui.defines.Material.JEWELRY;
+         a_entryObject.materialDisplay = null;
       }
       else if(a_entryObject.keywords.ArmorClothing != undefined)
       {
