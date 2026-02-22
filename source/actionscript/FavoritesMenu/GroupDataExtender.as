@@ -128,31 +128,77 @@ class GroupDataExtender implements skyui.components.list.IListProcessor
    function processIconData()
    {
       var _loc2_ = 0;
-      var _loc4_;
-      var _loc5_;
       var _loc3_;
       while(_loc2_ < this.iconData.length)
       {
-         _loc5_ = this.iconData[_loc2_];
-         if(_loc5_)
+         _loc3_ = new MovieClipLoader();
+         _loc3_.addListener(this);
+         _loc3_.loadClip("skyui/icons_item_psychosteve.swf",this._groupButtons[_loc2_].itemIcon);
+         this._groupButtons[_loc2_].itemIcon._visible = false;
+         _loc2_ = _loc2_ + 1;
+      }
+   }
+   function onLoadInit(a_icon)
+   {
+      var _loc2_ = 0;
+      while(_loc2_ < this._groupButtons.length)
+      {
+         if(this._groupButtons[_loc2_].itemIcon == a_icon)
          {
-            _loc3_ = this._itemIdMap[_loc5_];
-            if(_loc3_ != null)
-            {
-               _loc4_ = !_loc3_.iconLabel ? "misc_default" : _loc3_.iconLabel;
-            }
-            else
-            {
-               _loc4_ = "misc_default";
-               this.reportInvalidItem(_loc5_);
-            }
+            break;
+         }
+         _loc2_ = _loc2_ + 1;
+      }
+      if(_loc2_ >= this._groupButtons.length)
+      {
+         return undefined;
+      }
+      var _loc3_ = this.iconData[_loc2_];
+      var _loc4_;
+      var _loc5_;
+      if(_loc3_)
+      {
+         var _loc6_ = this._itemIdMap[_loc3_];
+         if(_loc6_ != null)
+         {
+            _loc4_ = _loc6_.iconLabel;
+            _loc5_ = _loc6_.iconColor;
          }
          else
          {
-            _loc4_ = "none";
+            this.reportInvalidItem(_loc3_);
          }
-         this._groupButtons[_loc2_].itemIcon.gotoAndStop(_loc4_);
-         _loc2_ = _loc2_ + 1;
+      }
+      a_icon._visible = true;
+      a_icon.gotoAndStop(_loc4_ == undefined ? "default_misc" : _loc4_);
+      this.changeIconColor(a_icon,_loc5_);
+      for(var _loc7_ in a_icon)
+      {
+         var _loc8_ = a_icon[_loc7_];
+         if(_loc8_ instanceof MovieClip)
+         {
+            var _loc9_ = _loc8_.transform;
+            var _loc10_ = _loc9_.matrix;
+            _loc10_.translate(-64,-64);
+            _loc9_.matrix = _loc10_;
+         }
+      }
+   }
+   function changeIconColor(a_icon, a_rgb)
+   {
+      var _loc2_;
+      var _loc1_;
+      var _loc3_;
+      for(var _loc6_ in a_icon)
+      {
+         _loc2_ = a_icon[_loc6_];
+         if(_loc2_ instanceof MovieClip)
+         {
+            _loc1_ = new flash.geom.ColorTransform();
+            _loc3_ = new flash.geom.Transform(MovieClip(_loc2_));
+            _loc1_.rgb = a_rgb != undefined ? a_rgb : 16777215;
+            _loc3_.colorTransform = _loc1_;
+         }
       }
    }
    function reportInvalidItem(a_itemId)
