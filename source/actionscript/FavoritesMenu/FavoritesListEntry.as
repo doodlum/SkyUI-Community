@@ -1,6 +1,7 @@
 class FavoritesListEntry extends skyui.components.list.BasicListEntry
 {
    var _alpha;
+   var _iconColor;
    var _iconLabel;
    var equipIcon;
    var hotkeyIcon;
@@ -80,6 +81,7 @@ class FavoritesListEntry extends skyui.components.list.BasicListEntry
          }
       }
       this._iconLabel = a_entryObject.iconLabel == undefined ? "default_misc" : a_entryObject.iconLabel;
+      this._iconColor = a_entryObject.iconColor;
       this.itemIcon.gotoAndStop(this._iconLabel);
       this.itemIcon._alpha = !_loc10_ ? 50 : 90;
       if(a_entryObject == null)
@@ -107,5 +109,23 @@ class FavoritesListEntry extends skyui.components.list.BasicListEntry
    {
       a_icon._visible = true;
       a_icon.gotoAndStop(this._iconLabel == undefined ? "default_misc" : this._iconLabel);
+      this.changeIconColor(a_icon,this._iconColor);
+   }
+   function changeIconColor(a_icon, a_rgb)
+   {
+      var _loc2_;
+      var _loc1_;
+      var _loc3_;
+      for(var _loc6_ in a_icon)
+      {
+         _loc2_ = a_icon[_loc6_];
+         if(_loc2_ instanceof MovieClip)
+         {
+            _loc1_ = new flash.geom.ColorTransform();
+            _loc3_ = new flash.geom.Transform(MovieClip(_loc2_));
+            _loc1_.rgb = a_rgb != undefined ? a_rgb : 16777215;
+            _loc3_.colorTransform = _loc1_;
+         }
+      }
    }
 }
