@@ -110,6 +110,10 @@ class skyui.defines.Form
    static var FORMID_FALMERARROW = 0x38341;
    static var FORMID_FOLLOWERIRONARROW = 0x10E2DE;
    static var FORMID_FORSWORNARROW = 0xCEE9E;
+   static var FORMID_FORSWORNAXE = 0xCC829;
+   static var FORMID_FORSWORNBOW = 0xCEE9B;
+   static var FORMID_FORSWORNSTAFF = 0xFA2C1;
+   static var FORMID_FORSWORNSWORD = 0xCADE9;
    static var FORMID_GEM1 = 0x1994F;
    static var FORMID_GEM2 = 0x59654;
    static var FORMID_GEM3 = 0x9DFBB;

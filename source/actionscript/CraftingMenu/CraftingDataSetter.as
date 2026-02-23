@@ -361,6 +361,13 @@ class CraftingDataSetter implements skyui.components.list.IListProcessor
                case skyui.defines.Form.FORMID_DUNHALTEDSTREAMPOACHERSAXE:
                   a_entryObject.subType = skyui.defines.Weapon.TYPE_WOODAXE;
                   a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Wood Axe");
+                  break;
+               case skyui.defines.Form.FORMID_FORSWORNAXE:
+               case skyui.defines.Form.FORMID_FORSWORNBOW:
+               case skyui.defines.Form.FORMID_FORSWORNSTAFF:
+               case skyui.defines.Form.FORMID_FORSWORNSWORD:
+                  a_entryObject.material = skyui.defines.Material.FORSWORN;
+                  a_entryObject.materialDisplay = skyui.util.Translator.translate("$Forsworn");
             }
             return;
          case 0x04:
