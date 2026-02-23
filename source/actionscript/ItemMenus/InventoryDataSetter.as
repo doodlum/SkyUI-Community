@@ -1187,6 +1187,11 @@ class InventoryDataSetter extends ItemcardDataExtender
                case skyui.defines.Form.BASEID_CC025ORE2:
                   a_entryObject.subType = skyui.defines.Item.MISC_ORE;
                   a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Ore");
+                  break;
+               case skyui.defines.Form.BASEID_CCVSV002PETGEAR:
+               case skyui.defines.Form.BASEID_CCVSV002PETAMULET:
+                  a_entryObject.subType = skyui.defines.Item.MISC_PETGEAR;
+                  a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$PetGear");
             }
             return;
       }

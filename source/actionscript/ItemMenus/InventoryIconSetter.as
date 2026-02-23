@@ -39,6 +39,7 @@ class InventoryIconSetter implements skyui.components.list.IListProcessor
             break;
          case skyui.defines.Form.TYPE_MISC:
             this.processMiscIcon(a_entryObject);
+            this.processMiscBaseIdIcon(a_entryObject);
             break;
          case skyui.defines.Form.TYPE_WEAPON:
             this.processWeaponIcon(a_entryObject);
@@ -432,6 +433,10 @@ class InventoryIconSetter implements skyui.components.list.IListProcessor
    }
    function processMiscIcon(a_entryObject)
    {
+      if(a_entryObject.iconLabel != undefined)
+      {
+         return;
+      }
       a_entryObject.iconLabel = "default_misc";
       switch(a_entryObject.subType)
       {
@@ -543,8 +548,20 @@ class InventoryIconSetter implements skyui.components.list.IListProcessor
             break;
          case skyui.defines.Item.MISC_INGREDIENT:
             a_entryObject.iconLabel = "default_ingredient";
+            break;
+         case skyui.defines.Item.MISC_PETGEAR:
+            a_entryObject.iconLabel = "clothing_backpack";
          default:
             return;
+      }
+   }
+   function processMiscBaseIdIcon(a_entryObject)
+   {
+      switch(a_entryObject.baseId)
+      {
+         case skyui.defines.Form.BASEID_CCVSV002PETAMULET:
+            a_entryObject.iconLabel = "armor_amulet";
+            break;
       }
    }
    function processBookBaseIdIcon(a_entryObject)

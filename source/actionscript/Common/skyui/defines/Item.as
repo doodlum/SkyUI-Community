@@ -56,6 +56,7 @@ class skyui.defines.Item
    static var MISC_BOOK = 36;
    static var MISC_RING = 37;
    static var MISC_INGREDIENT = 38;
+   static var MISC_PETGEAR = 39;
    static var BOOK_SPELLTOME = 0;
    static var BOOK_NOTE = 1;
    static var BOOK_RECIPE = 2;
