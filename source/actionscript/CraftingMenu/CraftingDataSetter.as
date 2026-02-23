@@ -223,7 +223,7 @@ class CraftingDataSetter implements skyui.components.list.IListProcessor
          a_entryObject.material = skyui.defines.Material.BONEMOLD;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Bonemold");
       }
-      else if(a_entryObject.keywords.DLC2ArmorMaterialChitinHeavy != undefined || a_entryObject.keywords.DLC2ArmorMaterialChitinLight != undefined)
+      else if(a_entryObject.keywords.DLC2ArmorMaterialChitinHeavy != undefined || a_entryObject.keywords.DLC2ArmorMaterialChitinLight != undefined || a_entryObject.keywords.DLC2ArmorMaterialMoragTong != undefined)
       {
          a_entryObject.material = skyui.defines.Material.CHITIN;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Chitin");
