@@ -132,7 +132,12 @@ class CraftingDataSetter implements skyui.components.list.IListProcessor
       {
          a_entryObject.material = null;
          a_entryObject.materialDisplay = null;
-      } 
+      }
+      else if(a_entryObject.subType == skyui.defines.Weapon.TYPE_STAFF)
+      {
+         a_entryObject.material = null;
+         a_entryObject.materialDisplay = null;
+      }
       else if(a_entryObject.keywords.ArmorMaterialDaedric != undefined || a_entryObject.keywords.WeapMaterialDaedric != undefined || a_entryObject.keywords.ccBGSSSE025_ArmorMaterialDark != undefined || a_entryObject.keywords.ccBGSSSE025_WeapMaterialDark != undefined || a_entryObject.keywords.ccBGSSSE025_ArmorMaterialGolden != undefined || a_entryObject.keywords.ccBGSSSE025_WeapMaterialGolden != undefined)
       {
          a_entryObject.material = skyui.defines.Material.DAEDRIC;
@@ -148,22 +153,22 @@ class CraftingDataSetter implements skyui.components.list.IListProcessor
          a_entryObject.material = skyui.defines.Material.DWARVEN;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Dwarven");
       }
-      else if(a_entryObject.keywords.ArmorMaterialEbony != undefined || a_entryObject.keywords.WeapMaterialEbony != undefined)
+      else if(a_entryObject.keywords.ArmorMaterialEbony != undefined || a_entryObject.keywords.WeapMaterialEbony != undefined || a_entryObject.keywords.DLC2ArmorMaterialStalhrimHeavy != undefined || a_entryObject.keywords.DLC2ArmorMaterialStalhrimLight != undefined || a_entryObject.keywords.DLC2WeaponMaterialStalhrim != undefined || a_entryObject.keywords.ccBGSSSE025_ArmorMaterialMadness != undefined || a_entryObject.keywords.ccBGSSSE025_WeapMaterialMadness != undefined)
       {
          a_entryObject.material = skyui.defines.Material.EBONY;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Ebony");
       }
-      else if(a_entryObject.keywords.ArmorMaterialElven != undefined || a_entryObject.keywords.WeapMaterialElven != undefined || a_entryObject.keywords.ArmorMaterialElvenGilded != undefined || a_entryObject.keywords.DLC2ArmorMaterialNordicHeavy != undefined)
+      else if(a_entryObject.keywords.ArmorMaterialElven != undefined || a_entryObject.keywords.WeapMaterialElven != undefined || a_entryObject.keywords.ArmorMaterialElvenGilded != undefined || a_entryObject.keywords.DLC2ArmorMaterialChitinHeavy != undefined || a_entryObject.keywords.DLC2ArmorMaterialChitinLight != undefined || a_entryObject.keywords.ccASVSSE001_ArmorOrdinator != undefined || a_entryObject.keywords.ccASVSSE001_ArmorOrdinatorIndoril != undefined || a_entryObject.keywords.DLC2ArmorMaterialNordicHeavy != undefined || a_entryObject.keywords.DLC2WeaponMaterialNordic != undefined)
       {
          a_entryObject.material = skyui.defines.Material.ELVEN;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Elven");
       }
-      else if(a_entryObject.keywords.ArmorMaterialGlass != undefined || a_entryObject.keywords.WeapMaterialGlass != undefined)
+      else if(a_entryObject.keywords.ArmorMaterialGlass != undefined || a_entryObject.keywords.WeapMaterialGlass != undefined || a_entryObject.keywords.ccBGSSSE025_ArmorMaterialAmber != undefined || a_entryObject.keywords.ccBGSSSE025_WeapMaterialAmber != undefined)
       {
          a_entryObject.material = skyui.defines.Material.GLASS;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Glass");
       }
-      else if(a_entryObject.keywords.ArmorMaterialScaled != undefined || a_entryObject.keywords.ArmorMaterialSteelPlate != undefined)
+      else if(a_entryObject.keywords.ArmorMaterialScaled != undefined || a_entryObject.keywords.ArmorMaterialSteelPlate != undefined || a_entryObject.keywords.ArmorMaterialFalmer != undefined || a_entryObject.keywords.DLC1ArmorMaterialFalmerHardened != undefined || a_entryObject.keywords.DLC1ArmorMaterielFalmerHeavy != undefined || a_entryObject.keywords.DLC1ArmorMaterielFalmerHeavyOriginal != undefined || a_entryObject.keywords.WeapMaterialFalmer != undefined || a_entryObject.keywords.WeapMaterialFalmerHoned != undefined)
       {
          a_entryObject.material = skyui.defines.Material.ADVANCED;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Advanced");
@@ -183,7 +188,7 @@ class CraftingDataSetter implements skyui.components.list.IListProcessor
          a_entryObject.material = skyui.defines.Material.ORCISH;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Orcish");
       }
-      else if(a_entryObject.keywords.ArmorMaterialSteel != undefined || a_entryObject.keywords.WeapMaterialSteel != undefined || a_entryObject.keywords.WeapMaterialDraugr != undefined || a_entryObject.keywords.WeapMaterialDraugrHoned != undefined || a_entryObject.keywords.ArmorMaterialImperialHeavy != undefined || a_entryObject.keywords.WeapMaterialImperial != undefined || a_entryObject.keywords.DLC1ArmorMaterialDawnguard != undefined || a_entryObject.keywords.ArmorMaterialBlades != undefined)
+      else if(a_entryObject.keywords.ArmorMaterialSteel != undefined || a_entryObject.keywords.WeapMaterialSteel != undefined || a_entryObject.keywords.WeapMaterialDraugr != undefined || a_entryObject.keywords.WeapMaterialDraugrHoned != undefined || a_entryObject.keywords.ArmorMaterialImperialHeavy != undefined || a_entryObject.keywords.WeapMaterialImperial != undefined || a_entryObject.keywords.DLC1ArmorMaterialDawnguard != undefined || a_entryObject.keywords.ArmorMaterialBlades != undefined || a_entryObject.keywords.DLC2ArmorMaterialBonemoldHeavy != undefined || a_entryObject.keywords.DLC2ArmorMaterialBonemoldLight != undefined)
       {
          a_entryObject.material = skyui.defines.Material.STEEL;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Steel");
@@ -192,51 +197,6 @@ class CraftingDataSetter implements skyui.components.list.IListProcessor
       {
          a_entryObject.material = skyui.defines.Material.SILVER;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Silver");
-      }
-      else if(a_entryObject.keywords.ArmorMaterialFalmer != undefined || a_entryObject.keywords.DLC1ArmorMaterialFalmerHardened != undefined || a_entryObject.keywords.DLC1ArmorMaterielFalmerHeavy != undefined || a_entryObject.keywords.DLC1ArmorMaterielFalmerHeavyOriginal != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.FALMER;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Falmer");
-      }
-      else if(a_entryObject.keywords.DLC2ArmorMaterialBonemoldHeavy != undefined || a_entryObject.keywords.DLC2ArmorMaterialBonemoldLight != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.BONEMOLD;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Bonemold");
-      }
-      else if(a_entryObject.keywords.DLC2ArmorMaterialChitinHeavy != undefined || a_entryObject.keywords.DLC2ArmorMaterialChitinLight != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.CHITIN;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Chitin");
-      }
-      else if(a_entryObject.keywords.DLC2WeaponMaterialNordic != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.NORDIC;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Nordic");
-      }
-      else if(a_entryObject.keywords.DLC2ArmorMaterialStalhrimHeavy != undefined || a_entryObject.keywords.DLC2ArmorMaterialStalhrimLight != undefined || a_entryObject.keywords.DLC2WeaponMaterialStalhrim != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.STALHRIM;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Stalhrim");
-      }
-      else if(a_entryObject.keywords.WeapMaterialFalmer != undefined || a_entryObject.keywords.WeapMaterialFalmerHoned != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.FALMER;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Falmer");
-      }
-      else if(a_entryObject.keywords.ccASVSSE001_ArmorOrdinator != undefined || a_entryObject.keywords.ccASVSSE001_ArmorOrdinatorIndoril != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.ORDINATOR;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Ordinator");
-      }
-      else if(a_entryObject.keywords.ccBGSSSE025_ArmorMaterialAmber != undefined || a_entryObject.keywords.ccBGSSSE025_WeapMaterialAmber != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.AMBER;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Amber");
-      }
-      else if(a_entryObject.keywords.ccBGSSSE025_ArmorMaterialMadness != undefined || a_entryObject.keywords.ccBGSSSE025_WeapMaterialMadness != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.MADNESS;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Madness");
       }
       else if(a_entryObject.keywords.WeapMaterialWood != undefined)
       {
