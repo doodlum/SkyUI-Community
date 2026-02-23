@@ -120,7 +120,7 @@ class InventoryDataSetter extends ItemcardDataExtender
       {
          return undefined;
       }
-      if(a_entryObject.keywords.ArmorJewelry != undefined || a_entryObject.keywords.ArmorClothing != undefined)
+      if(a_entryObject.keywords.VendorItemJewelry != undefined || a_entryObject.keywords.VendorItemClothing != undefined)
       {
          a_entryObject.material = null;
          a_entryObject.materialDisplay = null;
