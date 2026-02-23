@@ -131,12 +131,15 @@ class skyui.defines.Form
    static var FORMID_INSTRUMENT7 = 0x200B6;
    static var FORMID_INSTRUMENT8 = 0x105109;
    static var FORMID_INSTRUMENT9 = 0xE77BB;
+   static var FORMID_DRAVINSBOW = 0x6B9AD;
+   static var FORMID_HUNTINGBOW = 0x13985;
    static var FORMID_IRONARROW = 0x1397D;
    static var FORMID_IRONCLAW = 0x8CDFA;
    static var FORMID_IVORYDRAGONCLAW = 0xAB7BB;
    static var FORMID_LEATHER01 = 0xDB5D2;
    static var FORMID_LEATHERSTRIPS = 0x800E4;
    static var FORMID_LOCKPICK = 0xA;
+   static var FORMID_LONGBOW = 0x3B562;
    static var FORMID_MISCARTIFACT1 = 0x2C259;
    static var FORMID_MISCARTIFACT2 = 0x2C25A;
    static var FORMID_MISCAZURASSTAR = 0x28AD7;
