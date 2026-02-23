@@ -148,7 +148,7 @@ class CraftingDataSetter implements skyui.components.list.IListProcessor
          a_entryObject.material = skyui.defines.Material.DRAGON;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Dragon");
       }
-      else if(a_entryObject.keywords.ArmorMaterialDwarven != undefined || a_entryObject.keywords.WeapMaterialDwarven != undefined)
+      else if(a_entryObject.keywords.ArmorMaterialDwarven != undefined || a_entryObject.keywords.WeapMaterialDwarven != undefined || a_entryObject.keywords.DLC1LD_CraftingMaterialAetherium != undefined)
       {
          a_entryObject.material = skyui.defines.Material.DWARVEN;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Dwarven");
@@ -217,11 +217,6 @@ class CraftingDataSetter implements skyui.components.list.IListProcessor
       {
          a_entryObject.material = skyui.defines.Material.FALMER;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Falmer");
-      }
-      else if(a_entryObject.keywords.DLC1LD_CraftingMaterialAetherium != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.AETHERIUM;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Aetherium");
       }
       else if(a_entryObject.keywords.DLC2ArmorMaterialBonemoldHeavy != undefined || a_entryObject.keywords.DLC2ArmorMaterialBonemoldLight != undefined)
       {
