@@ -46,7 +46,7 @@ class MagicDataSetter extends ItemcardDataExtender
          case skyui.defines.Inventory.ICT_ACTIVE_EFFECT:
             if (a_itemInfo.timeRemaining != undefined && a_itemInfo.timeRemaining > 0)
             {
-               s = Math.round(a_itemInfo.timeRemaining);
+               s = Math.floor(a_itemInfo.timeRemaining);
                m = 0;
                h = 0;
                d = 0;
