@@ -41,6 +41,8 @@ endEvent
 
 ; @implements SKI_QuestBase
 event OnGameReload()
+	GoToState("")
+	
 	RegisterForModEvent("SKICP_modSelected", "OnModSelect")
 	RegisterForModEvent("SKICP_pageSelected", "OnPageSelect")
 	RegisterForModEvent("SKICP_optionHighlighted", "OnOptionHighlight")
