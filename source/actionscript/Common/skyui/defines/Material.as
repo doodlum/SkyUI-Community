@@ -9,7 +9,6 @@ class skyui.defines.Material
    static var EBONY      = 7;
    static var ELVEN      = 8;
    static var FALMER     = 9;
-   static var FORSWORN   = 10;
    static var GLASS      = 11;
    static var HIDE       = 12;
    static var IMPERIAL   = 13;

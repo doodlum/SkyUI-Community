@@ -178,11 +178,6 @@ class CraftingDataSetter implements skyui.components.list.IListProcessor
          a_entryObject.material = skyui.defines.Material.STORMCLOAK;
          a_entryObject.materialDisplay = skyui.util.Translator.translate("$Stormcloak");
       }
-      else if(a_entryObject.keywords.ArmorMaterialForsworn != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.FORSWORN;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Forsworn");
-      }
       else if(a_entryObject.keywords.ArmorMaterialImperialHeavy != undefined || a_entryObject.keywords.ArmorMaterialImperialLight != undefined || a_entryObject.keywords.WeapMaterialImperial != undefined || a_entryObject.keywords.ArmorMaterialImperialStudded != undefined || a_entryObject.keywords.ArmorMaterialStudded != undefined)
       {
          a_entryObject.material = skyui.defines.Material.IMPERIAL;
@@ -356,8 +351,7 @@ class CraftingDataSetter implements skyui.components.list.IListProcessor
                case skyui.defines.Form.FORMID_FORSWORNBOW:
                case skyui.defines.Form.FORMID_FORSWORNSTAFF:
                case skyui.defines.Form.FORMID_FORSWORNSWORD:
-                  a_entryObject.material = skyui.defines.Material.FORSWORN;
-                  a_entryObject.materialDisplay = skyui.util.Translator.translate("$Forsworn");
+                  break;
             }
             return;
          case 0x04:
@@ -605,10 +599,6 @@ class CraftingDataSetter implements skyui.components.list.IListProcessor
                case skyui.defines.Form.FORMID_FALMERARROW:
                   a_entryObject.material = skyui.defines.Material.FALMER;
                   a_entryObject.materialDisplay = skyui.util.Translator.translate("$Falmer");
-                  break;
-               case skyui.defines.Form.FORMID_FORSWORNARROW:
-                  a_entryObject.material = skyui.defines.Material.FORSWORN;
-                  a_entryObject.materialDisplay = skyui.util.Translator.translate("$Forsworn");
                   break;
                case skyui.defines.Form.FORMID_STEELARROW:
                case skyui.defines.Form.FORMID_MQ101STEELARROW:
