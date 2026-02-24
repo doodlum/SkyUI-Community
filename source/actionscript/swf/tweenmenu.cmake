@@ -1,4 +1,4 @@
-# ActionScript sources for inventorymenu.swf
+# ActionScript sources for tweenmenu.swf
 # Auto-generated from SWF decompilation
 
 set(tweenmenu_SOURCES
