@@ -16,22 +16,23 @@ include(BSArchive)
 file(GLOB PAPYRUS_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/source/scripts/*.psc")
 
 Papyrus_Add(
-	"Papyrus"
-	GAME "${SkyrimSE_PATH}"
-	MODE SkyrimSE
-	IMPORTS
-		"${CMAKE_CURRENT_SOURCE_DIR}/source/scripts"
-		"${SkyrimSE_PATH}/Data/Scripts/Source"
-	SOURCES ${PAPYRUS_SOURCES}
-	OPTIMIZE
-	ANONYMIZE
-	SKIP_DEFAULT_IMPORTS
+    "Papyrus"
+    GAME "${SkyrimSE_PATH}"
+    MODE SkyrimSE
+    IMPORTS
+        "${CMAKE_CURRENT_SOURCE_DIR}/source/scripts"
+        "${SkyrimSE_PATH}/Data/Scripts/Source"
+        "${SkyrimSE_PATH}/Data/Source/Scripts"
+    SOURCES ${PAPYRUS_SOURCES}
+    # OPTIMIZE
+    ANONYMIZE
+    SKIP_DEFAULT_IMPORTS
 )
 
 # --- ActionScript Compilation ---
 
 find_program(FFDEC_CLI NAMES ffdec-cli ffdec-cli.exe
-	PATHS "${CMAKE_CURRENT_SOURCE_DIR}/tools"
+	PATHS "${CMAKE_CURRENT_SOURCE_DIR}/tools/FFDec"
 	NO_DEFAULT_PATH
 )
 
