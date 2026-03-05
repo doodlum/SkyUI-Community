@@ -19,34 +19,34 @@
         skyui.filter.NameFilter.initCharMap();
     }
 
-    function get filterText() { return _filterText; }
+    function get filterText() { return this._filterText; }
 
     function set filterText(a_filterText: String)
     {
         if (a_filterText == undefined) a_filterText = "";
-        if (a_filterText == _filterText) return;
+        if (a_filterText == this._filterText) return;
 
-        _filterText = a_filterText;
-        _normalizedFilter = skyui.filter.NameFilter.normalizeString(a_filterText);
-        _filterLength = _normalizedFilter.length;
+        this._filterText = a_filterText;
+        this._normalizedFilter = skyui.filter.NameFilter.normalizeString(a_filterText);
+        this._filterLength = this._normalizedFilter.length;
 
-        if (_debounceID != undefined) {
-            clearInterval(_debounceID);
-            delete _debounceID;
+        if (this._debounceID != undefined) {
+            clearInterval(this._debounceID);
+            delete this._debounceID;
         }
 
         if (a_filterText == "") {
-            dispatchEvent({ type: "filterChange" });
+            this.dispatchEvent({ type: "filterChange" });
             return;
         }
 
-        _debounceID = setInterval(this, "_onDebounceTimer", DEBOUNCE_DELAY);
+        this._debounceID = setInterval(this, "_onDebounceTimer", skyui.filter.NameFilter.DEBOUNCE_DELAY);
     }
 
     function _onDebounceTimer() {
-        clearInterval(_debounceID);
-        delete _debounceID;
-        dispatchEvent({ type: "filterChange" });
+        clearInterval(this._debounceID);
+        delete this._debounceID;
+        this.dispatchEvent({ type: "filterChange" });
     }
 
     static function prenormalizeList(a_list: Array, a_nameAttr: String) {
@@ -65,34 +65,36 @@
     }
 
     function applyFilter(a_filteredList: Array) {
-        if (_filterLength == 0) return;
+        if (this._filterLength == 0) return;
 
-        var nf: String = _normalizedFilter;
-        var fl: Number = _filterLength;
-        var attr: String = nameAttribute;
+        var nf: String = this._normalizedFilter;
+        var fl: Number = this._filterLength;
+        
+        var attr: String = this.nameAttribute;
+        if (attr == undefined) attr = "text";
+
         var writeIndex: Number = 0;
         var len: Number = a_filteredList.length;
 
         for (var i: Number = 0; i < len; i++) {
             var e: Object = a_filteredList[i];
-
             var raw: String = e[attr];
+
+            if (raw == undefined) continue;
+
             if (e._normalizedSource !== raw) {
                 e._normalizedSource = raw;
-                e._normalizedName = (raw != undefined)
-                    ? skyui.filter.NameFilter.normalizeString(raw)
-                    : "";
+                e._normalizedName = skyui.filter.NameFilter.normalizeString(raw);
             }
 
             var name: String = e._normalizedName;
 
+            if (name == undefined) continue;
             if (name.length < fl) continue;
-
             if (name.indexOf(nf) == -1) continue;
 
             a_filteredList[writeIndex++] = e;
         }
-
 
         a_filteredList.length = writeIndex;
     }
@@ -166,10 +168,10 @@
     }
 
     static function initCharMap() {
-        if (_latinMap != undefined) return;
+        if (skyui.filter.NameFilter._latinMap != undefined) return;
 
         var cache: Array = new Array(8192);
-        _charStrCache = cache;
+        skyui.filter.NameFilter._charStrCache = cache;
 
         function fillCharCache(start: Number, end: Number) {
             for (var i: Number = start; i <= end; i++) {
@@ -197,7 +199,7 @@
 
         // ══════════════ Ignore symbols ══════════════
         var lm: Array = new Array(384);
-        _latinMap = lm;
+        skyui.filter.NameFilter._latinMap = lm;
 
         fillRange(lm, 161, 191, -1);
         lm[215] = -1;
@@ -240,7 +242,7 @@
 
         // ══════════════ Cyrillic ══════════════
         var cm: Object = {};
-        _cyrMap = cm;
+        skyui.filter.NameFilter._cyrMap = cm;
 
         // 'г' (1075) - Ґґ
         mapObjectCodes(cm, [1168, 1169], 1075);
@@ -263,9 +265,9 @@
     function isMatch(a_entry: Object) {
         var name: String = a_entry._normalizedName;
         if (name == undefined) return false;
-        var fl: Number = _filterLength;
+        var fl: Number = this._filterLength;
         if (fl == 0) return true;
         if (name.length < fl) return false;
-        return name.indexOf(_normalizedFilter) != -1;
+        return name.indexOf(this._normalizedFilter) != -1;
     }
 }
