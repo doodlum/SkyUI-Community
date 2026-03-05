@@ -8,7 +8,6 @@ set(skyui_configpanel_SOURCES
     ${AS_SOURCE_DIR}/ModConfigPanel/MenuDialog.as
     ${AS_SOURCE_DIR}/ModConfigPanel/MessageDialog.as
     ${AS_SOURCE_DIR}/ModConfigPanel/ModListPanel.as
-    ${AS_SOURCE_DIR}/ModConfigPanel/MultiColumnScrollBar.as
     ${AS_SOURCE_DIR}/ModConfigPanel/MultiColumnScrollingList.as
     ${AS_SOURCE_DIR}/ModConfigPanel/OptionDialog.as
     ${AS_SOURCE_DIR}/ModConfigPanel/OptionsListEntry.as
