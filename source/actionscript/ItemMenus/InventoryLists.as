@@ -19,6 +19,8 @@ class InventoryLists extends MovieClip
    var panelContainer;
    var searchWidget;
    var tabBar;
+   var _searchKeyHeld:Boolean = false;
+   var _searchKeyClearUsed:Boolean = false;
    static var SKYUI_RELEASE_IDX = 2018;
    static var SKYUI_VERSION_MAJOR = 5;
    static var SKYUI_VERSION_MINOR = 2;
@@ -183,17 +185,45 @@ class InventoryLists extends MovieClip
             return true;
          }
       }
-      if(Shared.GlobalFunc.IsKeyPressed(details))
+      if(details.skseKeycode == this._searchKey)
       {
-         if(details.skseKeycode == this._searchKey)
+         if(details.value == "keyDown")
          {
-            this.searchWidget.startInput();
+            this._searchKeyHeld = true;
+            this._searchKeyClearUsed = false;
             return true;
          }
+         if(details.value == "keyUp")
+         {
+            if(!this._searchKeyClearUsed && !this.searchWidget.isActive()) {
+                  this.searchWidget.onSearchKeyPress();
+            }
+            this._searchKeyHeld = false;
+            this._searchKeyClearUsed = false;
+            return true;
+         }
+         if(details.value == "keyHold")
+         {
+            return true;
+         }
+         return true;
+      }
+
+      if(this._searchKeyHeld && details.skseKeycode == 14)
+      {
+         if(details.value == "keyDown") {
+            this._searchKeyClearUsed = true;
+            this.searchWidget.onSearchKeyClear();
+         }
+         return true;
+      }
+
+      if(Shared.GlobalFunc.IsKeyPressed(details))
+      {
          if(this.tabBar != undefined && details.skseKeycode == this._switchTabKey)
          {
-            this.tabBar.tabToggle();
-            return true;
+               this.tabBar.tabToggle();
+               return true;
          }
       }
       if(this.categoryList.handleInput(details,pathToFocus))
@@ -400,6 +430,7 @@ class InventoryLists extends MovieClip
    }
    function onSearchInputStart(event)
    {
+      this._searchKeyHeld = false;
       this.categoryList.disableSelection = this.categoryList.disableInput = true;
       this.itemList.disableSelection = this.itemList.disableInput = true;
       this._nameFilter.filterText = "";

@@ -14,7 +14,13 @@ set(inventorymenu_SOURCES
     ${AS_SOURCE_DIR}/Common/skyui/filter/ItemTypeFilter.as
     ${AS_SOURCE_DIR}/Common/skyui/filter/NameFilter.as
     ${AS_SOURCE_DIR}/Common/skyui/filter/SortFilter.as
+<<<<<<< HEAD
     ${AS_SOURCE_DIR}/ItemMenus/InventoryMenu.as
+=======
+    ${AS_SOURCE_DIR}/Common/skyui/components/SearchWidget.as
+    ${AS_SOURCE_DIR}/ItemMenus/BottomBar.as
+    ${AS_SOURCE_DIR}/ItemMenus/CategoryList.as
+>>>>>>> ec7b136 (feat(search-widget): improve UX and input handling)
     ${AS_SOURCE_DIR}/ItemMenus/InventoryDataSetter.as
     ${AS_SOURCE_DIR}/ItemMenus/InventoryIconSetter.as
     ${AS_SOURCE_DIR}/ItemMenus/ItemMenu.as
