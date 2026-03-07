@@ -2,68 +2,117 @@
 ActionScript
 ------------
 
-Compile and inject ActionScript sources into SWF files using FFDec CLI.
+Two-phase ActionScript compilation: one global assemble, per-SWF inject.
 
-The function assumes FFDec CLI has already been located and stored in the
-cache variable ``FFDEC_CLI`` before this module is used.
+Architecture
+^^^^^^^^^^^^
+
+Phase 1 — Global Assemble (one cmake -P process for all SWFs)
+  A single ``cmake/AssembleScripts.cmake`` invocation copies ALL ActionScript
+  sources from ALL SWFs into one shared staging tree:
+
+    ${CMAKE_BINARY_DIR}/_AS_staging/__Packages/
+
+  This target (``ActionScript_Assemble``) depends on every .as file across
+  the entire project. It runs once when any source changes.
+
+Phase 2 — Per-SWF Inject (parallel, fine-grained)
+  Each SWF has its own ``add_custom_command`` whose DEPENDS list contains
+  that SWF's specific .as source files plus the original .swf.
+
+  This means CMake rebuilds a SWF if and only if:
+    - one of its own .as sources changed, OR
+    - the base .swf changed
+
+  Changing Quest_Journal.as → only quest_journal.swf reinjects.
+  Other SWFs are untouched.
+
+  All inject steps are independent and run in parallel under Ninja.
+
+Why inject depends on sources directly, not on the assemble stamp
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  If inject depended on the global stamp, any .as change anywhere would
+  invalidate all 30 inject steps — the opposite of what we want.
+
+  Instead:
+    - The assemble target is an ORDER-ONLY dependency (via add_dependencies)
+      so it always runs before any inject, but does not cause inject to
+      re-run unless the inject's own DEPENDS are stale.
+    - The inject command lists its specific .as sources in DEPENDS so CMake
+      can track exactly which SWF is affected by a given file change.
+
+Shared classes
+^^^^^^^^^^^^^^
+  If two SWFs share a class (e.g. Common/skyui/defines/Input.as) and that
+  file appears in both their SOURCES lists, both DEPENDS lists contain it.
+  Changing it correctly invalidates both SWF inject steps.
 
 Usage
 ^^^^^
 
-.. code-block:: cmake
+Step 1: Before the SWF loop, call once:
+
+  SkyUI_AS_GlobalAssemble_Init(
+      AS_SOURCE_DIR    <path>
+      ASSEMBLE_SCRIPT  <path/AssembleScripts.cmake>
+  )
+
+Step 2: Inside the SWF loop, call per SWF:
 
   SkyUI_AS_Add(
-      TARGET_NAME  <n>
-      SWF_REL      <relative-swf-path>
+      TARGET_NAME  AS_<name>
+      SWF_REL      <relative/path.swf>
       SOURCES      <file> [...]
-      [FRAME_SOURCES <file> [...]])
+      [FRAME_SOURCES <file> [...]]
+  )
 
-After the call, ``${TARGET_NAME}_OUTPUT`` is set in the calling scope to
-the absolute path of the compiled SWF in the build directory.
+Step 3: After the loop, call once to finalize the global assemble target:
 
-Parameters
-^^^^^^^^^^
+  SkyUI_AS_GlobalAssemble_Finalize()
 
-``TARGET_NAME``
-  CMake custom-target name.  Convention: ``AS_<swf_stem>``.
-
-``SWF_REL``
-  Path to the SWF relative to ``data/interface/``.
-  Example: ``quest_journal.swf``, ``mapMenu/map_menu.swf``
-
-``SOURCES``
-  One or more ActionScript source files (.as).
-  Any change to these files triggers a rebuild of this SWF only.
-
-``FRAME_SOURCES``
-  Optional frame / DoInitAction scripts staged at the staging root
-  rather than under ``__Packages/``.
-
-How incremental builds work
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Each SWF compilation is split into two custom-command steps that are
-tracked independently by CMake's dependency graph:
-
-Step 1 — Assemble
-  ``cmake/AssembleScripts.cmake`` copies the .as files into the
-  ``__Packages/`` staging tree that FFDec expects.
-  A stamp file ``<staging>/.assembled.stamp`` is the declared OUTPUT,
-  so CMake can compare it against source file timestamps.
-  DEPENDS lists every .as source explicitly → fine-grained, per-SWF
-  invalidation.  Touching one SWF's sources never invalidates another.
-
-Step 2 — Inject
-  Copies the pristine source SWF into the build tree (non-destructive;
-  the repository copy is never modified) then calls
-  ``ffdec-cli -importScript`` to inject the staged scripts.
-  DEPENDS the stamp from step 1 and the original .swf, so it only
-  runs when either the source SWF or the assembled scripts changed.
+After SkyUI_AS_Add, ``${TARGET_NAME}_OUTPUT`` is set in the calling scope.
 
 #]=======================================================================]
 
+# ---------------------------------------------------------------------------
+# Internal state (global properties, visible across function boundaries)
+# ---------------------------------------------------------------------------
+
+define_property(GLOBAL PROPERTY _SKYUI_AS_SOURCE_DIR)
+define_property(GLOBAL PROPERTY _SKYUI_AS_ASSEMBLE_SCRIPT)
+define_property(GLOBAL PROPERTY _SKYUI_AS_GLOBAL_STAGING)
+define_property(GLOBAL PROPERTY _SKYUI_AS_ALL_SOURCES)   # accumulates across calls
+define_property(GLOBAL PROPERTY _SKYUI_AS_ALL_FRAME_SOURCES)
+
+# ---------------------------------------------------------------------------
+# SkyUI_AS_GlobalAssemble_Init
+# ---------------------------------------------------------------------------
+# Call ONCE before the SWF discovery loop.
+# ---------------------------------------------------------------------------
+function(SkyUI_AS_GlobalAssemble_Init)
+    cmake_parse_arguments(ARG "" "AS_SOURCE_DIR;ASSEMBLE_SCRIPT" "" ${ARGN})
+
+    if(NOT ARG_AS_SOURCE_DIR)
+        message(FATAL_ERROR "SkyUI_AS_GlobalAssemble_Init: AS_SOURCE_DIR is required.")
+    endif()
+    if(NOT ARG_ASSEMBLE_SCRIPT)
+        message(FATAL_ERROR "SkyUI_AS_GlobalAssemble_Init: ASSEMBLE_SCRIPT is required.")
+    endif()
+
+    set_property(GLOBAL PROPERTY _SKYUI_AS_SOURCE_DIR      "${ARG_AS_SOURCE_DIR}")
+    set_property(GLOBAL PROPERTY _SKYUI_AS_ASSEMBLE_SCRIPT "${ARG_ASSEMBLE_SCRIPT}")
+    set_property(GLOBAL PROPERTY _SKYUI_AS_GLOBAL_STAGING
+        "${CMAKE_BINARY_DIR}/_AS_staging")
+    set_property(GLOBAL PROPERTY _SKYUI_AS_ALL_SOURCES "")
+    set_property(GLOBAL PROPERTY _SKYUI_AS_ALL_FRAME_SOURCES "")
+endfunction()
+
+# ---------------------------------------------------------------------------
+# SkyUI_AS_Add
+# ---------------------------------------------------------------------------
+# Call once per SWF inside the discovery loop.
+# ---------------------------------------------------------------------------
 function(SkyUI_AS_Add)
-    # ---- Argument parsing ------------------------------------------------
     cmake_parse_arguments(ARG
         ""
         "TARGET_NAME;SWF_REL"
@@ -81,102 +130,129 @@ function(SkyUI_AS_Add)
         message(FATAL_ERROR "SkyUI_AS_Add: SOURCES must contain at least one file.")
     endif()
     if(NOT FFDEC_CLI)
+        message(FATAL_ERROR "SkyUI_AS_Add: FFDEC_CLI is not set.")
+    endif()
+
+    # Retrieve global state
+    get_property(_AS_SOURCE_DIR   GLOBAL PROPERTY _SKYUI_AS_SOURCE_DIR)
+    get_property(_GLOBAL_STAGING  GLOBAL PROPERTY _SKYUI_AS_GLOBAL_STAGING)
+
+    if(NOT _AS_SOURCE_DIR OR NOT _GLOBAL_STAGING)
         message(FATAL_ERROR
-            "SkyUI_AS_Add: FFDEC_CLI cache variable is not set. "
-            "Locate ffdec-cli before calling this function."
-        )
+            "SkyUI_AS_Add: call SkyUI_AS_GlobalAssemble_Init() first.")
     endif()
 
-    # ---- Paths -----------------------------------------------------------
+    # Accumulate sources into global lists
+    set_property(GLOBAL APPEND PROPERTY _SKYUI_AS_ALL_SOURCES ${ARG_SOURCES})
+    if(ARG_FRAME_SOURCES)
+        set_property(GLOBAL APPEND PROPERTY
+            _SKYUI_AS_ALL_FRAME_SOURCES ${ARG_FRAME_SOURCES})
+    endif()
 
-    # Source SWF — lives in the repository; NEVER modified in-place.
-    set(SWF_INPUT  "${CMAKE_CURRENT_SOURCE_DIR}/data/interface/${ARG_SWF_REL}")
+    # ---- Inject step -------------------------------------------------------
+    # OUTPUT: compiled SWF in the build tree
+    # DEPENDS: this SWF's own .as sources + the original .swf
+    #
+    # NOTE: no dependency on the global stamp here. Instead, we use
+    # add_dependencies() (target-level) below to enforce ordering.
+    # This is the key to per-SWF incremental granularity.
 
-    # Output SWF — lives in the build tree under interface/, mirroring data/interface/.
-    set(SWF_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/interface/${ARG_SWF_REL}")
+    set(_SWF_INPUT  "${CMAKE_CURRENT_SOURCE_DIR}/data/interface/${ARG_SWF_REL}")
+    set(_SWF_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/interface/${ARG_SWF_REL}")
 
-    get_filename_component(SWF_OUTPUT_DIR "${SWF_OUTPUT}" DIRECTORY)
-    file(MAKE_DIRECTORY "${SWF_OUTPUT_DIR}")
+    get_filename_component(_SWF_OUTPUT_DIR "${_SWF_OUTPUT}" DIRECTORY)
+    file(MAKE_DIRECTORY "${_SWF_OUTPUT_DIR}")
 
-    # Filesystem-safe variable prefix derived from the relative SWF path.
-    # e.g.  "mapMenu/map_menu.swf"  →  "mapMenu_map_menu"
-    get_filename_component(SWF_NAME_WE   "${ARG_SWF_REL}" NAME_WE)
-    get_filename_component(SWF_DIR_PART  "${ARG_SWF_REL}" DIRECTORY)
+    add_custom_command(
+        OUTPUT "${_SWF_OUTPUT}"
+        COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+            "${_SWF_INPUT}" "${_SWF_OUTPUT}"
+        COMMAND "${FFDEC_CLI}"
+            -importScript "${_SWF_OUTPUT}" "${_SWF_OUTPUT}" "${_GLOBAL_STAGING}"
+        # Fine-grained: only this SWF's sources + the base SWF file.
+        # Changing quest_journal.as does NOT invalidate bartermenu.swf.
+        DEPENDS
+            "${_SWF_INPUT}"
+            ${ARG_SOURCES}
+            ${ARG_FRAME_SOURCES}
+        COMMENT "Injecting ActionScript into ${ARG_SWF_REL}"
+        VERBATIM
+    )
 
-    if(SWF_DIR_PART)
-        string(REPLACE "/" "_" _VAR_PREFIX "${SWF_DIR_PART}/${SWF_NAME_WE}")
+    add_custom_target("${ARG_TARGET_NAME}"
+        DEPENDS "${_SWF_OUTPUT}"
+        SOURCES ${ARG_SOURCES} ${ARG_FRAME_SOURCES}
+    )
+
+    # ORDER-ONLY: assemble must finish before inject runs, but a change to
+    # the assemble stamp does NOT force this inject to re-run.
+    add_dependencies("${ARG_TARGET_NAME}" "ActionScript_Assemble")
+
+    # Filesystem-safe source group name
+    get_filename_component(_SWF_NAME_WE  "${ARG_SWF_REL}" NAME_WE)
+    get_filename_component(_SWF_DIR_PART "${ARG_SWF_REL}" DIRECTORY)
+    if(_SWF_DIR_PART)
+        string(REPLACE "/" "_" _VAR_PREFIX "${_SWF_DIR_PART}/${_SWF_NAME_WE}")
     else()
-        set(_VAR_PREFIX "${SWF_NAME_WE}")
+        set(_VAR_PREFIX "${_SWF_NAME_WE}")
+    endif()
+    source_group("ActionScript\\${_VAR_PREFIX}" FILES ${ARG_SOURCES} ${ARG_FRAME_SOURCES})
+
+    set("${ARG_TARGET_NAME}_OUTPUT" "${_SWF_OUTPUT}" PARENT_SCOPE)
+endfunction()
+
+# ---------------------------------------------------------------------------
+# SkyUI_AS_GlobalAssemble_Finalize
+# ---------------------------------------------------------------------------
+# Call ONCE after the SWF discovery loop.
+# Creates the ActionScript_Assemble target with all accumulated sources.
+# ---------------------------------------------------------------------------
+function(SkyUI_AS_GlobalAssemble_Finalize)
+    get_property(_AS_SOURCE_DIR     GLOBAL PROPERTY _SKYUI_AS_SOURCE_DIR)
+    get_property(_ASSEMBLE_SCRIPT   GLOBAL PROPERTY _SKYUI_AS_ASSEMBLE_SCRIPT)
+    get_property(_GLOBAL_STAGING    GLOBAL PROPERTY _SKYUI_AS_GLOBAL_STAGING)
+    get_property(_ALL_SOURCES       GLOBAL PROPERTY _SKYUI_AS_ALL_SOURCES)
+    get_property(_ALL_FRAME_SOURCES GLOBAL PROPERTY _SKYUI_AS_ALL_FRAME_SOURCES)
+
+    # Deduplicate: shared classes appear in multiple SWF source lists.
+    list(REMOVE_DUPLICATES _ALL_SOURCES)
+    if(_ALL_FRAME_SOURCES)
+        list(REMOVE_DUPLICATES _ALL_FRAME_SOURCES)
     endif()
 
-    set(_AS_SOURCE_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/source/actionscript")
-    set(_AS_STAGING     "${CMAKE_CURRENT_BINARY_DIR}/_AS_staging/${_VAR_PREFIX}")
-    set(_ASSEMBLE_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/cmake/AssembleScripts.cmake")
-
-    # Source-list files are written at configure time so AssembleScripts.cmake
-    # can read them at build time with file(STRINGS …).
-    set(_SOURCES_FILE "${CMAKE_CURRENT_BINARY_DIR}/_AS_staging/${_VAR_PREFIX}_sources.txt")
-    list(JOIN ARG_SOURCES "\n" _SOURCES_CONTENT)
+    # Write source-list files at configure time for AssembleScripts.cmake
+    set(_SOURCES_FILE "${_GLOBAL_STAGING}/all_sources.txt")
+    list(JOIN _ALL_SOURCES "\n" _SOURCES_CONTENT)
+    file(MAKE_DIRECTORY "${_GLOBAL_STAGING}")
     file(WRITE "${_SOURCES_FILE}" "${_SOURCES_CONTENT}")
 
     set(_FRAME_SOURCES_FILE "")
-    if(ARG_FRAME_SOURCES)
-        set(_FRAME_SOURCES_FILE
-            "${CMAKE_CURRENT_BINARY_DIR}/_AS_staging/${_VAR_PREFIX}_frame_sources.txt")
-        list(JOIN ARG_FRAME_SOURCES "\n" _FRAME_CONTENT)
+    if(_ALL_FRAME_SOURCES)
+        set(_FRAME_SOURCES_FILE "${_GLOBAL_STAGING}/all_frame_sources.txt")
+        list(JOIN _ALL_FRAME_SOURCES "\n" _FRAME_CONTENT)
         file(WRITE "${_FRAME_SOURCES_FILE}" "${_FRAME_CONTENT}")
     endif()
 
-    # ---- Step 1: Assemble -----------------------------------------------
-
-    set(_ASSEMBLE_STAMP "${_AS_STAGING}/.assembled.stamp")
+    set(_GLOBAL_STAMP "${_GLOBAL_STAGING}/.assembled.stamp")
 
     add_custom_command(
-        OUTPUT "${_ASSEMBLE_STAMP}"
+        OUTPUT "${_GLOBAL_STAMP}"
         COMMAND "${CMAKE_COMMAND}"
-            "-DSTAGING_DIR=${_AS_STAGING}"
+            "-DSTAGING_DIR=${_GLOBAL_STAGING}"
             "-DSOURCES_FILE=${_SOURCES_FILE}"
             "-DFRAME_SOURCES_FILE=${_FRAME_SOURCES_FILE}"
             "-DAS_SOURCE_DIR=${_AS_SOURCE_DIR}"
             "-DPROJECT_VERSION_MAJOR=${PROJECT_VERSION_MAJOR}"
             "-DPROJECT_VERSION_MINOR=${PROJECT_VERSION_MINOR}"
             -P "${_ASSEMBLE_SCRIPT}"
-        COMMAND "${CMAKE_COMMAND}" -E touch "${_ASSEMBLE_STAMP}"
-        # Every .as source is an explicit dependency for fine-grained rebuild.
-        DEPENDS
-            ${ARG_SOURCES}
-            ${ARG_FRAME_SOURCES}
-            "${_ASSEMBLE_SCRIPT}"
-        COMMENT "Assembling ActionScript sources for ${ARG_SWF_REL}"
+        COMMAND "${CMAKE_COMMAND}" -E touch "${_GLOBAL_STAMP}"
+        # Depends on ALL sources: any .as change reruns assemble.
+        DEPENDS ${_ALL_SOURCES} ${_ALL_FRAME_SOURCES} "${_ASSEMBLE_SCRIPT}"
+        COMMENT "Assembling all ActionScript sources (${_GLOBAL_STAGING})"
         VERBATIM
     )
 
-    # ---- Step 2: Inject --------------------------------------------------
-
-    add_custom_command(
-        OUTPUT "${SWF_OUTPUT}"
-        # Copy the pristine source SWF into the build tree first.
-        COMMAND "${CMAKE_COMMAND}" -E copy_if_different
-            "${SWF_INPUT}" "${SWF_OUTPUT}"
-        # Inject the assembled scripts into the build-tree copy.
-        COMMAND "${FFDEC_CLI}"
-            -importScript "${SWF_OUTPUT}" "${SWF_OUTPUT}" "${_AS_STAGING}"
-        DEPENDS
-            "${SWF_INPUT}"
-            "${_ASSEMBLE_STAMP}"
-        COMMENT "Injecting ActionScript into ${ARG_SWF_REL}"
-        VERBATIM
+    add_custom_target("ActionScript_Assemble"
+        DEPENDS "${_GLOBAL_STAMP}"
     )
-
-    # ---- Target ----------------------------------------------------------
-
-    add_custom_target("${ARG_TARGET_NAME}"
-        DEPENDS "${SWF_OUTPUT}"
-        SOURCES ${ARG_SOURCES} ${ARG_FRAME_SOURCES}
-    )
-
-    source_group("ActionScript\\${_VAR_PREFIX}" FILES ${ARG_SOURCES} ${ARG_FRAME_SOURCES})
-
-    # Expose the compiled SWF path to the calling scope.
-    set("${ARG_TARGET_NAME}_OUTPUT" "${SWF_OUTPUT}" PARENT_SCOPE)
 endfunction()

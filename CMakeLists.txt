@@ -30,8 +30,7 @@ elseif(_BUILD_TYPE_UPPER STREQUAL "RELEASE")
     set(IS_DEBUG_BUILD FALSE)
 else()
     message(FATAL_ERROR
-        "Unsupported CMAKE_BUILD_TYPE '${CMAKE_BUILD_TYPE}'. "
-        "Use 'Debug' or 'Release'.")
+        "Unsupported CMAKE_BUILD_TYPE '${CMAKE_BUILD_TYPE}'. Use 'Debug' or 'Release'.")
 endif()
 
 message(STATUS "[SkyUI] Build type : ${CMAKE_BUILD_TYPE}")
@@ -39,8 +38,7 @@ message(STATUS "[SkyUI] Build type : ${CMAKE_BUILD_TYPE}")
 if(IS_DEBUG_BUILD)
     if(NOT DEFINED MOD_DEBUG_OUTPUT_DIR OR MOD_DEBUG_OUTPUT_DIR STREQUAL "")
         set(MOD_DEBUG_OUTPUT_DIR "${CMAKE_BINARY_DIR}/data"
-            CACHE PATH
-            "Debug output directory (Skyrim Data folder or MO2 mod folder)" FORCE)
+            CACHE PATH "Debug output directory (Skyrim Data or MO2 mod folder)" FORCE)
     endif()
     message(STATUS "[SkyUI] Debug output : ${MOD_DEBUG_OUTPUT_DIR}")
 endif()
@@ -75,9 +73,7 @@ if(FFDEC_CLI)
     message(STATUS "[SkyUI] FFDec CLI    : ${FFDEC_CLI}")
 else()
     message(WARNING
-        "[SkyUI] FFDec CLI not found in tools/FFDec/ or PATH. "
-        "ActionScript compilation will be skipped; SWFs will be used as-is."
-    )
+        "[SkyUI] FFDec CLI not found. ActionScript compilation will be skipped.")
 endif()
 
 # ==============================================================================
@@ -109,6 +105,24 @@ endif()
 # ==============================================================================
 # § 5  ActionScript / SWF Compilation
 # ==============================================================================
+#
+# Architecture: hybrid global-assemble / per-SWF-inject
+#
+#   Phase 1 (configure): Init global state
+#   Phase 2 (configure): Per-SWF loop — register sources, create inject commands
+#   Phase 3 (configure): Finalize — create single global assemble target
+#
+# Build-time dependency graph:
+#
+#   ActionScript_Assemble (1 cmake -P, all sources)
+#     ↓ add_dependencies (ORDER-ONLY: ordering guarantee, not file dependency)
+#   AS_bartermenu     ← DEPENDS: bartermenu_sources + bartermenu.swf
+#   AS_containermenu  ← DEPENDS: containermenu_sources + containermenu.swf
+#   ...               ← all inject steps run in PARALLEL under Ninja
+#
+# Incremental guarantee:
+#   Changing Quest_Journal.as → assemble reruns (cheap, 1 cmake -P) +
+#   only quest_journal inject reruns. All other SWFs are untouched.
 
 set(AS_SWF_DIR    "${CMAKE_CURRENT_SOURCE_DIR}/source/actionscript/swf")
 set(AS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/source/actionscript")
@@ -118,10 +132,17 @@ file(GLOB_RECURSE _ALL_SWF_RELPATHS
     "${CMAKE_CURRENT_SOURCE_DIR}/data/interface/*.swf"
 )
 
+# Phase 1: initialise global ActionScript state
+SkyUI_AS_GlobalAssemble_Init(
+    AS_SOURCE_DIR   "${AS_SOURCE_DIR}"
+    ASSEMBLE_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/cmake/AssembleScripts.cmake"
+)
+
 set(AS_TARGETS            "")
 set(SWF_COMPILED_OUTPUTS  "")
 set(SWF_PASSTHROUGH_FILES "")
 
+# Phase 2: per-SWF loop
 foreach(SWF_REL ${_ALL_SWF_RELPATHS})
     get_filename_component(SWF_NAME_WE  "${SWF_REL}" NAME_WE)
     get_filename_component(SWF_DIR_PART "${SWF_REL}" DIRECTORY)
@@ -161,6 +182,10 @@ foreach(SWF_REL ${_ALL_SWF_RELPATHS})
     endif()
 endforeach()
 
+# Phase 3: create the single global assemble target
+SkyUI_AS_GlobalAssemble_Finalize()
+
+# Aggregate target: builds every SWF
 add_custom_target("ActionScript" DEPENDS ${AS_TARGETS})
 
 # ==============================================================================
@@ -189,10 +214,7 @@ if(IS_DEBUG_BUILD)
     endforeach()
 
     foreach(_SWF_OUT ${SWF_COMPILED_OUTPUTS})
-        file(RELATIVE_PATH _SWF_REL
-            "${CMAKE_BINARY_DIR}/interface"
-            "${_SWF_OUT}"
-        )
+        file(RELATIVE_PATH _SWF_REL "${CMAKE_BINARY_DIR}/interface" "${_SWF_OUT}")
         set(_SWF_DEST "${MOD_DEBUG_OUTPUT_DIR}/interface/${_SWF_REL}")
         get_filename_component(_SWF_DEST_DIR "${_SWF_DEST}" DIRECTORY)
 
@@ -210,9 +232,7 @@ if(IS_DEBUG_BUILD)
 
     foreach(_SWF_SRC ${SWF_PASSTHROUGH_FILES})
         file(RELATIVE_PATH _SWF_REL
-            "${CMAKE_CURRENT_SOURCE_DIR}/data/interface"
-            "${_SWF_SRC}"
-        )
+            "${CMAKE_CURRENT_SOURCE_DIR}/data/interface" "${_SWF_SRC}")
         set(_SWF_DEST "${MOD_DEBUG_OUTPUT_DIR}/interface/${_SWF_REL}")
         get_filename_component(_SWF_DEST_DIR "${_SWF_DEST}" DIRECTORY)
 
@@ -237,9 +257,6 @@ if(IS_DEBUG_BUILD)
 # ==============================================================================
 # § 7  Release Mode -- BSA + ZIP
 # ==============================================================================
-#
-# The ZIP step is delegated entirely to cmake/Package.cmake (-P script).
-# This avoids all MSBuild argument-escaping issues with cmake -E tar on Windows.
 
 else()
 
@@ -262,12 +279,6 @@ else()
             "${CMAKE_CURRENT_SOURCE_DIR}/data"
     )
     add_dependencies("BSA" "Papyrus" "ActionScript")
-
-    # -- Release ZIP ----------------------------------------------------------
-    #
-    # Delegated to cmake/Package.cmake via cmake -P so that CMake handles
-    # all path quoting and file operations natively, bypassing MSBuild's
-    # argument-escaping layer entirely.
 
     set(_BSA_FILE    "${CMAKE_BINARY_DIR}/SkyUI_SE.bsa")
     set(_ESP_FILE    "${CMAKE_CURRENT_SOURCE_DIR}/data/SkyUI_SE.esp")
