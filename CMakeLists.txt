@@ -1,167 +1,298 @@
 cmake_minimum_required(VERSION 3.24)
 
 project(
-	SkyUI
-	VERSION 6.0
-	LANGUAGES NONE
+    SkyUI
+    VERSION 6.0
+    LANGUAGES NONE
 )
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/external/BethesdaCMakeModules/Modules")
+# ==============================================================================
+# § 1  Build Configuration
+# ==============================================================================
+# Supported values for CMAKE_BUILD_TYPE: Debug | Release
+#
+# Debug   -> no BSA, no ZIP; compiled files are written directly into the
+#             directory pointed to by MOD_DEBUG_OUTPUT_DIR.
+# Release -> full pipeline: compile -> BSA -> ZIP.
+# ==============================================================================
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release"
+        CACHE STRING "Build configuration (Debug or Release)" FORCE)
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
+endif()
+
+string(TOUPPER "${CMAKE_BUILD_TYPE}" _BUILD_TYPE_UPPER)
+
+if(_BUILD_TYPE_UPPER STREQUAL "DEBUG")
+    set(IS_DEBUG_BUILD TRUE)
+elseif(_BUILD_TYPE_UPPER STREQUAL "RELEASE")
+    set(IS_DEBUG_BUILD FALSE)
+else()
+    message(FATAL_ERROR
+        "Unsupported CMAKE_BUILD_TYPE '${CMAKE_BUILD_TYPE}'. "
+        "Use 'Debug' or 'Release'.")
+endif()
+
+message(STATUS "[SkyUI] Build type : ${CMAKE_BUILD_TYPE}")
+
+if(IS_DEBUG_BUILD)
+    if(NOT DEFINED MOD_DEBUG_OUTPUT_DIR OR MOD_DEBUG_OUTPUT_DIR STREQUAL "")
+        set(MOD_DEBUG_OUTPUT_DIR "${CMAKE_BINARY_DIR}/data"
+            CACHE PATH
+            "Debug output directory (Skyrim Data folder or MO2 mod folder)" FORCE)
+    endif()
+    message(STATUS "[SkyUI] Debug output : ${MOD_DEBUG_OUTPUT_DIR}")
+endif()
+
+# ==============================================================================
+# § 2  Module Paths
+# ==============================================================================
+
+list(APPEND CMAKE_MODULE_PATH
+    "${CMAKE_CURRENT_SOURCE_DIR}/external/BethesdaCMakeModules/Modules"
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake"
+)
 
 include(Papyrus)
 include(BSArchive)
+include(ActionScript)
 
-# --- Papyrus Scripts ---
+# ==============================================================================
+# § 3  FFDec CLI Detection
+# ==============================================================================
+
+find_program(FFDEC_CLI
+    NAMES ffdec-cli ffdec-cli.exe
+    PATHS "${CMAKE_CURRENT_SOURCE_DIR}/tools/FFDec"
+    NO_DEFAULT_PATH
+)
+if(NOT FFDEC_CLI)
+    find_program(FFDEC_CLI NAMES ffdec-cli ffdec-cli.exe)
+endif()
+
+if(FFDEC_CLI)
+    message(STATUS "[SkyUI] FFDec CLI    : ${FFDEC_CLI}")
+else()
+    message(WARNING
+        "[SkyUI] FFDec CLI not found in tools/FFDec/ or PATH. "
+        "ActionScript compilation will be skipped; SWFs will be used as-is."
+    )
+endif()
+
+# ==============================================================================
+# § 4  Papyrus Scripts
+# ==============================================================================
 
 file(GLOB PAPYRUS_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/source/scripts/*.psc")
 
-Papyrus_Add(
-    "Papyrus"
-    GAME "${SkyrimSE_PATH}"
-    MODE SkyrimSE
-    IMPORTS
-        "${CMAKE_CURRENT_SOURCE_DIR}/source/scripts"
-        "${SkyrimSE_PATH}/Data/Scripts/Source"
-        "${SkyrimSE_PATH}/Data/Source/Scripts"
-    SOURCES ${PAPYRUS_SOURCES}
-    # OPTIMIZE
-    ANONYMIZE
-    SKIP_DEFAULT_IMPORTS
-)
-
-# --- ActionScript Compilation ---
-
-find_program(FFDEC_CLI NAMES ffdec-cli ffdec-cli.exe
-	PATHS "${CMAKE_CURRENT_SOURCE_DIR}/tools/FFDec"
-	NO_DEFAULT_PATH
-)
-
-if(FFDEC_CLI)
-	set(AS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/source/actionscript")
-	set(AS_SWF_DIR "${AS_SOURCE_DIR}/swf")
-	set(AS_STAGING_BASE "${CMAKE_CURRENT_BINARY_DIR}/_AS_staging")
-	set(ASSEMBLE_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/cmake/AssembleScripts.cmake")
-
-	# Collect all SWFs
-	file(GLOB_RECURSE SWF_FILES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/data/interface"
-		"${CMAKE_CURRENT_SOURCE_DIR}/data/interface/*.swf")
-
-	set(AS_TARGETS "")
-	foreach(SWF_REL ${SWF_FILES})
-		get_filename_component(SWF_NAME_WE "${SWF_REL}" NAME_WE)
-		get_filename_component(SWF_DIR "${SWF_REL}" DIRECTORY)
-
-		# Check if a .cmake file exists for this SWF
-		if(SWF_DIR)
-			set(CMAKE_REL "${SWF_DIR}/${SWF_NAME_WE}.cmake")
-		else()
-			set(CMAKE_REL "${SWF_NAME_WE}.cmake")
-		endif()
-
-		set(SWF_INPUT "${CMAKE_CURRENT_SOURCE_DIR}/data/interface/${SWF_REL}")
-
-		if(EXISTS "${AS_SWF_DIR}/${CMAKE_REL}")
-			# Derive variable name: replace / with _ (matches .cmake file convention)
-			if(SWF_DIR)
-				string(REPLACE "/" "_" VAR_PREFIX "${SWF_DIR}/${SWF_NAME_WE}")
-			else()
-				set(VAR_PREFIX "${SWF_NAME_WE}")
-			endif()
-			include("${AS_SWF_DIR}/${CMAKE_REL}")
-
-			set(SOURCES_FILE "${AS_STAGING_BASE}/${VAR_PREFIX}_sources.txt")
-			set(AS_STAGING "${AS_STAGING_BASE}/${VAR_PREFIX}")
-
-			# Write source list at configure time
-			list(JOIN ${VAR_PREFIX}_SOURCES "\n" SOURCES_CONTENT)
-			file(WRITE "${SOURCES_FILE}" "${SOURCES_CONTENT}")
-
-			# Handle optional frame scripts (DoInitAction, staged at root of staging dir)
-			set(FRAME_SOURCES_FILE "")
-			if(DEFINED ${VAR_PREFIX}_FRAME_SOURCES)
-				set(FRAME_SOURCES_FILE "${AS_STAGING_BASE}/${VAR_PREFIX}_frame_sources.txt")
-				list(JOIN ${VAR_PREFIX}_FRAME_SOURCES "\n" FRAME_SOURCES_CONTENT)
-				file(WRITE "${FRAME_SOURCES_FILE}" "${FRAME_SOURCES_CONTENT}")
-			endif()
-
-			add_custom_target("AS_${VAR_PREFIX}"
-				COMMAND "${CMAKE_COMMAND}"
-					"-DSTAGING_DIR=${AS_STAGING}"
-					"-DSOURCES_FILE=${SOURCES_FILE}"
-					"-DFRAME_SOURCES_FILE=${FRAME_SOURCES_FILE}"
-					"-DAS_SOURCE_DIR=${AS_SOURCE_DIR}"
-					"-DPROJECT_VERSION_MAJOR=${PROJECT_VERSION_MAJOR}"
-					"-DPROJECT_VERSION_MINOR=${PROJECT_VERSION_MINOR}"
-					-P "${ASSEMBLE_SCRIPT}"
-				COMMAND "${FFDEC_CLI}" -importScript "${SWF_INPUT}" "${SWF_INPUT}" "${AS_STAGING}"
-				COMMENT "Importing ActionScript files into ${SWF_REL}"
-			)
-
-			list(APPEND AS_TARGETS "AS_${VAR_PREFIX}")
-		endif()
-	endforeach()
-
-	add_custom_target("ActionScript" DEPENDS ${AS_TARGETS})
-
-	# --- Data files for BSA ---
-
-	file(GLOB_RECURSE INTERFACE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/data/interface/*")
-
-	BSArchive_Add(
-		"BSA"
-		OUTPUT "SkyUI_SE.bsa"
-		FORMAT SSE
-		FILES ${Papyrus_OUTPUT} ${INTERFACE_FILES}
-		PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/data"
-	)
-
-	add_dependencies("BSA" "Papyrus" "ActionScript")
+if(PAPYRUS_SOURCES)
+    Papyrus_Add(
+        "Papyrus"
+        GAME "${SkyrimSE_PATH}"
+        MODE SkyrimSE
+        IMPORTS
+            "${CMAKE_CURRENT_SOURCE_DIR}/source/scripts"
+            "${SkyrimSE_PATH}/Data/Scripts/Source"
+            "${SkyrimSE_PATH}/Data/Source/Scripts"
+        SOURCES ${PAPYRUS_SOURCES}
+        # OPTIMIZE
+        ANONYMIZE
+        SKIP_DEFAULT_IMPORTS
+    )
 else()
-	message(WARNING "FFDEC CLI not found. SWFs will be packed as-is without ActionScript compilation.")
-
-	# --- Data files for BSA (no FFDEC fallback) ---
-
-	file(GLOB_RECURSE INTERFACE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/data/interface/*")
-
-	BSArchive_Add(
-		"BSA"
-		OUTPUT "SkyUI_SE.bsa"
-		FORMAT SSE
-		FILES ${Papyrus_OUTPUT} ${INTERFACE_FILES}
-		PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/data"
-	)
-
-	add_dependencies("BSA" "Papyrus")
+    message(STATUS "[SkyUI] No Papyrus sources found -- skipping.")
+    add_custom_target("Papyrus")
+    set(Papyrus_OUTPUT "")
 endif()
 
-# --- Release ---
+# ==============================================================================
+# § 5  ActionScript / SWF Compilation
+# ==============================================================================
 
-set(RELEASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/release")
-set(RELEASE_ZIP "${RELEASE_DIR}/SkyUI_SE-${PROJECT_VERSION}.zip")
-set(RELEASE_STAGING "${CMAKE_CURRENT_BINARY_DIR}/_Release")
+set(AS_SWF_DIR    "${CMAKE_CURRENT_SOURCE_DIR}/source/actionscript/swf")
+set(AS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/source/actionscript")
 
-file(MAKE_DIRECTORY "${RELEASE_STAGING}")
-
-add_custom_command(
-	OUTPUT "${RELEASE_ZIP}"
-	COMMAND "${CMAKE_COMMAND}" -E make_directory "${RELEASE_DIR}"
-	COMMAND "${CMAKE_COMMAND}" -E copy_if_different
-		"${CMAKE_CURRENT_BINARY_DIR}/SkyUI_SE.bsa"
-		"${CMAKE_CURRENT_SOURCE_DIR}/data/SkyUI_SE.esp"
-		"${RELEASE_STAGING}"
-	COMMAND "${CMAKE_COMMAND}" -E tar cf "${RELEASE_ZIP}" --format=zip
-		"SkyUI_SE.bsa"
-		"SkyUI_SE.esp"
-	WORKING_DIRECTORY "${RELEASE_STAGING}"
-	DEPENDS
-		"${CMAKE_CURRENT_BINARY_DIR}/SkyUI_SE.bsa"
-		"${CMAKE_CURRENT_SOURCE_DIR}/data/SkyUI_SE.esp"
-	VERBATIM
+file(GLOB_RECURSE _ALL_SWF_RELPATHS
+    RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/data/interface"
+    "${CMAKE_CURRENT_SOURCE_DIR}/data/interface/*.swf"
 )
 
-add_custom_target(
-	"Release" ALL
-	DEPENDS "${RELEASE_ZIP}"
-)
+set(AS_TARGETS            "")
+set(SWF_COMPILED_OUTPUTS  "")
+set(SWF_PASSTHROUGH_FILES "")
 
-add_dependencies("Release" "BSA")
+foreach(SWF_REL ${_ALL_SWF_RELPATHS})
+    get_filename_component(SWF_NAME_WE  "${SWF_REL}" NAME_WE)
+    get_filename_component(SWF_DIR_PART "${SWF_REL}" DIRECTORY)
+
+    if(SWF_DIR_PART)
+        set(_CMAKE_REL  "${SWF_DIR_PART}/${SWF_NAME_WE}.cmake")
+        string(REPLACE "/" "_" _VAR_PREFIX "${SWF_DIR_PART}/${SWF_NAME_WE}")
+    else()
+        set(_CMAKE_REL  "${SWF_NAME_WE}.cmake")
+        set(_VAR_PREFIX "${SWF_NAME_WE}")
+    endif()
+
+    set(_SWF_CMAKE_FILE "${AS_SWF_DIR}/${_CMAKE_REL}")
+
+    if(FFDEC_CLI AND EXISTS "${_SWF_CMAKE_FILE}")
+        include("${_SWF_CMAKE_FILE}")
+
+        set(_AS_TARGET "AS_${_VAR_PREFIX}")
+
+        set(_FRAME_SOURCES_ARG "")
+        if(DEFINED ${_VAR_PREFIX}_FRAME_SOURCES AND ${_VAR_PREFIX}_FRAME_SOURCES)
+            set(_FRAME_SOURCES_ARG FRAME_SOURCES ${${_VAR_PREFIX}_FRAME_SOURCES})
+        endif()
+
+        SkyUI_AS_Add(
+            TARGET_NAME "${_AS_TARGET}"
+            SWF_REL     "${SWF_REL}"
+            SOURCES     ${${_VAR_PREFIX}_SOURCES}
+            ${_FRAME_SOURCES_ARG}
+        )
+
+        list(APPEND AS_TARGETS           "${_AS_TARGET}")
+        list(APPEND SWF_COMPILED_OUTPUTS "${${_AS_TARGET}_OUTPUT}")
+    else()
+        list(APPEND SWF_PASSTHROUGH_FILES
+            "${CMAKE_CURRENT_SOURCE_DIR}/data/interface/${SWF_REL}")
+    endif()
+endforeach()
+
+add_custom_target("ActionScript" DEPENDS ${AS_TARGETS})
+
+# ==============================================================================
+# § 6  Debug Mode -- Direct Deployment
+# ==============================================================================
+
+if(IS_DEBUG_BUILD)
+
+    set(_DEBUG_DEPLOYED "")
+
+    foreach(_PEX ${Papyrus_OUTPUT})
+        get_filename_component(_PEX_NAME "${_PEX}" NAME)
+        set(_PEX_DEST "${MOD_DEBUG_OUTPUT_DIR}/Scripts/${_PEX_NAME}")
+
+        add_custom_command(
+            OUTPUT "${_PEX_DEST}"
+            COMMAND "${CMAKE_COMMAND}" -E make_directory
+                "${MOD_DEBUG_OUTPUT_DIR}/Scripts"
+            COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+                "${_PEX}" "${_PEX_DEST}"
+            DEPENDS "${_PEX}"
+            COMMENT "Deploying ${_PEX_NAME}"
+            VERBATIM
+        )
+        list(APPEND _DEBUG_DEPLOYED "${_PEX_DEST}")
+    endforeach()
+
+    foreach(_SWF_OUT ${SWF_COMPILED_OUTPUTS})
+        file(RELATIVE_PATH _SWF_REL
+            "${CMAKE_BINARY_DIR}/interface"
+            "${_SWF_OUT}"
+        )
+        set(_SWF_DEST "${MOD_DEBUG_OUTPUT_DIR}/interface/${_SWF_REL}")
+        get_filename_component(_SWF_DEST_DIR "${_SWF_DEST}" DIRECTORY)
+
+        add_custom_command(
+            OUTPUT "${_SWF_DEST}"
+            COMMAND "${CMAKE_COMMAND}" -E make_directory "${_SWF_DEST_DIR}"
+            COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+                "${_SWF_OUT}" "${_SWF_DEST}"
+            DEPENDS "${_SWF_OUT}"
+            COMMENT "Deploying interface/${_SWF_REL}"
+            VERBATIM
+        )
+        list(APPEND _DEBUG_DEPLOYED "${_SWF_DEST}")
+    endforeach()
+
+    foreach(_SWF_SRC ${SWF_PASSTHROUGH_FILES})
+        file(RELATIVE_PATH _SWF_REL
+            "${CMAKE_CURRENT_SOURCE_DIR}/data/interface"
+            "${_SWF_SRC}"
+        )
+        set(_SWF_DEST "${MOD_DEBUG_OUTPUT_DIR}/interface/${_SWF_REL}")
+        get_filename_component(_SWF_DEST_DIR "${_SWF_DEST}" DIRECTORY)
+
+        add_custom_command(
+            OUTPUT "${_SWF_DEST}"
+            COMMAND "${CMAKE_COMMAND}" -E make_directory "${_SWF_DEST_DIR}"
+            COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+                "${_SWF_SRC}" "${_SWF_DEST}"
+            DEPENDS "${_SWF_SRC}"
+            COMMENT "Deploying (pass-through) interface/${_SWF_REL}"
+            VERBATIM
+        )
+        list(APPEND _DEBUG_DEPLOYED "${_SWF_DEST}")
+    endforeach()
+
+    add_custom_target("deploy_debug" ALL
+        DEPENDS ${_DEBUG_DEPLOYED}
+        COMMENT "Debug deployment complete -> ${MOD_DEBUG_OUTPUT_DIR}"
+    )
+    add_dependencies("deploy_debug" "Papyrus" "ActionScript")
+
+# ==============================================================================
+# § 7  Release Mode -- BSA + ZIP
+# ==============================================================================
+#
+# The ZIP step is delegated entirely to cmake/Package.cmake (-P script).
+# This avoids all MSBuild argument-escaping issues with cmake -E tar on Windows.
+
+else()
+
+    file(GLOB_RECURSE _EXTRA_INTERFACE_FILES
+        "${CMAKE_CURRENT_SOURCE_DIR}/data/interface/*"
+    )
+    list(FILTER _EXTRA_INTERFACE_FILES EXCLUDE REGEX "\\.swf$")
+
+    BSArchive_Add(
+        "BSA"
+        OUTPUT  "${CMAKE_BINARY_DIR}/SkyUI_SE.bsa"
+        FORMAT  SSE
+        FILES
+            ${Papyrus_OUTPUT}
+            ${SWF_COMPILED_OUTPUTS}
+            ${SWF_PASSTHROUGH_FILES}
+            ${_EXTRA_INTERFACE_FILES}
+        PREFIX
+            "${CMAKE_BINARY_DIR}"
+            "${CMAKE_CURRENT_SOURCE_DIR}/data"
+    )
+    add_dependencies("BSA" "Papyrus" "ActionScript")
+
+    # -- Release ZIP ----------------------------------------------------------
+    #
+    # Delegated to cmake/Package.cmake via cmake -P so that CMake handles
+    # all path quoting and file operations natively, bypassing MSBuild's
+    # argument-escaping layer entirely.
+
+    set(_BSA_FILE    "${CMAKE_BINARY_DIR}/SkyUI_SE.bsa")
+    set(_ESP_FILE    "${CMAKE_CURRENT_SOURCE_DIR}/data/SkyUI_SE.esp")
+    set(_ZIP_OUTPUT  "${CMAKE_BINARY_DIR}/SkyUI_SE-${PROJECT_VERSION}.zip")
+    set(_STAGING_DIR "${CMAKE_BINARY_DIR}/_Release")
+    set(_PACKAGE_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Package.cmake")
+
+    add_custom_command(
+        OUTPUT "${_ZIP_OUTPUT}"
+        COMMAND "${CMAKE_COMMAND}"
+            "-DSTAGING_DIR=${_STAGING_DIR}"
+            "-DBSA_FILE=${_BSA_FILE}"
+            "-DESP_FILE=${_ESP_FILE}"
+            "-DZIP_OUTPUT=${_ZIP_OUTPUT}"
+            -P "${_PACKAGE_SCRIPT}"
+        DEPENDS
+            "${_BSA_FILE}"
+            "${_ESP_FILE}"
+        COMMENT "Packaging SkyUI_SE-${PROJECT_VERSION}.zip"
+        VERBATIM
+    )
+
+    add_custom_target("release" ALL
+        DEPENDS "${_ZIP_OUTPUT}"
+    )
+    add_dependencies("release" "BSA")
+
+endif()

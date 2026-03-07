@@ -1,28 +1,56 @@
 {
-	"version": 6,
-	"cmakeMinimumRequired": {
-		"major": 3,
-		"minor": 24,
-		"patch": 0
-	},
-	"configurePresets": [
-		{
-			"name": "build",
-			"displayName": "Build",
-			"binaryDir": "${sourceDir}/build",
-			"cacheVariables": {
-				"SkyrimSE_PATH": {
-					"type": "PATH",
-					"value": "$env{SkyrimSE_PATH}"
-				}
-			}
-		}
-	],
-	"buildPresets": [
-		{
-			"name": "release",
-			"displayName": "Release",
-			"configurePreset": "build"
-		}
-	]
+    "version": 6,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 24,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "_base",
+            "hidden": true,
+            "cacheVariables": {
+                "SkyrimSE_PATH": {
+                    "type": "PATH",
+                    "value": "$env{SkyrimSE_PATH}"
+                }
+            }
+        },
+        {
+            "name": "debug",
+            "displayName": "Debug",
+            "description": "Compile scripts and SWFs, deploy directly to MOD_DEBUG_OUTPUT_DIR. No BSA, no ZIP.",
+            "inherits": "_base",
+            "binaryDir": "${sourceDir}/build/debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "MOD_DEBUG_OUTPUT_DIR": {
+                    "type": "PATH",
+                    "value": "$env{MOD_DEBUG_OUTPUT_DIR}"
+                }
+            }
+        },
+        {
+            "name": "release",
+            "displayName": "Release",
+            "description": "Full pipeline: compile → BSA → SkyUI_SE-<version>.zip",
+            "inherits": "_base",
+            "binaryDir": "${sourceDir}/build/release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "debug",
+            "displayName": "Debug",
+            "configurePreset": "debug"
+        },
+        {
+            "name": "release",
+            "displayName": "Release",
+            "configurePreset": "release"
+        }
+    ]
 }
