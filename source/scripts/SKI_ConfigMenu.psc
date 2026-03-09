@@ -1715,23 +1715,12 @@ function ApplySettings()
 	_fInventory3DItemPosScale		= Utility.GetINIFloat("fInventory3DItemPosScale:Interface")
 	_fMagic3DItemPosScale			= Utility.GetINIFloat("fMagic3DItemPosScale:Interface")
 
-	float h = Utility.GetINIInt("iSize H:Display")
-	float w = Utility.GetINIInt("iSize W:Display")
-	float ar = w / h
+    float stageCenter       = 640.0      ; center UI
+    float stageUnitsPerUnit = 8.025      ; 1 unit = 8.025px
+    float flashCenterX      = 931.225    ; known default from ItemCard
 
-	; Widescreen
-	if (ar == 1.6) ; 16:10, 1920x1200
-		_itemXBaseW = -39.0583
-	else
-		_itemXBaseW = -35.7225
-	endIf
-
-	; Non-widescreen
-	if (ar == 1.25) ; 5:4, 1280x1024
-		_itemXBase = -48.2225
-	else
-		_itemXBase = -45.7225
-	endIf
+    _itemXBaseW = -(flashCenterX - stageCenter) / stageUnitsPerUnit
+    _itemXBase  = _itemXBaseW
 
 	Apply3DItemXOffset()
 	Apply3DItemYOffset()
