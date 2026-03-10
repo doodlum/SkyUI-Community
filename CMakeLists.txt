@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.24)
 
+# Suppress CMP0175: external Papyrus.cmake uses VERBATIM with APPEND in
+# add_custom_command, which is not supported. Setting OLD silences the
+# warning without modifying the upstream module.
+# Remove this block once BethesdaCMakeModules is updated.
+cmake_policy(SET CMP0175 OLD)
+
 project(
     SkyUI
     VERSION 6.0
@@ -8,12 +14,6 @@ project(
 
 # ==============================================================================
 # § 1  Build Configuration
-# ==============================================================================
-# Supported values for CMAKE_BUILD_TYPE: Debug | Release
-#
-# Debug   -> no BSA, no ZIP; compiled files are written directly into the
-#             directory pointed to by MOD_DEBUG_OUTPUT_DIR.
-# Release -> full pipeline: compile -> BSA -> ZIP.
 # ==============================================================================
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -79,8 +79,15 @@ endif()
 # ==============================================================================
 # § 4  Papyrus Scripts
 # ==============================================================================
+#
+# CONFIGURE_DEPENDS: CMake re-runs configure automatically when .psc files
+# are added or removed. Without it, the developer would have to manually
+# re-configure after adding a new script.
 
-file(GLOB PAPYRUS_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/source/scripts/*.psc")
+file(GLOB PAPYRUS_SOURCES
+    CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/source/scripts/*.psc"
+)
 
 if(PAPYRUS_SOURCES)
     Papyrus_Add(
@@ -106,33 +113,29 @@ endif()
 # § 5  ActionScript / SWF Compilation
 # ==============================================================================
 #
-# Architecture: hybrid global-assemble / per-SWF-inject
+# Three-phase configure-time setup (see cmake/ActionScript.cmake):
+#   Phase 1 — Init global state
+#   Phase 2 — Per-SWF loop
+#   Phase 3 — Finalize global assemble target
 #
-#   Phase 1 (configure): Init global state
-#   Phase 2 (configure): Per-SWF loop — register sources, create inject commands
-#   Phase 3 (configure): Finalize — create single global assemble target
+# Build-time graph:
+#   ActionScript_Assemble  (1× cmake -P, -cli -config autoDeobfuscate=false)
+#     ↓ ORDER-ONLY
+#   AS_swf1 … AS_swfN  →  all run in PARALLEL, each rebuilds only when
+#                          its own sources or base SWF changed
 #
-# Build-time dependency graph:
-#
-#   ActionScript_Assemble (1 cmake -P, all sources)
-#     ↓ add_dependencies (ORDER-ONLY: ordering guarantee, not file dependency)
-#   AS_bartermenu     ← DEPENDS: bartermenu_sources + bartermenu.swf
-#   AS_containermenu  ← DEPENDS: containermenu_sources + containermenu.swf
-#   ...               ← all inject steps run in PARALLEL under Ninja
-#
-# Incremental guarantee:
-#   Changing Quest_Journal.as → assemble reruns (cheap, 1 cmake -P) +
-#   only quest_journal inject reruns. All other SWFs are untouched.
+# CONFIGURE_DEPENDS: adding a new .swf to data/interface/ automatically
+# triggers re-configure without manual cmake --preset invocation.
 
 set(AS_SWF_DIR    "${CMAKE_CURRENT_SOURCE_DIR}/source/actionscript/swf")
 set(AS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/source/actionscript")
 
 file(GLOB_RECURSE _ALL_SWF_RELPATHS
+    CONFIGURE_DEPENDS
     RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/data/interface"
     "${CMAKE_CURRENT_SOURCE_DIR}/data/interface/*.swf"
 )
 
-# Phase 1: initialise global ActionScript state
 SkyUI_AS_GlobalAssemble_Init(
     AS_SOURCE_DIR   "${AS_SOURCE_DIR}"
     ASSEMBLE_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/cmake/AssembleScripts.cmake"
@@ -142,7 +145,6 @@ set(AS_TARGETS            "")
 set(SWF_COMPILED_OUTPUTS  "")
 set(SWF_PASSTHROUGH_FILES "")
 
-# Phase 2: per-SWF loop
 foreach(SWF_REL ${_ALL_SWF_RELPATHS})
     get_filename_component(SWF_NAME_WE  "${SWF_REL}" NAME_WE)
     get_filename_component(SWF_DIR_PART "${SWF_REL}" DIRECTORY)
@@ -182,75 +184,58 @@ foreach(SWF_REL ${_ALL_SWF_RELPATHS})
     endif()
 endforeach()
 
-# Phase 3: create the single global assemble target
 SkyUI_AS_GlobalAssemble_Finalize()
 
-# Aggregate target: builds every SWF
 add_custom_target("ActionScript" DEPENDS ${AS_TARGETS})
 
 # ==============================================================================
 # § 6  Debug Mode -- Direct Deployment
 # ==============================================================================
+#
+# Deploy uses a single cmake -P process (cmake/Deploy.cmake) instead of one
+# cmake process per file, eliminating ~38 subprocess launches per build.
+#
+# File lists are written to disk at configure-time and read by the script at
+# build-time. This avoids the semicolon-as-separator ambiguity that occurs
+# when passing CMake lists via -D on MSBuild generators.
 
 if(IS_DEBUG_BUILD)
 
-    set(_DEBUG_DEPLOYED "")
+    set(_DEPLOY_SCRIPT    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Deploy.cmake")
+    set(_DEPLOY_STAMP     "${CMAKE_BINARY_DIR}/_deploy.stamp")
+    set(_DEPLOY_LISTS_DIR "${CMAKE_BINARY_DIR}/_deploy_lists")
 
-    foreach(_PEX ${Papyrus_OUTPUT})
-        get_filename_component(_PEX_NAME "${_PEX}" NAME)
-        set(_PEX_DEST "${MOD_DEBUG_OUTPUT_DIR}/Scripts/${_PEX_NAME}")
+    file(MAKE_DIRECTORY "${_DEPLOY_LISTS_DIR}")
 
-        add_custom_command(
-            OUTPUT "${_PEX_DEST}"
-            COMMAND "${CMAKE_COMMAND}" -E make_directory
-                "${MOD_DEBUG_OUTPUT_DIR}/Scripts"
-            COMMAND "${CMAKE_COMMAND}" -E copy_if_different
-                "${_PEX}" "${_PEX_DEST}"
-            DEPENDS "${_PEX}"
-            COMMENT "Deploying ${_PEX_NAME}"
-            VERBATIM
-        )
-        list(APPEND _DEBUG_DEPLOYED "${_PEX_DEST}")
-    endforeach()
+    # Write list files at configure-time.
+    # One absolute path per line — read via file(STRINGS) in Deploy.cmake.
+    list(JOIN Papyrus_OUTPUT        "\n" _PEX_CONTENT)
+    list(JOIN SWF_COMPILED_OUTPUTS  "\n" _SWF_COMPILED_CONTENT)
+    list(JOIN SWF_PASSTHROUGH_FILES "\n" _SWF_PT_CONTENT)
 
-    foreach(_SWF_OUT ${SWF_COMPILED_OUTPUTS})
-        file(RELATIVE_PATH _SWF_REL "${CMAKE_BINARY_DIR}/interface" "${_SWF_OUT}")
-        set(_SWF_DEST "${MOD_DEBUG_OUTPUT_DIR}/interface/${_SWF_REL}")
-        get_filename_component(_SWF_DEST_DIR "${_SWF_DEST}" DIRECTORY)
+    file(WRITE "${_DEPLOY_LISTS_DIR}/pex_files.txt"       "${_PEX_CONTENT}")
+    file(WRITE "${_DEPLOY_LISTS_DIR}/swf_compiled.txt"    "${_SWF_COMPILED_CONTENT}")
+    file(WRITE "${_DEPLOY_LISTS_DIR}/swf_passthrough.txt" "${_SWF_PT_CONTENT}")
 
-        add_custom_command(
-            OUTPUT "${_SWF_DEST}"
-            COMMAND "${CMAKE_COMMAND}" -E make_directory "${_SWF_DEST_DIR}"
-            COMMAND "${CMAKE_COMMAND}" -E copy_if_different
-                "${_SWF_OUT}" "${_SWF_DEST}"
-            DEPENDS "${_SWF_OUT}"
-            COMMENT "Deploying interface/${_SWF_REL}"
-            VERBATIM
-        )
-        list(APPEND _DEBUG_DEPLOYED "${_SWF_DEST}")
-    endforeach()
-
-    foreach(_SWF_SRC ${SWF_PASSTHROUGH_FILES})
-        file(RELATIVE_PATH _SWF_REL
-            "${CMAKE_CURRENT_SOURCE_DIR}/data/interface" "${_SWF_SRC}")
-        set(_SWF_DEST "${MOD_DEBUG_OUTPUT_DIR}/interface/${_SWF_REL}")
-        get_filename_component(_SWF_DEST_DIR "${_SWF_DEST}" DIRECTORY)
-
-        add_custom_command(
-            OUTPUT "${_SWF_DEST}"
-            COMMAND "${CMAKE_COMMAND}" -E make_directory "${_SWF_DEST_DIR}"
-            COMMAND "${CMAKE_COMMAND}" -E copy_if_different
-                "${_SWF_SRC}" "${_SWF_DEST}"
-            DEPENDS "${_SWF_SRC}"
-            COMMENT "Deploying (pass-through) interface/${_SWF_REL}"
-            VERBATIM
-        )
-        list(APPEND _DEBUG_DEPLOYED "${_SWF_DEST}")
-    endforeach()
+    add_custom_command(
+        OUTPUT "${_DEPLOY_STAMP}"
+        COMMAND "${CMAKE_COMMAND}"
+            "-DOUTPUT_DIR=${MOD_DEBUG_OUTPUT_DIR}"
+            "-DDEPLOY_LISTS_DIR=${_DEPLOY_LISTS_DIR}"
+            "-DSWF_COMPILED_BASE=${CMAKE_BINARY_DIR}/interface"
+            "-DSWF_PASSTHROUGH_BASE=${CMAKE_CURRENT_SOURCE_DIR}/data/interface"
+            -P "${_DEPLOY_SCRIPT}"
+        COMMAND "${CMAKE_COMMAND}" -E touch "${_DEPLOY_STAMP}"
+        DEPENDS
+            ${Papyrus_OUTPUT}
+            ${SWF_COMPILED_OUTPUTS}
+            ${SWF_PASSTHROUGH_FILES}
+        COMMENT "Deploying to ${MOD_DEBUG_OUTPUT_DIR}"
+        VERBATIM
+    )
 
     add_custom_target("deploy_debug" ALL
-        DEPENDS ${_DEBUG_DEPLOYED}
-        COMMENT "Debug deployment complete -> ${MOD_DEBUG_OUTPUT_DIR}"
+        DEPENDS "${_DEPLOY_STAMP}"
     )
     add_dependencies("deploy_debug" "Papyrus" "ActionScript")
 
@@ -261,6 +246,7 @@ if(IS_DEBUG_BUILD)
 else()
 
     file(GLOB_RECURSE _EXTRA_INTERFACE_FILES
+        CONFIGURE_DEPENDS
         "${CMAKE_CURRENT_SOURCE_DIR}/data/interface/*"
     )
     list(FILTER _EXTRA_INTERFACE_FILES EXCLUDE REGEX "\\.swf$")
@@ -280,10 +266,10 @@ else()
     )
     add_dependencies("BSA" "Papyrus" "ActionScript")
 
-    set(_BSA_FILE    "${CMAKE_BINARY_DIR}/SkyUI_SE.bsa")
-    set(_ESP_FILE    "${CMAKE_CURRENT_SOURCE_DIR}/data/SkyUI_SE.esp")
-    set(_ZIP_OUTPUT  "${CMAKE_BINARY_DIR}/SkyUI_SE-${PROJECT_VERSION}.zip")
-    set(_STAGING_DIR "${CMAKE_BINARY_DIR}/_Release")
+    set(_BSA_FILE       "${CMAKE_BINARY_DIR}/SkyUI_SE.bsa")
+    set(_ESP_FILE       "${CMAKE_CURRENT_SOURCE_DIR}/data/SkyUI_SE.esp")
+    set(_ZIP_OUTPUT     "${CMAKE_BINARY_DIR}/SkyUI_SE-${PROJECT_VERSION}.zip")
+    set(_STAGING_DIR    "${CMAKE_BINARY_DIR}/_Release")
     set(_PACKAGE_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Package.cmake")
 
     add_custom_command(

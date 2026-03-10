@@ -160,14 +160,13 @@ function(SkyUI_AS_Add)
     set(_SWF_INPUT  "${CMAKE_CURRENT_SOURCE_DIR}/data/interface/${ARG_SWF_REL}")
     set(_SWF_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/interface/${ARG_SWF_REL}")
 
-    get_filename_component(_SWF_OUTPUT_DIR "${_SWF_OUTPUT}" DIRECTORY)
-    file(MAKE_DIRECTORY "${_SWF_OUTPUT_DIR}")
-
     add_custom_command(
         OUTPUT "${_SWF_OUTPUT}"
         COMMAND "${CMAKE_COMMAND}" -E copy_if_different
             "${_SWF_INPUT}" "${_SWF_OUTPUT}"
         COMMAND "${FFDEC_CLI}"
+            -config autoDeobfuscate=false,decompile=false
+            -onerror abort
             -importScript "${_SWF_OUTPUT}" "${_SWF_OUTPUT}" "${_GLOBAL_STAGING}"
         # Fine-grained: only this SWF's sources + the base SWF file.
         # Changing quest_journal.as does NOT invalidate bartermenu.swf.
@@ -237,6 +236,8 @@ function(SkyUI_AS_GlobalAssemble_Finalize)
 
     add_custom_command(
         OUTPUT "${_GLOBAL_STAMP}"
+        # Declare the staging tree so `cmake --build --target clean` removes it.
+        BYPRODUCTS "${_GLOBAL_STAGING}/__Packages"
         COMMAND "${CMAKE_COMMAND}"
             "-DSTAGING_DIR=${_GLOBAL_STAGING}"
             "-DSOURCES_FILE=${_SOURCES_FILE}"
@@ -248,7 +249,7 @@ function(SkyUI_AS_GlobalAssemble_Finalize)
         COMMAND "${CMAKE_COMMAND}" -E touch "${_GLOBAL_STAMP}"
         # Depends on ALL sources: any .as change reruns assemble.
         DEPENDS ${_ALL_SOURCES} ${_ALL_FRAME_SOURCES} "${_ASSEMBLE_SCRIPT}"
-        COMMENT "Assembling all ActionScript sources (${_GLOBAL_STAGING})"
+        COMMENT "Assembling all ActionScript sources"
         VERBATIM
     )
 
