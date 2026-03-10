@@ -47,14 +47,17 @@ endif()
 # § 2  Module Paths
 # ==============================================================================
 
+# cmake/ is listed FIRST so our modules (PapyrusCustom, ActionScript, …)
+# take precedence over BethesdaCMakeModules when names collide.
 list(APPEND CMAKE_MODULE_PATH
-    "${CMAKE_CURRENT_SOURCE_DIR}/external/BethesdaCMakeModules/Modules"
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake"
+    "${CMAKE_CURRENT_SOURCE_DIR}/external/BethesdaCMakeModules/Modules"
 )
 
-include(Papyrus)
-include(BSArchive)
-include(ActionScript)
+include(Papyrus)         # BethesdaCMakeModules — upstream fallback
+include(BSArchive)       # BethesdaCMakeModules
+include(PapyrusCustom)   # cmake/PapyrusCustom.cmake — community compiler
+include(ActionScript)    # cmake/ActionScript.cmake
 
 # ==============================================================================
 # § 3  FFDec CLI Detection
@@ -77,34 +80,76 @@ else()
 endif()
 
 # ==============================================================================
+# § 3b  Community Papyrus Compiler Detection
+# ==============================================================================
+#
+# Looks for tools/Papyrus/papyrus[.exe].
+# Sets PAPYRUS_CUSTOM_COMPILER in cache if found, empty otherwise.
+# The Papyrus section below uses it when present; falls back to
+# PapyrusCompiler.exe (via Papyrus_Add) when absent.
+
+PapyrusCustom_Find()
+
+# ==============================================================================
 # § 4  Papyrus Scripts
 # ==============================================================================
 #
+# SKYUI_ENABLE_PAPYRUS: set to OFF in environments without a Skyrim install
+# (e.g. CI). Defaults ON so local Debug/Release builds are unaffected.
+#
 # CONFIGURE_DEPENDS: CMake re-runs configure automatically when .psc files
-# are added or removed. Without it, the developer would have to manually
-# re-configure after adding a new script.
+# are added or removed.
 
-file(GLOB PAPYRUS_SOURCES
-    CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/source/scripts/*.psc"
-)
+option(SKYUI_ENABLE_PAPYRUS
+    "Compile Papyrus scripts (requires SkyrimSE_PATH or Caprica in PATH)" ON)
 
-if(PAPYRUS_SOURCES)
-    Papyrus_Add(
-        "Papyrus"
-        GAME "${SkyrimSE_PATH}"
-        MODE SkyrimSE
-        IMPORTS
-            "${CMAKE_CURRENT_SOURCE_DIR}/source/scripts"
-            "${SkyrimSE_PATH}/Data/Scripts/Source"
-            "${SkyrimSE_PATH}/Data/Source/Scripts"
-        SOURCES ${PAPYRUS_SOURCES}
-        # OPTIMIZE
-        ANONYMIZE
-        SKIP_DEFAULT_IMPORTS
+if(SKYUI_ENABLE_PAPYRUS)
+    file(GLOB PAPYRUS_SOURCES
+        CONFIGURE_DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/source/scripts/*.psc"
     )
+
+    if(PAPYRUS_SOURCES)
+        if(PAPYRUS_CUSTOM_COMPILER)
+            # ---- Community compiler (tools/Papyrus/papyrus.exe) -----------
+            # Faster than PapyrusCompiler.exe, built-in caching, no .flg.
+            # HEADERS maps to repeated  -h <dir>  arguments.
+            # source/scripts is listed first so scripts can reference each
+            # other, followed by the vanilla Skyrim source directories.
+            PapyrusCustom_Add(
+                "Papyrus"
+                SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/source/scripts"
+                SOURCES    ${PAPYRUS_SOURCES}
+                HEADERS
+                    "${CMAKE_CURRENT_SOURCE_DIR}/source/scripts"
+                    "${SkyrimSE_PATH}/Data/Source/Scripts"
+                    "${SkyrimSE_PATH}/Data/Scripts/Source"
+                ANONYMIZE
+                # VERBOSE
+            )
+        else()
+            # ---- Upstream fallback (PapyrusCompiler.exe) ------------------
+            Papyrus_Add(
+                "Papyrus"
+                GAME "${SkyrimSE_PATH}"
+                MODE SkyrimSE
+                IMPORTS
+                    "${CMAKE_CURRENT_SOURCE_DIR}/source/scripts"
+                    "${SkyrimSE_PATH}/Data/Scripts/Source"
+                    "${SkyrimSE_PATH}/Data/Source/Scripts"
+                SOURCES ${PAPYRUS_SOURCES}
+                # OPTIMIZE
+                ANONYMIZE
+                SKIP_DEFAULT_IMPORTS
+            )
+        endif()
+    else()
+        message(STATUS "[SkyUI] No Papyrus sources found -- skipping.")
+        add_custom_target("Papyrus")
+        set(Papyrus_OUTPUT "")
+    endif()
 else()
-    message(STATUS "[SkyUI] No Papyrus sources found -- skipping.")
+    message(STATUS "[SkyUI] Papyrus : disabled (SKYUI_ENABLE_PAPYRUS=OFF)")
     add_custom_target("Papyrus")
     set(Papyrus_OUTPUT "")
 endif()
