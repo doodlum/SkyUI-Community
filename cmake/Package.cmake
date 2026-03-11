@@ -32,17 +32,16 @@ endforeach()
 get_filename_component(_BSA_NAME "${BSA_FILE}" NAME)
 get_filename_component(_ESP_NAME "${ESP_FILE}" NAME)
 
+# CMAKE_EXECUTE_PROCESS_COMMAND_ERROR_IS_FATAL (CMake 4.0):
+# Any non-zero exit code from execute_process() becomes a fatal error automatically.
+# Eliminates the RESULT_VARIABLE / if(NOT ... EQUAL 0) boilerplate.
+set(CMAKE_EXECUTE_PROCESS_COMMAND_ERROR_IS_FATAL ANY)
+
 execute_process(
     COMMAND "${CMAKE_COMMAND}" -E tar cf "${ZIP_OUTPUT}" --format=zip
         "${_BSA_NAME}"
         "${_ESP_NAME}"
     WORKING_DIRECTORY "${STAGING_DIR}"
-    RESULT_VARIABLE _TAR_RESULT
-    ERROR_VARIABLE  _TAR_ERROR
 )
-
-if(NOT _TAR_RESULT EQUAL 0)
-    message(FATAL_ERROR "Package.cmake: zip creation failed:\n  ${_TAR_ERROR}")
-endif()
 
 message(STATUS "  Created: ${ZIP_OUTPUT}")

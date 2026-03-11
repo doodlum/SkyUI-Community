@@ -50,7 +50,7 @@ Usage
 .. code-block:: cmake
 
   # Detects tools/Papyrus/papyrus.exe; downloads automatically if absent.
-  PapyrusCustom_Find()          # sets PAPYRUS_CUSTOM_COMPILER (NO_CACHE)
+  PapyrusCustom_Find()          # sets PAPYRUS_CUSTOM_COMPILER in cache
 
   if(PAPYRUS_CUSTOM_COMPILER)
       PapyrusCustom_Add(
@@ -107,20 +107,49 @@ set(_PAPYRUS_COMPILER_URL
 set(PAPYRUS_COMPILER_SHA256 ""
     CACHE STRING "Expected SHA256 of the Papyrus compiler ZIP (leave empty to skip verification)"
 )
+# The ZIP extracts as:  papyrus-compiler/
+#                           papyrus.exe
+#                           ...
+# We extract into tools/ so the subfolder lands at tools/papyrus-compiler/.
+# _PAPYRUS_INSTALL_DIR points at the subfolder where the binary lives.
+set(_PAPYRUS_COMPILER_SUBDIR "papyrus-compiler")
 
-macro(PapyrusCustom_Find)
-    # NO_CACHE: re-run find_program on every configure so the binary is
-    # found immediately after the first-time download without a manual wipe.
+# PapyrusCustom_Find is a FUNCTION, not a macro.
+#
+# Critical distinction:
+#   macro : return() exits the CALLER's scope (e.g. CMakeLists.txt!) — BUG
+#   function: return() exits only this function — correct
+#
+# find_program without NO_CACHE writes to the CMake cache (global scope),
+# so the result is visible to the caller without any PARENT_SCOPE dance.
+# The cache variable is unset (unset(CACHE{PAPYRUS_CUSTOM_COMPILER})) before
+# each search so we re-probe on every configure — same behaviour as NO_CACHE
+# but compatible with function scope.
+function(PapyrusCustom_Find)
+    # Skip download when Papyrus compilation is disabled (e.g. CI without
+    # Skyrim install).  return() here is safe because this is a function.
+    if(NOT SKYUI_ENABLE_PAPYRUS)
+        message(STATUS "[SkyUI] Papyrus compilation disabled — skipping compiler detection.")
+        return()
+    endif()
+
+    # Clear any stale cache entry so find_program actually searches on
+    # every configure (equivalent to NO_CACHE, but cache-visible to callers).
+    # unset(CACHE{VAR}) is the CMake 4.2 explicit cache-entry syntax.
+    unset(CACHE{PAPYRUS_CUSTOM_COMPILER})
+
     find_program(PAPYRUS_CUSTOM_COMPILER
         NAMES papyrus papyrus.exe
-        PATHS "${CMAKE_CURRENT_SOURCE_DIR}/tools/Papyrus"
+        PATHS "${CMAKE_CURRENT_SOURCE_DIR}/tools/${_PAPYRUS_COMPILER_SUBDIR}"
         NO_DEFAULT_PATH
-        NO_CACHE
         DOC "Path to the community Papyrus compiler"
     )
 
     if(NOT PAPYRUS_CUSTOM_COMPILER)
-        set(_PAPYRUS_INSTALL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tools/Papyrus")
+        # Extract to tools/ so the archive subfolder papyrus-compiler/ lands
+        # directly at tools/papyrus-compiler/ without extra nesting.
+        set(_PAPYRUS_EXTRACT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/tools")
+        set(_PAPYRUS_INSTALL_DIR "${_PAPYRUS_EXTRACT_DIR}/${_PAPYRUS_COMPILER_SUBDIR}")
         set(_PAPYRUS_ZIP         "${CMAKE_CURRENT_BINARY_DIR}/download/papyrus-compiler-windows.zip")
 
         message(STATUS
@@ -131,7 +160,7 @@ macro(PapyrusCustom_Find)
         # Build the optional EXPECTED_HASH argument only when a hash is provided.
         set(_HASH_ARG "")
         if(PAPYRUS_COMPILER_SHA256)
-            set(_HASH_ARG EXPECTED_HASH "SHA256=${PAPYRUS_COMPILER_SHA256}")
+            set(_HASH_ARG EXPECTED_HASH "SHA256=EBB5B96545D9E296352BED86BC6665551185A2867E926AF8FC0EA87026632704")
         else()
             message(WARNING
                 "[SkyUI] PAPYRUS_COMPILER_SHA256 is not set — "
@@ -156,19 +185,21 @@ macro(PapyrusCustom_Find)
                 "Alternatively, download manually and extract to: ${_PAPYRUS_INSTALL_DIR}")
         endif()
 
-        message(STATUS "[SkyUI] Extracting to ${_PAPYRUS_INSTALL_DIR} ...")
+        message(STATUS "[SkyUI] Extracting to ${_PAPYRUS_EXTRACT_DIR} ...")
         file(ARCHIVE_EXTRACT
             INPUT       "${_PAPYRUS_ZIP}"
-            DESTINATION "${_PAPYRUS_INSTALL_DIR}"
+            DESTINATION "${_PAPYRUS_EXTRACT_DIR}"
         )
+        # Result: ${_PAPYRUS_EXTRACT_DIR}/papyrus-compiler/papyrus.exe
 
         # Re-run find_program after extraction to resolve the full path.
+        unset(CACHE{PAPYRUS_CUSTOM_COMPILER})
         find_program(PAPYRUS_CUSTOM_COMPILER
             NAMES papyrus papyrus.exe
             PATHS "${_PAPYRUS_INSTALL_DIR}"
             NO_DEFAULT_PATH
-            NO_CACHE
         )
+        # _PAPYRUS_INSTALL_DIR = tools/papyrus-compiler/
 
         if(NOT PAPYRUS_CUSTOM_COMPILER)
             message(FATAL_ERROR
@@ -181,7 +212,7 @@ macro(PapyrusCustom_Find)
     else()
         message(STATUS "[SkyUI] Papyrus compiler : ${PAPYRUS_CUSTOM_COMPILER}")
     endif()
-endmacro()
+endfunction()
 
 # ---------------------------------------------------------------------------
 # PapyrusCustom_Add

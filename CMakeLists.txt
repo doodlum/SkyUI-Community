@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 4.2)
 
 # Suppress CMP0175: external Papyrus.cmake uses VERBATIM with APPEND in
 # add_custom_command, which is not supported. Setting OLD silences the
@@ -88,6 +88,9 @@ endif()
 # The Papyrus section below uses it when present; falls back to
 # PapyrusCompiler.exe (via Papyrus_Add) when absent.
 
+option(SKYUI_ENABLE_PAPYRUS
+    "Compile Papyrus scripts (requires SkyrimSE_PATH)" ON)
+
 PapyrusCustom_Find()
 
 # ==============================================================================
@@ -99,9 +102,6 @@ PapyrusCustom_Find()
 #
 # CONFIGURE_DEPENDS: CMake re-runs configure automatically when .psc files
 # are added or removed.
-
-option(SKYUI_ENABLE_PAPYRUS
-    "Compile Papyrus scripts (requires SkyrimSE_PATH or Caprica in PATH)" ON)
 
 if(SKYUI_ENABLE_PAPYRUS)
     file(GLOB PAPYRUS_SOURCES
