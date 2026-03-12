@@ -293,16 +293,25 @@ function(PapyrusCustom_Add PAPYRUS_TARGET)
     # BYPRODUCTS lists the .pex files so that `cmake --build --target clean`
     # removes them, and so Ninja can correctly detect missing outputs.
 
+    # Run the compiler through a cmake -P wrapper script so that:
+    #   • stdout + stderr are captured together
+    #   • on failure the full compiler output is printed to the build log
+    #     (MSBuild truncates and mangles direct COMMAND output)
+    #   • the error message shows which source directory failed
+    #
+    # _H_ARGS is a list; join with the @@-separator the script uses to split.
+    string(JOIN "@@" _H_ARGS_STR ${_H_ARGS})
+
     add_custom_command(
         OUTPUT "${_STAMP}"
         BYPRODUCTS ${_PAPYRUS_OUTPUT}
         COMMAND "${CMAKE_COMMAND}" -E make_directory "${_STAMP_DIR}"
-        COMMAND "${PAPYRUS_CUSTOM_COMPILER}"
-                compile
-                -i  "${P_SOURCE_DIR}"
-                -o  "${_OUTPUT_DIR}"
-                ${_H_ARGS}
-                ${_SILENT_ARG}
+        COMMAND "${CMAKE_COMMAND}"
+                -DCOMPILER=${PAPYRUS_CUSTOM_COMPILER}
+                -DSOURCE_DIR=${P_SOURCE_DIR}
+                -DOUTPUT_DIR=${_OUTPUT_DIR}
+                "-DH_ARGS_STR=${_H_ARGS_STR}"
+                -P "${CMAKE_CURRENT_SOURCE_DIR}/cmake/PapyrusCompile.cmake"
         COMMAND "${CMAKE_COMMAND}" -E touch "${_STAMP}"
         DEPENDS ${P_SOURCES}
         COMMENT "Compiling Papyrus scripts (${P_SOURCE_DIR})"
