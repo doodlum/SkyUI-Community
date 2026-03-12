@@ -4,7 +4,9 @@ cmake_minimum_required(VERSION 4.2)
 # add_custom_command, which is not supported. Setting OLD silences the
 # warning without modifying the upstream module.
 # Remove this block once BethesdaCMakeModules is updated.
-cmake_policy(SET CMP0175 OLD)
+if(POLICY CMP0175)
+    cmake_policy(SET CMP0175 OLD)
+endif()
 
 project(
     SkyUI
@@ -212,6 +214,20 @@ foreach(SWF_REL ${_ALL_SWF_RELPATHS})
         set(_FRAME_SOURCES_ARG "")
         if(DEFINED ${_VAR_PREFIX}_FRAME_SOURCES AND ${_VAR_PREFIX}_FRAME_SOURCES)
             set(_FRAME_SOURCES_ARG FRAME_SOURCES ${${_VAR_PREFIX}_FRAME_SOURCES})
+        endif()
+
+        # Validate that the included .cmake file actually defined the SOURCES variable.
+        # Common mistake: variable name in the .cmake file doesn't match _VAR_PREFIX.
+        if(NOT ${_VAR_PREFIX}_SOURCES)
+            message(FATAL_ERROR
+                "[SkyUI] ActionScript sources not found for: ${SWF_REL}\n"
+                "  Expected variable : ${_VAR_PREFIX}_SOURCES\n"
+                "  Defined in        : ${_SWF_CMAKE_FILE}\n"
+                "  Make sure the .cmake file sets:\n"
+                "    set(${_VAR_PREFIX}_SOURCES\n"
+                "        \${AS_SOURCE_DIR}/Module/File.as\n"
+                "        ...\n"
+                "    )")
         endif()
 
         SkyUI_AS_Add(
