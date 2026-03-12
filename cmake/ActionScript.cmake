@@ -162,10 +162,7 @@ function(SkyUI_AS_Add)
 
     add_custom_command(
         OUTPUT "${_SWF_OUTPUT}"
-        # copy_if_newer (CMake 4.2): timestamp comparison is faster than
-        # content hashing (copy_if_different) and correct for build systems
-        # where file modification times are reliable.
-        COMMAND "${CMAKE_COMMAND}" -E copy_if_newer
+        COMMAND "${CMAKE_COMMAND}" -E copy_if_different
             "${_SWF_INPUT}" "${_SWF_OUTPUT}"
         COMMAND "${FFDEC_CLI}"
             -config autoDeobfuscate=false,decompile=false
