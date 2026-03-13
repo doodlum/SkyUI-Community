@@ -1,8 +1,8 @@
 {
-    "version": 6,
+    "version": 10,
     "cmakeMinimumRequired": {
-        "major": 3,
-        "minor": 24,
+        "major": 4,
+        "minor": 2,
         "patch": 0
     },
     "configurePresets": [
@@ -23,21 +23,35 @@
             "inherits": "_base",
             "binaryDir": "${sourceDir}/build/debug",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_BUILD_TYPE": {
+                    "type": "STRING",
+                    "value": "Debug"
+                },
                 "MOD_DEBUG_OUTPUT_DIR": {
                     "type": "PATH",
                     "value": "$env{MOD_DEBUG_OUTPUT_DIR}"
+                },
+                "CMAKE_CONFIGURATION_TYPES": {
+                    "type": "STRING",
+                    "value": "Debug"
                 }
             }
         },
         {
             "name": "release",
             "displayName": "Release",
-            "description": "Full pipeline: compile → BSA → SkyUI_SE-<version>.zip",
+            "description": "Full pipeline: compile -> BSA -> SkyUI_SE-<version>.zip",
             "inherits": "_base",
             "binaryDir": "${sourceDir}/build/release",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
+                "CMAKE_BUILD_TYPE": {
+                    "type": "STRING",
+                    "value": "Release"
+                },
+                "CMAKE_CONFIGURATION_TYPES": {
+                    "type": "STRING",
+                    "value": "Release"
+                }
             }
         }
     ],
