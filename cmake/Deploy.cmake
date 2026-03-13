@@ -7,6 +7,7 @@
 #   pex_files.txt          - one absolute .pex path per line
 #   swf_compiled.txt       - one absolute compiled-SWF path per line
 #   swf_passthrough.txt    - one absolute pass-through SWF path per line
+#   esp_file.txt           - one absolute .esp path (may be absent in CI)
 #
 # Context variables passed via -D:
 #   SWF_COMPILED_BASE      - build tree interface/ root (for relative-path calc)
@@ -78,5 +79,24 @@ _deploy_files(
     "interface"
 )
 message(STATUS "  Deployed pass-through SWFs")
+
+# ---- Deploy .esp (debug only) -----------------------------------------------
+set(_ESP_LIST_FILE "${DEPLOY_LISTS_DIR}/esp_file.txt")
+if(EXISTS "${_ESP_LIST_FILE}")
+    file(STRINGS "${_ESP_LIST_FILE}" _ESP_FILES)
+    foreach(_ESP IN LISTS _ESP_FILES)
+        if(_ESP STREQUAL "")
+            continue()
+        endif()
+        if(NOT EXISTS "${_ESP}")
+            message(WARNING "Deploy.cmake: .esp not found: ${_ESP}")
+            continue()
+        endif()
+        # The .esp goes to the mod root (no subdirectory) so MO2 picks it up.
+        get_filename_component(_ESP_NAME "${_ESP}" NAME)
+        file(COPY_FILE "${_ESP}" "${OUTPUT_DIR}/${_ESP_NAME}" ONLY_IF_DIFFERENT)
+    endforeach()
+    message(STATUS "  Deployed ${_ESP_NAME}")
+endif()
 
 message(STATUS "Deploy complete -> ${OUTPUT_DIR}")

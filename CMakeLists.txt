@@ -268,6 +268,9 @@ if(IS_DEBUG_BUILD)
 
     file(MAKE_DIRECTORY "${_DEPLOY_LISTS_DIR}")
 
+    # The .esp lives at data/SkyUI_SE.esp — same path used in the release block.
+    set(_ESP_FILE "${CMAKE_CURRENT_SOURCE_DIR}/data/SkyUI_SE.esp")
+
     # Write list files at configure-time.
     # One absolute path per line — read via file(STRINGS) in Deploy.cmake.
     list(JOIN Papyrus_OUTPUT        "\n" _PEX_CONTENT)
@@ -277,6 +280,8 @@ if(IS_DEBUG_BUILD)
     file(WRITE "${_DEPLOY_LISTS_DIR}/pex_files.txt"       "${_PEX_CONTENT}")
     file(WRITE "${_DEPLOY_LISTS_DIR}/swf_compiled.txt"    "${_SWF_COMPILED_CONTENT}")
     file(WRITE "${_DEPLOY_LISTS_DIR}/swf_passthrough.txt" "${_SWF_PT_CONTENT}")
+    # Single-entry file — Deploy.cmake reads it the same way as the other lists.
+    file(WRITE "${_DEPLOY_LISTS_DIR}/esp_file.txt"        "${_ESP_FILE}")
 
     add_custom_command(
         OUTPUT "${_DEPLOY_STAMP}"
@@ -291,6 +296,7 @@ if(IS_DEBUG_BUILD)
             ${Papyrus_OUTPUT}
             ${SWF_COMPILED_OUTPUTS}
             ${SWF_PASSTHROUGH_FILES}
+            "${_ESP_FILE}"
         COMMENT "Deploying to ${MOD_DEBUG_OUTPUT_DIR}"
         VERBATIM
     )
