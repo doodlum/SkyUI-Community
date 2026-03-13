@@ -38,11 +38,11 @@ endif()
 message(STATUS "[SkyUI] Build type : ${CMAKE_BUILD_TYPE}")
 
 if(IS_DEBUG_BUILD)
-    if(NOT DEFINED MOD_DEBUG_OUTPUT_DIR OR MOD_DEBUG_OUTPUT_DIR STREQUAL "")
-        set(MOD_DEBUG_OUTPUT_DIR "${CMAKE_BINARY_DIR}/data"
+    if(NOT DEFINED MOD_DEBUG_PATH OR MOD_DEBUG_PATH STREQUAL "")
+        set(MOD_DEBUG_PATH "${CMAKE_BINARY_DIR}/data"
             CACHE PATH "Debug output directory (Skyrim Data or MO2 mod folder)" FORCE)
     endif()
-    message(STATUS "[SkyUI] Debug output : ${MOD_DEBUG_OUTPUT_DIR}")
+    message(STATUS "[SkyUI] Debug output : ${MOD_DEBUG_PATH}")
 endif()
 
 # ==============================================================================
@@ -286,7 +286,7 @@ if(IS_DEBUG_BUILD)
     add_custom_command(
         OUTPUT "${_DEPLOY_STAMP}"
         COMMAND "${CMAKE_COMMAND}"
-            "-DOUTPUT_DIR=${MOD_DEBUG_OUTPUT_DIR}"
+            "-DOUTPUT_DIR=${MOD_DEBUG_PATH}"
             "-DDEPLOY_LISTS_DIR=${_DEPLOY_LISTS_DIR}"
             "-DSWF_COMPILED_BASE=${CMAKE_BINARY_DIR}/interface"
             "-DSWF_PASSTHROUGH_BASE=${CMAKE_CURRENT_SOURCE_DIR}/data/interface"
@@ -297,7 +297,7 @@ if(IS_DEBUG_BUILD)
             ${SWF_COMPILED_OUTPUTS}
             ${SWF_PASSTHROUGH_FILES}
             "${_ESP_FILE}"
-        COMMENT "Deploying to ${MOD_DEBUG_OUTPUT_DIR}"
+        COMMENT "Deploying to ${MOD_DEBUG_PATH}"
         VERBATIM
     )
 

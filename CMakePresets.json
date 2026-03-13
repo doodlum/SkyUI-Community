@@ -19,7 +19,7 @@
         {
             "name": "debug",
             "displayName": "Debug",
-            "description": "Compile scripts and SWFs, deploy directly to MOD_DEBUG_OUTPUT_DIR. No BSA, no ZIP.",
+            "description": "Compile scripts and SWFs, deploy directly to MOD_DEBUG_PATH. No BSA, no ZIP.",
             "inherits": "_base",
             "binaryDir": "${sourceDir}/build/debug",
             "cacheVariables": {
@@ -27,9 +27,9 @@
                     "type": "STRING",
                     "value": "Debug"
                 },
-                "MOD_DEBUG_OUTPUT_DIR": {
+                "MOD_DEBUG_PATH": {
                     "type": "PATH",
-                    "value": "$env{MOD_DEBUG_OUTPUT_DIR}"
+                    "value": "$env{MOD_DEBUG_PATH}"
                 },
                 "CMAKE_CONFIGURATION_TYPES": {
                     "type": "STRING",

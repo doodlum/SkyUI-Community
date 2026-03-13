@@ -1,6 +1,6 @@
 # cmake/Deploy.cmake
 # Invoked at build time via cmake -P with these variables (written as files):
-#   OUTPUT_DIR             - destination root (MOD_DEBUG_OUTPUT_DIR)
+#   OUTPUT_DIR             - destination root (MOD_DEBUG_PATH)
 #   DEPLOY_LISTS_DIR       - directory containing the list files below
 #
 # List files (written at configure-time, read here):
