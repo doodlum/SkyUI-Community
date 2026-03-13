@@ -4,7 +4,7 @@
 
 ### Prerequisites
 
-- [CMake 3.24+](https://cmake.org/download/)
+- [CMake 4.2+](https://cmake.org/download/)
 - [Visual Studio 2022](https://visualstudio.microsoft.com/) (or another CMake-supported generator)
 - [Java](https://www.java.com/en/download/) (required by the bundled ffdec-cli)
 - A clean Skyrim Special Edition installation with:
@@ -42,20 +42,31 @@ You can also set the `SkyrimSE_PATH` environment variable beforehand to skip the
 ```
 set SkyrimSE_PATH=C:\Program Files (x86)\Steam\steamapps\common\Skyrim Special Edition
 ```
+For convenient debugging, use `MOD_DEBUG_PATH`. `.swf` and `.pex` files will be placed in the specified path. If you only modify the `.swf`, you can test them without exiting the game. Skyrim's interface features "hot reloading." If you are already sitting in the modified menu, open it again to see the changes.
+```
+set MOD_DEBUG_PATH="C:\Users\user\AppData\Local\ModOrganizer\Skyrim Special Edition\mods\SkyUI_Test"
+```
 
 Alternatively, from the command line:
 
 ```
-cmake --preset build
-cmake --build build
+cmake --preset debug
+cmake --build --preset debug
 ```
 
 ### Output
 
-The build produces `release/SkyUI_SE-<version>.zip` containing:
+The build produces `build/release/SkyUI_SE-<version>.zip` containing:
 
 - `SkyUI_SE.esp` - Plugin file
 - `SkyUI_SE.bsa` - Archive containing compiled Papyrus scripts and all interface files
+
+For release use the following command lines:
+
+```
+cmake --preset release
+cmake --build --preset release
+```
 
 ## Contributing
 
