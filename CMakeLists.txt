@@ -40,7 +40,28 @@ message(STATUS "[SkyUI] Build type : ${CMAKE_BUILD_TYPE}")
 if(IS_DEBUG_BUILD)
     if(NOT DEFINED MOD_DEBUG_PATH OR MOD_DEBUG_PATH STREQUAL "")
         set(MOD_DEBUG_PATH "${CMAKE_BINARY_DIR}/data"
-            CACHE PATH "Debug output directory (Skyrim Data or MO2 mod folder)" FORCE)
+            CACHE STRING "Debug output directory (Skyrim Data or MO2 mod folder)" FORCE)
+    endif()
+
+    # Validate at configure time -- before any build targets are created.
+    # Normalize path to forward slashes for reliable IS_DIRECTORY check.
+    cmake_path(SET _MOD_DEBUG_PATH_NORM NORMALIZE "${MOD_DEBUG_PATH}")
+    cmake_path(SET _DEFAULT_PATH_NORM   NORMALIZE "${CMAKE_BINARY_DIR}/data")
+
+    if(_MOD_DEBUG_PATH_NORM STREQUAL _DEFAULT_PATH_NORM)
+        # Default output path -- create it automatically, it is not a real mod folder.
+        file(MAKE_DIRECTORY "${MOD_DEBUG_PATH}")
+    elseif(NOT IS_DIRECTORY "${MOD_DEBUG_PATH}")
+        # User-supplied MO2 mod folder -- must already exist.
+        # Never auto-create: a typo would silently produce a stray folder.
+        message(FATAL_ERROR
+            "[SkyUI] Debug output directory does not exist:
+"
+            "  ${MOD_DEBUG_PATH}
+"
+            "Create the folder first (e.g. in MO2: right-click -> Create empty mod),
+"
+            "or leave MOD_DEBUG_PATH empty to use the default: ${CMAKE_BINARY_DIR}/data")
     endif()
     message(STATUS "[SkyUI] Debug output : ${MOD_DEBUG_PATH}")
 endif()
@@ -224,10 +245,7 @@ foreach(SWF_REL ${_ALL_SWF_RELPATHS})
                 "  Expected variable : ${_VAR_PREFIX}_SOURCES\n"
                 "  Defined in        : ${_SWF_CMAKE_FILE}\n"
                 "  Make sure the .cmake file sets:\n"
-                "    set(${_VAR_PREFIX}_SOURCES\n"
-                "        \${AS_SOURCE_DIR}/Module/File.as\n"
-                "        ...\n"
-                "    )")
+                "    set(${_VAR_PREFIX}_SOURCES ...)  ")
         endif()
 
         SkyUI_AS_Add(
@@ -280,7 +298,6 @@ if(IS_DEBUG_BUILD)
     file(WRITE "${_DEPLOY_LISTS_DIR}/pex_files.txt"       "${_PEX_CONTENT}")
     file(WRITE "${_DEPLOY_LISTS_DIR}/swf_compiled.txt"    "${_SWF_COMPILED_CONTENT}")
     file(WRITE "${_DEPLOY_LISTS_DIR}/swf_passthrough.txt" "${_SWF_PT_CONTENT}")
-    # Single-entry file — Deploy.cmake reads it the same way as the other lists.
     file(WRITE "${_DEPLOY_LISTS_DIR}/esp_file.txt"        "${_ESP_FILE}")
 
     add_custom_command(
