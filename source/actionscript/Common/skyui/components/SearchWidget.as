@@ -20,6 +20,9 @@ class skyui.components.SearchWidget extends MovieClip
     private var _updateDelay: Number = 0;
     private var _updateTimerId: Number;
     private var _previousFocus: Object;
+
+    private var _suppressTextChange: Number = 0;
+    private var _suppressTimerId: Number;
     
     // Data
     private var _menuKey: String;
@@ -122,7 +125,7 @@ class skyui.components.SearchWidget extends MovieClip
         }
     }
 
-    // Called when clearing via long-press (if implemented in container)
+    // Called when clearing via Ctrl+Backspace
     public function onSearchKeyClear()
     {
         if (this._isActive) {
@@ -130,6 +133,22 @@ class skyui.components.SearchWidget extends MovieClip
             this._onTextChanged();
         } else {
             this.resetVisuals();
+        }
+    }
+
+    public function onHistoryBack()
+    {
+        if (!this._isActive) return;
+        this.armSuppressTimer();
+        this.navigateHistory(-1);
+    }
+
+    public function onHistoryForward()
+    {
+        if (!this._isActive) return;
+        this.armSuppressTimer();
+        if (this._historyIndex != -1) {
+            this.navigateHistory(1);
         }
     }
 
@@ -158,7 +177,6 @@ class skyui.components.SearchWidget extends MovieClip
         skse.AllowTextInput(true);
         this.dispatchEvent({type: "inputStart"});
 
-        // Capture 'this' for the closure
         var self: SearchWidget = this;
         this.textField.onChanged = function() { 
             self._onTextChanged(); 
@@ -169,18 +187,18 @@ class skyui.components.SearchWidget extends MovieClip
     {
         if (!this._isActive) return;
 
-        // Cleanup
         this.cancelDebounce();
+        this.cancelSuppressTimer();
         delete this.textField.onChanged;
-        delete _root.onEnterFrame; 
+        delete _root.onEnterFrame;
 
-        // Reset UI state
         this.textField.type = "dynamic";
         this.textField.selectable = false;
-        
+
         this.restorePreviousFocus();
 
         this._isActive = false;
+        this._suppressTextChange = 0;
         skse.AllowTextInput(false);
 
         var finalText: String = this.getTrimmedText();
@@ -195,12 +213,10 @@ class skyui.components.SearchWidget extends MovieClip
         }
     }
 
-    // Forces focus to the textfield and moves cursor to end
     private function forceRefocus()
     {
         Selection.setFocus(this.textField);
         
-        // Scaleform hack: Wait one frame to ensure selection sticks
         var self: SearchWidget = this;
         var tField: TextField = this.textField;
         
@@ -234,7 +250,17 @@ class skyui.components.SearchWidget extends MovieClip
     // ═══════════════════════════════════════════════════════
     private function _onTextChanged()
     {
-        // Reset history index if user types
+        if (this._suppressTextChange > 0) {
+            this._suppressTextChange--;
+            this.cancelSuppressTimer();
+            // SKSE appended exactly one character at the end — strip it.
+            var raw: String = this.textField.text;
+            var clean: String = (raw.length > 0) ? raw.slice(0, raw.length - 1) : "";
+            this.updateTextField(clean);
+            return;
+        }
+
+        // Real user input — exit history browsing mode
         if (this._historyIndex != -1) {
             this._historyIndex = -1;
             this._textBeforeHistory = "";
@@ -260,8 +286,29 @@ class skyui.components.SearchWidget extends MovieClip
         }
     }
 
+    private function armSuppressTimer()
+    {
+        this._suppressTextChange = 1;
+        this.cancelSuppressTimer();
+        this._suppressTimerId = setInterval(this, "onSuppressTimeout", 200);
+    }
+
+    private function cancelSuppressTimer()
+    {
+        if (this._suppressTimerId != undefined) {
+            clearInterval(this._suppressTimerId);
+            this._suppressTimerId = undefined;
+        }
+    }
+
+    private function onSuppressTimeout()
+    {
+        this.cancelSuppressTimer();
+        this._suppressTextChange = 0;
+    }
+
     // ═══════════════════════════════════════════════════════
-    // HISTORY & NAVIGATION (UP/DOWN ARROWS)
+    // HISTORY NAVIGATION
     // ═══════════════════════════════════════════════════════
     public function handleInput(details: Object, pathToFocus: Array)
     {
@@ -274,17 +321,6 @@ class skyui.components.SearchWidget extends MovieClip
             return true;
         }
 
-        if (this._isActive) {
-            if (nav == gfx.ui.NavigationCode.UP) {
-                this.navigateHistory(-1);
-                return true;
-            }
-            if (nav == gfx.ui.NavigationCode.DOWN) {
-                this.navigateHistory(1);
-                return true;
-            }
-        }
-
         var nextClip = pathToFocus.shift();
         if (nextClip) return nextClip.handleInput(details, pathToFocus);
         return false;
@@ -294,27 +330,24 @@ class skyui.components.SearchWidget extends MovieClip
     {
         if (this._history.length == 0) return;
 
-        // Start navigation: save current text
         if (this._historyIndex == -1 && dir == -1) {
             this._textBeforeHistory = this.getTrimmedText();
             this._historyIndex = 0;
-        } 
-        // Move forward
+        }
         else if (dir == -1 && this._historyIndex < this._history.length - 1) {
             this._historyIndex++;
-        } 
-        // Move backward
+        }
         else if (dir == 1 && this._historyIndex > 0) {
             this._historyIndex--;
-        } 
-        // Exit history mode
+        }
         else if (dir == 1 && this._historyIndex == 0) {
             this._historyIndex = -1;
             this.updateTextField(this._textBeforeHistory);
             this.fireInputChange();
             return;
-        } else {
-            return; // Bound reached
+        }
+        else {
+            return;
         }
 
         this.updateTextField(this._history[this._historyIndex]);
@@ -323,7 +356,6 @@ class skyui.components.SearchWidget extends MovieClip
 
     private function updateTextField(text: String)
     {
-        // Temporarily disable listener to prevent triggering logic loop
         delete this.textField.onChanged;
         
         this.textField.SetText((text != undefined) ? text : "");
@@ -336,7 +368,6 @@ class skyui.components.SearchWidget extends MovieClip
 
     private function pushHistory(text: String)
     {
-        // Remove duplicates
         for (var i: Number = 0; i < this._history.length; i++) {
             if (this._history[i] == text) {
                 this._history.splice(i, 1);
@@ -366,7 +397,6 @@ class skyui.components.SearchWidget extends MovieClip
         skse.SendModEvent("SaveSearchHistory", payload);
     }
 
-    // Callback invoked by Papyrus via UI.InvokeString
     public function receiveHistory(serialized: String)
     {
         if (serialized == undefined || serialized == "") {
@@ -396,7 +426,6 @@ class skyui.components.SearchWidget extends MovieClip
         
         if (j < 0) return "";
 
-        // Fast whitespace trim
         while (s.charCodeAt(i) <= 32 && i <= j) i++;
         while (s.charCodeAt(j) <= 32 && j >= i) j--;
 
