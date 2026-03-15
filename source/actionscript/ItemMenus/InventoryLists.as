@@ -156,15 +156,11 @@ class InventoryLists extends MovieClip
       {
          switch(details.skseKeycode)
          {
-            case 17: // W — history back (deeper)
-               this.searchWidget.onHistoryBack();
-               return true;
-            case 31: // S — history forward (toward present)
-               this.searchWidget.onHistoryForward();
-               return true;
-            case 14: // Backspace — clear search
-               this.searchWidget.onSearchKeyClear();
-               return true;
+            case 17: this.searchWidget.onHistoryBack();    return true;
+            case 31: this.searchWidget.onHistoryForward(); return true;
+            case 14: this.searchWidget.onSearchKeyClear(); return true;
+            case 1:
+            case 15: return true;
          }
       }
 
