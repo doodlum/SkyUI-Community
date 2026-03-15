@@ -1,7 +1,7 @@
-# ActionScript sources for containermenu.swf
+# ActionScript sources for craftingmenu.swf
 # Auto-generated from SWF decompilation
 
-set(containermenu_SOURCES
+set(craftingmenu_SOURCES
     ${AS_SOURCE_DIR}/Common/skyui/defines/Actor.as
     ${AS_SOURCE_DIR}/Common/skyui/defines/Armor.as
     ${AS_SOURCE_DIR}/Common/skyui/defines/Form.as
@@ -14,15 +14,13 @@ set(containermenu_SOURCES
     ${AS_SOURCE_DIR}/Common/skyui/filter/ItemTypeFilter.as
     ${AS_SOURCE_DIR}/Common/skyui/filter/NameFilter.as
     ${AS_SOURCE_DIR}/Common/skyui/filter/SortFilter.as
-<<<<<<< HEAD
-=======
     ${AS_SOURCE_DIR}/Common/skyui/components/SearchWidget.as
-    ${AS_SOURCE_DIR}/ItemMenus/BottomBar.as
-    ${AS_SOURCE_DIR}/ItemMenus/CategoryList.as
->>>>>>> ec7b136 (feat(search-widget): improve UX and input handling)
-    ${AS_SOURCE_DIR}/ItemMenus/ContainerMenu.as
-    ${AS_SOURCE_DIR}/ItemMenus/InventoryDataSetter.as
-    ${AS_SOURCE_DIR}/ItemMenus/InventoryIconSetter.as
-    ${AS_SOURCE_DIR}/ItemMenus/ItemMenu.as
-    ${AS_SOURCE_DIR}/ItemMenus/ItemcardDataExtender.as
+    ${AS_SOURCE_DIR}/CraftingMenu/CraftingDataSetter.as
+    ${AS_SOURCE_DIR}/CraftingMenu/CraftingIconSetter.as
+    ${AS_SOURCE_DIR}/CraftingMenu/CraftingListEntry.as
+    ${AS_SOURCE_DIR}/CraftingMenu/CraftingLists.as
+    ${AS_SOURCE_DIR}/CraftingMenu/CraftingMenu.as
+    ${AS_SOURCE_DIR}/CraftingMenu/CustomConstructDataSetter.as
+    ${AS_SOURCE_DIR}/CraftingMenu/IconTabList.as
+    ${AS_SOURCE_DIR}/CraftingMenu/IconTabListEntry.as
 )

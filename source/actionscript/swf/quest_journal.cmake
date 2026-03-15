@@ -18,5 +18,3 @@ set(quest_journal_SOURCES
     ${AS_SOURCE_DIR}/PauseMenu/StatsPage.as
     ${AS_SOURCE_DIR}/PauseMenu/SystemPage.as
 )
-
-
