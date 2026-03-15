@@ -328,7 +328,13 @@ class ConfigPanel extends MovieClip
    }
    function initExtensions()
    {
+      Stage.scaleMode = "showAll";
+      Shared.GlobalFunc.SetLockFunction();
       this.bottomBar.Lock("B");
+      var marginBottomBar = 8;
+
+      this.bottomBar._y += Stage.safeRect.y - marginBottomBar;
+
       this._bottomBarStartY = this.bottomBar._y;
       this.showWelcomeScreen();
    }
