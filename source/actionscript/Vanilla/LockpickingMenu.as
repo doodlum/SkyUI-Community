@@ -28,6 +28,7 @@ class LockpickingMenu extends MovieClip
    }
    function InitExtensions()
    {
+      Stage.scaleMode = "showAll";
       Shared.GlobalFunc.SetLockFunction();
       this.BottomBar_mc.Lock("B");
       this.InfoRect_mc.Lock("R");
