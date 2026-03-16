@@ -3,7 +3,7 @@ class AnimatedSkillText extends MovieClip
    var ThisInstance;
    var SKILLS = 18;
    var SKILL_ANGLE = 20;
-   var LocationsA = [-150,-10,130,270,410,640,870,1010,1150,1290,1430];
+   var LocationsA = [-1220,-1220,-580,20,370, 640, 910,1260,1860,2500,2500];
    var HIDDEN_X = -5000;
    function AnimatedSkillText()
    {
