@@ -11,9 +11,11 @@ class BookBottomBar extends MovieClip
    }
    function InitExtensions()
    {
+      Stage.scaleMode = "showAll";
       gfx.io.GameDelegate.addCallBack("ShowTakeButton",this,"ShowTakeButton");
       Shared.GlobalFunc.SetLockFunction();
-      MovieClip(this).Lock("BL");
+      MovieClip(this).Lock("B");
+      this._y -= 3;
    }
    function ShowTakeButton(abShow, abSteal)
    {
