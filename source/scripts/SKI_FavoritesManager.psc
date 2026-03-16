@@ -13,6 +13,8 @@ import Math
 ; 3:	- Less eagerly clearing of invalid entries
 ;
 ; 4:    - EDC - Added repeat find to InvalidateItem()
+;
+; 5:	- UnequipHand function will also unequip shields
 
 int function GetVersion()
 	return 4
@@ -748,20 +750,22 @@ function GroupUse(int a_groupIndex)
 endFunction
 
 function UnequipHand(int a_hand)
-	int a_handEx = 1
-	if (a_hand == 0)
-		a_handEx = 2 ; unequipspell and *ItemEx need different hand args
-	endIf
+    Form handItem = PlayerREF.GetEquippedObject(a_hand)
+    int a_handEx = 1
+    if handItem as Armor
+        a_handEx = 0; shields will not unequip with a_handEx = 2
+    elseif (a_hand == 0)
+        a_handEx = 2 ; unequipspell and *ItemEx need different hand args
+    endIf
 
-	Form handItem = PlayerREF.GetEquippedObject(a_hand)
-	if (handItem)
-		int itemType = handItem.GetType()
-		if (itemType == 22)
-			PlayerREF.UnequipSpell(handItem as Spell, a_hand)
-		else
-			PlayerREF.UnequipItemEx(handItem, a_handEx)
-		endIf
-	endIf
+    if (handItem)
+        int itemType = handItem.GetType()
+        if (itemType == 22)
+            PlayerREF.UnequipSpell(handItem as Spell, a_hand)
+        else
+            PlayerREF.UnequipItemEx(handItem, a_handEx)
+        endIf
+    endIf
 endFunction
 
 bool function IsItemValid(Form a_item, int a_itemType)
