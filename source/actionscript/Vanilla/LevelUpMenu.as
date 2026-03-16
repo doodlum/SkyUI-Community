@@ -12,6 +12,7 @@ class LevelUpMenu extends MovieClip
    }
    function InitExtensions()
    {
+      Stage.scaleMode = "showAll";
       this.HealthButton.addEventListener("press",this,"addHealth");
       this.HealthButton.addEventListener("focusOut",this,"playFocusSound");
       this.HealthButton.addEventListener("rollOver",this,"playFocusSound");
