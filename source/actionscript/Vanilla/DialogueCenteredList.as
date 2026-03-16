@@ -17,6 +17,7 @@ class DialogueCenteredList extends Shared.CenteredScrollingList
    var iPlatform;
    var iScrollPosition;
    var iSelectedIndex;
+   var iHighlightedIndex;
    function DialogueCenteredList()
    {
       super();
@@ -67,6 +68,7 @@ class DialogueCenteredList extends Shared.CenteredScrollingList
       if(this.bRecenterSelection || this.iPlatform != 0)
       {
          this.iSelectedIndex = _loc2_;
+         this.iHighlightedIndex = _loc2_;
       }
       while(_loc2_ < this.EntriesA.length && this.iListItemsShown < this.iMaxItemsShown && _loc6_ <= this.fListHeight)
       {
@@ -90,24 +92,24 @@ class DialogueCenteredList extends Shared.CenteredScrollingList
          this.GetClipByIndex(_loc7_).itemIndex = undefined;
          _loc7_ = _loc7_ + 1;
       }
-      var _loc3_;
-      if(!this.bRecenterSelection)
-      {
-         _loc3_ = Mouse.getTopMostEntity();
-         while(_loc3_ != undefined)
-         {
-            if(_loc3_._parent == this && _loc3_._visible && _loc3_.itemIndex != undefined)
-            {
-               this.doSetSelectedIndex(_loc3_.itemIndex,0);
-            }
-            _loc3_ = _loc3_._parent;
-         }
-      }
       this.bRecenterSelection = false;
       this.RepositionEntries();
       var _loc10_ = 3;
       this._parent.ScrollIndicators.Up._visible = this.scrollPosition > this.iNumTopHalfEntries;
       this._parent.ScrollIndicators.Down._visible = this.EntriesA.length - this.scrollPosition - 1 > _loc10_ || _loc6_ > this.fListHeight;
+   }
+   
+   function SetSelectedIndexByMouse(abMouseHighlight)
+   {
+      var _loc2_ = Mouse.getTopMostEntity();
+      while(_loc2_ != undefined)
+      {
+         if(_loc2_._parent == this && _loc2_._visible && _loc2_.itemIndex != undefined)
+         {
+            this.doSetSelectedIndex(_loc2_.itemIndex, 0, abMouseHighlight);
+         }
+         _loc2_ = _loc2_._parent;
+      }
    }
    function RepositionEntries()
    {
@@ -122,37 +124,28 @@ class DialogueCenteredList extends Shared.CenteredScrollingList
    }
    function onMouseWheel(delta)
    {
-      var _loc2_;
-      var _loc4_;
-      var _loc3_;
       if(!this.bDisableInput)
       {
-         _loc2_ = Mouse.getTopMostEntity();
-         this.iSelectedIndex = -1;
-         this.bRecenterSelection = true;
+         var _loc2_ = Mouse.getTopMostEntity();
          while(_loc2_ != undefined)
          {
             if(_loc2_ == this)
             {
-               this.bRecenterSelection = false;
+               var dialogueMenu = DialogueMenu(this._parent._parent);
+               if(dialogueMenu.menuState == DialogueMenu.TOPIC_LIST_SHOWN)
+               {
+                  if(delta < 0)
+                  {
+                     this.moveSelectionDown();
+                  }
+                  else if(delta > 0)
+                  {
+                     this.moveSelectionUp();
+                  }
+               }
+               break;
             }
             _loc2_ = _loc2_._parent;
-         }
-         if(delta < 0)
-         {
-            _loc4_ = this.GetClipByIndex(this.iNumTopHalfEntries + 1);
-            if(_loc4_._visible == true)
-            {
-               this.scrollPosition = this.scrollPosition + 1;
-            }
-         }
-         else if(delta > 0)
-         {
-            _loc3_ = this.GetClipByIndex(this.iNumTopHalfEntries - 1);
-            if(_loc3_._visible == true)
-            {
-               this.scrollPosition = this.scrollPosition - 1;
-            }
          }
       }
    }
@@ -166,6 +159,7 @@ class DialogueCenteredList extends Shared.CenteredScrollingList
          if(this.EntriesA[_loc2_].topicIndex == aiTopicIndex)
          {
             this.iScrollPosition = _loc2_;
+            this.doSetSelectedIndex(_loc2_, 0, false);
          }
          _loc2_ = _loc2_ + 1;
       }

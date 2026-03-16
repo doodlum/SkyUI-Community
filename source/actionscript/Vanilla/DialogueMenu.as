@@ -162,7 +162,7 @@ class DialogueMenu extends MovieClip
       {
          if(this.eMenuState == DialogueMenu.TOPIC_LIST_SHOWN)
          {
-            this.onSelectionClick();
+            this.onSelectionClick(event && event.mouseClick);
          }
          else if(this.eMenuState == DialogueMenu.TOPIC_CLICKED || this.eMenuState == DialogueMenu.SHOW_GREETING)
          {
@@ -175,18 +175,17 @@ class DialogueMenu extends MovieClip
    {
       if(this.bAllowProgress)
       {
-         gfx.io.GameDelegate.call("SkipText",[]);
+         gfx.io.GameDelegate.call("SkipText", []);
          this.bAllowProgress = false;
       }
    }
    function onMouseDown()
    {
       DialogueMenu.iMouseDownExecutionCount = DialogueMenu.iMouseDownExecutionCount + 1;
-      if(DialogueMenu.iMouseDownExecutionCount % 2 == 0)
+      if(DialogueMenu.iMouseDownExecutionCount % 2 != 0)
       {
-         return undefined;
+         this.onItemSelect({mouseClick: true});
       }
-      this.onItemSelect();
    }
    function onCancelPress()
    {
@@ -222,8 +221,12 @@ class DialogueMenu extends MovieClip
          aEvent.target._parent.gotoAndPlay("moveDown");
       }
    }
-   function onSelectionClick()
+   function onSelectionClick(abMouseClick)
    {
+      if(abMouseClick)
+      {
+         this.TopicList.SetSelectedIndexByMouse(false);
+      }
       if(this.eMenuState == DialogueMenu.TOPIC_LIST_SHOWN)
       {
          this.eMenuState = DialogueMenu.TOPIC_CLICKED;

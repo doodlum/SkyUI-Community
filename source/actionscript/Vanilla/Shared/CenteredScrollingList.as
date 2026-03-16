@@ -12,7 +12,6 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
    var bRecenterSelection;
    var border;
    var dispatchEvent;
-   var doSetSelectedIndex;
    var fListHeight;
    var iDividerIndex;
    var iListItemsShown;
@@ -24,6 +23,7 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
    var iPlatform;
    var iScrollPosition;
    var iSelectedIndex;
+   var iHighlightedIndex;
    function CenteredScrollingList()
    {
       super();
@@ -145,6 +145,7 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
       if(_loc2_ != undefined && (this.bRecenterSelection || this.iPlatform != 0))
       {
          this.iSelectedIndex = _loc2_;
+         this.iHighlightedIndex = _loc2_;
       }
       while(_loc2_ != undefined && _loc2_ != -1 && _loc2_ < this.EntriesA.length && this.iListItemsShown < this.iMaxItemsShown && _loc6_ <= this.fListHeight)
       {
@@ -168,19 +169,6 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
          this.GetClipByIndex(_loc8_)._visible = false;
          this.GetClipByIndex(_loc8_).itemIndex = undefined;
          _loc8_ = _loc8_ + 1;
-      }
-      var _loc3_;
-      if(this.bMouseDrivenNav && !this.bRecenterSelection)
-      {
-         _loc3_ = Mouse.getTopMostEntity();
-         while(_loc3_ != undefined)
-         {
-            if(_loc3_._parent == this && _loc3_._visible && _loc3_.itemIndex != undefined)
-            {
-               this.doSetSelectedIndex(_loc3_.itemIndex,0);
-            }
-            _loc3_ = _loc3_._parent;
-         }
       }
       this.bRecenterSelection = false;
    }
@@ -213,6 +201,8 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
       if(_loc2_ != undefined)
       {
          this.iSelectedIndex = _loc2_;
+         this.iHighlightedIndex = _loc2_;
+         this.bRecenterSelection = true;
          if(this.iScrollPosition > 0)
          {
             this.iScrollPosition = this.iScrollPosition - 1;
@@ -224,7 +214,7 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
    }
    function moveSelectionDown()
    {
-      var _loc4_ = this.GetClipByIndex(this.iNumTopHalfEntries);
+      // var _loc4_ = this.GetClipByIndex(this.iNumTopHalfEntries);
       var _loc2_ = this.filterer.GetNextFilterMatch(this.iSelectedIndex);
       var _loc3_ = this.iScrollPosition;
       if(_loc2_ != undefined && this.IsDivider(this.EntriesA[_loc2_]) == true)
@@ -235,6 +225,8 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
       if(_loc2_ != undefined)
       {
          this.iSelectedIndex = _loc2_;
+         this.iHighlightedIndex = _loc2_;
+         this.bRecenterSelection = true;
          if(this.iScrollPosition < this.iMaxScrollPosition)
          {
             this.iScrollPosition = this.iScrollPosition + 1;
@@ -308,6 +300,7 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
    }
    function SetEntry(aEntryClip, aEntryObject)
    {
+      var aSelectedEntry = this.EntriesA[this.iHighlightedIndex];
       var _loc3_;
       if(aEntryClip != undefined)
       {
@@ -321,7 +314,7 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
          }
          if(this.iPlatform == 0)
          {
-            aEntryClip._alpha = aEntryObject != this.selectedEntry ? 60 : 100;
+            aEntryClip._alpha = aEntryObject == aSelectedEntry ? 100 : 60;
          }
          else
          {
