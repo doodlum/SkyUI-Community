@@ -180,6 +180,8 @@ class StatsMenu extends MovieClip
       gfx.io.GameDelegate.addCallBack("SetStatsMode",this,"SetStatsMode");
       gfx.io.GameDelegate.addCallBack("SetPerkCount",this,"SetPerkCount");
       gfx.io.GameDelegate.addCallBack("ShowLegendaryButtonHint",this,"ShowLegendaryButtonHint");
+      // Fix: a gray animated square visible at the bottom of the screen at 4:3 resolution
+      this.CameraMovementInstance.CameraPositionAlpha._visible = false;
    }
    function SetStatsMode(abStats, aPerkCount)
    {
