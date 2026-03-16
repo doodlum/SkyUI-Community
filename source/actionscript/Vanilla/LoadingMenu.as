@@ -13,6 +13,7 @@ class LoadingMenu extends MovieClip
    }
    function InitExtensions()
    {
+      Stage.scaleMode = "showAll";
       Shared.GlobalFunc.SetLockFunction();
       this.LevelMeterRect.Lock("TR");
       this.LoadingTextFader.Lock("BR");
