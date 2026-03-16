@@ -92,7 +92,8 @@ class StatsMenu extends MovieClip
          _loc4_._x = -100 - this._x;
          _loc3_ = _loc3_ + 1;
       }
-      this.TopPlayerInfo.swapDepths(this.getNextHighestDepth());
+      // Fix: duplicate TopPlayerInfo
+      // this.TopPlayerInfo.swapDepths(this.getNextHighestDepth());
       this.SetStatsMode(true,0);
       this.CurrentPerkFrame = 0;
       this.PerkName0.gotoAndStop("Visible");
