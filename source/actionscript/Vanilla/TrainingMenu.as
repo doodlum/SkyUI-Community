@@ -25,6 +25,10 @@ class TrainingMenu extends MovieClip
       this.SkillMeter.SetFillSpeed(4);
       this.SkillMeter.SetEmptySpeed(100);
    }
+   function InitExtensions()
+   {
+      Stage.scaleMode = "showAll";
+   }
    function onLoad()
    {
       this.AcceptButton.label = "$Train";
