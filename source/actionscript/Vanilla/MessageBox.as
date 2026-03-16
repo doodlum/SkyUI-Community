@@ -32,6 +32,10 @@ class MessageBox extends MovieClip
       gfx.io.GameDelegate.addCallBack("setIsVertical",this,"SetIsVertical");
       gfx.io.GameDelegate.addCallBack("setIsCancellable",this,"SetIsCancellable");
    }
+   function InitExtensions()
+   {
+      Stage.scaleMode = "showAll";
+   }
    function handleInput(details, pathToFocus)
    {
       var _loc3_ = false;
