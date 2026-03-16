@@ -26,6 +26,7 @@ class StreamingInstall extends MovieClip
    }
    function InitExtensions()
    {
+      Stage.scaleMode = "showAll";
       gfx.io.GameDelegate.addCallBack("SetPercent",this,"SetPercent");
    }
    function FadeInMenu()
