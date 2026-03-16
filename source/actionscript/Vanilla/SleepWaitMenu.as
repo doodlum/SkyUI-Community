@@ -16,6 +16,7 @@ class SleepWaitMenu extends MovieClip
    }
    function InitExtensions()
    {
+      Stage.scaleMode = "showAll";
       Mouse.addListener(this);
       gfx.managers.FocusHandler.instance.setFocus(this.HoursSlider,0);
       this.HoursSlider.addEventListener("change",this,"sliderChange");
