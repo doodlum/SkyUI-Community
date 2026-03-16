@@ -386,6 +386,7 @@ class HUDMenu extends Shared.PlatformChangeUser
    }
    function InitExtensions()
    {
+      Stage.scaleMode = "showAll";
       var _loc4_ = this.QuestUpdateBaseInstance._y - this.CompassShoutMeterHolder._y;
       Shared.GlobalFunc.SetLockFunction();
       this.HealthMeterAnim.Lock("B");
