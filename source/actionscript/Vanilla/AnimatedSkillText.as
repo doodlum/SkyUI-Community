@@ -4,6 +4,7 @@ class AnimatedSkillText extends MovieClip
    var SKILLS = 18;
    var SKILL_ANGLE = 20;
    var LocationsA = [-150,-10,130,270,410,640,870,1010,1150,1290,1430];
+   var HIDDEN_X = -5000;
    function AnimatedSkillText()
    {
       super();
@@ -52,7 +53,7 @@ class AnimatedSkillText extends MovieClip
          {
             _loc3_.LegendaryIconInfoInstance._alpha = 0;
          }
-         _loc3_._x = this.LocationsA[0];
+         _loc3_._x = this.HIDDEN_X;
          _loc2_ += _loc6_;
       }
    }
@@ -61,7 +62,7 @@ class AnimatedSkillText extends MovieClip
       var _loc2_ = 0;
       while(_loc2_ < this.SKILLS)
       {
-         this.ThisInstance["SkillText" + _loc2_]._x = this.LocationsA[0];
+         this.ThisInstance["SkillText" + _loc2_]._x = this.HIDDEN_X;
          _loc2_ = _loc2_ + 1;
       }
    }
@@ -104,7 +105,7 @@ class AnimatedSkillText extends MovieClip
          }
          else
          {
-            this.ThisInstance["SkillText" + _loc2_]._x = this.LocationsA[0];
+            this.ThisInstance["SkillText" + _loc2_]._x = this.HIDDEN_X;
          }
          _loc2_ = _loc2_ + 1;
       }
