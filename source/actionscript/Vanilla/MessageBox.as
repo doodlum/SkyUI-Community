@@ -12,6 +12,15 @@ class MessageBox extends MovieClip
    var MessageText;
    var iPlatform;
    
+   var _yesStr;
+   var _noStr;
+   var _yesToAllStr;
+   var _cancelStr;
+   var _backStr;
+   var _exitStr;
+   var _doneStr;
+   var _returnStr;
+
    static var WIDTH_MARGIN = 20;
    static var HEIGHT_MARGIN = 30;
    static var MESSAGE_TO_BUTTON_SPACER = 10;
@@ -39,12 +48,46 @@ class MessageBox extends MovieClip
    function InitExtensions()
    {
       Stage.scaleMode = "showAll";
+      this.InitLocalization();
+   }
+
+   function InitLocalization()
+   {
+      this.createTextField("temp_txt", this.getNextHighestDepth(), 0, 0, 1, 1);
+      this.temp_txt._visible = false;
+
+      this.temp_txt.text = "$Yes";
+      this._yesStr = this.temp_txt.text;
+
+      this.temp_txt.text = "$No";
+      this._noStr = this.temp_txt.text;
+
+      this.temp_txt.text = "$YesToAll";
+      this._yesToAllStr = this.temp_txt.text;
+
+      this.temp_txt.text = "$Cancel";
+      this._cancelStr = this.temp_txt.text;
+
+      this.temp_txt.text = "$Back";
+      this._backStr = this.temp_txt.text;
+
+      this.temp_txt.text = "$Exit";
+      this._exitStr = this.temp_txt.text;
+
+      this.temp_txt.text = "$Done";
+      this._doneStr = this.temp_txt.text;
+
+      this.temp_txt.text = "$Return";
+      this._returnStr = this.temp_txt.text;
+
+      this.temp_txt.removeTextField();
    }
 
    function IsExitButton(aText)
    {
-      var str = aText.toLowerCase();
-      return (str == "return" || str == "exit" || str == "done" || str == "cancel" || str == "back" || str == "no");
+      var str = aText;
+      return (str == this._noStr || str == this._cancelStr || str == this._backStr || 
+              str == this._exitStr || str == this._doneStr || str == this._returnStr);
    }
 
    function handleInput(details, pathToFocus)
@@ -230,10 +273,20 @@ class MessageBox extends MovieClip
    {
       var code = Key.getCode();
       for (var i = 0; i < this.MessageButtons.length; i++) {
-         var btnText = this.MessageButtons[i].ButtonText.text.toLowerCase();
-         if (code == 89 && btnText == "yes") { gfx.io.GameDelegate.call("buttonPress",[i]); return; } // 'Y'
-         if (code == 78 && btnText == "no") { gfx.io.GameDelegate.call("buttonPress",[i]); return; }  // 'N'
-         if (code == 65 && btnText == "yes to all") { gfx.io.GameDelegate.call("buttonPress",[i]); return; } // 'A'
+         var btnText = this.MessageButtons[i].ButtonText.text;
+         
+         if (code == 89 && btnText == this._yesStr) { 
+            gfx.io.GameDelegate.call("buttonPress",[i]); 
+            return; 
+         } 
+         if (code == 78 && btnText == this._noStr) { 
+            gfx.io.GameDelegate.call("buttonPress",[i]); 
+            return; 
+         }
+         if (code == 65 && btnText == this._yesToAllStr) { 
+            gfx.io.GameDelegate.call("buttonPress",[i]); 
+            return; 
+         }
       }
    }
 
