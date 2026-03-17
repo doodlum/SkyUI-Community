@@ -90,9 +90,12 @@ class StatsMenu extends MovieClip
       {
          _loc4_ = this.attachMovie("PerkName","PerkName" + _loc3_,this.getNextHighestDepth());
          _loc4_._x = -100 - this._x;
+         // Fix: visible text "Perk Name" on 32:9
+         _loc4_._visible = false;
          _loc3_ = _loc3_ + 1;
       }
-      this.TopPlayerInfo.swapDepths(this.getNextHighestDepth());
+      // Fix: duplicate TopPlayerInfo
+      // this.TopPlayerInfo.swapDepths(this.getNextHighestDepth());
       this.SetStatsMode(true,0);
       this.CurrentPerkFrame = 0;
       this.PerkName0.gotoAndStop("Visible");
@@ -169,6 +172,7 @@ class StatsMenu extends MovieClip
    }
    function InitExtensions()
    {
+      Stage.scaleMode = "showAll";
       Shared.GlobalFunc.SetLockFunction();
       Shared.GlobalFunc.MaintainTextFormat();
       gfx.io.GameDelegate.addCallBack("SetDescriptionCard",this,"SetDescriptionCard");
@@ -179,6 +183,16 @@ class StatsMenu extends MovieClip
       gfx.io.GameDelegate.addCallBack("SetStatsMode",this,"SetStatsMode");
       gfx.io.GameDelegate.addCallBack("SetPerkCount",this,"SetPerkCount");
       gfx.io.GameDelegate.addCallBack("ShowLegendaryButtonHint",this,"ShowLegendaryButtonHint");
+
+      MovieClip(this.BottomBarInstance).Lock("B");
+      this.BottomBarInstance._y -= this.BottomBarInstance._height - 32;
+      MovieClip(this.TopPlayerInfo).Lock("T");
+      this.TopPlayerInfo._y += 24;
+      this.AddPerkTextInstance._y = this.TopPlayerInfo._y + this.TopPlayerInfo._height + 34;
+      // Fix: a gray animated square visible at the bottom of the screen at 4:3 resolution
+      this.CameraMovementInstance.CameraPositionAlpha._visible = false;
+      // Fix: visible localization text "$Perks to increase" at 4:3 resolution
+      _root.PerksInstance._visible = false;
    }
    function SetStatsMode(abStats, aPerkCount)
    {

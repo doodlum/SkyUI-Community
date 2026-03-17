@@ -24,6 +24,8 @@ class TweenMenu extends MovieClip
    }
    function InitExtensions()
    {
+      Stage.scaleMode = "showAll";
+      Shared.GlobalFunc.SetLockFunction();
       gfx.io.GameDelegate.addCallBack("StartOpenMenuAnim",this,"StartOpenMenuAnim");
       gfx.io.GameDelegate.addCallBack("StartCloseMenuAnim",this,"StartCloseMenuAnim");
       gfx.io.GameDelegate.addCallBack("ShowMenu",this,"ShowMenu");
@@ -33,8 +35,10 @@ class TweenMenu extends MovieClip
       gfx.io.GameDelegate.addCallBack("SetPlayerInfo",this,"SetPlayerInfo");
       this.LevelMeter = new Components.Meter(this.BottomBarTweener_mc.BottomBar_mc.LevelProgressBar);
       gfx.managers.FocusHandler.instance.setFocus(this,0);
-      Shared.GlobalFunc.SetLockFunction();
+      var marginBottomBar = 32;
+
       MovieClip(this.BottomBarTweener_mc).Lock("B");
+      this.BottomBarTweener_mc._y += Stage.safeRect.y + marginBottomBar;
       this.SkillsInputRect.onRollOver = function()
       {
          this._parent.onInputRectMouseOver(1);

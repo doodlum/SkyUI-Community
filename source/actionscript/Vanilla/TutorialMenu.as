@@ -16,6 +16,7 @@ class TutorialMenu extends MovieClip
    function InitExtensions()
    {
       trace("TutorialMenu::InitExtensions");
+      Stage.scaleMode = "showAll";
       this.TitleText.textAutoSize = "shrink";
       this.ButtonRect.ExitMouseButton.addEventListener("press",this,"onExitPress");
       this.ButtonRect.ExitMouseButton.SetPlatform(0,false);

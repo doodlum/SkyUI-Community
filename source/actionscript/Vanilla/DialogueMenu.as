@@ -29,6 +29,7 @@ class DialogueMenu extends MovieClip
    }
    function InitExtensions()
    {
+      Stage.scaleMode = "showAll";
       Mouse.addListener(this);
       gfx.io.GameDelegate.addCallBack("Cancel",this,"onCancelPress");
       gfx.io.GameDelegate.addCallBack("ShowDialogueText",this,"ShowDialogueText");

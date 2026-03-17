@@ -36,8 +36,14 @@ class Quest_Journal extends MovieClip
    }
    function InitExtensions()
    {
+      Stage.scaleMode = "showAll";
       Shared.GlobalFunc.SetLockFunction();
+      
+      var marginBottomBar = 12;
+
       MovieClip(this.BottomBar_mc).Lock("B");
+      this.BottomBar_mc._y += Stage.safeRect.y + marginBottomBar;
+
       this.ConfigPanel = _root.ConfigPanelFader.configPanel;
       this.QuestsTab.disableFocus = true;
       this.StatsTab.disableFocus = true;

@@ -66,6 +66,7 @@ class RaceSexPanels extends MovieClip
    }
    function InitExtensions()
    {
+      Stage.scaleMode = "showAll";
       _root.RaceSexMenuBaseInstance.RaceSexPanelsInstance.Lock("L");
       _root.RaceSexMenuBaseInstance.BottomBarInstance.Lock("B");
       _root.RaceSexMenuBaseInstance.BottomBarInstance.ButtonsInstance.Lock("L");

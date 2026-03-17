@@ -9,6 +9,7 @@ class LoadWaitSpinner extends MovieClip
    }
    function InitExtensions()
    {
+      Stage.scaleMode = "showAll";
       Shared.GlobalFunc.SetLockFunction();
       this.LoadingIconHolder.Lock("BR");
    }

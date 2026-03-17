@@ -164,6 +164,7 @@ class FavoritesMenu extends MovieClip
    }
    function InitExtensions()
    {
+      Stage.scaleMode = "showAll";
       skse.ExtendData(true);
       this.btnAll.group = this._categoryButtonGroup;
       this.btnGear.group = this._categoryButtonGroup;
