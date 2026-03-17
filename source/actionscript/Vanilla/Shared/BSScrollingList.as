@@ -60,13 +60,24 @@ class Shared.BSScrollingList extends MovieClip
          {
             if(this.itemIndex != undefined)
             {
-               this._parent.onItemPress(aiKeyboardOrMouse);
-               if(!this._parent.bDisableInput && this.onMousePress != undefined)
+               var list = this._parent;
+               var target = this.itemIndex;
+
+               if (list.iSelectedIndex != target)
                {
-                  this.onMousePress();
+                  list.iSelectedIndex = target;
+                  list.iHighlightedIndex = target;
+                  if (list.bRecenterSelection !== undefined)
+                  {
+                     list.iScrollPosition = target;
+                  }
+                  list.UpdateList();
                }
+
+               list.bMouseDrivenNav = false;
+               list.onItemPress(aiKeyboardOrMouse);
             }
-         };
+         }
          _loc3_.onPressAux = function(aiMouseIndex, aiKeyboardOrMouse, aiButtonIndex)
          {
             if(this.itemIndex != undefined)
