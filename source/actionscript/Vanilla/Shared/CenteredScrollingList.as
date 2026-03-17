@@ -214,7 +214,7 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
    }
    function moveSelectionDown()
    {
-      // var _loc4_ = this.GetClipByIndex(this.iNumTopHalfEntries);
+      var _loc4_ = this.GetClipByIndex(this.iNumTopHalfEntries);
       var _loc2_ = this.filterer.GetNextFilterMatch(this.iSelectedIndex);
       var _loc3_ = this.iScrollPosition;
       if(_loc2_ != undefined && this.IsDivider(this.EntriesA[_loc2_]) == true)
@@ -238,46 +238,35 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
    }
    function onMouseWheel(delta)
    {
-      var _loc2_;
-      var _loc4_;
-      var _loc3_;
       if(!this.bDisableInput)
       {
-         _loc2_ = Mouse.getTopMostEntity();
-         while(_loc2_ && _loc2_ != undefined)
+         var _loc2_ = Mouse.getTopMostEntity();
+         while(_loc2_ != undefined)
          {
             if(_loc2_ == this)
             {
+               var oldPos = this.scrollPosition;
                if(delta < 0)
                {
-                  _loc4_ = this.GetClipByIndex(this.iNumTopHalfEntries + 1);
-                  if(_loc4_._visible == true)
+                  var nextClip = this.GetClipByIndex(this.iNumTopHalfEntries + 1);
+                  if(nextClip._visible == true)
                   {
-                     if(_loc4_.itemIndex == undefined)
-                     {
-                        this.scrollPosition = this.scrollPosition + 2;
-                     }
-                     else
-                     {
-                        this.scrollPosition = this.scrollPosition + 1;
-                     }
+                     this.scrollPosition = (nextClip.itemIndex == undefined) ? this.scrollPosition + 2 : this.scrollPosition + 1;
                   }
                }
                else if(delta > 0)
                {
-                  _loc3_ = this.GetClipByIndex(this.iNumTopHalfEntries - 1);
-                  if(_loc3_._visible == true)
+                  var prevClip = this.GetClipByIndex(this.iNumTopHalfEntries - 1);
+                  if(prevClip._visible == true)
                   {
-                     if(_loc3_.itemIndex == undefined)
-                     {
-                        this.scrollPosition = this.scrollPosition - 2;
-                     }
-                     else
-                     {
-                        this.scrollPosition = this.scrollPosition - 1;
-                     }
+                     this.scrollPosition = (prevClip.itemIndex == undefined) ? this.scrollPosition - 2 : this.scrollPosition - 1;
                   }
                }
+
+               if (this.scrollPosition != oldPos) {
+                  this.doSetSelectedIndex(this.scrollPosition, 0, false);
+               }
+               break;
             }
             _loc2_ = _loc2_._parent;
          }
