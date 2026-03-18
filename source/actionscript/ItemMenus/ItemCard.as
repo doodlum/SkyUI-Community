@@ -798,6 +798,12 @@ class ItemCard extends MovieClip
    {
       if (tf == undefined || tf.text == "") return;
 
+      if (tf.origHeight == undefined) {
+         tf.origHeight = tf._height;
+      }
+      
+      tf._height = tf.origHeight;
+
       tf.multiline = true;
       tf.wordWrap = true;
       tf.textAutoSize = "none";
@@ -809,20 +815,36 @@ class ItemCard extends MovieClip
       tf.SetText(tfText, true);
       
       var tfHeight:Number = tf.getLineMetrics(0).height * tf.numLines;
-      var baseHeight:Number = tf._height;
+      var baseHeight:Number = tf.origHeight;
+
+      for (var prop in this)
+      {
+         var obj = this[prop];
+         if ((obj instanceof MovieClip || obj instanceof TextField) && obj != tf && obj._parent == this)
+         {
+            if (obj.origY != undefined) {
+               obj._y = obj.origY;
+            }
+         }
+      }
+      
+      if (this.background != undefined && this.background.origHeight != undefined) {
+         this.background._height = this.background.origHeight;
+      } else if (this.background != undefined) {
+         this.background.origHeight = this.background._height;
+      }
 
       if (tfHeight > baseHeight)
       {
          var neededDelta:Number = (tfHeight - baseHeight) + 6;
-         
          var actualExpansion:Number = Math.min(neededDelta, 80);
          
-         tf._height += actualExpansion;
+         tf._height = tf.origHeight + actualExpansion;
 
          var bg:MovieClip = (this.background != undefined) ? this.background : undefined;
          
          if (bg != undefined) {
-            bg._height += actualExpansion;
+            bg._height = bg.origHeight + actualExpansion;
          }
 
          for (var prop in this)
