@@ -77,8 +77,9 @@ class InventoryLists extends MovieClip
    {
       return this._tabBarIconArt;
    }
-   function onLoad()
+   function InitExtensions()
    {
+      Shared.GlobalFunc.SetLockFunction();
       this.categoryList.listEnumeration = new skyui.components.list.BasicEnumeration(this.categoryList.entryList);
       var _loc2_ = new skyui.components.list.FilteredEnumeration(this.itemList.entryList);
       _loc2_.addFilter(this._typeFilter);
@@ -99,9 +100,6 @@ class InventoryLists extends MovieClip
       this.searchWidget.addEventListener("inputEnd",this,"onSearchInputEnd");
       this.searchWidget.addEventListener("inputChange",this,"onSearchInputChange");
       this.columnSelectButton.addEventListener("press",this,"onColumnSelectButtonPress");
-   }
-   function InitExtensions()
-   {
       this.categoryList.suspended = true;
       this.itemList.suspended = true;
    }
@@ -359,6 +357,8 @@ class InventoryLists extends MovieClip
       {
          this.tabBar.setLabelText(this._leftTabText,this._rightTabText);
       }
+      this.tabBar.Lock("B");
+      this.tabBar._y = this._parent.bottomBar._y - this.tabBar._height - Stage.safeRect.y - Stage.visibleRect.y + 17;
    }
    function onColumnSelectButtonPress(event)
    {

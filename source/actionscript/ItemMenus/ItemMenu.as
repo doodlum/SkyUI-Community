@@ -43,6 +43,8 @@ class ItemMenu extends MovieClip
    }
    function InitExtensions(a_bPlayBladeSound)
    {
+      Stage.scaleMode = "showAll";
+      Shared.GlobalFunc.SetLockFunction();
       skse.ExtendData(true);
       skse.ForceContainerCategorization(true);
       this._bPlayBladeSound = a_bPlayBladeSound;
@@ -357,17 +359,51 @@ class ItemMenu extends MovieClip
       _loc2_.push(this.inventoryLists.itemList.layout.activeColumnState);
       gfx.io.GameDelegate.call("SaveIndices",[_loc2_]);
    }
+   function updateDynamicListHeight()
+   {
+      var listPoint = {
+         x: this.inventoryLists.itemList._x, 
+         y: this.inventoryLists.itemList._y
+      };
+      this._parent.globalToLocal(listPoint);
+      this.inventoryLists.panelContainer.localToGlobal(listPoint);
+
+      var tab = this.inventoryLists.panelContainer.tabBar;
+      var paddingItemList = 0;
+      var minHeightItemList = 100;
+      var heightItemList = this.bottomBar._y - listPoint.y - paddingItemList;
+
+      if (heightItemList < minHeightItemList)
+      {
+         heightItemList = minHeightItemList;
+      }
+      if (tab)
+      {
+         heightItemList -= tab._height;
+      }
+      this.inventoryLists.itemList.listHeight = heightItemList;
+      this.inventoryLists.itemList.requestUpdate();
+   }
+
    function positionFixedElements()
    {
-      Shared.GlobalFunc.SetLockFunction();
-      this.inventoryLists.Lock("L");
+      this.inventoryLists.Lock("TL");
       this.inventoryLists._x -= 20;
-      var _loc3_ = Stage.visibleRect.x + Stage.safeRect.x;
-      var _loc2_ = Stage.visibleRect.x + Stage.visibleRect.width - Stage.safeRect.x;
-      this.bottomBar.positionElements(_loc3_,_loc2_);
+      this.inventoryLists._y -= Stage.safeRect.y;
+      
+      var leftOffset = Stage.visibleRect.x + Stage.safeRect.x;
+      var rightOffset = Stage.visibleRect.x - Stage.safeRect.x + Stage.visibleRect.width;
+      var marginBottomBar = 17;
+
+      this.bottomBar.Lock("B");
+      this.bottomBar._y += Stage.safeRect.y - this.bottomBar._height + marginBottomBar;
+      this.bottomBar.positionElements(leftOffset, rightOffset);
+      
       MovieClip(this.exitMenuRect).Lock("TL");
       this.exitMenuRect._x -= Stage.safeRect.x;
       this.exitMenuRect._y -= Stage.safeRect.y;
+
+      this.updateDynamicListHeight();
    }
    function positionFloatingElements()
    {

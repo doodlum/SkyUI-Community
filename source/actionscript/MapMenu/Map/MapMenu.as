@@ -67,6 +67,7 @@ class Map.MapMenu
    }
    function InitExtensions()
    {
+      Stage.scaleMode = "showAll";
       skse.EnableMapMenuMouseWheel(true);
    }
    function initialize()
@@ -317,6 +318,8 @@ class Map.MapMenu
       }
       Shared.GlobalFunc.SetLockFunction();
       this._bottomBar.Lock("B");
+      var marginBottomBar = 12;
+      this._bottomBar._y += Stage.safeRect.y + marginBottomBar;
    }
    function createButtons(a_bGamepad)
    {

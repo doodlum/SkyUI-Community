@@ -195,14 +195,8 @@ endif()
 # CONFIGURE_DEPENDS: adding a new .swf to data/interface/ automatically
 # triggers re-configure without manual cmake --preset invocation.
 
-set(AS_SWF_DIR    "${CMAKE_CURRENT_SOURCE_DIR}/source/actionscript/swf")
+set(AS_SWF_DIR    "${CMAKE_CURRENT_SOURCE_DIR}/source/swf")
 set(AS_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/source/actionscript")
-
-file(GLOB_RECURSE _ALL_SWF_RELPATHS
-    CONFIGURE_DEPENDS
-    RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/data/interface"
-    "${CMAKE_CURRENT_SOURCE_DIR}/data/interface/*.swf"
-)
 
 SkyUI_AS_GlobalAssemble_Init(
     AS_SOURCE_DIR   "${AS_SOURCE_DIR}"
@@ -212,6 +206,12 @@ SkyUI_AS_GlobalAssemble_Init(
 set(AS_TARGETS            "")
 set(SWF_COMPILED_OUTPUTS  "")
 set(SWF_PASSTHROUGH_FILES "")
+
+file(GLOB_RECURSE _ALL_SWF_RELPATHS
+    CONFIGURE_DEPENDS
+    RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/data/interface"
+    "${CMAKE_CURRENT_SOURCE_DIR}/data/interface/*.swf"
+)
 
 foreach(SWF_REL ${_ALL_SWF_RELPATHS})
     get_filename_component(SWF_NAME_WE  "${SWF_REL}" NAME_WE)
@@ -249,9 +249,9 @@ foreach(SWF_REL ${_ALL_SWF_RELPATHS})
         endif()
 
         SkyUI_AS_Add(
-            TARGET_NAME "${_AS_TARGET}"
-            SWF_REL     "${SWF_REL}"
-            SOURCES     ${${_VAR_PREFIX}_SOURCES}
+            TARGET_NAME  "${_AS_TARGET}"
+            SWF_REL      "${SWF_REL}"
+            SOURCES      ${${_VAR_PREFIX}_SOURCES}
             ${_FRAME_SOURCES_ARG}
         )
 
@@ -335,6 +335,9 @@ else()
     )
     list(FILTER _EXTRA_INTERFACE_FILES EXCLUDE REGEX "\\.swf$")
 
+    cmake_path(SET _PREFIX_BUILD "${CMAKE_BINARY_DIR}" NORMALIZE)
+    cmake_path(SET _PREFIX_DATA  "${CMAKE_CURRENT_SOURCE_DIR}/data" NORMALIZE)
+
     BSArchive_Add(
         "BSA"
         OUTPUT  "${CMAKE_BINARY_DIR}/SkyUI_SE.bsa"
@@ -345,8 +348,8 @@ else()
             ${SWF_PASSTHROUGH_FILES}
             ${_EXTRA_INTERFACE_FILES}
         PREFIX
-            "${CMAKE_BINARY_DIR}"
-            "${CMAKE_CURRENT_SOURCE_DIR}/data"
+            "${_PREFIX_BUILD}"
+            "${_PREFIX_DATA}"
     )
     add_dependencies("BSA" "Papyrus" "ActionScript")
 

@@ -181,8 +181,8 @@ class ItemCard extends MovieClip
             }
             this.ApparelArmorValue.textAutoSize = "shrink";
             this.ApparelArmorValue.SetText(aUpdateObj.armor);
-            this.ApparelEnchantedLabel.textAutoSize = "shrink";
             this.ApparelEnchantedLabel.htmlText = aUpdateObj.effects;
+            this.ShrinkToFit(this.ApparelEnchantedLabel);
             this.SkillTextInstance.text = aUpdateObj.skillText;
             break;
          case skyui.defines.Inventory.ICT_WEAPON:
@@ -212,34 +212,30 @@ class ItemCard extends MovieClip
             this.PoisonInstance.gotoAndStop(_loc5_);
             this.WeaponDamageValue.textAutoSize = "shrink";
             this.WeaponDamageValue.SetText(aUpdateObj.damage);
-            this.WeaponEnchantedLabel.textAutoSize = "shrink";
             this.WeaponEnchantedLabel.htmlText = aUpdateObj.effects;
+            this.ShrinkToFit(this.WeaponEnchantedLabel);
             break;
          case skyui.defines.Inventory.ICT_BOOK:
             if(aUpdateObj.description != undefined && aUpdateObj.description != "")
             {
                this.gotoAndStop("Books_Description");
-               this.BookDescriptionLabel.SetText(aUpdateObj.description);
+               this.BookDescriptionLabel.SetText(aUpdateObj.description, true);
+               this.ShrinkToFit(this.BookDescriptionLabel);
                break;
             }
             this.gotoAndStop("Books_reg");
             break;
          case skyui.defines.Inventory.ICT_POTION:
-            this.gotoAndStop("Potions_reg");
-            this.PotionsLabel.textAutoSize = "shrink";
-            this.PotionsLabel.htmlText = aUpdateObj.effects;
-            this.SkillTextInstance.text = aUpdateObj.skillName != undefined ? aUpdateObj.skillName : "";
-            break;
          case skyui.defines.Inventory.ICT_FOOD:
             this.gotoAndStop("Potions_reg");
-            this.PotionsLabel.textAutoSize = "shrink";
             this.PotionsLabel.htmlText = aUpdateObj.effects;
+            this.ShrinkToFit(this.PotionsLabel);
             this.SkillTextInstance.text = aUpdateObj.skillName != undefined ? aUpdateObj.skillName : "";
             break;
          case skyui.defines.Inventory.ICT_SPELL_DEFAULT:
             this.gotoAndStop("Power_reg");
             this.MagicEffectsLabel.SetText(aUpdateObj.effects,true);
-            this.MagicEffectsLabel.textAutoSize = "shrink";
+            this.ShrinkToFit(this.MagicEffectsLabel);
             if(aUpdateObj.spellCost <= 0)
             {
                this.MagicCostValue._alpha = 0;
@@ -265,7 +261,7 @@ class ItemCard extends MovieClip
             }
             this.SkillLevelText.text = aUpdateObj.castLevel.toString();
             this.MagicEffectsLabel.SetText(aUpdateObj.effects,true);
-            this.MagicEffectsLabel.textAutoSize = "shrink";
+            this.ShrinkToFit(this.MagicEffectsLabel);
             this.MagicCostValue.textAutoSize = "shrink";
             this.MagicCostTimeValue.textAutoSize = "shrink";
             if(_loc6_)
@@ -340,13 +336,13 @@ class ItemCard extends MovieClip
                _loc7_ += 1;
             }
             this.ShoutEffectsLabel.htmlText = aUpdateObj.effects;
+            this.ShrinkToFit(this.ShoutEffectsLabel);
             this.ShoutCostValue.text = aUpdateObj.spellCost.toString();
             break;
          case skyui.defines.Inventory.ICT_ACTIVE_EFFECT:
             this.gotoAndStop("ActiveEffects");
-            this.MagicEffectsLabel.html = true;
             this.MagicEffectsLabel.SetText(aUpdateObj.effects,true);
-            this.MagicEffectsLabel.textAutoSize = "shrink";
+            this.ShrinkToFit(this.MagicEffectsLabel);
             if(aUpdateObj.timeRemaining > 0)
             {
                _loc12_ = Math.floor(aUpdateObj.timeRemaining);
@@ -473,8 +469,8 @@ class ItemCard extends MovieClip
                if(this.EnchantmentLabel != undefined)
                {
                   this.EnchantmentLabel.SetText(aUpdateObj.effects,true);
+                  this.ShrinkToFit(this.EnchantmentLabel);
                }
-               this.EnchantmentLabel.textAutoSize = "shrink";
                this.WeaponChargeMeter._alpha = 100;
                this.Enchanting_Background._alpha = 60;
                this.Enchanting_Slim_Background._alpha = 0;
@@ -797,5 +793,82 @@ class ItemCard extends MovieClip
    function onListSelectionChange(event)
    {
       this.ItemCardMeters[skyui.defines.Inventory.ICT_LIST].SetDeltaPercent(this.ItemList.selectedEntry.chargeAdded + this.LastUpdateObj.currentCharge);
+   }
+   function ShrinkToFit(tf:TextField)
+   {
+      if (tf == undefined || tf.text == "") return;
+
+      if (tf.origHeight == undefined) {
+         tf.origHeight = tf._height;
+      }
+      
+      tf._height = tf.origHeight;
+
+      tf.multiline = true;
+      tf.wordWrap = true;
+      tf.textAutoSize = "none";
+
+      var tfText:String = tf.htmlText;
+      var formatSize = tf.getTextFormat().size;
+      var fontSize:Number = (formatSize != undefined) ? formatSize : 20;
+
+      tf.SetText(tfText, true);
+      
+      var tfHeight:Number = tf.getLineMetrics(0).height * tf.numLines;
+      var baseHeight:Number = tf.origHeight;
+      
+      if (this.background != undefined && this.background.origHeight != undefined) {
+         this.background._height = this.background.origHeight;
+      } else if (this.background != undefined) {
+         this.background.origHeight = this.background._height;
+      }
+
+      if (tfHeight > baseHeight)
+      {
+         var neededDelta:Number = (tfHeight - baseHeight) + 6;
+         var actualExpansion:Number = Math.min(neededDelta, 80);
+         
+         tf._height = tf.origHeight + actualExpansion;
+
+         var bg:MovieClip = (this.background != undefined) ? this.background : undefined;
+         
+         if (bg != undefined) {
+            bg._height = bg.origHeight + actualExpansion;
+         }
+
+         for (var prop in this)
+         {
+            var obj = this[prop];
+            if ((obj instanceof MovieClip || obj instanceof TextField) 
+               && obj != tf 
+               && obj != bg
+               && obj._parent == this)
+            {
+               if (obj.origY == undefined) obj.origY = obj._y;
+               
+               if (obj._y > tf._y) {
+                  obj._y = obj.origY + actualExpansion;
+               }
+            }
+         }
+
+         tfHeight = tf.getLineMetrics(0).height * tf.numLines;
+      }
+
+      while (tfHeight > tf._height && fontSize > 5)
+      {
+         var beforeHtmlSize:String = "SIZE=\"" + fontSize.toString() + "\"";
+         fontSize -= 1;
+         var htmlSize:String = "SIZE=\"" + fontSize.toString() + "\"";
+
+         var newText:String = tfText.split(beforeHtmlSize).join(htmlSize);
+         
+         if (newText == tfText) break;
+         tfText = newText;
+
+         tf.textAutoSize = "none";
+         tf.SetText(tfText, true);
+         tfHeight = tf.getLineMetrics(0).height * tf.numLines;
+      }
    }
 }

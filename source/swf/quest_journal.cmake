@@ -17,4 +17,10 @@ set(quest_journal_SOURCES
     ${AS_SOURCE_DIR}/PauseMenu/StatsList.as
     ${AS_SOURCE_DIR}/PauseMenu/StatsPage.as
     ${AS_SOURCE_DIR}/PauseMenu/SystemPage.as
+    ${AS_SOURCE_DIR}/Vanilla/Shared/BSScrollingList.as
+    ${AS_SOURCE_DIR}/Vanilla/Shared/CenteredScrollingList.as
+    ${AS_SOURCE_DIR}/Vanilla/Shared/GlobalFunc.as
+    ${AS_SOURCE_DIR}/Vanilla/Shared/ListFilterer.as
 )
+
+

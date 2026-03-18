@@ -115,7 +115,7 @@ endfunction()
 function(SkyUI_AS_Add)
     cmake_parse_arguments(ARG
         ""
-        "TARGET_NAME;SWF_REL"
+        "TARGET_NAME;SWF_REL;SWF_BASE_DIR"
         "SOURCES;FRAME_SOURCES"
         ${ARGN}
     )
@@ -131,6 +131,10 @@ function(SkyUI_AS_Add)
     endif()
     if(NOT FFDEC_CLI)
         message(FATAL_ERROR "SkyUI_AS_Add: FFDEC_CLI is not set.")
+    endif()
+
+    if(NOT ARG_SWF_BASE_DIR)
+        set(ARG_SWF_BASE_DIR "data/interface")
     endif()
 
     # Retrieve global state
@@ -157,7 +161,7 @@ function(SkyUI_AS_Add)
     # add_dependencies() (target-level) below to enforce ordering.
     # This is the key to per-SWF incremental granularity.
 
-    set(_SWF_INPUT  "${CMAKE_CURRENT_SOURCE_DIR}/data/interface/${ARG_SWF_REL}")
+    set(_SWF_INPUT  "${CMAKE_CURRENT_SOURCE_DIR}/${ARG_SWF_BASE_DIR}/${ARG_SWF_REL}")
     set(_SWF_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/interface/${ARG_SWF_REL}")
 
     add_custom_command(

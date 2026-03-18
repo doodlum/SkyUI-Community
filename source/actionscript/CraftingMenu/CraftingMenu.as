@@ -86,6 +86,7 @@ class CraftingMenu extends MovieClip
    }
    function Initialize()
    {
+      Stage.scaleMode = "showAll";
       skse.ExtendData(true);
       skse.ExtendAlchemyCategories(true);
       this._subtypeName = CraftingMenu.SUBTYPE_NAMES[this._currentframe - 1];
@@ -278,23 +279,53 @@ class CraftingMenu extends MovieClip
       aPathToFocus[0].handleInput(aInputEvent,aPathToFocus.slice(1));
       return true;
    }
+   function updateDynamicListHeight()
+   {
+      var listPoint = {
+         x: this.ItemList._x, 
+         y: this.ItemList._y
+      };
+      this._parent.globalToLocal(listPoint);
+      this.CategoryList.panelContainer.localToGlobal(listPoint);
+
+      var paddingItemList = 0;
+      var minHeightItemList = 100;
+      var heightItemList = this.BottomBarInfo._y - listPoint.y - paddingItemList;
+
+      if (heightItemList < minHeightItemList)
+      {
+         heightItemList = minHeightItemList;
+      }
+
+      this.ItemList.listHeight = heightItemList;
+      this.ItemList.requestUpdate();
+   }
    function positionFixedElements()
    {
       Shared.GlobalFunc.SetLockFunction();
-      MovieClip(this.CategoryList).Lock("L");
+      MovieClip(this.CategoryList).Lock("TL");
       this.CategoryList._x -= CraftingMenu.LIST_OFFSET;
+      this.CategoryList._y -= Stage.safeRect.y;
       this.MenuNameHolder.Lock("L");
       this.MenuNameHolder._x -= CraftingMenu.LIST_OFFSET;
       this.MenuDescriptionHolder.Lock("TR");
-      var _loc5_ = Stage.visibleRect.x + Stage.safeRect.x;
-      var _loc2_ = Stage.visibleRect.x + Stage.visibleRect.width - Stage.safeRect.x;
+      var leftOffset = Stage.visibleRect.x + Stage.safeRect.x;
+      var rightOffset = Stage.visibleRect.x + Stage.visibleRect.width - Stage.safeRect.x;
       var _loc3_ = this.CategoryList.getContentBounds();
       var _loc4_ = this.CategoryList._x + _loc3_[0] + _loc3_[2] + 25;
       this.MenuDescriptionHolder._x = 10 + _loc4_ + (_loc2_ - _loc4_) / 2 + this.MenuDescriptionHolder._width / 2;
-      this.BottomBarInfo.positionElements(_loc5_,_loc2_);
+
+      var marginBottomBarInfo = 17;
+      
+      this.BottomBarInfo.Lock("B");
+      this.BottomBarInfo._y += Stage.safeRect.y - this.BottomBarInfo._height + marginBottomBarInfo;
+      this.BottomBarInfo.positionElements(leftOffset, rightOffset);
+
       MovieClip(this.ExitMenuRect).Lock("TL");
       this.ExitMenuRect._x -= Stage.safeRect.x + 10;
       this.ExitMenuRect._y -= Stage.safeRect.y;
+
+      this.updateDynamicListHeight();
    }
    function positionFloatingElements()
    {
