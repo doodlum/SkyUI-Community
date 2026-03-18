@@ -14,6 +14,7 @@ set(craftingmenu_SOURCES
     ${AS_SOURCE_DIR}/Common/skyui/filter/ItemTypeFilter.as
     ${AS_SOURCE_DIR}/Common/skyui/filter/NameFilter.as
     ${AS_SOURCE_DIR}/Common/skyui/filter/SortFilter.as
+    ${AS_SOURCE_DIR}/Common/skyui/components/SearchWidget.as
     ${AS_SOURCE_DIR}/CraftingMenu/CraftingDataSetter.as
     ${AS_SOURCE_DIR}/CraftingMenu/CraftingIconSetter.as
     ${AS_SOURCE_DIR}/CraftingMenu/CraftingListEntry.as

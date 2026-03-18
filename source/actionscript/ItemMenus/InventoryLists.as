@@ -19,6 +19,7 @@ class InventoryLists extends MovieClip
    var panelContainer;
    var searchWidget;
    var tabBar;
+   var _ctrlHeld: Boolean = false;
    static var SKYUI_RELEASE_IDX = 2018;
    static var SKYUI_VERSION_MAJOR = 5;
    static var SKYUI_VERSION_MINOR = 2;
@@ -117,6 +118,7 @@ class InventoryLists extends MovieClip
    function hidePanel()
    {
       this._currentState = InventoryLists.TRANSITIONING_TO_HIDE_PANEL;
+      this._ctrlHeld = false;
       this.gotoAndPlay("PanelHide");
       gfx.io.GameDelegate.call("PlaySound",["UIMenuBladeCloseSD"]);
    }
@@ -138,6 +140,28 @@ class InventoryLists extends MovieClip
       {
          return false;
       }
+
+      // ── Ctrl tracking (Left Ctrl = 29, Right Ctrl = 157) ──────────────────
+      if(details.skseKeycode == 29 || details.skseKeycode == 157)
+      {
+         if      (details.value == "keyDown") this._ctrlHeld = true;
+         else if (details.value == "keyUp")   this._ctrlHeld = false;
+         return false;
+      }
+
+      // ── Ctrl combos ───────────────────────────────────────────────────────
+      if(this._ctrlHeld && details.value == "keyDown")
+      {
+         switch(details.skseKeycode)
+         {
+            case 17: this.searchWidget.onHistoryBack();    return true;
+            case 31: this.searchWidget.onHistoryForward(); return true;
+            case 14: this.searchWidget.onSearchKeyClear(); return true;
+            case 1:
+            case 15: return true;
+         }
+      }
+
       if(this._platform != 0)
       {
          if(details.skseKeycode == this._sortOrderKey)
@@ -181,17 +205,29 @@ class InventoryLists extends MovieClip
             return true;
          }
       }
-      if(Shared.GlobalFunc.IsKeyPressed(details))
+
+      if(details.skseKeycode == this._searchKey)
       {
-         if(details.skseKeycode == this._searchKey)
+         if(details.value == "keyDown")
          {
-            this.searchWidget.startInput();
+            if(!this.searchWidget.isActive()) {
+               this.searchWidget.onSearchKeyPress();
+            }
             return true;
          }
+         if(details.value == "keyUp" || details.value == "keyHold")
+         {
+            return true;
+         }
+         return true;
+      }
+
+      if(Shared.GlobalFunc.IsKeyPressed(details))
+      {
          if(this.tabBar != undefined && details.skseKeycode == this._switchTabKey)
          {
-            this.tabBar.tabToggle();
-            return true;
+               this.tabBar.tabToggle();
+               return true;
          }
       }
       if(this.categoryList.handleInput(details,pathToFocus))
@@ -410,6 +446,7 @@ class InventoryLists extends MovieClip
    }
    function onSearchInputEnd(event)
    {
+      this._ctrlHeld = false;
       this.categoryList.disableSelection = this.categoryList.disableInput = false;
       this.itemList.disableSelection = this.itemList.disableInput = false;
       this._nameFilter.filterText = event.data;
