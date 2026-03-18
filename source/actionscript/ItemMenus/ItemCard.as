@@ -816,17 +816,6 @@ class ItemCard extends MovieClip
       
       var tfHeight:Number = tf.getLineMetrics(0).height * tf.numLines;
       var baseHeight:Number = tf.origHeight;
-
-      for (var prop in this)
-      {
-         var obj = this[prop];
-         if ((obj instanceof MovieClip || obj instanceof TextField) && obj != tf && obj._parent == this)
-         {
-            if (obj.origY != undefined) {
-               obj._y = obj.origY;
-            }
-         }
-      }
       
       if (this.background != undefined && this.background.origHeight != undefined) {
          this.background._height = this.background.origHeight;
@@ -850,7 +839,10 @@ class ItemCard extends MovieClip
          for (var prop in this)
          {
             var obj = this[prop];
-            if ((obj instanceof MovieClip || obj instanceof TextField) && obj != tf && obj != bg && obj._parent == this)
+            if ((obj instanceof MovieClip || obj instanceof TextField) 
+               && obj != tf 
+               && obj != bg
+               && obj._parent == this)
             {
                if (obj.origY == undefined) obj.origY = obj._y;
                
