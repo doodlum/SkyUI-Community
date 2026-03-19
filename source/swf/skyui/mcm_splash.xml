@@ -1,0 +1,943 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+WARNING: The structure of this XML is not final.
+In later versions of FFDec it can be changed.
+Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMinor keys.
+--><swf _xmlExportMajor="2" _xmlExportMinor="1" _generator="JPEXS Free Flash Decompiler v.25.1.3" type="SWF" charset="UTF-8" compression="ZLIB" encrypted="false" frameCount="1" frameRate="60.0" gfx="false" hasEndTag="true" version="15">
+  <displayRect type="RECT" Xmax="15400" Xmin="0" Ymax="8920" Ymin="0" nbits="15"/>
+  <tags>
+    <item type="FileAttributesTag" actionScript3="false" forceWriteAsLong="false" hasMetadata="true" noCrossDomainCache="false" reservedA="false" reservedB="0" swfRelativeUrls="false" useDirectBlit="false" useGPU="false" useNetwork="false"/>
+    <item type="MetadataTag" forceWriteAsLong="true" xmlMetadata="&lt;rdf:RDF xmlns:rdf=&quot;http://www.w3.org/1999/02/22-rdf-syntax-ns#&quot;&gt; &lt;rdf:Description rdf:about=&quot;&quot; xmlns:xmp=&quot;http://ns.adobe.com/xap/1.0/&quot;&gt; &lt;xmp:CreatorTool&gt;Adobe Flash CS4 Professional&lt;/xmp:CreatorTool&gt; &lt;xmp:CreateDate&gt;2012-07-18T20:25:15+02:00&lt;/xmp:CreateDate&gt; &lt;xmp:MetadataDate&gt;2017-09-17T18:26:28+02:00&lt;/xmp:MetadataDate&gt; &lt;xmp:ModifyDate&gt;2017-09-17T18:26:28+02:00&lt;/xmp:ModifyDate&gt; &lt;/rdf:Description&gt; &lt;rdf:Description rdf:about=&quot;&quot; xmlns:dc=&quot;http://purl.org/dc/elements/1.1/&quot;&gt; &lt;dc:format&gt;application/x-shockwave-flash&lt;/dc:format&gt; &lt;/rdf:Description&gt; &lt;rdf:Description rdf:about=&quot;&quot; xmlns:xmpMM=&quot;http://ns.adobe.com/xap/1.0/mm/&quot; xmlns:stRef=&quot;http://ns.adobe.com/xap/1.0/sType/ResourceRef#&quot;&gt; &lt;xmpMM:InstanceID&gt;xmp.iid:033448F1C49BE7119FB682FF8374E42F&lt;/xmpMM:InstanceID&gt; &lt;xmpMM:DocumentID&gt;xmp.did:033448F1C49BE7119FB682FF8374E42F&lt;/xmpMM:DocumentID&gt; &lt;xmpMM:OriginalDocumentID&gt;xmp.did:5CE72DEFFBD0E111B9A28424AB1580AA&lt;/xmpMM:OriginalDocumentID&gt; &lt;xmpMM:DerivedFrom rdf:parseType=&quot;Resource&quot;&gt; &lt;stRef:instanceID&gt;xmp.iid:023448F1C49BE7119FB682FF8374E42F&lt;/stRef:instanceID&gt; &lt;stRef:documentID&gt;xmp.did:812A44A4A1D6E111BFDFE839387284E2&lt;/stRef:documentID&gt; &lt;stRef:originalDocumentID&gt;xmp.did:5CE72DEFFBD0E111B9A28424AB1580AA&lt;/stRef:originalDocumentID&gt; &lt;/xmpMM:DerivedFrom&gt; &lt;/rdf:Description&gt; &lt;/rdf:RDF&gt; "/>
+    <item type="SetBackgroundColorTag" forceWriteAsLong="false">
+      <backgroundColor type="RGB" blue="51" green="51" red="51"/>
+    </item>
+    <item type="DoActionTag" actionBytes="96230000736b7975692f7265732f6d636d5f6c6f676f2e646473000701000000006c6f676f001c960b00006c6f61644d6f76696500521700" forceWriteAsLong="true"/>
+    <item type="DefineShape3Tag" forceWriteAsLong="true" shapeId="1">
+      <shapeBounds type="RECT" Xmax="15400" Xmin="0" Ymax="8920" Ymin="0" nbits="15"/>
+      <shapes type="SHAPEWITHSTYLE" numFillBits="1" numLineBits="0">
+        <fillStyles type="FILLSTYLEARRAY">
+          <fillStyles>
+            <item type="FILLSTYLE" bitmapId="0" fillStyleType="0">
+              <color type="RGBA" alpha="0" blue="153" green="153" red="153"/>
+            </item>
+          </fillStyles>
+        </fillStyles>
+        <lineStyles type="LINESTYLEARRAY">
+          <lineStyles/>
+          <lineStyles2/>
+        </lineStyles>
+        <shapeRecords>
+          <item type="StyleChangeRecord" fillStyle0="0" fillStyle1="1" lineStyle="0" moveBits="15" moveDeltaX="15400" moveDeltaY="8920" numFillBits="0" numLineBits="0" stateFillStyle0="false" stateFillStyle1="true" stateLineStyle="false" stateMoveTo="true" stateNewStyles="false"/>
+          <item type="StraightEdgeRecord" deltaX="-15400" deltaY="0" generalLineFlag="false" numBits="13" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-8920" generalLineFlag="false" numBits="13" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="15400" deltaY="0" generalLineFlag="false" numBits="13" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="8920" generalLineFlag="false" numBits="13" vertLineFlag="true"/>
+          <item type="EndShapeRecord" endOfShape="0"/>
+        </shapeRecords>
+      </shapes>
+    </item>
+    <item type="PlaceObject2Tag" characterId="1" clipDepth="0" depth="1" forceWriteAsLong="false" placeFlagHasCharacter="true" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="false" placeFlagHasMatrix="true" placeFlagHasName="false" placeFlagHasRatio="false" placeFlagMove="false" ratio="0">
+      <matrix type="MATRIX" hasRotate="false" hasScale="false" nRotateBits="0" nScaleBits="0" nTranslateBits="0" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.0" scaleY="0.0" translateX="0" translateY="0"/>
+    </item>
+    <item type="DefineShape2Tag" forceWriteAsLong="true" shapeId="2">
+      <shapeBounds type="RECT" Xmax="16094" Xmin="0" Ymax="1423" Ymin="44" nbits="15"/>
+      <shapes type="SHAPEWITHSTYLE" numFillBits="1" numLineBits="0">
+        <fillStyles type="FILLSTYLEARRAY">
+          <fillStyles>
+            <item type="FILLSTYLE" bitmapId="0" fillStyleType="0">
+              <color type="RGB" blue="255" green="255" red="255"/>
+            </item>
+          </fillStyles>
+        </fillStyles>
+        <lineStyles type="LINESTYLEARRAY">
+          <lineStyles/>
+          <lineStyles2/>
+        </lineStyles>
+        <shapeRecords>
+          <item type="StyleChangeRecord" fillStyle0="1" fillStyle1="0" lineStyle="0" moveBits="12" moveDeltaX="1494" moveDeltaY="125" numFillBits="0" numLineBits="0" stateFillStyle0="true" stateFillStyle1="false" stateLineStyle="false" stateMoveTo="true" stateNewStyles="false"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="37" anchorDeltaY="-11" controlDeltaX="12" controlDeltaY="-16" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="-348" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="25" controlDeltaX="48" controlDeltaY="17" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-24" anchorDeltaY="48" controlDeltaX="0" controlDeltaY="19" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="-446" deltaY="886" generalLineFlag="true" numBits="9" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="-444" deltaY="-879" generalLineFlag="true" numBits="9" vertLineFlag="false"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-14" controlDeltaX="-32" controlDeltaY="-61" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="47" anchorDeltaY="-17" controlDeltaX="0" controlDeltaY="-24" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="-344" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="12" anchorDeltaY="17" controlDeltaX="37" controlDeltaY="9" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="41" controlDeltaX="13" controlDeltaY="17" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="1103" generalLineFlag="false" numBits="10" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-13" anchorDeltaY="16" controlDeltaX="0" controlDeltaY="41" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-37" anchorDeltaY="11" controlDeltaX="-12" controlDeltaY="16" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="263" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-14" anchorDeltaY="-17" controlDeltaX="-36" controlDeltaY="-10" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-39" controlDeltaX="-12" controlDeltaY="-18" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-1006" generalLineFlag="false" numBits="9" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="561" deltaY="1121" generalLineFlag="true" numBits="10" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="566" deltaY="-1121" generalLineFlag="true" numBits="10" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="1006" generalLineFlag="false" numBits="9" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-13" anchorDeltaY="16" controlDeltaX="0" controlDeltaY="41" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-38" anchorDeltaY="10" controlDeltaX="-12" controlDeltaY="17" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="278" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-12" anchorDeltaY="-16" controlDeltaX="-37" controlDeltaY="-11" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-41" controlDeltaX="-13" controlDeltaY="-16" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-1103" generalLineFlag="false" numBits="10" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="13" anchorDeltaY="-16" controlDeltaX="0" controlDeltaY="-41" numBits="5"/>
+          <item type="StyleChangeRecord" fillStyle0="0" fillStyle1="0" lineStyle="0" moveBits="1" moveDeltaX="0" moveDeltaY="0" numFillBits="1" numLineBits="0" stateFillStyle0="true" stateFillStyle1="true" stateLineStyle="true" stateMoveTo="true" stateNewStyles="true">
+            <fillStyles type="FILLSTYLEARRAY">
+              <fillStyles>
+                <item type="FILLSTYLE" bitmapId="0" fillStyleType="0">
+                  <color type="RGB" blue="255" green="255" red="255"/>
+                </item>
+              </fillStyles>
+            </fillStyles>
+            <lineStyles type="LINESTYLEARRAY">
+              <lineStyles/>
+              <lineStyles2/>
+            </lineStyles>
+          </item>
+          <item type="StyleChangeRecord" fillStyle0="1" fillStyle1="0" lineStyle="0" moveBits="13" moveDeltaX="3350" moveDeltaY="423" numFillBits="0" numLineBits="0" stateFillStyle0="true" stateFillStyle1="false" stateLineStyle="false" stateMoveTo="true" stateNewStyles="false"/>
+          <item type="StraightEdgeRecord" deltaX="145" deltaY="-241" generalLineFlag="true" numBits="7" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="-27" deltaY="-14" generalLineFlag="true" numBits="4" vertLineFlag="false"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-12" anchorDeltaY="0" controlDeltaX="-34" controlDeltaY="37" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="-24" deltaY="-10" generalLineFlag="true" numBits="4" vertLineFlag="false"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-288" anchorDeltaY="0" controlDeltaX="-266" controlDeltaY="-151" numBits="8"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-215" anchorDeltaY="275" controlDeltaX="-434" controlDeltaY="0" numBits="8"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="241" controlDeltaX="-139" controlDeltaY="175" numBits="7"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="222" anchorDeltaY="196" controlDeltaX="0" controlDeltaY="305" numBits="8"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="337" anchorDeltaY="0" controlDeltaX="211" controlDeltaY="187" numBits="8"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="144" anchorDeltaY="-49" controlDeltaX="176" controlDeltaY="0" numBits="7"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="56" anchorDeltaY="-33" controlDeltaX="73" controlDeltaY="-25" numBits="6"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="90" anchorDeltaY="-68" controlDeltaX="59" controlDeltaY="-33" numBits="6"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="11" anchorDeltaY="0" controlDeltaX="27" controlDeltaY="-21" numBits="4"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="28" anchorDeltaY="25" controlDeltaX="16" controlDeltaY="0" numBits="4"/>
+          <item type="StraightEdgeRecord" deltaX="25" deltaY="-20" generalLineFlag="true" numBits="4" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="-174" deltaY="-211" generalLineFlag="true" numBits="7" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="-23" deltaY="19" generalLineFlag="true" numBits="4" vertLineFlag="false"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="14" controlDeltaX="16" controlDeltaY="31" numBits="4"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-86" anchorDeltaY="65" controlDeltaX="0" controlDeltaY="28" numBits="6"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-247" anchorDeltaY="0" controlDeltaX="-192" controlDeltaY="145" numBits="7"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-175" anchorDeltaY="-157" controlDeltaX="-254" controlDeltaY="0" numBits="7"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-243" controlDeltaX="-180" controlDeltaY="-162" numBits="7"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="173" anchorDeltaY="-153" controlDeltaX="0" controlDeltaY="-246" numBits="7"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="272" anchorDeltaY="0" controlDeltaX="172" controlDeltaY="-152" numBits="8"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="172" anchorDeltaY="84" controlDeltaX="203" controlDeltaY="0" numBits="7"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="39" controlDeltaX="125" controlDeltaY="62" numBits="6"/>
+          <item type="StraightEdgeRecord" deltaX="-9" deltaY="46" generalLineFlag="true" numBits="5" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="26" deltaY="15" generalLineFlag="true" numBits="4" vertLineFlag="false"/>
+          <item type="StyleChangeRecord" fillStyle0="0" fillStyle1="0" lineStyle="0" moveBits="1" moveDeltaX="0" moveDeltaY="0" numFillBits="1" numLineBits="0" stateFillStyle0="true" stateFillStyle1="true" stateLineStyle="true" stateMoveTo="true" stateNewStyles="true">
+            <fillStyles type="FILLSTYLEARRAY">
+              <fillStyles>
+                <item type="FILLSTYLE" bitmapId="0" fillStyleType="0">
+                  <color type="RGB" blue="255" green="255" red="255"/>
+                </item>
+              </fillStyles>
+            </fillStyles>
+            <lineStyles type="LINESTYLEARRAY">
+              <lineStyles/>
+              <lineStyles2/>
+            </lineStyles>
+          </item>
+          <item type="StyleChangeRecord" fillStyle0="1" fillStyle1="0" lineStyle="0" moveBits="14" moveDeltaX="5532" moveDeltaY="125" numFillBits="0" numLineBits="0" stateFillStyle0="true" stateFillStyle1="false" stateLineStyle="false" stateMoveTo="true" stateNewStyles="false"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="38" anchorDeltaY="-11" controlDeltaX="12" controlDeltaY="-16" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="-349" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="25" controlDeltaX="48" controlDeltaY="17" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-24" anchorDeltaY="48" controlDeltaX="0" controlDeltaY="19" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="-446" deltaY="886" generalLineFlag="true" numBits="9" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="-444" deltaY="-879" generalLineFlag="true" numBits="9" vertLineFlag="false"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-11" controlDeltaX="-32" controlDeltaY="-64" numBits="6"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="48" anchorDeltaY="-17" controlDeltaX="0" controlDeltaY="-24" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="-345" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="14" anchorDeltaY="17" controlDeltaX="36" controlDeltaY="9" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="40" controlDeltaX="12" controlDeltaY="18" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="1103" generalLineFlag="false" numBits="10" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-12" anchorDeltaY="16" controlDeltaX="0" controlDeltaY="41" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-36" anchorDeltaY="10" controlDeltaX="-14" controlDeltaY="17" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="263" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-12" anchorDeltaY="-16" controlDeltaX="-37" controlDeltaY="-11" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-40" controlDeltaX="-13" controlDeltaY="-17" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-1006" generalLineFlag="false" numBits="9" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="561" deltaY="1121" generalLineFlag="true" numBits="10" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="566" deltaY="-1121" generalLineFlag="true" numBits="10" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="1006" generalLineFlag="false" numBits="9" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-12" anchorDeltaY="16" controlDeltaX="0" controlDeltaY="41" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-39" anchorDeltaY="10" controlDeltaX="-12" controlDeltaY="17" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="279" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-12" anchorDeltaY="-16" controlDeltaX="-38" controlDeltaY="-11" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-41" controlDeltaX="-13" controlDeltaY="-16" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-1103" generalLineFlag="false" numBits="10" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="13" anchorDeltaY="-16" controlDeltaX="0" controlDeltaY="-41" numBits="5"/>
+          <item type="StyleChangeRecord" fillStyle0="0" fillStyle1="0" lineStyle="0" moveBits="1" moveDeltaX="0" moveDeltaY="0" numFillBits="1" numLineBits="0" stateFillStyle0="true" stateFillStyle1="true" stateLineStyle="true" stateMoveTo="true" stateNewStyles="true">
+            <fillStyles type="FILLSTYLEARRAY">
+              <fillStyles>
+                <item type="FILLSTYLE" bitmapId="0" fillStyleType="0">
+                  <color type="RGB" blue="255" green="255" red="255"/>
+                </item>
+              </fillStyles>
+            </fillStyles>
+            <lineStyles type="LINESTYLEARRAY">
+              <lineStyles/>
+              <lineStyles2/>
+            </lineStyles>
+          </item>
+          <item type="StyleChangeRecord" fillStyle0="1" fillStyle1="0" lineStyle="0" moveBits="14" moveDeltaX="8105" moveDeltaY="136" numFillBits="0" numLineBits="0" stateFillStyle0="true" stateFillStyle1="false" stateLineStyle="false" stateMoveTo="true" stateNewStyles="false"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-18" anchorDeltaY="0" controlDeltaX="-30" controlDeltaY="39" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="-40" deltaY="-13" generalLineFlag="true" numBits="5" vertLineFlag="false"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-119" anchorDeltaY="-28" controlDeltaX="-140" controlDeltaY="-64" numBits="7"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-138" anchorDeltaY="0" controlDeltaX="-110" controlDeltaY="-26" numBits="7"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-138" anchorDeltaY="42" controlDeltaX="-164" controlDeltaY="0" numBits="7"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-78" anchorDeltaY="75" controlDeltaX="-138" controlDeltaY="42" numBits="7"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="142" controlDeltaX="-105" controlDeltaY="101" numBits="7"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="40" anchorDeltaY="70" controlDeltaX="0" controlDeltaY="83" numBits="6"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="69" anchorDeltaY="39" controlDeltaX="41" controlDeltaY="71" numBits="6"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="96" anchorDeltaY="18" controlDeltaX="73" controlDeltaY="42" numBits="6"/>
+          <item type="StraightEdgeRecord" deltaX="264" deltaY="26" generalLineFlag="true" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="285" deltaY="13" generalLineFlag="true" numBits="8" vertLineFlag="false"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="47" anchorDeltaY="17" controlDeltaX="50" controlDeltaY="4" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="130" controlDeltaX="146" controlDeltaY="50" numBits="7"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-85" anchorDeltaY="72" controlDeltaX="0" controlDeltaY="100" numBits="6"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-248" anchorDeltaY="0" controlDeltaX="-127" controlDeltaY="109" numBits="7"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-106" anchorDeltaY="-26" controlDeltaX="-120" controlDeltaY="0" numBits="6"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-113" anchorDeltaY="-60" controlDeltaX="-103" controlDeltaY="-25" numBits="6"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-32" controlDeltaX="-125" controlDeltaY="-64" numBits="6"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="18" anchorDeltaY="-39" controlDeltaX="0" controlDeltaY="-14" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="-27" deltaY="-16" generalLineFlag="true" numBits="4" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="-147" deltaY="245" generalLineFlag="true" numBits="7" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="27" deltaY="17" generalLineFlag="true" numBits="4" vertLineFlag="false"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="16" anchorDeltaY="0" controlDeltaX="30" controlDeltaY="-35" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="47" anchorDeltaY="22" controlDeltaX="10" controlDeltaY="0" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="125" anchorDeltaY="34" controlDeltaX="176" controlDeltaY="92" numBits="7"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="171" anchorDeltaY="0" controlDeltaX="124" controlDeltaY="34" numBits="7"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="167" anchorDeltaY="-128" controlDeltaX="293" controlDeltaY="0" numBits="8"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-181" controlDeltaX="150" controlDeltaY="-115" numBits="7"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-166" anchorDeltaY="-93" controlDeltaX="0" controlDeltaY="-190" numBits="7"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-99" anchorDeltaY="-16" controlDeltaX="-60" controlDeltaY="-33" numBits="6"/>
+          <item type="StraightEdgeRecord" deltaX="-321" deltaY="-21" generalLineFlag="true" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="-234" deltaY="-14" generalLineFlag="true" numBits="7" vertLineFlag="false"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-51" anchorDeltaY="-25" controlDeltaX="-74" controlDeltaY="-9" numBits="6"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-32" anchorDeltaY="-44" controlDeltaX="-45" controlDeltaY="-20" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-49" controlDeltaX="-29" controlDeltaY="-44" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="37" anchorDeltaY="-52" controlDeltaX="0" controlDeltaY="-59" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="64" anchorDeltaY="-33" controlDeltaX="39" controlDeltaY="-52" numBits="6"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="179" anchorDeltaY="0" controlDeltaX="135" controlDeltaY="-68" numBits="7"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="198" anchorDeltaY="92" controlDeltaX="218" controlDeltaY="0" numBits="7"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="29" controlDeltaX="72" controlDeltaY="35" numBits="6"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-16" anchorDeltaY="42" controlDeltaX="0" controlDeltaY="12" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="27" deltaY="15" generalLineFlag="true" numBits="4" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="140" deltaY="-252" generalLineFlag="true" numBits="7" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="-28" deltaY="-14" generalLineFlag="true" numBits="4" vertLineFlag="false"/>
+          <item type="StyleChangeRecord" fillStyle0="0" fillStyle1="0" lineStyle="0" moveBits="1" moveDeltaX="0" moveDeltaY="0" numFillBits="1" numLineBits="0" stateFillStyle0="true" stateFillStyle1="true" stateLineStyle="true" stateMoveTo="true" stateNewStyles="true">
+            <fillStyles type="FILLSTYLEARRAY">
+              <fillStyles>
+                <item type="FILLSTYLE" bitmapId="0" fillStyleType="0">
+                  <color type="RGB" blue="255" green="255" red="255"/>
+                </item>
+              </fillStyles>
+            </fillStyles>
+            <lineStyles type="LINESTYLEARRAY">
+              <lineStyles/>
+              <lineStyles2/>
+            </lineStyles>
+          </item>
+          <item type="StyleChangeRecord" fillStyle0="1" fillStyle1="0" lineStyle="0" moveBits="15" moveDeltaX="9920" moveDeltaY="98" numFillBits="0" numLineBits="0" stateFillStyle0="true" stateFillStyle1="false" stateLineStyle="false" stateMoveTo="true" stateNewStyles="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="-352" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="22" controlDeltaX="37" controlDeltaY="6" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-38" anchorDeltaY="29" controlDeltaX="0" controlDeltaY="18" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="-719" deltaY="563" generalLineFlag="true" numBits="9" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-554" generalLineFlag="false" numBits="9" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="12" anchorDeltaY="-17" controlDeltaX="0" controlDeltaY="-40" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="36" anchorDeltaY="-10" controlDeltaX="14" controlDeltaY="-17" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="-278" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="14" anchorDeltaY="17" controlDeltaX="36" controlDeltaY="9" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="40" controlDeltaX="12" controlDeltaY="18" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="1103" generalLineFlag="false" numBits="10" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-12" anchorDeltaY="16" controlDeltaX="0" controlDeltaY="41" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-36" anchorDeltaY="10" controlDeltaX="-14" controlDeltaY="17" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="278" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-14" anchorDeltaY="-17" controlDeltaX="-36" controlDeltaY="-10" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-41" controlDeltaX="-12" controlDeltaY="-16" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-397" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="299" deltaY="-232" generalLineFlag="true" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="483" deltaY="617" generalLineFlag="true" numBits="9" vertLineFlag="false"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="10" controlDeltaX="43" controlDeltaY="57" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-42" anchorDeltaY="10" controlDeltaX="0" controlDeltaY="19" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="325" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="-57" deltaY="-11" generalLineFlag="true" numBits="5" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="-40" deltaY="-37" generalLineFlag="true" numBits="5" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="-596" deltaY="-755" generalLineFlag="true" numBits="9" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="542" deltaY="-420" generalLineFlag="true" numBits="9" vertLineFlag="false"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="60" anchorDeltaY="-5" controlDeltaX="55" controlDeltaY="-43" numBits="5"/>
+          <item type="StyleChangeRecord" fillStyle0="0" fillStyle1="0" lineStyle="0" moveBits="1" moveDeltaX="0" moveDeltaY="0" numFillBits="1" numLineBits="0" stateFillStyle0="true" stateFillStyle1="true" stateLineStyle="true" stateMoveTo="true" stateNewStyles="true">
+            <fillStyles type="FILLSTYLEARRAY">
+              <fillStyles>
+                <item type="FILLSTYLE" bitmapId="0" fillStyleType="0">
+                  <color type="RGB" blue="255" green="255" red="255"/>
+                </item>
+              </fillStyles>
+            </fillStyles>
+            <lineStyles type="LINESTYLEARRAY">
+              <lineStyles/>
+              <lineStyles2/>
+            </lineStyles>
+          </item>
+          <item type="StyleChangeRecord" fillStyle0="1" fillStyle1="0" lineStyle="0" moveBits="15" moveDeltaX="11463" moveDeltaY="141" numFillBits="0" numLineBits="0" stateFillStyle0="true" stateFillStyle1="false" stateLineStyle="false" stateMoveTo="true" stateNewStyles="false"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="48" anchorDeltaY="-9" controlDeltaX="34" controlDeltaY="-34" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="-315" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="25" controlDeltaX="43" controlDeltaY="10" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-43" anchorDeltaY="59" controlDeltaX="0" controlDeltaY="23" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="-337" deltaY="477" generalLineFlag="true" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="-339" deltaY="-461" generalLineFlag="true" numBits="8" vertLineFlag="false"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-31" controlDeltaX="-46" controlDeltaY="-64" numBits="6"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="46" anchorDeltaY="-12" controlDeltaX="0" controlDeltaY="-26" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="-338" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="26" anchorDeltaY="23" controlDeltaX="41" controlDeltaY="8" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="97" deltaY="117" generalLineFlag="true" numBits="6" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="431" deltaY="564" generalLineFlag="true" numBits="9" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="475" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-13" anchorDeltaY="18" controlDeltaX="0" controlDeltaY="39" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-36" anchorDeltaY="10" controlDeltaX="-14" controlDeltaY="17" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="278" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-12" anchorDeltaY="-16" controlDeltaX="-37" controlDeltaY="-11" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-40" controlDeltaX="-13" controlDeltaY="-17" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-475" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="408" deltaY="-564" generalLineFlag="true" numBits="9" vertLineFlag="false"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="72" anchorDeltaY="-77" controlDeltaX="19" controlDeltaY="-28" numBits="6"/>
+          <item type="StyleChangeRecord" fillStyle0="0" fillStyle1="0" lineStyle="0" moveBits="1" moveDeltaX="0" moveDeltaY="0" numFillBits="1" numLineBits="0" stateFillStyle0="true" stateFillStyle1="true" stateLineStyle="true" stateMoveTo="true" stateNewStyles="true">
+            <fillStyles type="FILLSTYLEARRAY">
+              <fillStyles>
+                <item type="FILLSTYLE" bitmapId="0" fillStyleType="0">
+                  <color type="RGB" blue="255" green="255" red="255"/>
+                </item>
+              </fillStyles>
+            </fillStyles>
+            <lineStyles type="LINESTYLEARRAY">
+              <lineStyles/>
+              <lineStyles2/>
+            </lineStyles>
+          </item>
+          <item type="StyleChangeRecord" fillStyle0="1" fillStyle1="0" lineStyle="0" moveBits="15" moveDeltaX="13161" moveDeltaY="252" numFillBits="0" numLineBits="0" stateFillStyle0="true" stateFillStyle1="false" stateLineStyle="false" stateMoveTo="true" stateNewStyles="false"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-68" anchorDeltaY="-43" controlDeltaX="-39" controlDeltaY="-70" numBits="6"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-87" anchorDeltaY="-16" controlDeltaX="-65" controlDeltaY="-40" numBits="6"/>
+          <item type="StraightEdgeRecord" deltaX="-238" deltaY="-16" generalLineFlag="true" numBits="7" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="-731" deltaY="0" generalLineFlag="false" numBits="9" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="14" anchorDeltaY="17" controlDeltaX="36" controlDeltaY="9" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="40" controlDeltaX="12" controlDeltaY="18" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="1103" generalLineFlag="false" numBits="10" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-12" anchorDeltaY="16" controlDeltaX="0" controlDeltaY="41" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-37" anchorDeltaY="11" controlDeltaX="-13" controlDeltaY="16" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="278" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-14" anchorDeltaY="-17" controlDeltaX="-36" controlDeltaY="-10" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-41" controlDeltaX="-12" controlDeltaY="-16" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-485" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="509" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="303" deltaY="478" generalLineFlag="true" numBits="8" vertLineFlag="false"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="10" controlDeltaX="34" controlDeltaY="53" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-48" anchorDeltaY="7" controlDeltaX="0" controlDeltaY="21" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="309" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-31" anchorDeltaY="-49" controlDeltaX="-57" controlDeltaY="0" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="-339" deltaY="-526" generalLineFlag="true" numBits="9" vertLineFlag="false"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="99" anchorDeltaY="-95" controlDeltaX="179" controlDeltaY="-15" numBits="7"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-151" controlDeltaX="101" controlDeltaY="-98" numBits="7"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-47" anchorDeltaY="-82" controlDeltaX="0" controlDeltaY="-101" numBits="6"/>
+          <item type="StyleChangeRecord" fillStyle0="0" fillStyle1="0" lineStyle="0" moveBits="15" moveDeltaX="12855" moveDeltaY="664" numFillBits="0" numLineBits="0" stateFillStyle0="false" stateFillStyle1="false" stateLineStyle="false" stateMoveTo="true" stateNewStyles="false"/>
+          <item type="StraightEdgeRecord" deltaX="-166" deltaY="9" generalLineFlag="true" numBits="7" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="-540" deltaY="0" generalLineFlag="false" numBits="9" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-479" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="526" deltaY="0" generalLineFlag="false" numBits="9" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="174" deltaY="9" generalLineFlag="true" numBits="7" vertLineFlag="false"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="44" anchorDeltaY="25" controlDeltaX="58" controlDeltaY="9" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="138" controlDeltaX="104" controlDeltaY="59" numBits="7"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-101" anchorDeltaY="59" controlDeltaX="0" controlDeltaY="137" numBits="7"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-58" anchorDeltaY="9" controlDeltaX="-41" controlDeltaY="25" numBits="5"/>
+          <item type="StyleChangeRecord" fillStyle0="0" fillStyle1="0" lineStyle="0" moveBits="1" moveDeltaX="0" moveDeltaY="0" numFillBits="1" numLineBits="0" stateFillStyle0="true" stateFillStyle1="true" stateLineStyle="true" stateMoveTo="true" stateNewStyles="true">
+            <fillStyles type="FILLSTYLEARRAY">
+              <fillStyles>
+                <item type="FILLSTYLE" bitmapId="0" fillStyleType="0">
+                  <color type="RGB" blue="255" green="255" red="255"/>
+                </item>
+              </fillStyles>
+            </fillStyles>
+            <lineStyles type="LINESTYLEARRAY">
+              <lineStyles/>
+              <lineStyles2/>
+            </lineStyles>
+          </item>
+          <item type="StyleChangeRecord" fillStyle0="1" fillStyle1="0" lineStyle="0" moveBits="15" moveDeltaX="13786" moveDeltaY="182" numFillBits="0" numLineBits="0" stateFillStyle0="true" stateFillStyle1="false" stateLineStyle="false" stateMoveTo="true" stateNewStyles="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="1103" generalLineFlag="false" numBits="10" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-12" anchorDeltaY="16" controlDeltaX="0" controlDeltaY="41" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-38" anchorDeltaY="11" controlDeltaX="-12" controlDeltaY="16" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="278" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-12" anchorDeltaY="-16" controlDeltaX="-38" controlDeltaY="-11" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-41" controlDeltaX="-12" controlDeltaY="-16" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-1103" generalLineFlag="false" numBits="10" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="12" anchorDeltaY="-17" controlDeltaX="0" controlDeltaY="-40" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="36" anchorDeltaY="-10" controlDeltaX="14" controlDeltaY="-17" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="-278" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="14" anchorDeltaY="17" controlDeltaX="36" controlDeltaY="9" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="40" controlDeltaX="12" controlDeltaY="18" numBits="5"/>
+          <item type="StyleChangeRecord" fillStyle0="0" fillStyle1="0" lineStyle="0" moveBits="1" moveDeltaX="0" moveDeltaY="0" numFillBits="1" numLineBits="0" stateFillStyle0="true" stateFillStyle1="true" stateLineStyle="true" stateMoveTo="true" stateNewStyles="true">
+            <fillStyles type="FILLSTYLEARRAY">
+              <fillStyles>
+                <item type="FILLSTYLE" bitmapId="0" fillStyleType="0">
+                  <color type="RGB" blue="255" green="255" red="255"/>
+                </item>
+              </fillStyles>
+            </fillStyles>
+            <lineStyles type="LINESTYLEARRAY">
+              <lineStyles/>
+              <lineStyles2/>
+            </lineStyles>
+          </item>
+          <item type="StyleChangeRecord" fillStyle0="1" fillStyle1="0" lineStyle="0" moveBits="15" moveDeltaX="16044" moveDeltaY="125" numFillBits="0" numLineBits="0" stateFillStyle0="true" stateFillStyle1="false" stateLineStyle="false" stateMoveTo="true" stateNewStyles="false"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="36" anchorDeltaY="-10" controlDeltaX="14" controlDeltaY="-17" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="-349" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="25" controlDeltaX="48" controlDeltaY="17" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-23" anchorDeltaY="49" controlDeltaX="0" controlDeltaY="18" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="-446" deltaY="886" generalLineFlag="true" numBits="9" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="-445" deltaY="-879" generalLineFlag="true" numBits="9" vertLineFlag="false"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-11" controlDeltaX="-32" controlDeltaY="-64" numBits="6"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="48" anchorDeltaY="-17" controlDeltaX="0" controlDeltaY="-24" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="-345" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="14" anchorDeltaY="17" controlDeltaX="36" controlDeltaY="9" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="38" controlDeltaX="13" controlDeltaY="20" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="1103" generalLineFlag="false" numBits="10" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-13" anchorDeltaY="18" controlDeltaX="0" controlDeltaY="39" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-36" anchorDeltaY="10" controlDeltaX="-14" controlDeltaY="17" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="264" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-12" anchorDeltaY="-16" controlDeltaX="-38" controlDeltaY="-11" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-40" controlDeltaX="-13" controlDeltaY="-17" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-1006" generalLineFlag="false" numBits="9" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="561" deltaY="1121" generalLineFlag="true" numBits="10" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="566" deltaY="-1121" generalLineFlag="true" numBits="10" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="1006" generalLineFlag="false" numBits="9" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-12" anchorDeltaY="16" controlDeltaX="0" controlDeltaY="41" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-38" anchorDeltaY="11" controlDeltaX="-12" controlDeltaY="16" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="StraightEdgeRecord" deltaX="278" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-31" generalLineFlag="false" numBits="4" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="-14" anchorDeltaY="-17" controlDeltaX="-36" controlDeltaY="-10" numBits="5"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-41" controlDeltaX="-12" controlDeltaY="-16" numBits="5"/>
+          <item type="StraightEdgeRecord" deltaX="0" deltaY="-1103" generalLineFlag="false" numBits="10" vertLineFlag="true"/>
+          <item type="CurvedEdgeRecord" anchorDeltaX="12" anchorDeltaY="-17" controlDeltaX="0" controlDeltaY="-40" numBits="5"/>
+          <item type="EndShapeRecord" endOfShape="0"/>
+        </shapeRecords>
+      </shapes>
+    </item>
+    <item type="DefineFont3Tag" fontAscent="0" fontDescent="0" fontFlagsANSI="false" fontFlagsBold="false" fontFlagsHasLayout="false" fontFlagsItalic="false" fontFlagsShiftJIS="false" fontFlagsSmallText="false" fontFlagsWideCodes="true" fontFlagsWideOffsets="false" fontID="3" fontLeading="0" fontName="Copperplate Gothic Light\u0000" forceWriteAsLong="true">
+      <languageCode type="LANGCODE" languageCode="1"/>
+      <glyphShapeTable>
+        <item type="SHAPE" numFillBits="1" numLineBits="0">
+          <shapeRecords>
+            <item type="EndShapeRecord" endOfShape="0"/>
+          </shapeRecords>
+        </item>
+        <item type="SHAPE" numFillBits="1" numLineBits="0">
+          <shapeRecords>
+            <item type="StyleChangeRecord" fillStyle0="1" fillStyle1="0" lineStyle="0" moveBits="15" moveDeltaX="11230" moveDeltaY="-4170" numFillBits="0" numLineBits="0" stateFillStyle0="true" stateFillStyle1="false" stateLineStyle="false" stateMoveTo="true" stateNewStyles="false"/>
+            <item type="StraightEdgeRecord" deltaX="1350" deltaY="0" generalLineFlag="false" numBits="10" vertLineFlag="false"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="180" anchorDeltaY="-130" controlDeltaX="420" controlDeltaY="0" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="90" anchorDeltaY="-380" controlDeltaX="170" controlDeltaY="-130" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="320" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="2580" generalLineFlag="false" numBits="11" vertLineFlag="true"/>
+            <item type="StraightEdgeRecord" deltaX="-320" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-170" anchorDeltaY="-130" controlDeltaX="-90" controlDeltaY="-380" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-420" anchorDeltaY="0" controlDeltaX="-180" controlDeltaY="-130" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="-1350" deltaY="0" generalLineFlag="false" numBits="10" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="1690" generalLineFlag="false" numBits="10" vertLineFlag="true"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="130" anchorDeltaY="170" controlDeltaX="0" controlDeltaY="400" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="380" anchorDeltaY="100" controlDeltaX="130" controlDeltaY="170" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="340" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="StraightEdgeRecord" deltaX="-2780" deltaY="0" generalLineFlag="false" numBits="11" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="-340" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="130" anchorDeltaY="-160" controlDeltaX="380" controlDeltaY="-100" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-410" controlDeltaX="130" controlDeltaY="-170" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="-1690" generalLineFlag="false" numBits="10" vertLineFlag="true"/>
+            <item type="StraightEdgeRecord" deltaX="-7560" deltaY="0" generalLineFlag="false" numBits="12" vertLineFlag="false"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-170" anchorDeltaY="130" controlDeltaX="-420" controlDeltaY="0" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-90" anchorDeltaY="380" controlDeltaX="-180" controlDeltaY="130" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="-320" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="-1650" generalLineFlag="false" numBits="10" vertLineFlag="true"/>
+            <item type="StraightEdgeRecord" deltaX="7680" deltaY="-8920" generalLineFlag="true" numBits="13" vertLineFlag="false"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-90" controlDeltaX="120" controlDeltaY="-140" numBits="7"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-490" anchorDeltaY="-120" controlDeltaX="0" controlDeltaY="-160" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="-340" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="StraightEdgeRecord" deltaX="3570" deltaY="0" generalLineFlag="false" numBits="11" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="340" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-130" anchorDeltaY="170" controlDeltaX="-380" controlDeltaY="90" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="410" controlDeltaX="-130" controlDeltaY="170" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="8300" generalLineFlag="false" numBits="13" vertLineFlag="true"/>
+            <item type="StyleChangeRecord" fillStyle0="0" fillStyle1="0" lineStyle="0" moveBits="15" moveDeltaX="9730" moveDeltaY="-4170" numFillBits="0" numLineBits="0" stateFillStyle0="false" stateFillStyle1="false" stateLineStyle="false" stateMoveTo="true" stateNewStyles="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="-7950" generalLineFlag="false" numBits="12" vertLineFlag="true"/>
+            <item type="StraightEdgeRecord" deltaX="-6740" deltaY="7950" generalLineFlag="true" numBits="12" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="6740" deltaY="0" generalLineFlag="false" numBits="12" vertLineFlag="false"/>
+            <item type="EndShapeRecord" endOfShape="0"/>
+          </shapeRecords>
+        </item>
+        <item type="SHAPE" numFillBits="1" numLineBits="0">
+          <shapeRecords>
+            <item type="StyleChangeRecord" fillStyle0="1" fillStyle1="0" lineStyle="0" moveBits="14" moveDeltaX="3710" moveDeltaY="-6370" numFillBits="0" numLineBits="0" stateFillStyle0="true" stateFillStyle1="false" stateLineStyle="false" stateMoveTo="true" stateNewStyles="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="5070" generalLineFlag="false" numBits="12" vertLineFlag="true"/>
+            <item type="StraightEdgeRecord" deltaX="8750" deltaY="0" generalLineFlag="false" numBits="13" vertLineFlag="false"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="180" anchorDeltaY="-130" controlDeltaX="420" controlDeltaY="0" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="90" anchorDeltaY="-380" controlDeltaX="170" controlDeltaY="-130" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="320" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="2580" generalLineFlag="false" numBits="11" vertLineFlag="true"/>
+            <item type="StraightEdgeRecord" deltaX="-320" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-170" anchorDeltaY="-130" controlDeltaX="-100" controlDeltaY="-380" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-420" anchorDeltaY="0" controlDeltaX="-180" controlDeltaY="-130" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="-10950" deltaY="0" generalLineFlag="false" numBits="13" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="-320" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="130" anchorDeltaY="-170" controlDeltaX="390" controlDeltaY="-100" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-420" controlDeltaX="120" controlDeltaY="-170" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="-11290" generalLineFlag="false" numBits="13" vertLineFlag="true"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-130" anchorDeltaY="-170" controlDeltaX="0" controlDeltaY="-420" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-380" anchorDeltaY="-100" controlDeltaX="-130" controlDeltaY="-170" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="-320" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="StraightEdgeRecord" deltaX="10830" deltaY="0" generalLineFlag="false" numBits="13" vertLineFlag="false"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="170" anchorDeltaY="-130" controlDeltaX="420" controlDeltaY="0" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="100" anchorDeltaY="-380" controlDeltaX="170" controlDeltaY="-130" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="320" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="2580" generalLineFlag="false" numBits="11" vertLineFlag="true"/>
+            <item type="StraightEdgeRecord" deltaX="-320" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-170" anchorDeltaY="-130" controlDeltaX="-90" controlDeltaY="-380" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-420" anchorDeltaY="0" controlDeltaX="-180" controlDeltaY="-130" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="-8620" deltaY="0" generalLineFlag="false" numBits="13" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="4680" generalLineFlag="false" numBits="12" vertLineFlag="true"/>
+            <item type="StraightEdgeRecord" deltaX="5650" deltaY="0" generalLineFlag="false" numBits="12" vertLineFlag="false"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="180" anchorDeltaY="-130" controlDeltaX="420" controlDeltaY="0" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="90" anchorDeltaY="-380" controlDeltaX="170" controlDeltaY="-130" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="320" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="2580" generalLineFlag="false" numBits="11" vertLineFlag="true"/>
+            <item type="StraightEdgeRecord" deltaX="-320" deltaY="0" generalLineFlag="false" numBits="8" vertLineFlag="false"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-170" anchorDeltaY="-130" controlDeltaX="-90" controlDeltaY="-380" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-420" anchorDeltaY="0" controlDeltaX="-180" controlDeltaY="-130" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="-5650" deltaY="0" generalLineFlag="false" numBits="12" vertLineFlag="false"/>
+            <item type="EndShapeRecord" endOfShape="0"/>
+          </shapeRecords>
+        </item>
+        <item type="SHAPE" numFillBits="1" numLineBits="0">
+          <shapeRecords>
+            <item type="StyleChangeRecord" fillStyle0="1" fillStyle1="0" lineStyle="0" moveBits="13" moveDeltaX="2140" moveDeltaY="-1180" numFillBits="0" numLineBits="0" stateFillStyle0="true" stateFillStyle1="false" stateLineStyle="false" stateMoveTo="true" stateNewStyles="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="-11290" generalLineFlag="false" numBits="13" vertLineFlag="true"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-130" anchorDeltaY="-170" controlDeltaX="0" controlDeltaY="-420" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-380" anchorDeltaY="-90" controlDeltaX="-130" controlDeltaY="-180" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="-320" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="StraightEdgeRecord" deltaX="2850" deltaY="0" generalLineFlag="false" numBits="11" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="320" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-130" anchorDeltaY="170" controlDeltaX="-380" controlDeltaY="100" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="420" controlDeltaX="-130" controlDeltaY="170" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="11290" generalLineFlag="false" numBits="13" vertLineFlag="true"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="130" anchorDeltaY="170" controlDeltaX="0" controlDeltaY="420" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="390" anchorDeltaY="100" controlDeltaX="120" controlDeltaY="170" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="320" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="StraightEdgeRecord" deltaX="-2850" deltaY="0" generalLineFlag="false" numBits="11" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="-320" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="130" anchorDeltaY="-170" controlDeltaX="390" controlDeltaY="-100" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-420" controlDeltaX="120" controlDeltaY="-170" numBits="8"/>
+            <item type="EndShapeRecord" endOfShape="0"/>
+          </shapeRecords>
+        </item>
+        <item type="SHAPE" numFillBits="1" numLineBits="0">
+          <shapeRecords>
+            <item type="StyleChangeRecord" fillStyle0="1" fillStyle1="0" lineStyle="0" moveBits="15" moveDeltaX="3570" moveDeltaY="-11920" numFillBits="0" numLineBits="0" stateFillStyle0="true" stateFillStyle1="false" stateLineStyle="false" stateMoveTo="true" stateNewStyles="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="10740" generalLineFlag="false" numBits="13" vertLineFlag="true"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="130" anchorDeltaY="180" controlDeltaX="0" controlDeltaY="410" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="380" anchorDeltaY="100" controlDeltaX="130" controlDeltaY="170" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="320" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="StraightEdgeRecord" deltaX="-2710" deltaY="0" generalLineFlag="false" numBits="11" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="-320" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="130" anchorDeltaY="-170" controlDeltaX="390" controlDeltaY="-100" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-420" controlDeltaX="120" controlDeltaY="-170" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="-11290" generalLineFlag="false" numBits="13" vertLineFlag="true"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-130" anchorDeltaY="-170" controlDeltaX="0" controlDeltaY="-420" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-380" anchorDeltaY="-90" controlDeltaX="-130" controlDeltaY="-180" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="-320" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="StraightEdgeRecord" deltaX="3920" deltaY="0" generalLineFlag="false" numBits="11" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="320" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="290" controlDeltaX="-470" controlDeltaY="160" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="470" anchorDeltaY="550" controlDeltaX="0" controlDeltaY="200" numBits="9"/>
+            <item type="StraightEdgeRecord" deltaX="8230" deltaY="9620" generalLineFlag="true" numBits="13" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="-9960" generalLineFlag="false" numBits="13" vertLineFlag="true"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-130" anchorDeltaY="-170" controlDeltaX="0" controlDeltaY="-420" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-380" anchorDeltaY="-90" controlDeltaX="-130" controlDeltaY="-180" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="-320" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="StraightEdgeRecord" deltaX="2710" deltaY="0" generalLineFlag="false" numBits="11" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="320" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-130" anchorDeltaY="180" controlDeltaX="-380" controlDeltaY="90" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="420" controlDeltaX="-130" controlDeltaY="170" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="11290" generalLineFlag="false" numBits="13" vertLineFlag="true"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="130" anchorDeltaY="170" controlDeltaX="0" controlDeltaY="420" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="380" anchorDeltaY="100" controlDeltaX="130" controlDeltaY="170" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="320" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="StraightEdgeRecord" deltaX="-3150" deltaY="0" generalLineFlag="false" numBits="11" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="-320" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-290" controlDeltaX="460" controlDeltaY="-120" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-420" anchorDeltaY="-500" controlDeltaX="0" controlDeltaY="-220" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="-9040" deltaY="-10470" generalLineFlag="true" numBits="13" vertLineFlag="false"/>
+            <item type="EndShapeRecord" endOfShape="0"/>
+          </shapeRecords>
+        </item>
+        <item type="SHAPE" numFillBits="1" numLineBits="0">
+          <shapeRecords>
+            <item type="StyleChangeRecord" fillStyle0="1" fillStyle1="0" lineStyle="0" moveBits="15" moveDeltaX="9300" moveDeltaY="-13890" numFillBits="0" numLineBits="0" stateFillStyle0="true" stateFillStyle1="false" stateLineStyle="false" stateMoveTo="true" stateNewStyles="false"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="2210" anchorDeltaY="1890" controlDeltaX="3610" controlDeltaY="0" numBits="11"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="620" anchorDeltaY="1520" controlDeltaX="1240" controlDeltaY="1050" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="1440" controlDeltaX="510" controlDeltaY="1250" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-1110" anchorDeltaY="1700" controlDeltaX="0" controlDeltaY="1950" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-2170" anchorDeltaY="830" controlDeltaX="-1220" controlDeltaY="1880" numBits="11"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-2050" anchorDeltaY="0" controlDeltaX="-1620" controlDeltaY="620" numBits="11"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-2200" anchorDeltaY="-1890" controlDeltaX="-3590" controlDeltaY="0" numBits="11"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-630" anchorDeltaY="-1510" controlDeltaX="-1230" controlDeltaY="-1060" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-1370" controlDeltaX="-510" controlDeltaY="-1240" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="1100" anchorDeltaY="-1710" controlDeltaX="0" controlDeltaY="-2030" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="2200" anchorDeltaY="-850" controlDeltaX="1200" controlDeltaY="-1850" numBits="11"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="2100" anchorDeltaY="-30" controlDeltaX="1540" controlDeltaY="-590" numBits="11"/>
+            <item type="StyleChangeRecord" fillStyle0="0" fillStyle1="0" lineStyle="0" moveBits="15" moveDeltaX="9300" moveDeltaY="-12520" numFillBits="0" numLineBits="0" stateFillStyle0="false" stateFillStyle1="false" stateLineStyle="false" stateMoveTo="true" stateNewStyles="false"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-1790" anchorDeltaY="1720" controlDeltaX="-3070" controlDeltaY="0" numBits="11"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="2390" controlDeltaX="-1640" controlDeltaY="1580" numBits="11"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="1640" anchorDeltaY="1580" controlDeltaX="0" controlDeltaY="2400" numBits="11"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="3100" anchorDeltaY="0" controlDeltaX="1780" controlDeltaY="1720" numBits="11"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="1790" anchorDeltaY="-1720" controlDeltaX="3110" controlDeltaY="0" numBits="11"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-2320" controlDeltaX="1630" controlDeltaY="-1580" numBits="11"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-1630" anchorDeltaY="-1540" controlDeltaX="0" controlDeltaY="-2510" numBits="11"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-1120" anchorDeltaY="-370" controlDeltaX="-980" controlDeltaY="-920" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-1580" anchorDeltaY="-10" controlDeltaX="-1240" controlDeltaY="-420" numBits="10"/>
+            <item type="EndShapeRecord" endOfShape="0"/>
+          </shapeRecords>
+        </item>
+        <item type="SHAPE" numFillBits="1" numLineBits="0">
+          <shapeRecords>
+            <item type="StyleChangeRecord" fillStyle0="1" fillStyle1="0" lineStyle="0" moveBits="14" moveDeltaX="3710" moveDeltaY="-6140" numFillBits="0" numLineBits="0" stateFillStyle0="true" stateFillStyle1="false" stateLineStyle="false" stateMoveTo="true" stateNewStyles="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="4960" generalLineFlag="false" numBits="12" vertLineFlag="true"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="130" anchorDeltaY="180" controlDeltaX="0" controlDeltaY="410" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="380" anchorDeltaY="100" controlDeltaX="130" controlDeltaY="170" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="320" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="StraightEdgeRecord" deltaX="-2850" deltaY="0" generalLineFlag="false" numBits="11" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="-320" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="130" anchorDeltaY="-170" controlDeltaX="380" controlDeltaY="-100" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-420" controlDeltaX="130" controlDeltaY="-170" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="-11290" generalLineFlag="false" numBits="13" vertLineFlag="true"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-130" anchorDeltaY="-170" controlDeltaX="0" controlDeltaY="-420" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-380" anchorDeltaY="-90" controlDeltaX="-130" controlDeltaY="-180" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="-320" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="StraightEdgeRecord" deltaX="7490" deltaY="0" generalLineFlag="false" numBits="12" vertLineFlag="false"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="900" anchorDeltaY="170" controlDeltaX="1540" controlDeltaY="0" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="660" anchorDeltaY="410" controlDeltaX="890" controlDeltaY="160" numBits="9"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="420" anchorDeltaY="730" controlDeltaX="680" controlDeltaY="420" numBits="9"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="1050" controlDeltaX="480" controlDeltaY="830" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-1030" anchorDeltaY="980" controlDeltaX="0" controlDeltaY="1560" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-1810" anchorDeltaY="140" controlDeltaX="-1040" controlDeltaY="990" numBits="10"/>
+            <item type="StraightEdgeRecord" deltaX="3470" deltaY="5390" generalLineFlag="true" numBits="12" vertLineFlag="false"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="590" anchorDeltaY="0" controlDeltaX="310" controlDeltaY="500" numBits="9"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="320" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="StraightEdgeRecord" deltaX="-3160" deltaY="0" generalLineFlag="false" numBits="11" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="-320" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-200" controlDeltaX="490" controlDeltaY="-80" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-350" anchorDeltaY="-550" controlDeltaX="0" controlDeltaY="-100" numBits="9"/>
+            <item type="StraightEdgeRecord" deltaX="-3100" deltaY="-4890" generalLineFlag="true" numBits="12" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="-5220" deltaY="0" generalLineFlag="false" numBits="12" vertLineFlag="false"/>
+            <item type="StyleChangeRecord" fillStyle0="0" fillStyle1="0" lineStyle="0" moveBits="14" moveDeltaX="3710" moveDeltaY="-7440" numFillBits="0" numLineBits="0" stateFillStyle0="false" stateFillStyle1="false" stateLineStyle="false" stateMoveTo="true" stateNewStyles="false"/>
+            <item type="StraightEdgeRecord" deltaX="5530" deltaY="0" generalLineFlag="false" numBits="12" vertLineFlag="false"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="580" anchorDeltaY="-90" controlDeltaX="1130" controlDeltaY="0" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="440" anchorDeltaY="-250" controlDeltaX="570" controlDeltaY="-100" numBits="9"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-1410" controlDeltaX="1030" controlDeltaY="-600" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-1060" anchorDeltaY="-600" controlDeltaX="0" controlDeltaY="-1420" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-570" anchorDeltaY="-90" controlDeltaX="-470" controlDeltaY="-260" numBits="9"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-1210" anchorDeltaY="0" controlDeltaX="-580" controlDeltaY="-90" numBits="10"/>
+            <item type="StraightEdgeRecord" deltaX="-5390" deltaY="0" generalLineFlag="false" numBits="12" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="4910" generalLineFlag="false" numBits="12" vertLineFlag="true"/>
+            <item type="EndShapeRecord" endOfShape="0"/>
+          </shapeRecords>
+        </item>
+        <item type="SHAPE" numFillBits="1" numLineBits="0">
+          <shapeRecords>
+            <item type="StyleChangeRecord" fillStyle0="1" fillStyle1="0" lineStyle="0" moveBits="15" moveDeltaX="14310" moveDeltaY="-12800" numFillBits="0" numLineBits="0" stateFillStyle0="true" stateFillStyle1="false" stateLineStyle="false" stateMoveTo="true" stateNewStyles="false"/>
+            <item type="StraightEdgeRecord" deltaX="-1430" deltaY="2580" generalLineFlag="true" numBits="11" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="-280" deltaY="-150" generalLineFlag="true" numBits="8" vertLineFlag="false"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-110" controlDeltaX="170" controlDeltaY="-450" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-740" anchorDeltaY="-350" controlDeltaX="0" controlDeltaY="-300" numBits="9"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-2250" anchorDeltaY="0" controlDeltaX="-2010" controlDeltaY="-940" numBits="11"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-1370" anchorDeltaY="690" controlDeltaX="-1850" controlDeltaY="0" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-380" anchorDeltaY="540" controlDeltaX="-660" controlDeltaY="340" numBits="9"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="590" controlDeltaX="-390" controlDeltaY="540" numBits="9"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="300" anchorDeltaY="450" controlDeltaX="0" controlDeltaY="500" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="490" anchorDeltaY="220" controlDeltaX="300" controlDeltaY="440" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="740" anchorDeltaY="100" controlDeltaX="540" controlDeltaY="250" numBits="9"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="1660" anchorDeltaY="50" controlDeltaX="730" controlDeltaY="90" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="990" anchorDeltaY="150" controlDeltaX="2300" controlDeltaY="70" numBits="11"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="640" anchorDeltaY="360" controlDeltaX="990" controlDeltaY="140" numBits="9"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="1940" controlDeltaX="1700" controlDeltaY="950" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-1540" anchorDeltaY="1180" controlDeltaX="0" controlDeltaY="1850" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-3000" anchorDeltaY="0" controlDeltaX="-1710" controlDeltaY="1320" numBits="11"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-1290" anchorDeltaY="-350" controlDeltaX="-1730" controlDeltaY="0" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-1790" anchorDeltaY="-940" controlDeltaX="-1290" controlDeltaY="-350" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-90" anchorDeltaY="0" controlDeltaX="-500" controlDeltaY="-230" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-320" anchorDeltaY="360" controlDeltaX="-150" controlDeltaY="0" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="-270" deltaY="-170" generalLineFlag="true" numBits="8" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="1500" deltaY="-2510" generalLineFlag="true" numBits="11" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="280" deltaY="160" generalLineFlag="true" numBits="8" vertLineFlag="false"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="140" controlDeltaX="-190" controlDeltaY="400" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="1280" anchorDeltaY="670" controlDeltaX="0" controlDeltaY="320" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="1070" anchorDeltaY="270" controlDeltaX="1150" controlDeltaY="600" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="1250" anchorDeltaY="0" controlDeltaX="1060" controlDeltaY="260" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="1310" anchorDeltaY="-1110" controlDeltaX="2530" controlDeltaY="0" numBits="11"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-1020" controlDeltaX="870" controlDeltaY="-740" numBits="9"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-1490" anchorDeltaY="-510" controlDeltaX="0" controlDeltaY="-1340" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-510" anchorDeltaY="-40" controlDeltaX="-480" controlDeltaY="-170" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-2410" anchorDeltaY="-90" controlDeltaX="-520" controlDeltaY="-50" numBits="11"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-970" anchorDeltaY="-190" controlDeltaX="-1720" controlDeltaY="-70" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-760" anchorDeltaY="-430" controlDeltaX="-980" controlDeltaY="-190" numBits="9"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-410" anchorDeltaY="-720" controlDeltaX="-710" controlDeltaY="-400" numBits="9"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-850" controlDeltaX="-420" controlDeltaY="-720" numBits="9"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="1080" anchorDeltaY="-1040" controlDeltaX="0" controlDeltaY="-1450" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="1410" anchorDeltaY="-430" controlDeltaX="800" controlDeltaY="-760" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="1680" anchorDeltaY="0" controlDeltaX="1410" controlDeltaY="-440" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="1180" anchorDeltaY="270" controlDeltaX="1370" controlDeltaY="0" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="1480" anchorDeltaY="670" controlDeltaX="1170" controlDeltaY="270" numBits="10"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="80" anchorDeltaY="0" controlDeltaX="330" controlDeltaY="140" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="310" anchorDeltaY="-400" controlDeltaX="180" controlDeltaY="0" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="280" deltaY="140" generalLineFlag="true" numBits="8" vertLineFlag="false"/>
+            <item type="EndShapeRecord" endOfShape="0"/>
+          </shapeRecords>
+        </item>
+        <item type="SHAPE" numFillBits="1" numLineBits="0">
+          <shapeRecords>
+            <item type="StyleChangeRecord" fillStyle0="1" fillStyle1="0" lineStyle="0" moveBits="14" moveDeltaX="7400" moveDeltaY="-1780" numFillBits="0" numLineBits="0" stateFillStyle0="true" stateFillStyle1="false" stateLineStyle="false" stateMoveTo="true" stateNewStyles="false"/>
+            <item type="StraightEdgeRecord" deltaX="4420" deltaY="-10110" generalLineFlag="true" numBits="13" vertLineFlag="false"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-300" controlDeltaX="280" controlDeltaY="-620" numBits="9"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-580" anchorDeltaY="-140" controlDeltaX="0" controlDeltaY="-380" numBits="9"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="-320" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="StraightEdgeRecord" deltaX="3090" deltaY="0" generalLineFlag="false" numBits="11" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="320" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-180" anchorDeltaY="230" controlDeltaX="-470" controlDeltaY="140" numBits="8"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-480" anchorDeltaY="1100" controlDeltaX="-170" controlDeltaY="230" numBits="10"/>
+            <item type="StraightEdgeRecord" deltaX="-4400" deltaY="9920" generalLineFlag="true" numBits="13" vertLineFlag="false"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="260" controlDeltaX="-250" controlDeltaY="590" numBits="9"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="570" anchorDeltaY="120" controlDeltaX="0" controlDeltaY="420" numBits="9"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="320" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="StraightEdgeRecord" deltaX="-3810" deltaY="0" generalLineFlag="false" numBits="11" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="-320" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="-440" controlDeltaX="570" controlDeltaY="-120" numBits="9"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-260" anchorDeltaY="-590" controlDeltaX="0" controlDeltaY="-240" numBits="9"/>
+            <item type="StraightEdgeRecord" deltaX="-4480" deltaY="-10220" generalLineFlag="true" numBits="13" vertLineFlag="false"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-180" anchorDeltaY="-220" controlDeltaX="-370" controlDeltaY="-830" numBits="9"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="-450" anchorDeltaY="-130" controlDeltaX="-180" controlDeltaY="-220" numBits="8"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="-320" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="StraightEdgeRecord" deltaX="3260" deltaY="0" generalLineFlag="false" numBits="11" vertLineFlag="false"/>
+            <item type="StraightEdgeRecord" deltaX="0" deltaY="320" generalLineFlag="false" numBits="8" vertLineFlag="true"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="0" anchorDeltaY="380" controlDeltaX="-590" controlDeltaY="140" numBits="9"/>
+            <item type="CurvedEdgeRecord" anchorDeltaX="260" anchorDeltaY="580" controlDeltaX="0" controlDeltaY="340" numBits="9"/>
+            <item type="StraightEdgeRecord" deltaX="4400" deltaY="10110" generalLineFlag="true" numBits="13" vertLineFlag="false"/>
+            <item type="EndShapeRecord" endOfShape="0"/>
+          </shapeRecords>
+        </item>
+        <item type="SHAPE" numFillBits="1" numLineBits="0">
+          <shapeRecords>
+            <item type="EndShapeRecord" endOfShape="0"/>
+          </shapeRecords>
+        </item>
+      </glyphShapeTable>
+      <codeTable>
+        <item>32</item>
+        <item>52</item>
+        <item>69</item>
+        <item>73</item>
+        <item>78</item>
+        <item>79</item>
+        <item>82</item>
+        <item>83</item>
+        <item>86</item>
+        <item>160</item>
+      </codeTable>
+    </item>
+    <item type="DefineFontAlignZonesTag" CSMTableHint="1" fontID="3" forceWriteAsLong="true" reserved="0">
+      <zoneTable>
+        <item type="ZONERECORD" zoneMaskX="false" zoneMaskY="false">
+          <zonedata>
+            <item type="ZONEDATA" alignmentCoordinate="0" range="0"/>
+            <item type="ZONEDATA" alignmentCoordinate="0" range="0"/>
+          </zonedata>
+        </item>
+        <item type="ZONERECORD" zoneMaskX="true" zoneMaskY="true">
+          <zonedata>
+            <item type="ZONEDATA" alignmentCoordinate="16332" range="0"/>
+            <item type="ZONEDATA" alignmentCoordinate="0" range="17067"/>
+          </zonedata>
+        </item>
+        <item type="ZONERECORD" zoneMaskX="true" zoneMaskY="true">
+          <zonedata>
+            <item type="ZONEDATA" alignmentCoordinate="14173" range="0"/>
+            <item type="ZONEDATA" alignmentCoordinate="0" range="17067"/>
+          </zonedata>
+        </item>
+        <item type="ZONERECORD" zoneMaskX="true" zoneMaskY="true">
+          <zonedata>
+            <item type="ZONEDATA" alignmentCoordinate="14169" range="0"/>
+            <item type="ZONEDATA" alignmentCoordinate="0" range="17067"/>
+          </zonedata>
+        </item>
+        <item type="ZONERECORD" zoneMaskX="true" zoneMaskY="true">
+          <zonedata>
+            <item type="ZONEDATA" alignmentCoordinate="14149" range="0"/>
+            <item type="ZONEDATA" alignmentCoordinate="16963" range="17067"/>
+          </zonedata>
+        </item>
+        <item type="ZONERECORD" zoneMaskX="true" zoneMaskY="true">
+          <zonedata>
+            <item type="ZONEDATA" alignmentCoordinate="13263" range="0"/>
+            <item type="ZONEDATA" alignmentCoordinate="17111" range="17067"/>
+          </zonedata>
+        </item>
+        <item type="ZONERECORD" zoneMaskX="true" zoneMaskY="true">
+          <zonedata>
+            <item type="ZONEDATA" alignmentCoordinate="14155" range="0"/>
+            <item type="ZONEDATA" alignmentCoordinate="0" range="17067"/>
+          </zonedata>
+        </item>
+        <item type="ZONERECORD" zoneMaskX="true" zoneMaskY="true">
+          <zonedata>
+            <item type="ZONEDATA" alignmentCoordinate="14151" range="0"/>
+            <item type="ZONEDATA" alignmentCoordinate="0" range="17067"/>
+          </zonedata>
+        </item>
+        <item type="ZONERECORD" zoneMaskX="true" zoneMaskY="true">
+          <zonedata>
+            <item type="ZONEDATA" alignmentCoordinate="14151" range="0"/>
+            <item type="ZONEDATA" alignmentCoordinate="0" range="17067"/>
+          </zonedata>
+        </item>
+        <item type="ZONERECORD" zoneMaskX="false" zoneMaskY="false">
+          <zonedata>
+            <item type="ZONEDATA" alignmentCoordinate="0" range="0"/>
+            <item type="ZONEDATA" alignmentCoordinate="0" range="0"/>
+          </zonedata>
+        </item>
+      </zoneTable>
+    </item>
+    <item type="DefineFontNameTag" fontCopyright="Data copyright © URW Software &amp; Type GbmH., additional data copyright The Font Bureau, Inc. Copyright 1994 Microsoft Corporation. All rights reserved." fontId="3" fontName="Copperplate Gothic Light" forceWriteAsLong="true"/>
+    <item type="DefineTextTag" characterID="4" forceWriteAsLong="true">
+      <textBounds type="RECT" Xmax="7297" Xmin="-4124" Ymax="1104" Ymin="169" nbits="14"/>
+      <textMatrix type="MATRIX" hasRotate="false" hasScale="false" nRotateBits="0" nScaleBits="0" nTranslateBits="14" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.0" scaleY="0.0" translateX="-4129" translateY="0"/>
+      <textRecords>
+        <item type="TEXTRECORD" fontId="3" styleFlagsHasColor="true" styleFlagsHasFont="true" styleFlagsHasXOffset="false" styleFlagsHasYOffset="true" textHeight="1200" xOffset="0" yOffset="1040">
+          <textColor type="RGB" blue="255" green="255" red="255"/>
+          <glyphEntries>
+            <item type="GLYPHENTRY" glyphAdvance="1020" glyphIndex="8"/>
+            <item type="GLYPHENTRY" glyphAdvance="1024" glyphIndex="2"/>
+            <item type="GLYPHENTRY" glyphAdvance="1082" glyphIndex="6"/>
+            <item type="GLYPHENTRY" glyphAdvance="1058" glyphIndex="7"/>
+            <item type="GLYPHENTRY" glyphAdvance="503" glyphIndex="3"/>
+            <item type="GLYPHENTRY" glyphAdvance="1253" glyphIndex="5"/>
+            <item type="GLYPHENTRY" glyphAdvance="1169" glyphIndex="4"/>
+            <item type="GLYPHENTRY" glyphAdvance="460" glyphIndex="0"/>
+            <item type="GLYPHENTRY" glyphAdvance="1024" glyphIndex="1"/>
+            <item type="GLYPHENTRY" glyphAdvance="460" glyphIndex="0"/>
+            <item type="GLYPHENTRY" glyphAdvance="1058" glyphIndex="7"/>
+            <item type="GLYPHENTRY" glyphAdvance="1024" glyphIndex="2"/>
+          </glyphEntries>
+        </item>
+      </textRecords>
+    </item>
+    <item type="CSMSettingsTag" forceWriteAsLong="true" gridFit="2" reserved="0" reserved2="0" sharpness="0.0" textID="4" thickness="0.0" useFlashType="1"/>
+    <item type="DefineSpriteTag" forceWriteAsLong="true" frameCount="1" hasEndTag="true" spriteId="5">
+      <subTags>
+        <item type="PlaceObject2Tag" characterId="2" clipDepth="0" depth="9" forceWriteAsLong="false" placeFlagHasCharacter="true" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="false" placeFlagHasMatrix="true" placeFlagHasName="false" placeFlagHasRatio="false" placeFlagMove="false" ratio="0">
+          <matrix type="MATRIX" hasRotate="false" hasScale="false" nRotateBits="0" nScaleBits="0" nTranslateBits="0" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.0" scaleY="0.0" translateX="0" translateY="0"/>
+        </item>
+        <item type="PlaceObject2Tag" characterId="4" clipDepth="0" depth="10" forceWriteAsLong="false" placeFlagHasCharacter="true" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="false" placeFlagHasMatrix="true" placeFlagHasName="false" placeFlagHasRatio="false" placeFlagMove="false" ratio="0">
+          <matrix type="MATRIX" hasRotate="false" hasScale="false" nRotateBits="0" nScaleBits="0" nTranslateBits="14" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.0" scaleY="0.0" translateX="6607" translateY="3264"/>
+        </item>
+        <item type="ShowFrameTag" forceWriteAsLong="false"/>
+      </subTags>
+    </item>
+    <item type="DefineShape4Tag" forceWriteAsLong="true" reserved="0" shapeId="6" usesFillWindingRule="false" usesNonScalingStrokes="false" usesScalingStrokes="true">
+      <edgeBounds type="RECT" Xmax="22160" Xmin="5760" Ymax="2413" Ymin="2413" nbits="16"/>
+      <shapeBounds type="RECT" Xmax="22200" Xmin="5720" Ymax="2453" Ymin="2373" nbits="16"/>
+      <shapes type="SHAPEWITHSTYLE" numFillBits="0" numLineBits="1">
+        <fillStyles type="FILLSTYLEARRAY">
+          <fillStyles/>
+        </fillStyles>
+        <lineStyles type="LINESTYLEARRAY">
+          <lineStyles/>
+          <lineStyles2>
+            <item type="LINESTYLE2" endCapStyle="0" hasFillFlag="false" joinStyle="0" miterLimitFactor="0.0" noClose="false" noHScaleFlag="false" noVScaleFlag="false" pixelHintingFlag="false" reserved="0" startCapStyle="0" width="80">
+              <color type="RGBA" alpha="255" blue="255" green="255" red="255"/>
+            </item>
+          </lineStyles2>
+        </lineStyles>
+        <shapeRecords>
+          <item type="StyleChangeRecord" fillStyle0="0" fillStyle1="0" lineStyle="1" moveBits="14" moveDeltaX="5760" moveDeltaY="2413" numFillBits="0" numLineBits="0" stateFillStyle0="false" stateFillStyle1="false" stateLineStyle="true" stateMoveTo="true" stateNewStyles="false"/>
+          <item type="StraightEdgeRecord" deltaX="16400" deltaY="0" generalLineFlag="false" numBits="14" vertLineFlag="false"/>
+          <item type="EndShapeRecord" endOfShape="0"/>
+        </shapeRecords>
+      </shapes>
+    </item>
+    <item type="DefineSpriteTag" forceWriteAsLong="true" frameCount="1" hasEndTag="true" spriteId="7">
+      <subTags>
+        <item type="PlaceObject2Tag" characterId="5" clipDepth="0" depth="1" forceWriteAsLong="false" placeFlagHasCharacter="true" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="false" placeFlagHasMatrix="true" placeFlagHasName="false" placeFlagHasRatio="false" placeFlagMove="false" ratio="0">
+          <matrix type="MATRIX" hasRotate="false" hasScale="false" nRotateBits="0" nScaleBits="0" nTranslateBits="14" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.0" scaleY="0.0" translateX="5941" translateY="0"/>
+        </item>
+        <item type="PlaceObject2Tag" characterId="6" clipDepth="0" depth="12" forceWriteAsLong="false" placeFlagHasCharacter="true" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="false" placeFlagHasMatrix="true" placeFlagHasName="false" placeFlagHasRatio="false" placeFlagMove="false" ratio="0">
+          <matrix type="MATRIX" hasRotate="false" hasScale="false" nRotateBits="0" nScaleBits="0" nTranslateBits="0" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.0" scaleY="0.0" translateX="0" translateY="0"/>
+        </item>
+        <item type="ShowFrameTag" forceWriteAsLong="false"/>
+      </subTags>
+    </item>
+    <item type="PlaceObject2Tag" characterId="7" clipDepth="0" depth="2" forceWriteAsLong="false" placeFlagHasCharacter="true" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="false" placeFlagHasMatrix="true" placeFlagHasName="false" placeFlagHasRatio="false" placeFlagMove="false" ratio="0">
+      <matrix type="MATRIX" hasRotate="false" hasScale="true" nRotateBits="0" nScaleBits="16" nTranslateBits="14" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.32452393" scaleY="0.32452393" translateX="0" translateY="5000"/>
+    </item>
+    <item type="DefineSpriteTag" forceWriteAsLong="true" frameCount="1" hasEndTag="true" spriteId="8">
+      <subTags>
+        <item type="ShowFrameTag" forceWriteAsLong="false"/>
+      </subTags>
+    </item>
+    <item type="PlaceObject2Tag" characterId="8" clipDepth="0" depth="15" forceWriteAsLong="true" name="logo" placeFlagHasCharacter="true" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="false" placeFlagHasMatrix="true" placeFlagHasName="true" placeFlagHasRatio="false" placeFlagMove="false" ratio="0">
+      <matrix type="MATRIX" hasRotate="false" hasScale="false" nRotateBits="0" nScaleBits="0" nTranslateBits="12" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.0" scaleY="0.0" translateX="2000" translateY="0"/>
+    </item>
+    <item type="ShowFrameTag" forceWriteAsLong="false"/>
+  </tags>
+</swf>

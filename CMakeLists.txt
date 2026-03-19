@@ -207,23 +207,26 @@ set(AS_TARGETS            "")
 set(SWF_COMPILED_OUTPUTS  "")
 set(SWF_PASSTHROUGH_FILES "")
 
-file(GLOB_RECURSE _ALL_SWF_RELPATHS
-    CONFIGURE_DEPENDS
-    RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/data/interface"
-    "${CMAKE_CURRENT_SOURCE_DIR}/data/interface/*.swf"
-)
-
-# Also discover SWFs from swf_xml folder
+# Discover SWFs from XML sources in source/swf
 file(GLOB_RECURSE _ALL_XML_RELPATHS
     CONFIGURE_DEPENDS
-    RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/swf_xml"
-    "${CMAKE_CURRENT_SOURCE_DIR}/swf_xml/*.xml"
+    RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/source/swf"
+    "${CMAKE_CURRENT_SOURCE_DIR}/source/swf/*.xml"
 )
 
+set(_ALL_SWF_RELPATHS "")
 foreach(XML_REL ${_ALL_XML_RELPATHS})
     string(REPLACE ".xml" ".swf" SWF_REL "${XML_REL}")
     list(APPEND _ALL_SWF_RELPATHS "${SWF_REL}")
 endforeach()
+
+# Also discover any SWFs that don't have XML sources yet (passthrough)
+file(GLOB_RECURSE _ALL_DATA_SWF_RELPATHS
+    CONFIGURE_DEPENDS
+    RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/data/interface"
+    "${CMAKE_CURRENT_SOURCE_DIR}/data/interface/*.swf"
+)
+list(APPEND _ALL_SWF_RELPATHS ${_ALL_DATA_SWF_RELPATHS})
 list(REMOVE_DUPLICATES _ALL_SWF_RELPATHS)
 
 foreach(SWF_REL ${_ALL_SWF_RELPATHS})
