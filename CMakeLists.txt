@@ -79,7 +79,6 @@ list(APPEND CMAKE_MODULE_PATH
 
 include(Papyrus)         # BethesdaCMakeModules — upstream fallback
 include(BSArchive)       # BethesdaCMakeModules
-include(PapyrusCustom)   # cmake/PapyrusCustom.cmake — community compiler
 include(ImportToSWF)    # cmake/ImportToSWF.cmake
 
 # ==============================================================================
@@ -103,20 +102,6 @@ else()
 endif()
 
 # ==============================================================================
-# § 3b  Community Papyrus Compiler Detection
-# ==============================================================================
-#
-# Looks for tools/Papyrus/papyrus[.exe].
-# Sets PAPYRUS_CUSTOM_COMPILER in cache if found, empty otherwise.
-# The Papyrus section below uses it when present; falls back to
-# PapyrusCompiler.exe (via Papyrus_Add) when absent.
-
-option(SKYUI_ENABLE_PAPYRUS
-    "Compile Papyrus scripts (requires SkyrimSE_PATH)" ON)
-
-PapyrusCustom_Find()
-
-# ==============================================================================
 # § 4  Papyrus Scripts
 # ==============================================================================
 #
@@ -126,6 +111,9 @@ PapyrusCustom_Find()
 # CONFIGURE_DEPENDS: CMake re-runs configure automatically when .psc files
 # are added or removed.
 
+option(SKYUI_ENABLE_PAPYRUS
+    "Compile Papyrus scripts (requires SkyrimSE_PATH)" ON)
+
 if(SKYUI_ENABLE_PAPYRUS)
     file(GLOB PAPYRUS_SOURCES
         CONFIGURE_DEPENDS
@@ -133,39 +121,19 @@ if(SKYUI_ENABLE_PAPYRUS)
     )
 
     if(PAPYRUS_SOURCES)
-        if(PAPYRUS_CUSTOM_COMPILER)
-            # ---- Community compiler (tools/Papyrus/papyrus.exe) -----------
-            # Faster than PapyrusCompiler.exe, built-in caching, no .flg.
-            # HEADERS maps to repeated  -h <dir>  arguments.
-            # source/scripts is listed first so scripts can reference each
-            # other, followed by the vanilla Skyrim source directories.
-            PapyrusCustom_Add(
-                "Papyrus"
-                SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/source/scripts"
-                SOURCES    ${PAPYRUS_SOURCES}
-                HEADERS
-                    "${CMAKE_CURRENT_SOURCE_DIR}/source/scripts"
-                    "${SkyrimSE_PATH}/Data/Source/Scripts"
-                    "${SkyrimSE_PATH}/Data/Scripts/Source"
-                ANONYMIZE
-                # VERBOSE
-            )
-        else()
-            # ---- Upstream fallback (PapyrusCompiler.exe) ------------------
-            Papyrus_Add(
-                "Papyrus"
-                GAME "${SkyrimSE_PATH}"
-                MODE SkyrimSE
-                IMPORTS
-                    "${CMAKE_CURRENT_SOURCE_DIR}/source/scripts"
-                    "${SkyrimSE_PATH}/Data/Scripts/Source"
-                    "${SkyrimSE_PATH}/Data/Source/Scripts"
-                SOURCES ${PAPYRUS_SOURCES}
-                # OPTIMIZE
-                ANONYMIZE
-                SKIP_DEFAULT_IMPORTS
-            )
-        endif()
+        Papyrus_Add(
+            "Papyrus"
+            GAME "${SkyrimSE_PATH}"
+            MODE SkyrimSE
+            IMPORTS
+                "${CMAKE_CURRENT_SOURCE_DIR}/source/scripts"
+                "${SkyrimSE_PATH}/Data/Scripts/Source"
+                "${SkyrimSE_PATH}/Data/Source/Scripts"
+            SOURCES ${PAPYRUS_SOURCES}
+            # OPTIMIZE
+            ANONYMIZE
+            SKIP_DEFAULT_IMPORTS
+        )
     else()
         message(STATUS "[SkyUI] No Papyrus sources found -- skipping.")
         add_custom_target("Papyrus")
