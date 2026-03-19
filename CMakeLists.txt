@@ -39,7 +39,7 @@ message(STATUS "[SkyUI] Build type : ${CMAKE_BUILD_TYPE}")
 
 if(IS_DEBUG_BUILD)
     if(NOT DEFINED MOD_DEBUG_PATH OR MOD_DEBUG_PATH STREQUAL "")
-        set(MOD_DEBUG_PATH "${CMAKE_BINARY_DIR}/data"
+        set(MOD_DEBUG_PATH "${CMAKE_CURRENT_SOURCE_DIR}/dist"
             CACHE STRING "Debug output directory (Skyrim Data or MO2 mod folder)" FORCE)
     endif()
 
@@ -371,7 +371,7 @@ else()
 
     set(_BSA_FILE       "${CMAKE_BINARY_DIR}/SkyUI_SE.bsa")
     set(_ESP_FILE       "${CMAKE_CURRENT_SOURCE_DIR}/data/SkyUI_SE.esp")
-    set(_ZIP_OUTPUT     "${CMAKE_CURRENT_SOURCE_DIR}/release/SkyUI_SE-${PROJECT_VERSION}.zip")
+    set(_ZIP_OUTPUT     "${CMAKE_CURRENT_SOURCE_DIR}/dist/SkyUI_SE-${PROJECT_VERSION}.zip")
     set(_STAGING_DIR    "${CMAKE_BINARY_DIR}/_Release")
     set(_PACKAGE_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Package.cmake")
 
