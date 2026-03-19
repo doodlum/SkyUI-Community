@@ -1,107 +1,248 @@
-# ActionScript sources for all SWFs
-# This file consolidates the source lists for each SWF.
+# cmake/SWFSources.cmake
+# Consolidated source and path mapping for all SWF targets.
+# Only importing files that are DIFFERENT from what is already in the SWF.
+# Relative paths are automatically prefixed with source/actionscript/.
 
-# ---- Common shared sources ---------------------------------------------------
+# ---- Shared source groups ----------------------------------------------------
 
 set(CORE_SOURCES
-    ${AS_SOURCE_DIR}/Common/skyui/defines/Actor.as
-    ${AS_SOURCE_DIR}/Common/skyui/defines/Armor.as
-    ${AS_SOURCE_DIR}/Common/skyui/defines/Form.as
-    ${AS_SOURCE_DIR}/Common/skyui/defines/Input.as
-    ${AS_SOURCE_DIR}/Common/skyui/defines/Inventory.as
-    ${AS_SOURCE_DIR}/Common/skyui/defines/Item.as
-    ${AS_SOURCE_DIR}/Common/skyui/defines/Magic.as
-    ${AS_SOURCE_DIR}/Common/skyui/defines/Material.as
-    ${AS_SOURCE_DIR}/Common/skyui/defines/Weapon.as
-    ${AS_SOURCE_DIR}/Common/skyui/filter/ItemTypeFilter.as
-    ${AS_SOURCE_DIR}/Common/skyui/filter/NameFilter.as
-    ${AS_SOURCE_DIR}/Common/skyui/filter/SortFilter.as
+    Common/skyui/defines/Armor.as
+    Common/skyui/defines/Form.as
+    Common/skyui/defines/Item.as
+    Common/skyui/defines/Material.as
+    Common/skyui/defines/Weapon.as
+    Common/skyui/filter/NameFilter.as
 )
 
 set(ITEM_MENU_CORE
     ${CORE_SOURCES}
-    ${AS_SOURCE_DIR}/ItemMenus/InventoryDataSetter.as
-    ${AS_SOURCE_DIR}/ItemMenus/InventoryIconSetter.as
-    ${AS_SOURCE_DIR}/ItemMenus/ItemMenu.as
-    ${AS_SOURCE_DIR}/ItemMenus/ItemcardDataExtender.as
+    ItemMenus/InventoryDataSetter.as
+    ItemMenus/InventoryIconSetter.as
+    ItemMenus/ItemMenu.as
 )
 
-set(VANILLA_SHARED
-    ${AS_SOURCE_DIR}/Vanilla/Shared/GlobalFunc.as
-    ${AS_SOURCE_DIR}/Vanilla/Shared/Proxy.as
-    ${AS_SOURCE_DIR}/Vanilla/Shared/ButtonChange.as
-    ${AS_SOURCE_DIR}/Vanilla/Shared/ButtonMapping.as
-)
+# ---- Helper macro ------------------------------------------------------------
 
-# ---- Individual SWF sources --------------------------------------------------
+macro(Add_SkyUI_SWF _TARGET_NAME _SWF_REL _XML_PATH)
+    SkyUI_AS_Add(
+        TARGET_NAME  "AS_${_TARGET_NAME}"
+        SWF_REL      "${_SWF_REL}"
+        XML_PATH     "${_XML_PATH}"
+        SOURCES      ${ARGN}
+    )
+    list(APPEND AS_TARGETS           "AS_${_TARGET_NAME}")
+    list(APPEND SWF_COMPILED_OUTPUTS "${AS_${_TARGET_NAME}_OUTPUT}")
+endmacro()
+
+# ---- Target Definitions ------------------------------------------------------
 
 # Item Menus
-set(bartermenu_SOURCES      ${ITEM_MENU_CORE} ${AS_SOURCE_DIR}/ItemMenus/BarterMenu.as ${AS_SOURCE_DIR}/ItemMenus/BarterDataSetter.as)
-set(containermenu_SOURCES   ${ITEM_MENU_CORE} ${AS_SOURCE_DIR}/ItemMenus/ContainerMenu.as)
-set(inventorymenu_SOURCES   ${ITEM_MENU_CORE} ${AS_SOURCE_DIR}/ItemMenus/InventoryMenu.as)
-set(magicmenu_SOURCES       ${ITEM_MENU_CORE} ${AS_SOURCE_DIR}/ItemMenus/MagicMenu.as)
-set(giftmenu_SOURCES        ${ITEM_MENU_CORE} ${AS_SOURCE_DIR}/ItemMenus/GiftMenu.as)
+Add_SkyUI_SWF(bartermenu
+    "bartermenu.swf"
+    "ItemMenus/bartermenu.xml"
+    ${ITEM_MENU_CORE}
+)
+
+Add_SkyUI_SWF(containermenu
+    "containermenu.swf"
+    "ItemMenus/containermenu.xml"
+    ${ITEM_MENU_CORE}
+)
+
+Add_SkyUI_SWF(inventorymenu
+    "inventorymenu.swf"
+    "ItemMenus/inventorymenu.xml"
+    ${ITEM_MENU_CORE}
+)
+
+Add_SkyUI_SWF(magicmenu
+    "magicmenu.swf"
+    "ItemMenus/magicmenu.xml"
+    ${ITEM_MENU_CORE}
+    ItemMenus/MagicDataSetter.as
+    ItemMenus/MagicIconSetter.as
+)
+
+Add_SkyUI_SWF(giftmenu
+    "giftmenu.swf"
+    "ItemMenus/giftmenu.xml"
+    ${ITEM_MENU_CORE}
+)
+
+Add_SkyUI_SWF(bottombar
+    "skyui/bottombar.swf"
+    "ItemMenus/bottombar.xml"
+)
+
+Add_SkyUI_SWF(inventorylists
+    "skyui/inventorylists.swf"
+    "ItemMenus/inventorylists.xml"
+    ItemMenus/InventoryLists.as
+    ItemMenus/CategoryList.as
+)
+
+Add_SkyUI_SWF(itemcard
+    "skyui/itemcard.swf"
+    "ItemMenus/itemcard.xml"
+    ItemMenus/ItemCard.as
+)
 
 # Crafting
-set(craftingmenu_SOURCES
+Add_SkyUI_SWF(craftingmenu
+    "craftingmenu.swf"
+    "CraftingMenu/craftingmenu.xml"
     ${CORE_SOURCES}
-    ${AS_SOURCE_DIR}/CraftingMenu/CraftingMenu.as
-    ${AS_SOURCE_DIR}/CraftingMenu/CraftingDataSetter.as
-    ${AS_SOURCE_DIR}/CraftingMenu/CraftingIconSetter.as
-    ${AS_SOURCE_DIR}/CraftingMenu/CraftingListEntry.as
-    ${AS_SOURCE_DIR}/CraftingMenu/CraftingLists.as
-    ${AS_SOURCE_DIR}/CraftingMenu/CustomConstructDataSetter.as
-    ${AS_SOURCE_DIR}/CraftingMenu/IconTabList.as
-    ${AS_SOURCE_DIR}/CraftingMenu/IconTabListEntry.as
+    CraftingMenu/CraftingMenu.as
+    CraftingMenu/CraftingDataSetter.as
+    CraftingMenu/CraftingIconSetter.as
+    CraftingMenu/IconTabList.as
 )
 
 # Favorites
-set(favoritesmenu_SOURCES
+Add_SkyUI_SWF(favoritesmenu
+    "favoritesmenu.swf"
+    "FavoritesMenu/favoritesmenu.xml"
     ${CORE_SOURCES}
-    ${AS_SOURCE_DIR}/FavoritesMenu/FavoritesMenu.as
-    ${AS_SOURCE_DIR}/FavoritesMenu/FavoritesIconSetter.as
-    ${AS_SOURCE_DIR}/FavoritesMenu/FavoritesListEntry.as
+    FavoritesMenu/FavoritesMenu.as
+    FavoritesMenu/FavoritesIconSetter.as
+    FavoritesMenu/FavoritesListEntry.as
+    FavoritesMenu/FilterDataExtender.as
+    FavoritesMenu/GroupDataExtender.as
 )
 
-# Journal & Pause
-set(quest_journal_SOURCES   ${CORE_SOURCES} ${AS_SOURCE_DIR}/PauseMenu/Quest_Journal.as)
-set(statsmenu_SOURCES       ${VANILLA_SHARED} ${AS_SOURCE_DIR}/Vanilla/StatsMenu.as)
-set(sleepwaitmenu_SOURCES   ${VANILLA_SHARED} ${AS_SOURCE_DIR}/Vanilla/SleepWaitMenu.as)
-set(startmenu_SOURCES       ${VANILLA_SHARED} ${AS_SOURCE_DIR}/Vanilla/StartMenu.as)
+# Journal & Map
+Add_SkyUI_SWF(quest_journal
+    "quest_journal.swf"
+    "PauseMenu/quest_journal.xml"
+    ${CORE_SOURCES}
+    PauseMenu/Quest_Journal.as
+    PauseMenu/InputMappingArt.as
+    PauseMenu/InputMappingList.as
+    PauseMenu/ObjectiveScrollingList.as
+    PauseMenu/OptionsList.as
+    PauseMenu/QuestsPage.as
+    PauseMenu/SaveLoadPanel.as
+    PauseMenu/SettingsOptionItem.as
+    PauseMenu/StatsPage.as
+    PauseMenu/SystemPage.as
+)
 
-# Map
-set(map_SOURCES             ${CORE_SOURCES} ${AS_SOURCE_DIR}/MapMenu/Map/MapMenu.as)
+Add_SkyUI_SWF(map
+    "map.swf"
+    "MapMenu/map.xml"
+    ${CORE_SOURCES}
+    MapMenu/Map/MapMenu.as
+)
 
 # MCM
-set(modmanager_SOURCES      ${AS_SOURCE_DIR}/ModConfigPanel/ConfigPanel.as)
-
-# HUD & Widgets
-set(hudmenu_SOURCES         ${VANILLA_SHARED} ${AS_SOURCE_DIR}/Vanilla/HUDMenu.as)
-set(exported_skyui_widgetloader_SOURCES ${AS_SOURCE_DIR}/HUDWidgets/WidgetLoader.as)
-set(exported_widgets_skyui_activeeffects_SOURCES
-    ${AS_SOURCE_DIR}/HUDWidgets/skyui/widgets/activeeffects/ActiveEffectsWidget.as
-    ${AS_SOURCE_DIR}/HUDWidgets/skyui/widgets/activeeffects/ActiveEffect.as
-    ${AS_SOURCE_DIR}/HUDWidgets/skyui/widgets/activeeffects/ActiveEffectsGroup.as
+Add_SkyUI_SWF(modmanager
+    "modmanager.swf"
+    "ModConfigPanel/modmanager.xml"
+    ModConfigPanel/ConfigPanel.as
 )
 
-# Tween
-set(tweenmenu_SOURCES       ${AS_SOURCE_DIR}/TweenMenu/TweenMenu.as)
+Add_SkyUI_SWF(configpanel     "skyui/configpanel.swf" "ModConfigPanel/configpanel.xml")
+Add_SkyUI_SWF(mcm_splash      "skyui/mcm_splash.swf" "ModConfigPanel/mcm_splash.xml")
+Add_SkyUI_SWF(skyui_splash    "skyui/skyui_splash.swf" "ModConfigPanel/skyui_splash.xml")
 
-# Vanilla Menus (minimal/pass-through injection)
-set(console_SOURCES         ${VANILLA_SHARED} ${AS_SOURCE_DIR}/Vanilla/Console.as)
-set(bookmenu_SOURCES        ${VANILLA_SHARED} ${AS_SOURCE_DIR}/Vanilla/BookMenu.as)
-set(messagebox_SOURCES      ${VANILLA_SHARED} ${AS_SOURCE_DIR}/Vanilla/MessageBox.as)
-set(dialoguemenu_SOURCES    ${VANILLA_SHARED} ${AS_SOURCE_DIR}/Vanilla/DialogueMenu.as)
-set(lockpickingmenu_SOURCES ${VANILLA_SHARED} ${AS_SOURCE_DIR}/Vanilla/LockpickingMenu.as)
-set(loadingmenu_SOURCES     ${VANILLA_SHARED} ${AS_SOURCE_DIR}/Vanilla/LoadingMenu.as)
-set(loadwaitspinner_SOURCES ${VANILLA_SHARED} ${AS_SOURCE_DIR}/Vanilla/LoadWaitSpinner.as)
-set(racesex_menu_SOURCES    ${VANILLA_SHARED} ${AS_SOURCE_DIR}/Vanilla/RaceSexPanels.as)
-set(trainingmenu_SOURCES    ${VANILLA_SHARED} ${AS_SOURCE_DIR}/Vanilla/TrainingMenu.as)
-set(tutorialmenu_SOURCES    ${VANILLA_SHARED} ${AS_SOURCE_DIR}/Vanilla/TutorialMenu.as)
-set(levelupmenu_SOURCES     ${VANILLA_SHARED} ${AS_SOURCE_DIR}/Vanilla/LevelUpMenu.as)
-set(kinectmenu_SOURCES      ${VANILLA_SHARED} ${AS_SOURCE_DIR}/Vanilla/KinectMenu.as)
-set(fadermenu_SOURCES       ${VANILLA_SHARED} ${AS_SOURCE_DIR}/Vanilla/FaderMenu.as)
-set(bethesdanetlogin_SOURCES ${VANILLA_SHARED} ${AS_SOURCE_DIR}/Vanilla/BethesdaNetLogin.as)
-set(creationclubmenu_SOURCES ${VANILLA_SHARED} ${AS_SOURCE_DIR}/Vanilla/CreationClubMenu.as)
-set(creditsmenu_SOURCES     ${VANILLA_SHARED} ${AS_SOURCE_DIR}/Vanilla/CreditsMenu.as)
-set(streaminginstall_SOURCES ${VANILLA_SHARED} ${AS_SOURCE_DIR}/Vanilla/StreamingInstall.as)
+# HUD & Widgets
+Add_SkyUI_SWF(activeeffects
+    "exported/widgets/skyui/activeeffects.swf"
+    "HUDWidgets/activeeffects.xml"
+    HUDWidgets/skyui/widgets/activeeffects/ActiveEffectsWidget.as
+)
+
+Add_SkyUI_SWF(widgetloader    "exported/skyui/widgetloader.swf" "HUDWidgets/widgetloader.xml")
+
+# Resources
+Add_SkyUI_SWF(buttonart       "skyui/buttonart.swf" "Resources/buttonArt.xml")
+Add_SkyUI_SWF(mapmarkerart    "skyui/mapmarkerart.swf" "Resources/mapMarkerArt.xml")
+Add_SkyUI_SWF(icons_category_celtic      "skyui/icons_category_celtic.swf"      "Resources/icons_category_celtic.xml")
+Add_SkyUI_SWF(icons_category_curved      "skyui/icons_category_curved.swf"      "Resources/icons_category_curved.xml")
+Add_SkyUI_SWF(icons_category_psychosteve  "skyui/icons_category_psychosteve.swf"  "Resources/icons_category_psychosteve.xml")
+Add_SkyUI_SWF(icons_category_straight    "skyui/icons_category_straight.swf"    "Resources/icons_category_straight.xml")
+Add_SkyUI_SWF(icons_item_psychosteve      "skyui/icons_item_psychosteve.swf"      "Resources/icons_item_psychosteve.xml")
+Add_SkyUI_SWF(icons_effect_psychosteve    "exported/skyui/icons_effect_psychosteve.swf" "Resources/icons_effect_psychosteve.xml")
+
+# Vanilla / Shared
+Add_SkyUI_SWF(hudmenu
+    "hudmenu.swf"
+    "Vanilla/hudmenu.xml"
+    Vanilla/HUDMenu.as
+)
+
+Add_SkyUI_SWF(statsmenu
+    "statsmenu.swf"
+    "Vanilla/statsmenu.xml"
+    Vanilla/StatsMenu.as
+    Vanilla/Shared/BSScrollingList.as
+)
+
+Add_SkyUI_SWF(sleepwaitmenu
+    "sleepwaitmenu.swf"
+    "Vanilla/sleepwaitmenu.xml"
+    Vanilla/SleepWaitMenu.as
+)
+
+Add_SkyUI_SWF(startmenu       "startmenu.swf"       "Vanilla/startmenu.xml")
+Add_SkyUI_SWF(console         "console.swf"         "Vanilla/console.xml")
+
+Add_SkyUI_SWF(bookmenu
+    "bookmenu.swf"
+    "Vanilla/bookmenu.xml"
+    Vanilla/BookBottomBar.as
+)
+
+Add_SkyUI_SWF(messagebox
+    "messagebox.swf"
+    "Vanilla/messagebox.xml"
+    Vanilla/MessageBox.as
+)
+
+Add_SkyUI_SWF(dialoguemenu
+    "dialoguemenu.swf"
+    "Vanilla/dialoguemenu.xml"
+    Vanilla/DialogueMenu.as
+    Vanilla/DialogueCenteredList.as
+)
+
+Add_SkyUI_SWF(lockpickingmenu "lockpickingmenu.swf" "Vanilla/lockpickingmenu.xml")
+Add_SkyUI_SWF(loadingmenu     "loadingmenu.swf"     "Vanilla/loadingmenu.xml")
+Add_SkyUI_SWF(loadwaitspinner "loadwaitspinner.swf" "Vanilla/loadwaitspinner.xml")
+
+Add_SkyUI_SWF(racesex_menu
+    "racesex_menu.swf"
+    "Vanilla/racesex_menu.xml"
+    Vanilla/RaceSexPanels.as
+    Vanilla/RaceWidePanel.as
+)
+
+Add_SkyUI_SWF(trainingmenu    "trainingmenu.swf"    "Vanilla/trainingmenu.xml")
+Add_SkyUI_SWF(tutorialmenu    "tutorialmenu.swf"    "Vanilla/tutorialmenu.xml")
+Add_SkyUI_SWF(levelupmenu     "levelupmenu.swf"     "Vanilla/levelupmenu.xml")
+Add_SkyUI_SWF(kinectmenu      "kinectmenu.swf"      "Vanilla/kinectmenu.xml")
+Add_SkyUI_SWF(fadermenu       "fadermenu.swf"       "Vanilla/fadermenu.xml")
+Add_SkyUI_SWF(bethesdanetlogin "bethesdanetlogin.swf" "Vanilla/bethesdanetlogin.xml")
+Add_SkyUI_SWF(creationclubmenu "creationclubmenu.swf" "Vanilla/creationclubmenu.xml")
+Add_SkyUI_SWF(creditsmenu     "creditsmenu.swf"     "Vanilla/creditsmenu.xml")
+
+Add_SkyUI_SWF(streaminginstall
+    "streaminginstall.swf"
+    "Vanilla/streaminginstall.xml"
+    Vanilla/StreamingInstall.as
+)
+
+Add_SkyUI_SWF(book            "book.swf"            "Vanilla/book.xml")
+Add_SkyUI_SWF(cursormenu      "cursormenu.swf"      "Vanilla/cursormenu.xml")
+Add_SkyUI_SWF(safezone        "safezone.swf"        "Vanilla/safezone.xml")
+Add_SkyUI_SWF(sharedcomponents "sharedcomponents.swf" "Vanilla/sharedcomponents.xml")
+Add_SkyUI_SWF(textentry       "textentry.swf"       "Vanilla/textentry.xml")
+Add_SkyUI_SWF(titles          "titles.swf"          "Vanilla/titles.xml")
+
+Add_SkyUI_SWF(tweenmenu
+    "tweenmenu.swf"
+    "Vanilla/tweenmenu.xml"
+    TweenMenu/TweenMenu.as
+)
+
+Add_SkyUI_SWF(widgetoverlay   "widgetoverlay.swf"   "Vanilla/widgetoverlay.xml")
