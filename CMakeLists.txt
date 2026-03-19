@@ -65,21 +65,18 @@ if(IS_DEBUG_BUILD)
     endif()
     message(STATUS "[SkyUI] Debug output : ${MOD_DEBUG_PATH}")
 endif()
-
 # ==============================================================================
 # § 2  Module Paths
 # ==============================================================================
 
-# cmake/ is listed FIRST so our modules (PapyrusCustom, ActionScript, …)
-# take precedence over BethesdaCMakeModules when names collide.
 list(APPEND CMAKE_MODULE_PATH
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake"
     "${CMAKE_CURRENT_SOURCE_DIR}/external/BethesdaCMakeModules/Modules"
 )
 
-include(Papyrus)         # BethesdaCMakeModules — upstream fallback
-include(BSArchive)       # BethesdaCMakeModules
-include(ImportToSWF)    # cmake/ImportToSWF.cmake
+include(Papyrus)
+include(BSArchive)
+include(ImportToSWF)
 
 # ==============================================================================
 # § 3  FFDec CLI Detection
@@ -105,42 +102,30 @@ endif()
 # § 4  Papyrus Scripts
 # ==============================================================================
 #
-# SKYUI_ENABLE_PAPYRUS: set to OFF in environments without a Skyrim install
-# (e.g. CI). Defaults ON so local Debug/Release builds are unaffected.
-#
 # CONFIGURE_DEPENDS: CMake re-runs configure automatically when .psc files
 # are added or removed.
 
-option(SKYUI_ENABLE_PAPYRUS
-    "Compile Papyrus scripts (requires SkyrimSE_PATH)" ON)
+file(GLOB PAPYRUS_SOURCES
+    CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/source/scripts/*.psc"
+)
 
-if(SKYUI_ENABLE_PAPYRUS)
-    file(GLOB PAPYRUS_SOURCES
-        CONFIGURE_DEPENDS
-        "${CMAKE_CURRENT_SOURCE_DIR}/source/scripts/*.psc"
+if(PAPYRUS_SOURCES)
+    Papyrus_Add(
+        "Papyrus"
+        GAME "${SkyrimSE_PATH}"
+        MODE SkyrimSE
+        IMPORTS
+            "${CMAKE_CURRENT_SOURCE_DIR}/source/scripts"
+            "${SkyrimSE_PATH}/Data/Scripts/Source"
+            "${SkyrimSE_PATH}/Data/Source/Scripts"
+        SOURCES ${PAPYRUS_SOURCES}
+        # OPTIMIZE
+        ANONYMIZE
+        SKIP_DEFAULT_IMPORTS
     )
-
-    if(PAPYRUS_SOURCES)
-        Papyrus_Add(
-            "Papyrus"
-            GAME "${SkyrimSE_PATH}"
-            MODE SkyrimSE
-            IMPORTS
-                "${CMAKE_CURRENT_SOURCE_DIR}/source/scripts"
-                "${SkyrimSE_PATH}/Data/Scripts/Source"
-                "${SkyrimSE_PATH}/Data/Source/Scripts"
-            SOURCES ${PAPYRUS_SOURCES}
-            # OPTIMIZE
-            ANONYMIZE
-            SKIP_DEFAULT_IMPORTS
-        )
-    else()
-        message(STATUS "[SkyUI] No Papyrus sources found -- skipping.")
-        add_custom_target("Papyrus")
-        set(Papyrus_OUTPUT "")
-    endif()
 else()
-    message(STATUS "[SkyUI] Papyrus : disabled (SKYUI_ENABLE_PAPYRUS=OFF)")
+    message(STATUS "[SkyUI] No Papyrus sources found -- skipping.")
     add_custom_target("Papyrus")
     set(Papyrus_OUTPUT "")
 endif()
@@ -158,11 +143,10 @@ SkyUI_AS_GlobalAssemble_Init(
 )
 
 # Load all SWF source definitions from a single file
-include("${SWF_SOURCE_DIR}/SWFSources.cmake")
+include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/SWFSources.cmake")
 
 set(AS_TARGETS            "")
 set(SWF_COMPILED_OUTPUTS  "")
-set(SWF_PASSTHROUGH_FILES "")
 
 # Discover all SWFs that have an XML source
 file(GLOB_RECURSE _ALL_XML_FILES
@@ -183,8 +167,13 @@ foreach(XML_REL ${_ALL_XML_FILES})
         set(_VAR_PREFIX "${SWF_NAME_WE}")
     endif()
 
-    if(FFDEC_CLI AND DEFINED ${_VAR_PREFIX}_SOURCES)
+    if(FFDEC_CLI)
         set(_AS_TARGET "AS_${_VAR_PREFIX}")
+
+        set(_SOURCES "")
+        if(DEFINED ${_VAR_PREFIX}_SOURCES)
+            set(_SOURCES ${${_VAR_PREFIX}_SOURCES})
+        endif()
 
         set(_FRAME_SOURCES_ARG "")
         if(DEFINED ${_VAR_PREFIX}_FRAME_SOURCES)
@@ -194,48 +183,14 @@ foreach(XML_REL ${_ALL_XML_FILES})
         SkyUI_AS_Add(
             TARGET_NAME  "${_AS_TARGET}"
             SWF_REL      "${SWF_REL}"
-            SOURCES      ${${_VAR_PREFIX}_SOURCES}
+            SOURCES      ${_SOURCES}
             ${_FRAME_SOURCES_ARG}
         )
 
         list(APPEND AS_TARGETS           "${_AS_TARGET}")
         list(APPEND SWF_COMPILED_OUTPUTS "${${_AS_TARGET}_OUTPUT}")
     else()
-        # If no custom sources, still build from XML (visual-only)
-        if(FFDEC_CLI)
-             set(_AS_TARGET "AS_${_VAR_PREFIX}")
-             SkyUI_AS_Add(
-                TARGET_NAME  "${_AS_TARGET}"
-                SWF_REL      "${SWF_REL}"
-                SOURCES      "" # No AS sources to inject
-            )
-            list(APPEND AS_TARGETS           "${_AS_TARGET}")
-            list(APPEND SWF_COMPILED_OUTPUTS "${${_AS_TARGET}_OUTPUT}")
-        else()
-            message(WARNING "[SkyUI] FFDec CLI not found, skipping XML build for ${SWF_REL}")
-        endif()
-    endif()
-endforeach()
-
-# Discover any remaining SWFs in data/interface that weren't built from XML
-file(GLOB_RECURSE _DATA_SWF_FILES
-    CONFIGURE_DEPENDS
-    RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/data/interface"
-    "${CMAKE_CURRENT_SOURCE_DIR}/data/interface/*.swf"
-)
-
-foreach(DATA_SWF_REL ${_DATA_SWF_FILES})
-    # If this SWF was already handled by the XML loop, skip it
-    set(_ALREADY_HANDLED FALSE)
-    foreach(COMPILED_SWF ${SWF_COMPILED_OUTPUTS})
-        if(COMPILED_SWF MATCHES "${DATA_SWF_REL}$")
-            set(_ALREADY_HANDLED TRUE)
-            break()
-        endif()
-    endforeach()
-
-    if(NOT _ALREADY_HANDLED)
-        list(APPEND SWF_PASSTHROUGH_FILES "${CMAKE_CURRENT_SOURCE_DIR}/data/interface/${DATA_SWF_REL}")
+        message(WARNING "[SkyUI] FFDec CLI not found, skipping XML build for ${SWF_REL}")
     endif()
 endforeach()
 
@@ -269,11 +224,10 @@ if(IS_DEBUG_BUILD)
     # One absolute path per line — read via file(STRINGS) in Deploy.cmake.
     list(JOIN Papyrus_OUTPUT        "\n" _PEX_CONTENT)
     list(JOIN SWF_COMPILED_OUTPUTS  "\n" _SWF_COMPILED_CONTENT)
-    list(JOIN SWF_PASSTHROUGH_FILES "\n" _SWF_PT_CONTENT)
 
     file(WRITE "${_DEPLOY_LISTS_DIR}/pex_files.txt"       "${_PEX_CONTENT}")
     file(WRITE "${_DEPLOY_LISTS_DIR}/swf_compiled.txt"    "${_SWF_COMPILED_CONTENT}")
-    file(WRITE "${_DEPLOY_LISTS_DIR}/swf_passthrough.txt" "${_SWF_PT_CONTENT}")
+    file(WRITE "${_DEPLOY_LISTS_DIR}/swf_passthrough.txt" "") # Obsolete
     file(WRITE "${_DEPLOY_LISTS_DIR}/esp_file.txt"        "${_ESP_FILE}")
 
     add_custom_command(
@@ -288,7 +242,6 @@ if(IS_DEBUG_BUILD)
         DEPENDS
             ${Papyrus_OUTPUT}
             ${SWF_COMPILED_OUTPUTS}
-            ${SWF_PASSTHROUGH_FILES}
             "${_ESP_FILE}"
         COMMENT "Deploying to ${MOD_DEBUG_PATH}"
         VERBATIM
@@ -321,7 +274,6 @@ else()
         FILES
             ${Papyrus_OUTPUT}
             ${SWF_COMPILED_OUTPUTS}
-            ${SWF_PASSTHROUGH_FILES}
             ${_EXTRA_INTERFACE_FILES}
         PREFIX
             "${_PREFIX_BUILD}"
