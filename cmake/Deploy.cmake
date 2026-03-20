@@ -30,57 +30,74 @@ foreach(REQUIRED_VAR OUTPUT_DIR DEPLOY_LISTS_DIR SWF_COMPILED_BASE SWF_PASSTHROU
 endforeach()
 
 # ---------------------------------------------------------------------------
-# Deployment Logic
+# Helpers
 # ---------------------------------------------------------------------------
 
-# 1. PEX Scripts
-set(_PEX_LIST_FILE "${DEPLOY_LISTS_DIR}/pex_files.txt")
-if(EXISTS "${_PEX_LIST_FILE}")
-    file(STRINGS "${_PEX_LIST_FILE}" _PEX_FILES)
-    foreach(_PEX ${_PEX_FILES})
-        if(EXISTS "${_PEX}")
-            file(COPY_FILE "${_PEX}" "${OUTPUT_DIR}/scripts/${_PEX_NAME}" ONLY_IF_DIFFERENT)
+function(copy_files_from_list LIST_FILE DEST_ROOT)
+    set(BASE_DIR "")
+    if(ARGC GREATER 2)
+        set(BASE_DIR "${ARGV2}")
+    endif()
+
+    if(NOT EXISTS "${LIST_FILE}")
+        return()
+    endif()
+
+    file(STRINGS "${LIST_FILE}" FILES)
+
+    foreach(SRC ${FILES})
+        if(NOT EXISTS "${SRC}")
+            message(WARNING "Deploy.cmake: file not found: ${SRC}")
+            continue()
+        endif()
+
+        if(BASE_DIR)
+            file(RELATIVE_PATH REL "${BASE_DIR}" "${SRC}")
+            set(DEST "${DEST_ROOT}/${REL}")
         else()
-            message(WARNING "Deploy.cmake: .pex not found: ${_PEX}")
+            get_filename_component(NAME "${SRC}" NAME)
+            set(DEST "${DEST_ROOT}/${NAME}")
         endif()
-    endforeach()
-    message(STATUS "  Deployed scripts")
-endif()
 
-# 2. Compiled SWFs
-set(_SWF_C_LIST_FILE "${DEPLOY_LISTS_DIR}/swf_compiled.txt")
-if(EXISTS "${_SWF_C_LIST_FILE}")
-    file(STRINGS "${_SWF_C_LIST_FILE}" _SWF_FILES)
-    foreach(_SWF ${_SWF_FILES})
-        if(EXISTS "${_SWF}")
-            file(RELATIVE_PATH _REL "${SWF_COMPILED_BASE}" "${_SWF}")
-            file(COPY_FILE "${_SWF}" "${OUTPUT_DIR}/interface/${_REL}" ONLY_IF_DIFFERENT)
-        endif()
-    endforeach()
-    message(STATUS "  Deployed compiled SWFs")
-endif()
+        get_filename_component(DEST_DIR "${DEST}" DIRECTORY)
+        file(MAKE_DIRECTORY "${DEST_DIR}")
 
-# 3. Passthrough SWFs
-set(_SWF_P_LIST_FILE "${DEPLOY_LISTS_DIR}/swf_passthrough.txt")
-if(EXISTS "${_SWF_P_LIST_FILE}")
-    file(STRINGS "${_SWF_P_LIST_FILE}" _SWF_FILES)
-    foreach(_SWF ${_SWF_FILES})
-        if(EXISTS "${_SWF}")
-            file(RELATIVE_PATH _REL "${SWF_PASSTHROUGH_BASE}" "${_SWF}")
-            file(COPY_FILE "${_SWF}" "${OUTPUT_DIR}/interface/${_REL}" ONLY_IF_DIFFERENT)
-        endif()
+        file(COPY_FILE "${SRC}" "${DEST}" ONLY_IF_DIFFERENT)
     endforeach()
-endif()
+endfunction()
 
-# 4. ESP File
+# ---------------------------------------------------------------------------
+# Deployment
+# ---------------------------------------------------------------------------
+
+# 1. PEX Scripts (flat copy)
+copy_files_from_list(
+    "${DEPLOY_LISTS_DIR}/pex_files.txt"
+    "${OUTPUT_DIR}/scripts"
+)
+message(STATUS "  Deployed scripts")
+
+# 2. Compiled SWFs (structured copy)
+copy_files_from_list(
+    "${DEPLOY_LISTS_DIR}/swf_compiled.txt"
+    "${OUTPUT_DIR}/interface"
+    "${SWF_COMPILED_BASE}"
+)
+message(STATUS "  Deployed compiled SWFs")
+
+# 3. Passthrough SWFs (structured copy)
+copy_files_from_list(
+    "${DEPLOY_LISTS_DIR}/swf_passthrough.txt"
+    "${OUTPUT_DIR}/interface"
+    "${SWF_PASSTHROUGH_BASE}"
+)
+message(STATUS "  Deployed passthrough SWFs")
+
+# 4. ESP files (flat copy, debug only)
 set(_ESP_LIST_FILE "${DEPLOY_LISTS_DIR}/esp_file.txt")
 if(EXISTS "${_ESP_LIST_FILE}")
-    file(STRINGS "${_ESP_LIST_FILE}" _ESP_FILES)
-    foreach(_ESP ${_ESP_FILES})
-        get_filename_component(_ESP_NAME "${_ESP}" NAME)
-        file(COPY_FILE "${_ESP}" "${OUTPUT_DIR}/${_ESP_NAME}" ONLY_IF_DIFFERENT)
-    endforeach()
-    message(STATUS "  Deployed ${_ESP_NAME}")
+    copy_files_from_list("${_ESP_LIST_FILE}" "${OUTPUT_DIR}")
+    message(STATUS "  Deployed ESP")
 endif()
 
 message(STATUS "Deploy complete -> ${OUTPUT_DIR}")
