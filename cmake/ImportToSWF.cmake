@@ -173,21 +173,21 @@ function(AS_GlobalAssemble_Finalize)
     endif()
 
     set(_GLOBAL_STAMP "${_GLOBAL_STAGING}/.assembled.stamp")
-
     add_custom_command(
         OUTPUT "${_GLOBAL_STAMP}"
         BYPRODUCTS "${_GLOBAL_STAGING}/__Packages"
+        COMMAND "${CMAKE_COMMAND}" -E echo "[Build] Assembling all ActionScript sources"
         COMMAND "${CMAKE_COMMAND}"
+            "--log-level=WARNING"
             "-DSTAGING_DIR=${_GLOBAL_STAGING}"
             "-DSOURCES_FILE=${_SOURCES_FILE}"
             "-DFRAME_SOURCES_FILE=${_FRAME_SOURCES_FILE}"
             "-DAS_SOURCE_DIR=${_AS_SOURCE_DIR}"
             "-DPROJECT_VERSION_MAJOR=${PROJECT_VERSION_MAJOR}"
             "-DPROJECT_VERSION_MINOR=${PROJECT_VERSION_MINOR}"
+            "-DGLOBAL_STAMP=${_GLOBAL_STAMP}"
             -P "${_AS_IMPORT_MODULE_SCRIPT}"
-        COMMAND "${CMAKE_COMMAND}" -E touch "${_GLOBAL_STAMP}"
         DEPENDS ${_ALL_SOURCES} ${_ALL_FRAME_SOURCES} "${_AS_IMPORT_MODULE_SCRIPT}"
-        COMMENT "Assembling all ActionScript sources"
         VERBATIM
     )
 
@@ -222,21 +222,7 @@ foreach(SRC ${SOURCES})
     get_filename_component(DST_DIR "${DST}" DIRECTORY)
     file(MAKE_DIRECTORY "${DST_DIR}")
     file(COPY_FILE "${SRC}" "${DST}" ONLY_IF_DIFFERENT)
-
-    # Note SkyUISplash.as location for patching after the loop
-    get_filename_component(DST_NAME "${DST}" NAME)
-    if(DST_NAME STREQUAL "SkyUISplash.as")
-        set(_SPLASH_DST "${DST}")
-    endif()
 endforeach()
-
-# Patch version constants in SkyUISplash.as (outside the loop)
-if(_SPLASH_DST AND DEFINED PROJECT_VERSION_MAJOR AND DEFINED PROJECT_VERSION_MINOR)
-    file(READ "${_SPLASH_DST}" _SPLASH_CONTENT)
-    string(REGEX REPLACE "(SKYUI_VERSION_MAJOR[ \t]*=[ \t]*)[0-9]+" "\\1${PROJECT_VERSION_MAJOR}" _SPLASH_CONTENT "${_SPLASH_CONTENT}")
-    string(REGEX REPLACE "(SKYUI_VERSION_MINOR[ \t]*=[ \t]*)[0-9]+" "\\1${PROJECT_VERSION_MINOR}" _SPLASH_CONTENT "${_SPLASH_CONTENT}")
-    file(WRITE "${_SPLASH_DST}" "${_SPLASH_CONTENT}")
-endif()
 
 if(DEFINED FRAME_SOURCES_FILE AND EXISTS "${FRAME_SOURCES_FILE}")
     file(STRINGS "${FRAME_SOURCES_FILE}" FRAME_SOURCES)
@@ -246,6 +232,10 @@ if(DEFINED FRAME_SOURCES_FILE AND EXISTS "${FRAME_SOURCES_FILE}")
             file(COPY_FILE "${SRC}" "${STAGING_DIR}/${FNAME}" ONLY_IF_DIFFERENT)
         endif()
     endforeach()
+endif()
+
+if(DEFINED GLOBAL_STAMP)
+    file(TOUCH "${GLOBAL_STAMP}")
 endif()
 
 endif()
