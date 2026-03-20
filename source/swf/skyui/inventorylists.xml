@@ -3471,7 +3471,7 @@ Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMi
         <item type="DoActionTag" actionBytes="0700" forceWriteAsLong="true"/>
         <item type="FrameLabelTag" forceWriteAsLong="true" name="Mouse" namedAnchor="false"/>
         <item type="PlaceObject2Tag" characterId="92" clipDepth="0" depth="1" forceWriteAsLong="false" placeFlagHasCharacter="true" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="false" placeFlagHasMatrix="true" placeFlagHasName="false" placeFlagHasRatio="false" placeFlagMove="false" ratio="0">
-          <matrix type="MATRIX" hasRotate="false" hasScale="false" nRotateBits="0" nScaleBits="0" nTranslateBits="0" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.0" scaleY="0.0" translateX="0" translateY="0"/>
+          <matrix type="MATRIX" hasRotate="true" hasScale="true" nRotateBits="0" nScaleBits="19" nTranslateBits="14" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="1.0" scaleY="2.0" translateX="0" translateY="-7544"/>
         </item>
         <item type="ShowFrameTag" forceWriteAsLong="false"/>
       </subTags>
