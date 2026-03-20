@@ -30,8 +30,6 @@ Step 3: After the loop, call once to perform the global assembly:
 
 #]=======================================================================]
 
-if(NOT CMAKE_SCRIPT_MODE_FILE)
-
 # ---------------------------------------------------------------------------
 # State Management
 # ---------------------------------------------------------------------------
@@ -92,28 +90,35 @@ function(Add_AS)
     get_property(_AS_SOURCE_DIR   GLOBAL PROPERTY _AS_SOURCE_DIR)
     get_property(_GLOBAL_STAGING  GLOBAL PROPERTY _AS_GLOBAL_STAGING)
 
-    if(NOT _AS_SOURCE_DIR OR NOT _GLOBAL_STAGING)
-        message(FATAL_ERROR "Add_AS: call AS_GlobalAssemble_Init() first.")
-    endif()
-
     # Prepend source dir to relative paths
     set(_REAL_SOURCES "")
+    set(_STAGED_SOURCES "")
     foreach(_SRC ${ARG_SOURCES})
-        if(IS_ABSOLUTE "${_SRC}")
-            list(APPEND _REAL_SOURCES "${_SRC}")
-        else()
-            list(APPEND _REAL_SOURCES "${_AS_SOURCE_DIR}/${_SRC}")
+        if(NOT IS_ABSOLUTE "${_SRC}")
+            set(_SRC "${_AS_SOURCE_DIR}/${_SRC}")
+        endif()
+        list(APPEND _REAL_SOURCES "${_SRC}")
+        
+        file(RELATIVE_PATH REL "${_AS_SOURCE_DIR}" "${_SRC}")
+        string(FIND "${REL}" "/" SLASH_POS)
+        if(NOT SLASH_POS EQUAL -1)
+            math(EXPR AFTER "${SLASH_POS} + 1")
+            string(SUBSTRING "${REL}" ${AFTER} -1 CLASSPATH)
+            list(APPEND _STAGED_SOURCES "${_GLOBAL_STAGING}/__Packages/${CLASSPATH}")
         endif()
     endforeach()
     set(ARG_SOURCES ${_REAL_SOURCES})
 
     set(_REAL_FRAME_SOURCES "")
+    set(_STAGED_FRAME_SOURCES "")
     foreach(_SRC ${ARG_FRAME_SOURCES})
-        if(IS_ABSOLUTE "${_SRC}")
-            list(APPEND _REAL_FRAME_SOURCES "${_SRC}")
-        else()
-            list(APPEND _REAL_FRAME_SOURCES "${_AS_SOURCE_DIR}/${_SRC}")
+        if(NOT IS_ABSOLUTE "${_SRC}")
+            set(_SRC "${_AS_SOURCE_DIR}/${_SRC}")
         endif()
+        list(APPEND _REAL_FRAME_SOURCES "${_SRC}")
+        
+        get_filename_component(FNAME "${_SRC}" NAME)
+        list(APPEND _STAGED_FRAME_SOURCES "${_GLOBAL_STAGING}/${FNAME}")
     endforeach()
     set(ARG_FRAME_SOURCES ${_REAL_FRAME_SOURCES})
 
@@ -132,8 +137,8 @@ function(Add_AS)
             -importScript "${ARG_SWF_OUTPUT}" "${ARG_SWF_OUTPUT}" "${_GLOBAL_STAGING}"
         DEPENDS
             "${ARG_SWF_INPUT}"
-            ${ARG_SOURCES}
-            ${ARG_FRAME_SOURCES}
+            ${_STAGED_SOURCES}
+            ${_STAGED_FRAME_SOURCES}
         VERBATIM
     )
 
@@ -159,66 +164,35 @@ function(AS_GlobalAssemble_Finalize)
         list(REMOVE_DUPLICATES _ALL_FRAME_SOURCES)
     endif()
 
-    set(_SOURCES_FILE "${_GLOBAL_STAGING}/all_sources.txt")
-    list(JOIN _ALL_SOURCES "\n" _SOURCES_CONTENT)
-    file(MAKE_DIRECTORY "${_GLOBAL_STAGING}")
-    file(WRITE "${_SOURCES_FILE}" "${_SOURCES_CONTENT}")
-
-    set(_FRAME_SOURCES_FILE "")
-    if(_ALL_FRAME_SOURCES)
-        set(_FRAME_SOURCES_FILE "${_GLOBAL_STAGING}/all_frame_sources.txt")
-        list(JOIN _ALL_FRAME_SOURCES "\n" _FRAME_CONTENT)
-        file(WRITE "${_FRAME_SOURCES_FILE}" "${_FRAME_CONTENT}")
-    endif()
-
-    # Build-time assembly logic (runs at configure-time for simplicity)
-    execute_process(
-        COMMAND "${CMAKE_COMMAND}"
-            "--log-level=WARNING"
-            "-DSTAGING_DIR=${_GLOBAL_STAGING}"
-            "-DSOURCES_FILE=${_SOURCES_FILE}"
-            "-DFRAME_SOURCES_FILE=${_FRAME_SOURCES_FILE}"
-            "-DAS_SOURCE_DIR=${_AS_SOURCE_DIR}"
-            -P "${_AS_IMPORT_MODULE_SCRIPT}"
-    )
-endfunction()
-
-else() # CMAKE_SCRIPT_MODE_FILE
-
-# ---------------------------------------------------------------------------
-# Build-time Assembly Logic
-# ---------------------------------------------------------------------------
-
-file(MAKE_DIRECTORY "${STAGING_DIR}/__Packages")
-file(STRINGS "${SOURCES_FILE}" SOURCES)
-
-foreach(SRC ${SOURCES})
-    file(RELATIVE_PATH REL "${AS_SOURCE_DIR}" "${SRC}")
-    string(FIND "${REL}" "/" SLASH_POS)
-    if(SLASH_POS EQUAL -1)
-        continue()
-    endif()
-    math(EXPR AFTER "${SLASH_POS} + 1")
-    string(SUBSTRING "${REL}" ${AFTER} -1 CLASSPATH)
-
-    set(DST "${STAGING_DIR}/__Packages/${CLASSPATH}")
-    if(NOT EXISTS "${SRC}")
-        continue()
-    endif()
-
-    get_filename_component(DST_DIR "${DST}" DIRECTORY)
-    file(MAKE_DIRECTORY "${DST_DIR}")
-    file(COPY_FILE "${SRC}" "${DST}" ONLY_IF_DIFFERENT)
-endforeach()
-
-if(DEFINED FRAME_SOURCES_FILE AND EXISTS "${FRAME_SOURCES_FILE}")
-    file(STRINGS "${FRAME_SOURCES_FILE}" FRAME_SOURCES)
-    foreach(SRC ${FRAME_SOURCES})
-        if(EXISTS "${SRC}")
-            get_filename_component(FNAME "${SRC}" NAME)
-            file(COPY_FILE "${SRC}" "${STAGING_DIR}/${FNAME}" ONLY_IF_DIFFERENT)
+    foreach(SRC IN LISTS _ALL_SOURCES)
+        file(RELATIVE_PATH REL "${_AS_SOURCE_DIR}" "${SRC}")
+        string(FIND "${REL}" "/" SLASH_POS)
+        if(SLASH_POS EQUAL -1)
+            continue()
         endif()
-    endforeach()
-endif()
+        math(EXPR AFTER "${SLASH_POS} + 1")
+        string(SUBSTRING "${REL}" ${AFTER} -1 CLASSPATH)
 
-endif()
+        set(DST "${_GLOBAL_STAGING}/__Packages/${CLASSPATH}")
+        get_filename_component(DST_DIR "${DST}" DIRECTORY)
+        
+        add_custom_command(
+            OUTPUT "${DST}"
+            COMMAND "${CMAKE_COMMAND}" -E make_directory "${DST_DIR}"
+            COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${SRC}" "${DST}"
+            DEPENDS "${SRC}"
+        )
+    endforeach()
+
+    foreach(SRC IN LISTS _ALL_FRAME_SOURCES)
+        get_filename_component(FNAME "${SRC}" NAME)
+        set(DST "${_GLOBAL_STAGING}/${FNAME}")
+        
+        add_custom_command(
+            OUTPUT "${DST}"
+            COMMAND "${CMAKE_COMMAND}" -E make_directory "${_GLOBAL_STAGING}"
+            COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${SRC}" "${DST}"
+            DEPENDS "${SRC}"
+        )
+    endforeach()
+endfunction()
