@@ -2,7 +2,7 @@
 WARNING: The structure of this XML is not final.
 In later versions of FFDec it can be changed.
 Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMinor keys.
---><swf _xmlExportMajor="2" _xmlExportMinor="1" _generator="JPEXS Free Flash Decompiler v.25.1.3" type="SWF" charset="UTF-8" compression="ZLIB" encrypted="false" frameCount="21" frameRate="24.0" gfx="false" hasEndTag="true" version="10">
+--><swf _xmlExportMajor="2" _xmlExportMinor="1" _generator="JPEXS Free Flash Decompiler v.25.1.3" type="SWF" charset="UTF-8" compression="ZLIB" encrypted="false" frameCount="21" frameRate="60.0" gfx="false" hasEndTag="true" version="10">
   <displayRect type="RECT" Xmax="2560" Xmin="0" Ymax="2560" Ymin="0" nbits="13"/>
   <tags>
     <item type="FileAttributesTag" actionScript3="false" forceWriteAsLong="false" hasMetadata="true" noCrossDomainCache="false" reservedA="false" reservedB="0" swfRelativeUrls="false" useDirectBlit="false" useGPU="false" useNetwork="false"/>
