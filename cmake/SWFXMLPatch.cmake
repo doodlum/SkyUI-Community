@@ -47,6 +47,7 @@ function(Add_XML_Base)
         "skyui/icons_category_straight.xml"
         "skyui/icons_item_psychosteve.xml"
         "exported/skyui/icons_effect_psychosteve.xml"
+        "skyui/mapmarkerart.xml"
     )
 
     list(FIND _EXCLUSION_LIST "${ARG_XML_PATH}" _EXCLUDED_INDEX)
