@@ -18,7 +18,6 @@ class Shared.BSScrollingList extends MovieClip
    var iScrollPosition;
    var iScrollbarDrawTimerID;
    var iSelectedIndex;
-   var iHighlightedIndex;
    var iTextOption;
    var itemIndex;
    var onMousePress;
@@ -36,7 +35,6 @@ class Shared.BSScrollingList extends MovieClip
       gfx.events.EventDispatcher.initialize(this);
       Mouse.addListener(this);
       this.iSelectedIndex = -1;
-      this.iHighlightedIndex = -1;
       this.iScrollPosition = 0;
       this.iMaxScrollPosition = 0;
       this.iListItemsShown = 0;
@@ -52,7 +50,7 @@ class Shared.BSScrollingList extends MovieClip
          {
             if(!this._parent.listAnimating && !this._parent.bDisableInput && this.itemIndex != undefined)
             {
-               this._parent.doSetSelectedIndex(this.itemIndex, 0, true);
+               this._parent.doSetSelectedIndex(this.itemIndex,0);
                this._parent.bMouseDrivenNav = true;
             }
          };
@@ -60,24 +58,13 @@ class Shared.BSScrollingList extends MovieClip
          {
             if(this.itemIndex != undefined)
             {
-               var list = this._parent;
-               var target = this.itemIndex;
-
-               if (list.iSelectedIndex != target)
+               this._parent.onItemPress(aiKeyboardOrMouse);
+               if(!this._parent.bDisableInput && this.onMousePress != undefined)
                {
-                  list.iSelectedIndex = target;
-                  list.iHighlightedIndex = target;
-                  if (list.bRecenterSelection !== undefined)
-                  {
-                     list.iScrollPosition = target;
-                  }
-                  list.UpdateList();
+                  this.onMousePress();
                }
-
-               list.bMouseDrivenNav = false;
-               list.onItemPress(aiKeyboardOrMouse);
             }
-         }
+         };
          _loc3_.onPressAux = function(aiMouseIndex, aiKeyboardOrMouse, aiButtonIndex)
          {
             if(this.itemIndex != undefined)
@@ -99,7 +86,6 @@ class Shared.BSScrollingList extends MovieClip
    function ClearList()
    {
       this.EntriesA.splice(0,this.EntriesA.length);
-      this.iHighlightedIndex = -1;
    }
    function GetClipByIndex(aiIndex)
    {
@@ -107,54 +93,54 @@ class Shared.BSScrollingList extends MovieClip
    }
    function handleInput(details, pathToFocus)
    {
-      var _loc2_ = false;
-      var _loc4_;
+      var _loc4_ = false;
+      var _loc5_;
       if(!this.bDisableInput)
       {
-         _loc4_ = this.GetClipByIndex(this.selectedIndex - this.scrollPosition);
-         _loc2_ = _loc4_ != undefined && _loc4_.handleInput != undefined && _loc4_.handleInput(details,pathToFocus.slice(1));
-         if(!_loc2_ && Shared.GlobalFunc.IsKeyPressed(details))
+         _loc5_ = this.GetClipByIndex(this.selectedIndex - this.scrollPosition);
+         _loc4_ = _loc5_ != undefined && _loc5_.handleInput != undefined && _loc5_.handleInput(details,pathToFocus.slice(1));
+         if(!_loc4_ && Shared.GlobalFunc.IsKeyPressed(details))
          {
             if(details.navEquivalent == gfx.ui.NavigationCode.UP)
             {
                this.moveSelectionUp();
-               _loc2_ = true;
+               _loc4_ = true;
             }
             else if(details.navEquivalent == gfx.ui.NavigationCode.DOWN)
             {
                this.moveSelectionDown();
-               _loc2_ = true;
+               _loc4_ = true;
             }
             else if(!this.bDisableSelection && details.navEquivalent == gfx.ui.NavigationCode.ENTER)
             {
                this.onItemPress();
-               _loc2_ = true;
+               _loc4_ = true;
             }
          }
       }
-      return _loc2_;
+      return _loc4_;
    }
    function onMouseWheel(delta)
    {
-      var _loc2_;
+      var _loc3_;
       if(!this.bDisableInput)
       {
-         _loc2_ = Mouse.getTopMostEntity();
-         while(_loc2_ && _loc2_ != undefined)
+         _loc3_ = Mouse.getTopMostEntity();
+         while(_loc3_ && _loc3_ != undefined)
          {
-            if(_loc2_ == this)
+            if(_loc3_ == this)
             {
-               this.doSetSelectedIndex(-1, 0, false);
+               this.doSetSelectedIndex(-1,0);
                if(delta < 0)
                {
-                  this.scrollPosition = this.scrollPosition + 1;
+                  this.scrollPosition += 1;
                }
                else if(delta > 0)
                {
-                  this.scrollPosition = this.scrollPosition - 1;
+                  this.scrollPosition -= 1;
                }
             }
-            _loc2_ = _loc2_._parent;
+            _loc3_ = _loc3_._parent;
          }
       }
    }
@@ -164,7 +150,7 @@ class Shared.BSScrollingList extends MovieClip
    }
    function set selectedIndex(aiNewIndex)
    {
-      this.doSetSelectedIndex(aiNewIndex, 0, false);
+      this.doSetSelectedIndex(aiNewIndex);
    }
    function get length()
    {
@@ -178,71 +164,40 @@ class Shared.BSScrollingList extends MovieClip
    {
       this.bListAnimating = abFlag;
    }
-   function doSetSelectedIndex(aiNewIndex, aiKeyboardOrMouse, abMouseFocus)
+   function doSetSelectedIndex(aiNewIndex, aiKeyboardOrMouse)
    {
-      var iCurHighlightIndex = this.iHighlightedIndex;
-
-      if(!this.bDisableSelection)
+      var _loc4_;
+      if(!this.bDisableSelection && aiNewIndex != this.iSelectedIndex)
       {
-         if(abMouseFocus !== true)
+         _loc4_ = this.iSelectedIndex;
+         this.iSelectedIndex = aiNewIndex;
+         if(_loc4_ != -1)
          {
-            this.iSelectedIndex = aiNewIndex;
+            this.SetEntry(this.GetClipByIndex(this.EntriesA[_loc4_].clipIndex),this.EntriesA[_loc4_]);
          }
-
-         if(aiNewIndex != iCurHighlightIndex)
+         if(this.iSelectedIndex != -1)
          {
-            var iCurrentIndex = this.iHighlightedIndex;
-            this.iHighlightedIndex = aiNewIndex;
-
-            if(iCurrentIndex != -1)
+            if(this.iPlatform != 0)
             {
-               this.SetEntry(
-                  this.GetClipByIndex(this.EntriesA[iCurrentIndex].clipIndex),
-                  this.EntriesA[iCurrentIndex]
-               );
-            }
-
-            if(this.iHighlightedIndex != -1)
-            {
-               if(this.iPlatform != 0)
+               if(this.iSelectedIndex < this.iScrollPosition)
                {
-                  if(this.iHighlightedIndex < this.iScrollPosition)
-                  {
-                     this.scrollPosition = this.iHighlightedIndex;
-                  }
-                  else if(this.iHighlightedIndex >= this.iScrollPosition + this.iListItemsShown)
-                  {
-                     this.scrollPosition = Math.min(
-                        this.iHighlightedIndex - this.iListItemsShown + 1,
-                        this.iMaxScrollPosition
-                     );
-                  }
-                  else
-                  {
-                     this.SetEntry(
-                        this.GetClipByIndex(this.EntriesA[this.iHighlightedIndex].clipIndex),
-                        this.EntriesA[this.iHighlightedIndex]
-                     );
-                  }
+                  this.scrollPosition = this.iSelectedIndex;
+               }
+               else if(this.iSelectedIndex >= this.iScrollPosition + this.iListItemsShown)
+               {
+                  this.scrollPosition = Math.min(this.iSelectedIndex - this.iListItemsShown + 1,this.iMaxScrollPosition);
                }
                else
                {
-                  this.SetEntry(
-                     this.GetClipByIndex(this.EntriesA[this.iHighlightedIndex].clipIndex),
-                     this.EntriesA[this.iHighlightedIndex]
-                  );
+                  this.SetEntry(this.GetClipByIndex(this.EntriesA[this.iSelectedIndex].clipIndex),this.EntriesA[this.iSelectedIndex]);
                }
-            }
-
-            if(abMouseFocus === true)
-            {
-               dispatchEvent({type:"highlightChange", index:iHighlightedIndex});
             }
             else
             {
-               dispatchEvent({type:"selectionChange", index:iSelectedIndex, keyboardOrMouse:aiKeyboardOrMouse});
+               this.SetEntry(this.GetClipByIndex(this.EntriesA[this.iSelectedIndex].clipIndex),this.EntriesA[this.iSelectedIndex]);
             }
          }
+         this.dispatchEvent({type:"selectionChange",index:this.iSelectedIndex,keyboardOrMouse:aiKeyboardOrMouse});
       }
    }
    function get scrollPosition()
@@ -325,37 +280,37 @@ class Shared.BSScrollingList extends MovieClip
    }
    function UpdateList()
    {
-      var _loc6_ = this.GetClipByIndex(0)._y;
-      var _loc5_ = 0;
-      var _loc2_ = 0;
-      while(_loc2_ < this.iScrollPosition)
+      var _loc2_ = this.GetClipByIndex(0)._y;
+      var _loc3_ = 0;
+      var _loc4_ = 0;
+      while(_loc4_ < this.iScrollPosition)
       {
-         this.EntriesA[_loc2_].clipIndex = undefined;
-         _loc2_ = _loc2_ + 1;
+         this.EntriesA[_loc4_].clipIndex = undefined;
+         _loc4_ += 1;
       }
       this.iListItemsShown = 0;
-      _loc2_ = this.iScrollPosition;
-      var _loc3_;
-      while(_loc2_ < this.EntriesA.length && this.iListItemsShown < this.iMaxItemsShown && _loc5_ <= this.fListHeight)
+      _loc4_ = this.iScrollPosition;
+      var _loc5_;
+      while(_loc4_ < this.EntriesA.length && this.iListItemsShown < this.iMaxItemsShown && _loc3_ <= this.fListHeight)
       {
-         _loc3_ = this.GetClipByIndex(this.iListItemsShown);
-         this.SetEntry(_loc3_,this.EntriesA[_loc2_]);
-         this.EntriesA[_loc2_].clipIndex = this.iListItemsShown;
-         _loc3_.itemIndex = _loc2_;
-         _loc3_._y = _loc6_ + _loc5_;
-         _loc3_._visible = true;
-         _loc5_ += _loc3_._height;
-         if(_loc5_ <= this.fListHeight && this.iListItemsShown < this.iMaxItemsShown)
+         _loc5_ = this.GetClipByIndex(this.iListItemsShown);
+         this.SetEntry(_loc5_,this.EntriesA[_loc4_]);
+         this.EntriesA[_loc4_].clipIndex = this.iListItemsShown;
+         _loc5_.itemIndex = _loc4_;
+         _loc5_._y = _loc2_ + _loc3_;
+         _loc5_._visible = true;
+         _loc3_ += _loc5_._height;
+         if(_loc3_ <= this.fListHeight && this.iListItemsShown < this.iMaxItemsShown)
          {
-            this.iListItemsShown = this.iListItemsShown + 1;
+            this.iListItemsShown++;
          }
-         _loc2_ = _loc2_ + 1;
+         _loc4_ += 1;
       }
-      var _loc4_ = this.iListItemsShown;
-      while(_loc4_ < this.iMaxItemsShown)
+      var _loc6_ = this.iListItemsShown;
+      while(_loc6_ < this.iMaxItemsShown)
       {
-         this.GetClipByIndex(_loc4_)._visible = false;
-         _loc4_ = _loc4_ + 1;
+         this.GetClipByIndex(_loc6_)._visible = false;
+         _loc6_ += 1;
       }
       if(this.ScrollUp != undefined)
       {
@@ -406,23 +361,23 @@ class Shared.BSScrollingList extends MovieClip
    }
    function CalculateMaxScrollPosition()
    {
-      var _loc3_ = 0;
-      var _loc2_ = this.EntriesA.length - 1;
-      while(_loc2_ >= 0 && _loc3_ <= this.fListHeight)
+      var _loc2_ = 0;
+      var _loc3_ = this.EntriesA.length - 1;
+      while(_loc3_ >= 0 && _loc2_ <= this.fListHeight)
       {
-         _loc3_ += this.GetEntryHeight(_loc2_);
-         if(_loc3_ <= this.fListHeight)
+         _loc2_ += this.GetEntryHeight(_loc3_);
+         if(_loc2_ <= this.fListHeight)
          {
-            _loc2_ = _loc2_ - 1;
+            _loc3_ -= 1;
          }
       }
-      this.iMaxScrollPosition = _loc2_ + 1;
+      this.iMaxScrollPosition = _loc3_ + 1;
    }
    function GetEntryHeight(aiEntryIndex)
    {
-      var _loc2_ = this.GetClipByIndex(0);
-      this.SetEntry(_loc2_,this.EntriesA[aiEntryIndex]);
-      return _loc2_._height;
+      var _loc3_ = this.GetClipByIndex(0);
+      this.SetEntry(_loc3_,this.EntriesA[aiEntryIndex]);
+      return _loc3_._height;
    }
    function moveSelectionUp()
    {
@@ -432,12 +387,12 @@ class Shared.BSScrollingList extends MovieClip
          {
             if(this.selectedIndex > 0)
             {
-               this.selectedIndex = this.selectedIndex - 1;
+               this.selectedIndex -= 1;
             }
          }
          else
          {
-            this.scrollPosition = this.scrollPosition - 1;
+            this.scrollPosition -= 1;
          }
       }
    }
@@ -449,12 +404,12 @@ class Shared.BSScrollingList extends MovieClip
          {
             if(this.selectedIndex < this.EntriesA.length - 1)
             {
-               this.selectedIndex = this.selectedIndex + 1;
+               this.selectedIndex += 1;
             }
          }
          else
          {
-            this.scrollPosition = this.scrollPosition + 1;
+            this.scrollPosition += 1;
          }
       }
    }
@@ -463,9 +418,11 @@ class Shared.BSScrollingList extends MovieClip
       if(!this.bDisableInput && !this.bDisableSelection && this.iSelectedIndex != -1)
       {
          this.dispatchEvent({type:"itemPress",index:this.iSelectedIndex,entry:this.EntriesA[this.iSelectedIndex],keyboardOrMouse:aiKeyboardOrMouse});
-         return;
       }
-      this.dispatchEvent({type:"listPress"});
+      else
+      {
+         this.dispatchEvent({type:"listPress"});
+      }
    }
    function onItemPressAux(aiKeyboardOrMouse, aiButtonIndex)
    {
@@ -476,10 +433,9 @@ class Shared.BSScrollingList extends MovieClip
    }
    function SetEntry(aEntryClip, aEntryObject)
    {
-      var aSelectedEntry = this.EntriesA[this.iHighlightedIndex];
       if(aEntryClip != undefined)
       {
-         if(aEntryObject == aSelectedEntry)
+         if(aEntryObject == this.selectedEntry)
          {
             aEntryClip.gotoAndStop("Selected");
          }

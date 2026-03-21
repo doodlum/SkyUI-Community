@@ -122,18 +122,18 @@ class DialogueMenu extends MovieClip
    }
    function PopulateDialogueLists()
    {
-      var _loc9_ = 0;
-      var _loc11_ = 1;
-      var _loc8_ = 2;
-      var _loc10_ = 3;
-      this.TopicList.ClearList();
       var _loc3_ = 0;
-      var _loc4_;
-      while(_loc3_ < arguments.length - 1)
+      var _loc4_ = 1;
+      var _loc5_ = 2;
+      var _loc6_ = 3;
+      this.TopicList.ClearList();
+      var _loc7_ = 0;
+      var _loc8_;
+      while(_loc7_ < arguments.length - 1)
       {
-         _loc4_ = {text:arguments[_loc3_ + _loc9_],topicIsNew:arguments[_loc3_ + _loc11_],topicIndex:arguments[_loc3_ + _loc8_]};
-         this.TopicList.entryList.push(_loc4_);
-         _loc3_ += _loc10_;
+         _loc8_ = {text:arguments[_loc7_ + _loc3_],topicIsNew:arguments[_loc7_ + _loc4_],topicIndex:arguments[_loc7_ + _loc5_]};
+         this.TopicList.entryList.push(_loc8_);
+         _loc7_ += _loc6_;
       }
       if(arguments[arguments.length - 1] != -1)
       {
@@ -163,7 +163,7 @@ class DialogueMenu extends MovieClip
       {
          if(this.eMenuState == DialogueMenu.TOPIC_LIST_SHOWN)
          {
-            this.onSelectionClick(event && event.mouseClick);
+            this.onSelectionClick();
          }
          else if(this.eMenuState == DialogueMenu.TOPIC_CLICKED || this.eMenuState == DialogueMenu.SHOW_GREETING)
          {
@@ -176,17 +176,18 @@ class DialogueMenu extends MovieClip
    {
       if(this.bAllowProgress)
       {
-         gfx.io.GameDelegate.call("SkipText", []);
+         gfx.io.GameDelegate.call("SkipText",[]);
          this.bAllowProgress = false;
       }
    }
    function onMouseDown()
    {
-      DialogueMenu.iMouseDownExecutionCount = DialogueMenu.iMouseDownExecutionCount + 1;
-      if(DialogueMenu.iMouseDownExecutionCount % 2 != 0)
+      DialogueMenu.iMouseDownExecutionCount++;
+      if(DialogueMenu.iMouseDownExecutionCount % 2 == 0)
       {
-         this.onItemSelect({mouseClick: true});
+         return undefined;
       }
+      this.onItemSelect();
    }
    function onCancelPress()
    {
@@ -222,12 +223,8 @@ class DialogueMenu extends MovieClip
          aEvent.target._parent.gotoAndPlay("moveDown");
       }
    }
-   function onSelectionClick(abMouseClick)
+   function onSelectionClick()
    {
-      if(abMouseClick)
-      {
-         this.TopicList.SetSelectedIndexByMouse(false);
-      }
       if(this.eMenuState == DialogueMenu.TOPIC_LIST_SHOWN)
       {
          this.eMenuState = DialogueMenu.TOPIC_CLICKED;
