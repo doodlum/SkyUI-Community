@@ -381,9 +381,10 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
          {
             aEntryClip.gotoAndStop("Normal");
          }
-         if(!this.bPointerHighlight && this.iPlatform == 0)
+         if(this.iPlatform == 0)
          {
-            aEntryClip._alpha = aEntryObject != this.selectedEntry ? 60 : 100;
+            var selectedEntry = this.EntriesA[this.iSelectedIndex];
+            aEntryClip._alpha = aEntryObject == selectedEntry ? 100 : 60;
          }
          else
          {
@@ -401,6 +402,7 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
                aEntryClip._alpha = 100;
             }
          }
+         
          this.SetEntryText(aEntryClip,aEntryObject);
       }
    }
