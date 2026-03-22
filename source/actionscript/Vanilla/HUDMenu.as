@@ -72,7 +72,7 @@ class HUDMenu extends Shared.PlatformChangeUser
    var SavedRolloverText = "";
    var ItemInfoArray = new Array();
    var CompassMarkerList = new Array();
-   var METER_PAUSE_FRAME = 40;
+   var METER_PAUSE_FRAME = 200;
    var HealthPenaltyPercent = 0;
    var StaminaPenaltyPercent = 0;
    var MagickaPenaltyPercent = 0;

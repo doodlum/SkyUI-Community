@@ -17,7 +17,7 @@ project(
 # Options & Core Paths
 # ---------------------------------------------------------------------------
 
-option(ENABLE_FPS_PATCH "Enable FPS patching" OFF)
+option(ENABLE_FPS_PATCH "Enable FPS patching" ON)
 
 # SkyrimSE_PATH: absolute path to the game directory. 
 # Defaults to the standard Steam library location if not provided.

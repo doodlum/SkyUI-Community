@@ -8,7 +8,7 @@ class Messages extends MovieClip
    var ySpacing;
    static var MAX_SHOWN = 4;
    static var Y_SPACING = 15;
-   static var END_ANIM_FRAME = 80;
+   static var END_ANIM_FRAME = 400;
    static var InstanceCounter = 0;
    function Messages()
    {
