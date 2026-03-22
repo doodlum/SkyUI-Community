@@ -52,7 +52,7 @@ function(Add_XML_Base)
 
     list(FIND _EXCLUSION_LIST "${ARG_XML_PATH}" _EXCLUDED_INDEX)
 
-    if(_EXCLUDED_INDEX EQUAL -1)
+    if(ENABLE_FPS_PATCH AND _EXCLUDED_INDEX EQUAL -1)
         # File is NOT excluded: Patch it
         add_custom_command(
             OUTPUT "${_XML_PATCHED}"
