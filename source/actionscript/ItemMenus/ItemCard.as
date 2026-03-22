@@ -3,6 +3,7 @@ class ItemCard extends MovieClip
    var ActiveEffectTimeValue;
    var ApparelArmorValue;
    var ApparelEnchantedLabel;
+   var ApparelWarmthValue;
    var BookDescriptionLabel;
    var ButtonRect;
    var ButtonRect_mc;
@@ -173,12 +174,25 @@ class ItemCard extends MovieClip
          case skyui.defines.Inventory.ICT_ARMOR:
             if(aUpdateObj.effects.length == 0)
             {
-               this.gotoAndStop("Apparel_reg");
+               if(aUpdateObj.warmth != undefined)
+               {
+                  this.gotoAndStop("Apparel_Survival_reg");
+               }
+               else
+               {
+                  this.gotoAndStop("Apparel_reg");
+               }
+            }
+            else if(aUpdateObj.warmth != undefined)
+            {
+               this.gotoAndStop("Apparel_Survival_Enchanted");
             }
             else
             {
                this.gotoAndStop("Apparel_Enchanted");
             }
+            this.ApparelWarmthValue.textAutoSize = "shrink";
+            this.ApparelWarmthValue.SetText(aUpdateObj.warmth);
             this.ApparelArmorValue.textAutoSize = "shrink";
             this.ApparelArmorValue.SetText(aUpdateObj.armor);
             this.ApparelEnchantedLabel.htmlText = aUpdateObj.effects;
