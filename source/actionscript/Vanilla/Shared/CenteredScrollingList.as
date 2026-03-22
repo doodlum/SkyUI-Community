@@ -131,6 +131,8 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
       var _loc6_ = 0;
       var _loc2_ = this.filterer.ClampIndex(0);
       this.iDividerIndex = -1;
+      
+      // 1. Сначала находим все разделители (как в оригинале)
       var _loc7_ = 0;
       while(_loc7_ < this.EntriesA.length)
       {
@@ -140,14 +142,28 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
          }
          _loc7_ = _loc7_ + 1;
       }
-      if(this.bRecenterSelection || this.iPlatform != 0)
+
+      // --- НОВОЕ: ВЫЧИСЛЯЕМ ИНДЕКС ВЫБОРА ЗАРАНЕЕ ---
+      // Нам нужно заранее узнать, какой индекс окажется в центре после скролла
+      if(this.bRecenterSelection || this.iPlatform != 0 || this.bPointerHighlight)
       {
-         this.iSelectedIndex = -1;
+         var _tempLoc = this.filterer.ClampIndex(0);
+         var _scrollCounter = 0;
+         // Пропускаем элементы до позиции скролла
+         while(_scrollCounter < this.iScrollPosition && _tempLoc != undefined)
+         {
+            _tempLoc = this.filterer.GetNextFilterMatch(_tempLoc);
+            _scrollCounter++;
+         }
+         this.iSelectedIndex = _tempLoc;
       }
-      else if(!this.bPointerHighlight)
+      else
       {
          this.iSelectedIndex = this.filterer.ClampIndex(this.iSelectedIndex);
       }
+      // ----------------------------------------------
+
+      // Пропускаем элементы, которые находятся выше видимой области
       var _loc9_ = 0;
       while(_loc9_ < this.iScrollPosition - this.iNumTopHalfEntries)
       {
@@ -155,10 +171,13 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
          _loc2_ = this.filterer.GetNextFilterMatch(_loc2_);
          _loc9_ = _loc9_ + 1;
       }
+
       this.iListItemsShown = 0;
       this.iNumUnfilteredItems = 0;
       var _loc4_ = 0;
       var _loc5_;
+
+      // Рисуем верхнюю половину (теперь iSelectedIndex уже правильный!)
       while(_loc4_ < this.iNumTopHalfEntries)
       {
          _loc5_ = this.GetClipByIndex(_loc4_);
@@ -181,14 +200,15 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
          this.iListItemsShown++;
          _loc4_ = _loc4_ + 1;
       }
-      if(_loc2_ != undefined && (this.bRecenterSelection || this.iPlatform != 0 || this.bPointerHighlight))
-      {
-         this.iSelectedIndex = _loc2_;
-      }
+
+      // УДАЛЕНО: Здесь больше не нужно пересчитывать iSelectedIndex, 
+      // так как мы сделали это выше.
+
+      // Рисуем центральный и нижние элементы
       while(_loc2_ != undefined && _loc2_ != -1 && _loc2_ < this.EntriesA.length && this.iListItemsShown < this.iMaxItemsShown && _loc6_ <= this.fListHeight)
       {
          _loc5_ = this.GetClipByIndex(this.iListItemsShown);
-         this.SetEntry(_loc5_,this.EntriesA[_loc2_]);
+         this.SetEntry(_loc5_,this.EntriesA[_loc2_]); // Теперь здесь используется тот же индекс
          this.EntriesA[_loc2_].clipIndex = this.iListItemsShown;
          _loc5_.itemIndex = this.IsDivider(this.EntriesA[_loc2_]) == true ? undefined : _loc2_;
          _loc5_._y = _loc10_ + _loc6_;
@@ -201,6 +221,8 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
          }
          _loc2_ = this.filterer.GetNextFilterMatch(_loc2_);
       }
+      
+      // Остаток функции (скрытие невидимых клипов и MouseDrivenNav) остается без изменений...
       var _loc8_ = this.iListItemsShown;
       while(_loc8_ < this.iMaxItemsShown)
       {
@@ -407,33 +429,100 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
       }
    }
    function onItemPress(aiKeyboardOrMouse)
+{
+   if(aiKeyboardOrMouse == undefined)
    {
-      if(aiKeyboardOrMouse == undefined)
+      var _targetIndex_ = undefined;
+      
+      // === НАХОДИМ ЭЛЕМЕНТ ПОД КУРСОРОМ МЫШИ ===
+      // Проверяем все видимые клипы используя hitTest
+      for(var i = 0; i < this.iMaxItemsShown; i++)
+      {
+         var _clip_ = this.GetClipByIndex(i);
+         if(_clip_ != undefined && _clip_._visible && _clip_.itemIndex != undefined)
+         {
+            // hitTest с shapeFlag=false проверяет bounding box
+            if(_clip_.hitTest(_root._xmouse, _root._ymouse, false))
+            {
+               _targetIndex_ = _clip_.itemIndex;
+               break;
+            }
+         }
+      }
+      
+      // Если hitTest не сработал (например, клик на вложенный объект), 
+      // пробуем Mouse.getTopMostEntity()
+      if(_targetIndex_ == undefined)
+      {
+         var _mouseObj_ = Mouse.getTopMostEntity();
+         while(_mouseObj_ != undefined)
+         {
+            if(_mouseObj_._parent == this)
+            {
+               if(_mouseObj_.itemIndex != undefined)
+               {
+                  _targetIndex_ = _mouseObj_.itemIndex;
+                  break;
+               }
+               // Проверяем родителя если кликнули на дочерний объект
+               if(_mouseObj_._parent != undefined && _mouseObj_._parent.itemIndex != undefined)
+               {
+                  _targetIndex_ = _mouseObj_._parent.itemIndex;
+                  break;
+               }
+            }
+            _mouseObj_ = _mouseObj_._parent;
+         }
+      }
+      
+      // Если не нашли под мышью - используем центральный элемент
+      if(_targetIndex_ == undefined)
       {
          var _centerClip_ = this.GetClipByIndex(this.iNumTopHalfEntries);
-         var _pointerIndex_ = (_centerClip_ != undefined) ? _centerClip_.itemIndex : undefined;
-
-         if(!this.bDisableInput && !this.bDisableSelection && _pointerIndex_ != undefined)
-         {
-            if(!this.bPointerHighlight)
-            {
-               this.bPointerHighlight = true;
-               this.iSelectedIndex = _pointerIndex_;
-               this.UpdateList();
-            }
-            this.dispatchEvent({type:"itemPress",
-                                index:_pointerIndex_,
-                                entry:this.EntriesA[_pointerIndex_],
-                                keyboardOrMouse:aiKeyboardOrMouse});
-         }
-         else if(!this.bDisableInput)
-         {
-            this.dispatchEvent({type:"listPress"});
-         }
+         _targetIndex_ = (_centerClip_ != undefined) ? _centerClip_.itemIndex : undefined;
       }
-      else
+
+      if(!this.bDisableInput && !this.bDisableSelection && _targetIndex_ != undefined)
       {
-         super.onItemPress(aiKeyboardOrMouse);
+         // === СМЕЩАЕМ ВЫДЕЛЕНИЕ НА ЭЛЕМЕНТ ПОД МЫШЬЮ ===
+         if(this.iSelectedIndex != _targetIndex_)
+         {
+            this.iSelectedIndex = _targetIndex_;
+            this.bPointerHighlight = true;
+            
+            // Пересчитываем позицию скролла чтобы элемент оказался в центре
+            var _scrollPos_ = 0;
+            var _currIdx_ = this.filterer.ClampIndex(0);
+            while(_currIdx_ != undefined && _currIdx_ != this.iSelectedIndex)
+            {
+               _scrollPos_++;
+               _currIdx_ = this.filterer.GetNextFilterMatch(_currIdx_);
+            }
+            this.iScrollPosition = _scrollPos_ - this.iNumTopHalfEntries;
+            if(this.iScrollPosition < 0) this.iScrollPosition = 0;
+            if(this.iScrollPosition > this.iMaxScrollPosition) this.iScrollPosition = this.iMaxScrollPosition;
+            
+            this.UpdateList();
+         }
+         else if(!this.bPointerHighlight)
+         {
+            this.bPointerHighlight = true;
+            this.UpdateList();
+         }
+         
+         this.dispatchEvent({type:"itemPress",
+                             index:_targetIndex_,
+                             entry:this.EntriesA[_targetIndex_],
+                             keyboardOrMouse:aiKeyboardOrMouse});
+      }
+      else if(!this.bDisableInput)
+      {
+         this.dispatchEvent({type:"listPress"});
       }
    }
+   else
+   {
+      super.onItemPress(aiKeyboardOrMouse);
+   }
+}
 }
