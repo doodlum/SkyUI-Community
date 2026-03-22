@@ -31,7 +31,8 @@ class LockpickingMenu extends MovieClip
       Stage.scaleMode = "showAll";
       Shared.GlobalFunc.SetLockFunction();
       this.BottomBar_mc.Lock("B");
-      this.BottomBar_mc._y += Stage.safeRect.y - 3;
+      this.InfoRect_mc.Lock("R");
+      this.ButtonRect_mc.Lock("L");
       gfx.io.GameDelegate.addCallBack("UpdatePickAngle",this,"UpdatePickAngle");
       gfx.io.GameDelegate.addCallBack("UpdateLockAngle",this,"UpdateLockAngle");
       gfx.io.GameDelegate.addCallBack("UpdateSweetSpot",this,"UpdateSweetSpot");
