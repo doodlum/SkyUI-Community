@@ -157,6 +157,11 @@ Add_SWF(exported_skyui_widgetloader
     HUDWidgets/WidgetLoader.as
 )
 
+Add_SWF(exported_skyui_icons_effect_psychosteve
+    exported/skyui/icons_effect_psychosteve.swf
+    exported/skyui/icons_effect_psychosteve.xml
+)
+
 Add_SWF(exported_widgets_skyui_activeeffects
     exported/widgets/skyui/activeeffects.swf
     exported/widgets/skyui/activeeffects.xml
