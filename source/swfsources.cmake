@@ -53,12 +53,6 @@ Add_SWF(bartermenu
     Vanilla/Shared/GlobalFunc.as
 )
 
-
-
-
-
-
-
 Add_SWF(console
     console.swf
     console.xml
@@ -119,10 +113,6 @@ Add_SWF(craftingmenu
     Vanilla/Shared/ButtonChange.as
     Vanilla/Shared/GlobalFunc.as
 )
-
-
-
-
 
 Add_SWF(dialoguemenu
     dialoguemenu.swf
@@ -260,8 +250,6 @@ Add_SWF(inventorymenu
     ItemMenus/ItemcardDataExtender.as
 )
 
-
-
 Add_SWF(levelupmenu
     levelupmenu.swf
     levelupmenu.xml
@@ -339,8 +327,6 @@ Add_SWF(messagebox
     Vanilla/MessageBox.as
     Vanilla/Shared/GlobalFunc.as
 )
-
-
 
 Add_SWF(quest_journal
     quest_journal.swf
@@ -538,8 +524,6 @@ Add_SWF(statsmenu
     Vanilla/StatsMenu.as
 )
 
-
-
 Add_SWF(textentry
     textentry.swf
     textentry.xml
@@ -587,5 +571,3 @@ Add_SWF(tweenmenu
     Vanilla/Shared/GlobalFunc.as
     Vanilla/Shared/Proxy.as
 )
-
-
