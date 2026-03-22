@@ -1,11 +1,28 @@
 {
-    "bartermenu.xml": [],
+    "bartermenu.xml": [
+        "4"
+    ],
     "bookmenu.xml": [
         "25"
     ],
-    "console.xml": [],
-    "containermenu.xml": [],
-    "craftingmenu.xml": [],
+    "console.xml": [
+        "8"
+    ],
+    "containermenu.xml": [
+        "7"
+    ],
+    "craftingmenu.xml": [
+        "107",
+        "110",
+        "111",
+        "113",
+        "119",
+        "122",
+        "126",
+        "127",
+        "128",
+        "134"
+    ],
     "cursormenu.xml": [],
     "dialoguemenu.xml": [
         "236",
@@ -26,7 +43,9 @@
         "198",
         "203"
     ],
-    "giftmenu.xml": [],
+    "giftmenu.xml": [
+        "4"
+    ],
     "hudmenu.xml": [
         "147",
         "416",
@@ -66,7 +85,9 @@
         "833",
         "834"
     ],
-    "inventorymenu.xml": [],
+    "inventorymenu.xml": [
+        "4"
+    ],
     "levelupmenu.xml": [],
     "loadingmenu.xml": [
         "4",
@@ -80,7 +101,9 @@
         "50",
         "51"
     ],
-    "magicmenu.xml": [],
+    "magicmenu.xml": [
+        "2"
+    ],
     "map.xml": [
         "20",
         "29",
@@ -225,7 +248,23 @@
     ],
     "buttonart.xml": [],
     "configpanel.xml": [
-        "55"
+        "3",
+        "9",
+        "13",
+        "24",
+        "29",
+        "55",
+        "59",
+        "65",
+        "69",
+        "82",
+        "85",
+        "86",
+        "87",
+        "112",
+        "113",
+        "122",
+        "139"
     ],
     "icons_category_celtic.xml": [],
     "icons_category_curved.xml": [],
@@ -234,9 +273,15 @@
     "icons_item_psychosteve.xml": [],
     "inventorylists.xml": [],
     "itemcard.xml": [
+        "7",
+        "30",
+        "33",
+        "41",
+        "43",
         "66",
         "70",
         "71",
+        "73",  
         "94",
         "185",
         "232"
