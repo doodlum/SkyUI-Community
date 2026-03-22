@@ -4920,7 +4920,7 @@ Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMi
     <item type="DefineSpriteTag" forceWriteAsLong="true" frameCount="1" hasEndTag="true" spriteId="53">
       <subTags>
         <item type="PlaceObject2Tag" characterId="33" clipDepth="0" depth="1" forceWriteAsLong="false" placeFlagHasCharacter="true" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="false" placeFlagHasMatrix="true" placeFlagHasName="false" placeFlagHasRatio="false" placeFlagMove="false" ratio="0">
-          <matrix type="MATRIX" hasRotate="false" hasScale="true" nRotateBits="0" nScaleBits="0" nTranslateBits="0" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="2.0" scaleY="1.0" translateX="-12800" translateY="0"/>
+          <matrix type="MATRIX" hasRotate="true" hasScale="true" nRotateBits="0" nScaleBits="19" nTranslateBits="15" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="2.0" scaleY="1.0" translateX="-12800" translateY="0"/>
         </item>
         <item type="PlaceObject2Tag" characterId="34" clipDepth="0" depth="2" forceWriteAsLong="true" name="ButtonRect_mc" placeFlagHasCharacter="true" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="false" placeFlagHasMatrix="true" placeFlagHasName="true" placeFlagHasRatio="false" placeFlagMove="false" ratio="0">
           <matrix type="MATRIX" hasRotate="false" hasScale="false" nRotateBits="0" nScaleBits="0" nTranslateBits="11" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.0" scaleY="0.0" translateX="2080" translateY="-760"/>
