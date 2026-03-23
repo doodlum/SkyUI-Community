@@ -810,9 +810,10 @@ class ItemCard extends MovieClip
    }
    function ShrinkToFit(tf:TextField)
    {
-      var MAX_EXPANSION:Number = 60;
+      var MAX_EXPANSION:Number = 40;
       var MIN_FONT_SIZE:Number = 8;
-      var BOTTOM_PADDING:Number = 6;
+      var BOTTOM_PADDING:Number = 0;
+      var BOTTOM_PADDING_SHOUT:Number = -10;
 
       if (tf == undefined || tf.text == "") return;
 
@@ -845,19 +846,23 @@ class ItemCard extends MovieClip
       
       var tfHeight:Number = tf.getLineMetrics(0).height * tf.numLines;
       var baseHeight:Number = tf.origHeight;
-      
       var bg:MovieClip = (this.background != undefined) ? this.background : this.Enchanting_Background;
 
       if (tfHeight > baseHeight)
       {
-         var neededDelta:Number = (tfHeight - baseHeight) + BOTTOM_PADDING;
-         var actualExpansion:Number = Math.min(neededDelta, MAX_EXPANSION);
+         var textDelta:Number = (tfHeight - baseHeight);
+         var actualExpansion:Number = Math.min(textDelta, MAX_EXPANSION);
          
          tf._height = tf.origHeight + actualExpansion;
 
+         var isShout:Boolean = (tf == this.ShoutEffectsLabel);
+         var activePadding:Number = isShout ? BOTTOM_PADDING_SHOUT : BOTTOM_PADDING;
+
+         var totalPush:Number = actualExpansion + activePadding;
+
          if (bg != undefined) {
             if (bg.origHeight == undefined) bg.origHeight = bg._height;
-            bg._height = bg.origHeight + actualExpansion;
+            bg._height = bg.origHeight + totalPush;
          }
 
          for (var prop in this)
@@ -870,7 +875,7 @@ class ItemCard extends MovieClip
                if (obj.origY == undefined) obj.origY = obj._y;
                
                if (obj.origY > tf.origY) {
-                  obj._y = obj.origY + actualExpansion;
+                  obj._y = obj.origY + totalPush;
                }
             }
          }
@@ -882,10 +887,8 @@ class ItemCard extends MovieClip
          var beforeHtmlSize:String = "SIZE=\"" + fontSize.toString() + "\"";
          fontSize -= 1;
          var htmlSize:String = "SIZE=\"" + fontSize.toString() + "\"";
-         
          var newText:String = tfText.split(beforeHtmlSize).join(htmlSize);
          if (newText == tfText) break;
-         
          tfText = newText;
          tf.SetText(tfText, true);
          tfHeight = tf.getLineMetrics(0).height * tf.numLines;
