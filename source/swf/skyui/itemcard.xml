@@ -1758,6 +1758,9 @@ Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMi
         <item type="ShowFrameTag" forceWriteAsLong="false"/>
       </subTags>
     </item>
+    <item type="DefineScalingGridTag" characterId="27" forceWriteAsLong="false">
+      <splitter type="RECT" Xmax="7960" Xmin="600" Ymax="3100" Ymin="1600" nbits="14"/>
+    </item>
     <item type="ExportAssetsTag" forceWriteAsLong="true">
       <tags>
         <item>27</item>
@@ -3082,6 +3085,9 @@ Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMi
         </item>
         <item type="ShowFrameTag" forceWriteAsLong="false"/>
       </subTags>
+    </item>
+    <item type="DefineScalingGridTag" characterId="59" forceWriteAsLong="false">
+      <splitter type="RECT" Xmax="7960" Xmin="600" Ymax="2460" Ymin="1600" nbits="14"/>
     </item>
     <item type="ExportAssetsTag" forceWriteAsLong="true">
       <tags>
@@ -9030,6 +9036,9 @@ Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMi
         <item type="ShowFrameTag" forceWriteAsLong="false"/>
       </subTags>
     </item>
+    <item type="DefineScalingGridTag" characterId="106" forceWriteAsLong="false">
+      <splitter type="RECT" Xmax="7960" Xmin="600" Ymax="3100" Ymin="1600" nbits="14"/>
+    </item>
     <item type="DefineEditTextTag" align="1" autoSize="false" border="false" characterID="107" fontHeight="320" fontId="37" forceWriteAsLong="true" hasFont="true" hasFontClass="false" hasLayout="true" hasMaxLength="false" hasText="true" hasTextColor="true" html="true" indent="0" initialText="&lt;p align=&quot;right&quot;&gt;&lt;font face=&quot;$EverywhereMediumFont&quot; size=&quot;16&quot; color=&quot;#999999&quot; letterSpacing=&quot;0.000000&quot; kerning=&quot;1&quot;&gt;$DAMAGE&lt;/font&gt;&lt;/p&gt;" leading="40" leftMargin="0" maxLength="0" multiline="false" noSelect="true" password="false" readOnly="true" rightMargin="0" useOutlines="true" variableName="" wasStatic="false" wordWrap="false">
       <bounds type="RECT" Xmax="1301" Xmin="-40" Ymax="419" Ymin="-40" nbits="12"/>
       <textColor type="RGBA" alpha="255" blue="153" green="153" red="153"/>
@@ -9679,6 +9688,9 @@ Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMi
         </item>
         <item type="ShowFrameTag" forceWriteAsLong="false"/>
       </subTags>
+    </item>
+    <item type="DefineScalingGridTag" characterId="195" forceWriteAsLong="false">
+      <splitter type="RECT" Xmax="7960" Xmin="600" Ymax="4600" Ymin="3200" nbits="14"/>
     </item>
     <item type="DefineEditTextTag" align="2" autoSize="false" border="false" characterID="196" fontHeight="400" fontId="37" forceWriteAsLong="true" hasFont="true" hasFontClass="false" hasLayout="true" hasMaxLength="false" hasText="true" hasTextColor="true" html="true" indent="0" initialText="&lt;p align=&quot;center&quot;&gt;&lt;font face=&quot;$EverywhereMediumFont&quot; size=&quot;20&quot; color=&quot;#999999&quot; letterSpacing=&quot;0.800000&quot; kerning=&quot;1&quot;&gt;Creates a force that pushes targets away.&lt;/font&gt;&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;font face=&quot;$EverywhereMediumFont&quot; size=&quot;20&quot; color=&quot;#999999&quot; letterSpacing=&quot;0.800000&quot; kerning=&quot;1&quot;&gt;Creates a force that pushes targets away.&lt;/font&gt;&lt;/p&gt;" leading="40" leftMargin="0" maxLength="0" multiline="true" noSelect="false" password="false" readOnly="true" rightMargin="0" useOutlines="true" variableName="" wasStatic="false" wordWrap="true">
       <bounds type="RECT" Xmax="8080" Xmin="-40" Ymax="1028" Ymin="-40" nbits="14"/>
@@ -11110,6 +11122,9 @@ Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMi
         </item>
         <item type="ShowFrameTag" forceWriteAsLong="false"/>
       </subTags>
+    </item>
+    <item type="DefineScalingGridTag" characterId="210" forceWriteAsLong="false">
+      <splitter type="RECT" Xmax="7960" Xmin="600" Ymax="3100" Ymin="1600" nbits="14"/>
     </item>
     <item type="DefineEditTextTag" align="2" autoSize="false" border="false" characterID="211" fontHeight="400" fontId="37" forceWriteAsLong="true" hasFont="true" hasFontClass="false" hasLayout="true" hasMaxLength="false" hasText="true" hasTextColor="true" html="true" indent="0" initialText="&lt;p align=&quot;center&quot;&gt;&lt;font face=&quot;$EverywhereMediumFont&quot; size=&quot;20&quot; color=&quot;#999999&quot; letterSpacing=&quot;0.800000&quot; kerning=&quot;1&quot;&gt;Magic Effects Label Magic Effects Label Magic Effects Label Magic Effects Label Magic Effects Label&lt;/font&gt;&lt;/p&gt;" leading="40" leftMargin="0" maxLength="0" multiline="true" noSelect="true" password="false" readOnly="true" rightMargin="0" useOutlines="true" variableName="" wasStatic="false" wordWrap="true">
       <bounds type="RECT" Xmax="7349" Xmin="-40" Ymax="1315" Ymin="-40" nbits="14"/>

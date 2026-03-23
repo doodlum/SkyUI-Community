@@ -157,6 +157,23 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
       }
       this.iListItemsShown = 0;
       this.iNumUnfilteredItems = 0;
+      var _tempCenter_ = _loc2_;
+      var _tempIdx_ = 0;
+      while(_tempIdx_ < this.iNumTopHalfEntries)
+      {
+         if(this.iScrollPosition - this.iNumTopHalfEntries + _tempIdx_ >= 0)
+         {
+            if (_tempCenter_ != undefined) {
+               _tempCenter_ = this.filterer.GetNextFilterMatch(_tempCenter_);
+            }
+         }
+         _tempIdx_ = _tempIdx_ + 1;
+      }
+      
+      if(_tempCenter_ != undefined && (this.bRecenterSelection || this.iPlatform != 0 || this.bPointerHighlight))
+      {
+         this.iSelectedIndex = _tempCenter_;
+      }
       var _loc4_ = 0;
       var _loc5_;
       while(_loc4_ < this.iNumTopHalfEntries)
