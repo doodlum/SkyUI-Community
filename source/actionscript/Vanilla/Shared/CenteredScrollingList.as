@@ -22,6 +22,7 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
    var iPlatform;
    var iScrollPosition;
    var iSelectedIndex;
+   static var PLATFORM_PC = 0;
 
    function CenteredScrollingList()
    {
@@ -72,8 +73,7 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
       var currentY = 0;
       var entryIdx = this.filterer.ClampIndex(0);
       
-      var isConsole = this.iPlatform != 0;
-      var shouldRecenter = this.bRecenterSelection || isConsole || this.bPointerHighlight;
+      var shouldRecenter = this.bRecenterSelection || this.iPlatform != Shared.CenteredScrollingList.PLATFORM_PC || this.bPointerHighlight;
       
       this.iDividerIndex = -1;
       this.iListItemsShown = 0;
@@ -149,7 +149,7 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
       
       var dist = Math.abs(aEntryClip.clipIndex - this.iNumTopHalfEntries);
 
-      if (this.iPlatform == 0) {
+      if (this.iPlatform == Shared.CenteredScrollingList.PLATFORM_PC) {
          var isSelected = (aEntryObject == this.EntriesA[this.iSelectedIndex]);
          aEntryClip._alpha = isSelected ? 100 : 60;
       } else {
