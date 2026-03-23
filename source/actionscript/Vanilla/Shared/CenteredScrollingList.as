@@ -22,418 +22,256 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
    var iPlatform;
    var iScrollPosition;
    var iSelectedIndex;
-   var scrollPosition;
-   var selectedEntry;
 
    function CenteredScrollingList()
    {
       super();
       this._filterer = new Shared.ListFilterer();
-      this._filterer.addEventListener("filterChange",this,"onFilterChange");
+      this._filterer.addEventListener("filterChange", this, "onFilterChange");
       this.bRecenterSelection = false;
       this.iMaxTextLength = 256;
       this.iDividerIndex = -1;
       this.iNumUnfilteredItems = 0;
       this.bPointerHighlight = false;
    }
-   function get filterer()
-   {
-      return this._filterer;
-   }
-   function set maxTextLength(aLength)
-   {
-      if(aLength > 3)
-      {
-         this.iMaxTextLength = aLength;
-      }
-   }
-   function get numUnfilteredItems()
-   {
-      return this.iNumUnfilteredItems;
-   }
-   function get maxTextLength()
-   {
-      return this.iMaxTextLength;
-   }
-   function get numTopHalfEntries()
-   {
-      return this.iNumTopHalfEntries;
-   }
-   function set numTopHalfEntries(aiNum)
-   {
-      this.iNumTopHalfEntries = aiNum;
-   }
+
+   function get filterer() { return this._filterer; }
+   function set maxTextLength(aLength) { if (aLength > 3) this.iMaxTextLength = aLength; }
+   function get numUnfilteredItems() { return this.iNumUnfilteredItems; }
+   function get numTopHalfEntries() { return this.iNumTopHalfEntries; }
+
+   function set numTopHalfEntries(aiNum) { this.iNumTopHalfEntries = aiNum; }
+
    function get centeredEntry()
    {
-      return this.EntriesA[this.GetClipByIndex(this.iNumTopHalfEntries).itemIndex];
-   }
-   function IsDivider(aEntry)
-   {
-      return aEntry.divider == true || aEntry.flag == 0;
+      var centerClip = this.GetClipByIndex(this.iNumTopHalfEntries);
+      return (centerClip && centerClip.itemIndex != undefined) ? this.EntriesA[centerClip.itemIndex] : null;
    }
 
-   function get dividerIndex()
-   {
-      return this.iDividerIndex;
-   }
+   function IsDivider(aEntry) { return aEntry.divider == true || aEntry.flag == 0; }
 
    function RestoreScrollPosition(aiNewPosition, abRecenterSelection)
    {
-      this.iScrollPosition = aiNewPosition;
-      if(this.iScrollPosition < 0)
-      {
-         this.iScrollPosition = 0;
-      }
-      if(this.iScrollPosition > this.iMaxScrollPosition)
-      {
-         this.iScrollPosition = this.iMaxScrollPosition;
-      }
+      this.iScrollPosition = Math.max(0, Math.min(aiNewPosition, this.iMaxScrollPosition));
       this.bRecenterSelection = abRecenterSelection;
    }
-   function onMouseMove()
-   {
-      if (this.bPointerHighlight)
-      {
-         this.bPointerHighlight = false;
-         this.UpdateList(); 
-      }
-   }
 
-   function doSetSelectedIndex(aiNewIndex, aiKeyboardOrMouse)
-   {
-      if (this.bPointerHighlight && aiKeyboardOrMouse == 0) return;
-
-      if(!this.bDisableSelection && aiNewIndex != this.iSelectedIndex)
-      {
-         this.bPointerHighlight = false; 
-         this.iSelectedIndex = aiNewIndex;
-
-         var _loc2_ = 0;
-         while(_loc2_ < this.iMaxItemsShown)
-         {
-            var _cl_ = this.GetClipByIndex(_loc2_);
-            if(_cl_ != undefined && _cl_.itemIndex != undefined)
-            {
-               this.SetEntry(_cl_, this.EntriesA[_cl_.itemIndex]);
-            }
-            _loc2_++;
-         }
-
-         this.dispatchEvent({type:"selectionChange",
-                             index:this.iSelectedIndex,
-                             keyboardOrMouse:aiKeyboardOrMouse});
-      }
-   }
-
-   function UpdateList()
-   {
-      var _loc10_ = this.GetClipByIndex(0)._y;
-      var _loc6_ = 0;
-      var _loc2_ = this.filterer.ClampIndex(0);
-      this.iDividerIndex = -1;
-      var _loc7_ = 0;
-      while(_loc7_ < this.EntriesA.length)
-      {
-         if(this.IsDivider(this.EntriesA[_loc7_]))
-         {
-            this.iDividerIndex = _loc7_;
-         }
-         _loc7_ = _loc7_ + 1;
-      }
-      if(this.bRecenterSelection || this.iPlatform != 0)
-      {
-         this.iSelectedIndex = -1;
-      }
-      else if(!this.bPointerHighlight)
-      {
-         this.iSelectedIndex = this.filterer.ClampIndex(this.iSelectedIndex);
-      }
-      var _loc9_ = 0;
-      while(_loc9_ < this.iScrollPosition - this.iNumTopHalfEntries)
-      {
-         this.EntriesA[_loc2_].clipIndex = undefined;
-         _loc2_ = this.filterer.GetNextFilterMatch(_loc2_);
-         _loc9_ = _loc9_ + 1;
-      }
-      this.iListItemsShown = 0;
-      this.iNumUnfilteredItems = 0;
-      var _loc4_ = 0;
-      var _loc5_;
-      while(_loc4_ < this.iNumTopHalfEntries)
-      {
-         _loc5_ = this.GetClipByIndex(_loc4_);
-         if(this.iScrollPosition - this.iNumTopHalfEntries + _loc4_ >= 0)
-         {
-            this.SetEntry(_loc5_,this.EntriesA[_loc2_]);
-            _loc5_._visible = true;
-            _loc5_.itemIndex = this.IsDivider(this.EntriesA[_loc2_]) == true ? undefined : _loc2_;
-            this.EntriesA[_loc2_].clipIndex = _loc4_;
-            _loc2_ = this.filterer.GetNextFilterMatch(_loc2_);
-            this.iNumUnfilteredItems++;
-         }
-         else
-         {
-            _loc5_._visible = false;
-            _loc5_.itemIndex = undefined;
-         }
-         _loc5_._y = _loc10_ + _loc6_;
-         _loc6_ += _loc5_._height;
-         this.iListItemsShown++;
-         _loc4_ = _loc4_ + 1;
-      }
-      if(_loc2_ != undefined && (this.bRecenterSelection || this.iPlatform != 0 || this.bPointerHighlight))
-      {
-         this.iSelectedIndex = _loc2_;
-      }
-      while(_loc2_ != undefined && _loc2_ != -1 && _loc2_ < this.EntriesA.length && this.iListItemsShown < this.iMaxItemsShown && _loc6_ <= this.fListHeight)
-      {
-         _loc5_ = this.GetClipByIndex(this.iListItemsShown);
-         this.SetEntry(_loc5_,this.EntriesA[_loc2_]);
-         this.EntriesA[_loc2_].clipIndex = this.iListItemsShown;
-         _loc5_.itemIndex = this.IsDivider(this.EntriesA[_loc2_]) == true ? undefined : _loc2_;
-         _loc5_._y = _loc10_ + _loc6_;
-         _loc5_._visible = true;
-         _loc6_ += _loc5_._height;
-         if(_loc6_ <= this.fListHeight && this.iListItemsShown < this.iMaxItemsShown)
-         {
-            this.iListItemsShown++;
-            this.iNumUnfilteredItems++;
-         }
-         _loc2_ = this.filterer.GetNextFilterMatch(_loc2_);
-      }
-      var _loc8_ = this.iListItemsShown;
-      while(_loc8_ < this.iMaxItemsShown)
-      {
-         this.GetClipByIndex(_loc8_)._visible = false;
-         this.GetClipByIndex(_loc8_).itemIndex = undefined;
-         _loc8_ = _loc8_ + 1;
-      }
-      var _loc3_;
-      if(this.bMouseDrivenNav && !this.bRecenterSelection && !this.bPointerHighlight)
-      {
-         _loc3_ = Mouse.getTopMostEntity();
-         while(_loc3_ != undefined)
-         {
-            if(_loc3_._parent == this && _loc3_._visible && _loc3_.itemIndex != undefined)
-            {
-               this.doSetSelectedIndex(_loc3_.itemIndex,0);
-            }
-            _loc3_ = _loc3_._parent;
-         }
-      }
-      this.bRecenterSelection = false;
-   }
    function InvalidateData()
    {
       this.bPointerHighlight = false;
       this.filterer.filterArray = this.EntriesA;
       this.fListHeight = this.border._height;
       this.CalculateMaxScrollPosition();
-      if(this.iScrollPosition > this.iMaxScrollPosition)
-      {
-         this.iScrollPosition = this.iMaxScrollPosition;
-      }
+      this.iScrollPosition = Math.min(this.iScrollPosition, this.iMaxScrollPosition);
       this.UpdateList();
    }
-   function onFilterChange()
-   {
-      this.iSelectedIndex = this.filterer.ClampIndex(this.iSelectedIndex);
-      this.CalculateMaxScrollPosition();
-   }
-   function moveSelectionUp()
-   {
-      if(!this.bPointerHighlight)
-      {
-         var _centerClip_ = this.GetClipByIndex(this.iNumTopHalfEntries);
-         if(_centerClip_ != undefined && _centerClip_.itemIndex != undefined)
-         {
-            this.iSelectedIndex = _centerClip_.itemIndex;
-         }
-      }
-      this.bPointerHighlight = true;
 
-      var _loc4_ = this.GetClipByIndex(this.iNumTopHalfEntries);
-      var _loc2_ = this.filterer.GetPrevFilterMatch(this.iSelectedIndex);
-      var _loc3_ = this.iScrollPosition;
-      if(_loc2_ != undefined && this.IsDivider(this.EntriesA[_loc2_]) == true)
-      {
-         this.iScrollPosition--;
-         _loc2_ = this.filterer.GetPrevFilterMatch(_loc2_);
-      }
-      if(_loc2_ != undefined)
-      {
-         this.iSelectedIndex = _loc2_;
-         if(this.iScrollPosition > 0)
-         {
-            this.iScrollPosition--;
+   function UpdateList()
+   {
+      var baseY = this.GetClipByIndex(0)._y;
+      var currentY = 0;
+      var entryIdx = this.filterer.ClampIndex(0);
+      
+      var isConsole = this.iPlatform != 0;
+      var shouldRecenter = this.bRecenterSelection || isConsole || this.bPointerHighlight;
+      
+      this.iDividerIndex = -1;
+      this.iListItemsShown = 0;
+      this.iNumUnfilteredItems = 0;
+
+      for (var i = 0; i < this.EntriesA.length; i++) {
+         if (this.IsDivider(this.EntriesA[i])) {
+            this.iDividerIndex = i;
          }
-         this.bMouseDrivenNav = false;
+      }
+
+      if (shouldRecenter) {
+         this.iSelectedIndex = -1;
+      }
+
+      var skipCount = Math.max(0, this.iScrollPosition - this.iNumTopHalfEntries);
+      for (var s = 0; s < skipCount && entryIdx != undefined; s++) {
+         entryIdx = this.filterer.GetNextFilterMatch(entryIdx);
+      }
+
+      var firstVisibleSlot = Math.max(0, this.iNumTopHalfEntries - this.iScrollPosition);
+
+      for (var clipIdx = 0; clipIdx < this.iMaxItemsShown; clipIdx++) {
+         var clip = this.GetClipByIndex(clipIdx);
+         var isVisible = (clipIdx >= firstVisibleSlot) && (entryIdx != undefined) && (entryIdx < this.EntriesA.length);
+
+         if (isVisible && currentY <= this.fListHeight) {
+            var entry = this.EntriesA[entryIdx];
+            
+            clip.itemIndex = this.IsDivider(entry) ? undefined : entryIdx;
+            clip.clipIndex = clipIdx;
+            clip._visible = true;
+
+            if (clipIdx == this.iNumTopHalfEntries && shouldRecenter) {
+               this.iSelectedIndex = entryIdx;
+            }
+
+            this.SetEntry(clip, entry);
+
+            entryIdx = this.filterer.GetNextFilterMatch(entryIdx);
+            this.iNumUnfilteredItems++;
+            this.iListItemsShown++;
+         } else {
+            clip._visible = false;
+            clip.itemIndex = undefined;
+            clip.clipIndex = undefined;
+         }
+         
+         clip._y = baseY + currentY;
+         currentY += clip._height;
+      }
+
+      if (this.bMouseDrivenNav && !shouldRecenter) {
+         var mouseTarget = Mouse.getTopMostEntity();
+         while (mouseTarget != undefined) {
+            if (mouseTarget._parent == this && mouseTarget._visible && mouseTarget.itemIndex != undefined) {
+               this.doSetSelectedIndex(mouseTarget.itemIndex, 0);
+               break;
+            }
+            mouseTarget = mouseTarget._parent;
+         }
+      }
+      
+      this.bRecenterSelection = false;
+   }
+
+   function SetEntry(aEntryClip, aEntryObject)
+   {
+      if (!aEntryClip) return;
+      
+      var isDivider = this.IsDivider(aEntryObject);
+      aEntryClip.gotoAndStop(isDivider ? "Divider" : "Normal");
+      
+      var dist = Math.abs(aEntryClip.clipIndex - this.iNumTopHalfEntries);
+
+      if (this.iPlatform == 0) {
+         var isSelected = (aEntryObject == this.EntriesA[this.iSelectedIndex]);
+         aEntryClip._alpha = isSelected ? 100 : 60;
+      } else {
+         var dist = Math.abs(aEntryClip.clipIndex - this.iNumTopHalfEntries);
+         aEntryClip._alpha = (dist == 0) ? 100 : Math.max(20, 60 - dist * 10);
+      }
+      
+      this.SetEntryText(aEntryClip, aEntryObject);
+   }
+
+   function _moveSelection(direction, eventType)
+   {
+      this.bPointerHighlight = true;
+      this.bMouseDrivenNav = false;
+
+      var oldScroll = this.iScrollPosition;
+      var newScroll = this.iScrollPosition + direction;
+      
+      this.iScrollPosition = Math.max(0, Math.min(this.iMaxScrollPosition, newScroll));
+
+      if (oldScroll != this.iScrollPosition) {
          this.UpdateList();
-         this.dispatchEvent({type:"listMovedUp",index:this.iSelectedIndex,scrollChanged:_loc3_ != this.iScrollPosition});
+         this.dispatchEvent({
+            type: eventType, 
+            index: this.iSelectedIndex, 
+            scrollChanged: true
+         });
       }
    }
-   function moveSelectionDown()
-   {
-      if(!this.bPointerHighlight)
-      {
-         var _centerClip_ = this.GetClipByIndex(this.iNumTopHalfEntries);
-         if(_centerClip_ != undefined && _centerClip_.itemIndex != undefined)
-         {
-            this.iSelectedIndex = _centerClip_.itemIndex;
-         }
-      }
-      this.bPointerHighlight = true;
 
-      var _loc4_ = this.GetClipByIndex(this.iNumTopHalfEntries);
-      var _loc2_ = this.filterer.GetNextFilterMatch(this.iSelectedIndex);
-      var _loc3_ = this.iScrollPosition;
-      if(_loc2_ != undefined && this.IsDivider(this.EntriesA[_loc2_]) == true)
-      {
-         this.iScrollPosition++;
-         _loc2_ = this.filterer.GetNextFilterMatch(_loc2_);
+   function moveSelectionUp() { this._moveSelection(-1, "listMovedUp"); }
+
+   function moveSelectionDown() { this._moveSelection(1, "listMovedDown"); }
+
+   function onMouseMove()
+   {
+      this.bMouseDrivenNav = true;
+      this.bPointerHighlight = false;
+
+      var item = this.GetItemUnderMouse();
+      if (item) {
+         this.doSetSelectedIndex(item.itemIndex, 0);
       }
-      if(_loc2_ != undefined)
-      {
-         this.iSelectedIndex = _loc2_;
-         if(this.iScrollPosition < this.iMaxScrollPosition)
-         {
-            this.iScrollPosition++;
-         }
-         this.bMouseDrivenNav = false;
-         this.UpdateList();
-         this.dispatchEvent({type:"listMovedDown",index:this.iSelectedIndex,scrollChanged:_loc3_ != this.iScrollPosition});
+   }
+   function onMouseDown()
+   {
+      if (this.bDisableInput) return;
+
+      this.bMouseDrivenNav = true;
+      this.bPointerHighlight = false;
+
+      var item = this.GetItemUnderMouse();
+      if (item) {
+         this.doSetSelectedIndex(item.itemIndex, 0);
+         this.dispatchEvent({type: "itemClicked", index: item.itemIndex});
       }
    }
    function onMouseWheel(delta)
    {
-      var _loc2_;
-      var _loc4_;
-      var _loc3_;
-      if(!this.bDisableInput)
-      {
-         _loc2_ = Mouse.getTopMostEntity();
-         while(_loc2_ && _loc2_ != undefined)
-         {
-            if(_loc2_ == this)
-            {
-               this.bPointerHighlight = true;
+      if (this.bDisableInput) return;
+      
+      var target = Mouse.getTopMostEntity();
+      while (target != undefined && target != this) {
+         target = target._parent;
+      }
+      if (target != this) return;
 
-               if(delta < 0)
-               {
-                  _loc4_ = this.GetClipByIndex(this.iNumTopHalfEntries + 1);
-                  if(_loc4_._visible == true)
-                  {
-                     if(_loc4_.itemIndex == undefined)
-                     {
-                        this.scrollPosition += 2;
-                     }
-                     else
-                     {
-                        this.scrollPosition += 1;
-                     }
-                  }
-               }
-               else if(delta > 0)
-               {
-                  _loc3_ = this.GetClipByIndex(this.iNumTopHalfEntries - 1);
-                  if(_loc3_._visible == true)
-                  {
-                     if(_loc3_.itemIndex == undefined)
-                     {
-                        this.scrollPosition -= 2;
-                     }
-                     else
-                     {
-                        this.scrollPosition -= 1;
-                     }
-                  }
-               }
-            }
-            _loc2_ = _loc2_._parent;
-         }
-         this.bMouseDrivenNav = true;
+      this.bPointerHighlight = true;
+      this.bMouseDrivenNav = true;
+      
+      var oldScroll = this.iScrollPosition;
+      var direction = (delta > 0) ? -1 : 1;
+      
+      this.iScrollPosition = Math.max(0, Math.min(this.iMaxScrollPosition, this.iScrollPosition + direction));
+      
+      if (oldScroll != this.iScrollPosition) {
+         this.UpdateList();
       }
    }
+   function GetItemUnderMouse()
+   {
+      var mouseTarget = Mouse.getTopMostEntity();
+      while (mouseTarget != undefined) {
+         if (mouseTarget._parent == this && mouseTarget._visible && mouseTarget.itemIndex != undefined) {
+            return mouseTarget;
+         }
+         mouseTarget = mouseTarget._parent;
+      }
+      return null;
+   }
+
    function CalculateMaxScrollPosition()
    {
-      this.iMaxScrollPosition = -1;
-      var _loc2_ = this.filterer.ClampIndex(0);
-      while(_loc2_ != undefined)
-      {
-         this.iMaxScrollPosition++;
-         _loc2_ = this.filterer.GetNextFilterMatch(_loc2_);
+      var count = 0;
+      var idx = this.filterer.ClampIndex(0);
+      while (idx != undefined) {
+         count++;
+         idx = this.filterer.GetNextFilterMatch(idx);
       }
-      if(this.iMaxScrollPosition == undefined || this.iMaxScrollPosition < 0)
-      {
-         this.iMaxScrollPosition = 0;
-      }
+      this.iMaxScrollPosition = Math.max(0, count - 1);
    }
-   function SetEntry(aEntryClip, aEntryObject)
-   {
-      var _loc3_;
-      if(aEntryClip != undefined)
-      {
-         if(this.IsDivider(aEntryObject) == true)
-         {
-            aEntryClip.gotoAndStop("Divider");
-         }
-         else
-         {
-            aEntryClip.gotoAndStop("Normal");
-         }
-         if(this.iPlatform == 0)
-         {
-            var selectedEntry = this.EntriesA[this.iSelectedIndex];
-            aEntryClip._alpha = aEntryObject == selectedEntry ? 100 : 60;
-         }
-         else
-         {
-            _loc3_ = 4;
-            if(aEntryClip.clipIndex < this.iNumTopHalfEntries)
-            {
-               aEntryClip._alpha = 60 - _loc3_ * (this.iNumTopHalfEntries - aEntryClip.clipIndex);
-            }
-            else if(aEntryClip.clipIndex > this.iNumTopHalfEntries)
-            {
-               aEntryClip._alpha = 60 - _loc3_ * (aEntryClip.clipIndex - this.iNumTopHalfEntries);
-            }
-            else
-            {
-               aEntryClip._alpha = 100;
-            }
-         }
-         
-         this.SetEntryText(aEntryClip,aEntryObject);
-      }
-   }
-   function onItemPress(aiKeyboardOrMouse)
-   {
-      if(aiKeyboardOrMouse == undefined)
-      {
-         var _centerClip_ = this.GetClipByIndex(this.iNumTopHalfEntries);
-         var _pointerIndex_ = (_centerClip_ != undefined) ? _centerClip_.itemIndex : undefined;
 
-         if(!this.bDisableInput && !this.bDisableSelection && _pointerIndex_ != undefined)
-         {
-            if(!this.bPointerHighlight)
-            {
-               this.bPointerHighlight = true;
-               this.iSelectedIndex = _pointerIndex_;
-               this.UpdateList();
+   function onFilterChange()
+   {
+      this.iSelectedIndex = this.filterer.ClampIndex(this.iSelectedIndex);
+      this.CalculateMaxScrollPosition();
+      this.UpdateList();
+   }
+
+   function doSetSelectedIndex(aiNewIndex, aiKeyboardOrMouse)
+   {
+      if (this.bPointerHighlight && aiKeyboardOrMouse == 0) return;
+
+      if (!this.bDisableSelection && aiNewIndex != this.iSelectedIndex) {
+         this.iSelectedIndex = aiNewIndex;
+         for (var i = 0; i < this.iMaxItemsShown; i++) {
+            var clip = this.GetClipByIndex(i);
+            if (clip && clip.itemIndex != undefined) {
+               this.SetEntry(clip, this.EntriesA[clip.itemIndex]);
             }
-            this.dispatchEvent({type:"itemPress",
-                                index:_pointerIndex_,
-                                entry:this.EntriesA[_pointerIndex_],
-                                keyboardOrMouse:aiKeyboardOrMouse});
          }
-         else if(!this.bDisableInput)
-         {
-            this.dispatchEvent({type:"listPress"});
-         }
-      }
-      else
-      {
-         super.onItemPress(aiKeyboardOrMouse);
+         this.dispatchEvent({type: "selectionChange", index: this.iSelectedIndex, keyboardOrMouse: aiKeyboardOrMouse});
       }
    }
 }
