@@ -367,7 +367,7 @@ Add_SWF(quest_journal
     PauseMenu/QuestCenteredList.as
     PauseMenu/Quest_Journal.as
     PauseMenu/QuestsPage.as
-    PauseMenu/SaveLoadPanel.as
+    Vanilla/SaveLoadPanel.as
     PauseMenu/SettingsOptionItem.as
     PauseMenu/StatsList.as
     PauseMenu/StatsPage.as
