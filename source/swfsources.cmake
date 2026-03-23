@@ -1,18 +1,14 @@
-# cmake/SWFSources.cmake (Generated)
-# Consolidated source and path mapping for all SWF targets.
-# Identical files are commented out.
-
 macro(Add_SWF _TARGET_NAME _SWF_REL _XML_PATH)
     set(_BASE_SWF "${CMAKE_CURRENT_BINARY_DIR}/interface/base/${_SWF_REL}")
     set(_FINAL_SWF "${CMAKE_CURRENT_BINARY_DIR}/interface/${_SWF_REL}")
 
-    # Phase 1: Rebuild base from XML
+    # Rebuild base from XML
     Add_XML_Base(
         OUTPUT_SWF "${_BASE_SWF}"
         XML_PATH   "${_XML_PATH}"
     )
 
-    # Phase 2: Inject ActionScript sources into that base
+    # Inject ActionScript sources into that base
     Add_AS(
         TARGET_NAME  AS_${_TARGET_NAME}
         SWF_REL      "${_SWF_REL}"
@@ -598,5 +594,3 @@ Add_SWF(tweenmenu
     Vanilla/Shared/GlobalFunc.as
     Vanilla/Shared/Proxy.as
 )
-
-
