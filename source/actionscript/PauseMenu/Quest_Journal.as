@@ -40,6 +40,7 @@ class Quest_Journal extends MovieClip
       this.BottomBar_mc._y += Stage.safeRect.y + marginBottomBar;
 
       this.ConfigPanel = _root.ConfigPanelFader.configPanel;
+      _root.ConfigPanelFader._visible = false;
       this.QuestsTab.disableFocus = true;
       this.StatsTab.disableFocus = true;
       this.SystemTab.disableFocus = true;
@@ -205,6 +206,7 @@ class Quest_Journal extends MovieClip
       this.DisableTabs(true);
       this.SystemFader.Page_mc.endPage();
       this.DoHideMenu();
+      _root.ConfigPanelFader._visible = true;
       _root.ConfigPanelFader.swapDepths(_root.QuestJournalFader);
       gfx.managers.FocusHandler.instance.setFocus(this.ConfigPanel,0);
       this.ConfigPanel.startPage();
@@ -213,6 +215,7 @@ class Quest_Journal extends MovieClip
    {
       this.ConfigPanel.endPage();
       _root.QuestJournalFader.swapDepths(_root.ConfigPanelFader);
+      _root.ConfigPanelFader._visible = false;
       gfx.managers.FocusHandler.instance.setFocus(this,0);
       this.DoShowMenu();
       this.SystemFader.Page_mc.startPage();
