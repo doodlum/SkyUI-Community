@@ -117,6 +117,8 @@ if(NOT CMAKE_SCRIPT_MODE_FILE)
                 "-DSOURCES_FILE=${_SOURCES_LIST_FILE}"
                 "-DFRAME_SOURCES_FILE=${_FRAME_SOURCES_LIST_FILE}"
                 "-DAS_SOURCE_DIR=${_AS_SOURCE_DIR}"
+                "-DSKYUI_VERSION_MAJOR=${PROJECT_VERSION_MAJOR}"
+                "-DSKYUI_VERSION_MINOR=${PROJECT_VERSION_MINOR}"
                 -P "${_AS_IMPORT_MODULE_SCRIPT}"
 
             # 2. Copy Base SWF
@@ -182,6 +184,14 @@ else()
             get_filename_component(DST_DIR "${DST}" DIRECTORY)
             file(MAKE_DIRECTORY "${DST_DIR}")
             file(COPY_FILE "${SRC}" "${DST}" ONLY_IF_DIFFERENT)
+
+            # Patch version if variables are provided
+            if(DEFINED SKYUI_VERSION_MAJOR AND DEFINED SKYUI_VERSION_MINOR)
+                file(READ "${DST}" _CONTENT)
+                string(REGEX REPLACE "static var SKYUI_VERSION_MAJOR = [0-9]+;" "static var SKYUI_VERSION_MAJOR = ${SKYUI_VERSION_MAJOR};" _CONTENT "${_CONTENT}")
+                string(REGEX REPLACE "static var SKYUI_VERSION_MINOR = [0-9]+;" "static var SKYUI_VERSION_MINOR = ${SKYUI_VERSION_MINOR};" _CONTENT "${_CONTENT}")
+                file(WRITE "${DST}" "${_CONTENT}")
+            endif()
         endforeach()
     endif()
 
@@ -191,7 +201,16 @@ else()
         foreach(SRC ${FRAME_SOURCES})
             if(SRC AND EXISTS "${SRC}")
                 get_filename_component(FNAME "${SRC}" NAME)
-                file(COPY_FILE "${SRC}" "${STAGING_DIR}/${FNAME}" ONLY_IF_DIFFERENT)
+                set(DST "${STAGING_DIR}/${FNAME}")
+                file(COPY_FILE "${SRC}" "${DST}" ONLY_IF_DIFFERENT)
+
+                # Patch version if variables are provided
+                if(DEFINED SKYUI_VERSION_MAJOR AND DEFINED SKYUI_VERSION_MINOR)
+                    file(READ "${DST}" _CONTENT)
+                    string(REGEX REPLACE "static var SKYUI_VERSION_MAJOR = [0-9]+;" "static var SKYUI_VERSION_MAJOR = ${SKYUI_VERSION_MAJOR};" _CONTENT "${_CONTENT}")
+                    string(REGEX REPLACE "static var SKYUI_VERSION_MINOR = [0-9]+;" "static var SKYUI_VERSION_MINOR = ${SKYUI_VERSION_MINOR};" _CONTENT "${_CONTENT}")
+                    file(WRITE "${DST}" "${_CONTENT}")
+                endif()
             endif()
         endforeach()
     endif()

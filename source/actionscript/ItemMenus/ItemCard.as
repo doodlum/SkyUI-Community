@@ -810,14 +810,30 @@ class ItemCard extends MovieClip
    }
    function ShrinkToFit(tf:TextField)
    {
+      var MAX_EXPANSION:Number = 40;
+      var MIN_FONT_SIZE:Number = 8;
+      var BOTTOM_PADDING:Number = 0;
+      var BOTTOM_PADDING_SHOUT:Number = -10;
+
       if (tf == undefined || tf.text == "") return;
 
-      if (tf.origHeight == undefined) {
-         tf.origHeight = tf._height;
+      if (tf.origHeight == undefined) tf.origHeight = tf._height;
+      if (tf.origY == undefined) tf.origY = tf._y;
+
+      for (var prop in this) {
+         var obj = this[prop];
+         if ((obj instanceof MovieClip || obj instanceof TextField) && obj._parent == this) {
+            if (obj != this.ItemText && obj != this.ItemText.ItemTextField && obj.origY != undefined) {
+               obj._y = obj.origY;
+            }
+         }
+      }
+
+      if (this.background != undefined && this.background.origHeight != undefined) {
+         this.background._height = this.background.origHeight;
       }
       
       tf._height = tf.origHeight;
-
       tf.multiline = true;
       tf.wordWrap = true;
       tf.textAutoSize = "none";
@@ -830,57 +846,50 @@ class ItemCard extends MovieClip
       
       var tfHeight:Number = tf.getLineMetrics(0).height * tf.numLines;
       var baseHeight:Number = tf.origHeight;
-      
-      if (this.background != undefined && this.background.origHeight != undefined) {
-         this.background._height = this.background.origHeight;
-      } else if (this.background != undefined) {
-         this.background.origHeight = this.background._height;
-      }
+      var bg:MovieClip = (this.background != undefined) ? this.background : this.Enchanting_Background;
 
       if (tfHeight > baseHeight)
       {
-         var neededDelta:Number = (tfHeight - baseHeight) + 6;
-         var actualExpansion:Number = Math.min(neededDelta, 80);
+         var textDelta:Number = (tfHeight - baseHeight);
+         var actualExpansion:Number = Math.min(textDelta, MAX_EXPANSION);
          
          tf._height = tf.origHeight + actualExpansion;
 
-         var bg:MovieClip = (this.background != undefined) ? this.background : undefined;
-         
+         var isShout:Boolean = (tf == this.ShoutEffectsLabel);
+         var activePadding:Number = isShout ? BOTTOM_PADDING_SHOUT : BOTTOM_PADDING;
+
+         var totalPush:Number = actualExpansion + activePadding;
+
          if (bg != undefined) {
-            bg._height = bg.origHeight + actualExpansion;
+            if (bg.origHeight == undefined) bg.origHeight = bg._height;
+            bg._height = bg.origHeight + totalPush;
          }
 
          for (var prop in this)
          {
             var obj = this[prop];
             if ((obj instanceof MovieClip || obj instanceof TextField) 
-               && obj != tf 
-               && obj != bg
-               && obj._parent == this)
+               && obj._parent == this && obj != tf && obj != bg 
+               && obj != this.ItemText && obj != this.ItemText.ItemTextField)
             {
                if (obj.origY == undefined) obj.origY = obj._y;
                
-               if (obj._y > tf._y) {
-                  obj._y = obj.origY + actualExpansion;
+               if (obj.origY > tf.origY) {
+                  obj._y = obj.origY + totalPush;
                }
             }
          }
-
          tfHeight = tf.getLineMetrics(0).height * tf.numLines;
       }
 
-      while (tfHeight > tf._height && fontSize > 5)
+      while (tfHeight > tf._height && fontSize > MIN_FONT_SIZE)
       {
          var beforeHtmlSize:String = "SIZE=\"" + fontSize.toString() + "\"";
          fontSize -= 1;
          var htmlSize:String = "SIZE=\"" + fontSize.toString() + "\"";
-
          var newText:String = tfText.split(beforeHtmlSize).join(htmlSize);
-         
          if (newText == tfText) break;
          tfText = newText;
-
-         tf.textAutoSize = "none";
          tf.SetText(tfText, true);
          tfHeight = tf.getLineMetrics(0).height * tf.numLines;
       }

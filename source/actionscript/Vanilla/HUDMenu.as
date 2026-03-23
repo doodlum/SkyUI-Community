@@ -189,6 +189,7 @@ class HUDMenu extends Shared.PlatformChangeUser
       this.HudElements.push(this.FloatingQuestMarker_mc);
       this.HudElements.push(this.LocationLockBase);
       this.HudElements.push(this.TutorialLockInstance);
+      
       this.Health.All = true;
       this.Magica.All = true;
       this.Stamina.All = true;
@@ -209,9 +210,10 @@ class HUDMenu extends Shared.PlatformChangeUser
       this.ArrowInfoInstance.All = true;
       this.FloatingQuestMarker_mc.All = true;
       this.StealthMeterInstance.SneakTextHolder.SneakTextClip.All = true;
-      this.StealthMeterInstance.SneakTextHolder.SneakTextClip.SneakTextInstance.All = true;
+      this.StealthMeterInstance.SneakTextHolder.SneakTextClip.SneakTextInstance.All = true;    
       this.LocationLockBase.All = true;
       this.TutorialLockInstance.All = true;
+      
       this.CrosshairInstance.Favor = true;
       this.RolloverText.Favor = true;
       this.RolloverInfoText.Favor = true;
@@ -228,22 +230,38 @@ class HUDMenu extends Shared.PlatformChangeUser
       this.FloatingQuestMarker_mc.Favor = true;
       this.LocationLockBase.Favor = true;
       this.TutorialLockInstance.Favor = true;
+      
       this.MessagesBlock.InventoryMode = true;
       this.QuestUpdateBaseInstance.InventoryMode = true;
+      this.LocationLockBase.InventoryMode = true;
+      
       this.MessagesBlock.TweenMode = true;
       this.QuestUpdateBaseInstance.TweenMode = true;
+      this.LocationLockBase.TweenMode = true;
+      
       this.MessagesBlock.BookMode = true;
       this.QuestUpdateBaseInstance.BookMode = true;
+      this.LocationLockBase.BookMode = true;
+      
       this.QuestUpdateBaseInstance.DialogueMode = true;
       this.CompassShoutMeterHolder.DialogueMode = true;
       this.MessagesBlock.DialogueMode = true;
+      this.LocationLockBase.DialogueMode = true;
+      
       this.QuestUpdateBaseInstance.BarterMode = true;
       this.MessagesBlock.BarterMode = true;
+      this.LocationLockBase.BarterMode = true;
+      
       this.MessagesBlock.WorldMapMode = true;
+      this.LocationLockBase.WorldMapMode = true;
+      this.QuestUpdateBaseInstance.WorldMapMode = true;
+      
       this.MessagesBlock.MovementDisabled = true;
       this.QuestUpdateBaseInstance.MovementDisabled = true;
       this.SubtitleTextHolder.MovementDisabled = true;
       this.TutorialLockInstance.MovementDisabled = true;
+      this.LocationLockBase.MovementDisabled = true;
+      
       this.Health.StealthMode = true;
       this.Magica.StealthMode = true;
       this.Stamina.StealthMode = true;
@@ -265,6 +283,7 @@ class HUDMenu extends Shared.PlatformChangeUser
       this.FloatingQuestMarker_mc.StealthMode = true;
       this.LocationLockBase.StealthMode = true;
       this.TutorialLockInstance.StealthMode = true;
+      
       this.Health.Swimming = true;
       this.Magica.Swimming = true;
       this.Stamina.Swimming = true;
@@ -284,6 +303,7 @@ class HUDMenu extends Shared.PlatformChangeUser
       this.FloatingQuestMarker_mc.Swimming = true;
       this.LocationLockBase.Swimming = true;
       this.TutorialLockInstance.Swimming = true;
+      
       this.Health.HorseMode = true;
       this.Magica.HorseMode = true;
       this.CompassShoutMeterHolder.HorseMode = true;
@@ -294,6 +314,7 @@ class HUDMenu extends Shared.PlatformChangeUser
       this.FloatingQuestMarker_mc.HorseMode = true;
       this.LocationLockBase.HorseMode = true;
       this.TutorialLockInstance.HorseMode = true;
+      
       this.Health.WarHorseMode = true;
       this.Magica.WarHorseMode = true;
       this.CompassShoutMeterHolder.WarHorseMode = true;
@@ -308,9 +329,19 @@ class HUDMenu extends Shared.PlatformChangeUser
       this.Stamina.WarHorseMode = true;
       this.RightChargeMeterAnim.WarHorseMode = true;
       this.ArrowInfoInstance.WarHorseMode = true;
+      
       this.MessagesBlock.CartMode = true;
       this.SubtitleTextHolder.CartMode = true;
+      this.LocationLockBase.CartMode = true;
       this.TutorialLockInstance.CartMode = true;
+      
+      this.MessagesBlock.SleepWaitMode = true
+      this.LocationLockBase.SleepWaitMode = true;
+      this.QuestUpdateBaseInstance.SleepWaitMode = true;
+      
+      this.MessagesBlock.JournalMode = true
+      this.LocationLockBase.JournalMode = true;
+      this.QuestUpdateBaseInstance.JournalMode = true;
    }
    function ShowElements(aMode, abShow)
    {
