@@ -188,6 +188,7 @@ class SettingsOptionItem extends MovieClip
             {
                this.OptionStepper_mc.prevBtn.onPress();
             }
+         case 2:
          default:
             return;
       }

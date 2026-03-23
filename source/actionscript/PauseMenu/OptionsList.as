@@ -2,8 +2,8 @@ class OptionsList extends Shared.BSScrollingList
 {
    var EntriesA;
    var GetClipByIndex;
-   var __get__selectedEntry;
    var bAllowValueOverwrite;
+   var selectedEntry;
    function OptionsList()
    {
       super();

@@ -16,9 +16,11 @@ class QuestCenteredList extends Shared.CenteredScrollingList
          if(aEntryObject != undefined && aEntryObject.active)
          {
             aEntryClip.EquipIcon.gotoAndStop("Equipped");
-            return undefined;
          }
-         aEntryClip.EquipIcon.gotoAndStop("None");
+         else
+         {
+            aEntryClip.EquipIcon.gotoAndStop("None");
+         }
       }
    }
 }

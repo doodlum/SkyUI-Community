@@ -21,41 +21,40 @@ class StatsPage extends MovieClip
       this.CategoryList.entryList.push({text:"$CRAFTING",stats:new Array(),savedHighlight:0});
       this.CategoryList.entryList.push({text:"$CRIME",stats:new Array(),savedHighlight:0});
       this.CategoryList.InvalidateData();
-      this.CategoryList.addEventListener("listMovedUp",this,"onCategoryListMoveUp");
-      this.CategoryList.addEventListener("listMovedDown",this,"onCategoryListMoveDown");
-      this.CategoryList.addEventListener("selectionChange",this,"onCategoryListMouseSelectionChange");
-      this.CategoryList.disableInput = true;
       this._StatsList.disableSelection = true;
    }
    function startPage()
    {
-      this.CategoryList.disableInput = false;
       gfx.managers.FocusHandler.instance.setFocus(this.CategoryList,0);
-      if(this.bUpdated)
+      if(!this.bUpdated)
       {
-         return undefined;
+         gfx.io.GameDelegate.call("updateStats",[],this,"PopulateStatsList");
+         this.bUpdated = true;
       }
-      gfx.io.GameDelegate.call("updateStats",[],this,"PopulateStatsList");
-      this.bUpdated = true;
+      this.CategoryList.addEventListener("listMovedUp",this,"onCategoryListMoveUp");
+      this.CategoryList.addEventListener("listMovedDown",this,"onCategoryListMoveDown");
+      this.CategoryList.addEventListener("selectionChange",this,"onCategoryListMouseSelectionChange");
    }
    function endPage()
    {
-      this.CategoryList.disableInput = true;
+      this.CategoryList.removeEventListener("listMovedUp",this,"onCategoryListMoveUp");
+      this.CategoryList.removeEventListener("listMovedDown",this,"onCategoryListMoveDown");
+      this.CategoryList.removeEventListener("selectionChange",this,"onCategoryListMouseSelectionChange");
    }
    function PopulateStatsList()
    {
       var _loc10_ = 0;
-      var _loc9_ = 1;
-      var _loc7_ = 2;
+      var _loc8_ = 1;
+      var _loc9_ = 2;
       var _loc11_ = 3;
-      var _loc8_ = 4;
+      var _loc7_ = 4;
       var _loc3_ = 0;
       var _loc4_;
       while(_loc3_ < arguments.length)
       {
-         _loc4_ = {text:"$" + arguments[_loc3_ + _loc10_],value:arguments[_loc3_ + _loc9_]};
-         this.CategoryList.entryList[arguments[_loc3_ + _loc7_]].stats.push(_loc4_);
-         _loc3_ += _loc8_;
+         _loc4_ = {text:"$" + arguments[_loc3_ + _loc10_],value:arguments[_loc3_ + _loc8_]};
+         this.CategoryList.entryList[arguments[_loc3_ + _loc9_]].stats.push(_loc4_);
+         _loc3_ += _loc7_;
       }
       this.onCategoryHighlight();
    }
@@ -103,9 +102,11 @@ class StatsPage extends MovieClip
       if(afY < 0)
       {
          this._StatsList.moveSelectionDown();
-         return undefined;
       }
-      this._StatsList.moveSelectionUp();
+      else
+      {
+         this._StatsList.moveSelectionUp();
+      }
    }
    function SetPlatform(aiPlatform, abPS3Switch)
    {

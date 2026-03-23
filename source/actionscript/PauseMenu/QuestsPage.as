@@ -1,19 +1,16 @@
 class QuestsPage extends MovieClip
 {
+   var BottomBar_mc;
    var DescriptionText;
    var Divider;
    var NoQuestsText;
    var ObjectiveList;
    var ObjectivesHeader;
    var QuestTitleText;
+   var ShowOnMapButton;
    var TitleList;
    var TitleList_mc;
-   var _bottomBar;
-   var _deleteControls;
-   var _showOnMapButton;
-   var _showOnMapControls;
-   var _toggleActiveButton;
-   var _toggleActiveControls;
+   var ToggleActiveButton;
    var bAllowShowOnMap;
    var bHasMiscQuests;
    var bUpdated;
@@ -33,53 +30,49 @@ class QuestsPage extends MovieClip
       this.ObjectivesHeader = this.objectivesHeader;
       this.bHasMiscQuests = false;
       this.bUpdated = false;
-      this._bottomBar = this._parent._parent.BottomBar_mc;
    }
    function onLoad()
    {
+      this.BottomBar_mc = this._parent._parent.BottomBar_mc;
       this.QuestTitleText.SetText(" ");
       this.DescriptionText.SetText(" ");
       this.DescriptionText.verticalAutoSize = "top";
       this.QuestTitleText.textAutoSize = "shrink";
-      this.TitleList.addEventListener("itemPress",this,"onTitleListSelect");
-      this.TitleList.addEventListener("listMovedUp",this,"onTitleListMoveUp");
-      this.TitleList.addEventListener("listMovedDown",this,"onTitleListMoveDown");
-      this.TitleList.addEventListener("selectionChange",this,"onTitleListMouseSelectionChange");
-      this.TitleList.disableInput = true;
       this.ObjectiveList.addEventListener("itemPress",this,"onObjectiveListSelect");
       this.ObjectiveList.addEventListener("selectionChange",this,"onObjectiveListHighlight");
    }
    function startPage()
    {
-      this.TitleList.disableInput = false;
       if(!this.bUpdated)
       {
          gfx.io.GameDelegate.call("RequestQuestsData",[this.TitleList],this,"onQuestsDataComplete");
+         this.ToggleActiveButton = this.BottomBar_mc.Buttons[0];
+         this.ShowOnMapButton = this.BottomBar_mc.Buttons[1];
          this.bUpdated = true;
       }
-      this._bottomBar.buttonPanel.clearButtons();
-      this._toggleActiveButton = this._bottomBar.buttonPanel.addButton({text:"$Toggle Active",controls:this._toggleActiveControls});
-      if(this.bAllowShowOnMap)
-      {
-         this._showOnMapButton = this._bottomBar.buttonPanel.addButton({text:"$Show on Map",controls:this._showOnMapControls});
-      }
-      this._bottomBar.buttonPanel.updateButtons(true);
-      this.switchFocusToTitles();
+      this.UpdateButtonsVisibility();
+      this.TitleList.addEventListener("itemPress",this,"onTitleListSelect");
+      this.TitleList.addEventListener("listMovedUp",this,"onTitleListMoveUp");
+      this.TitleList.addEventListener("listMovedDown",this,"onTitleListMoveDown");
+      this.TitleList.addEventListener("selectionChange",this,"onTitleListMouseSelectionChange");
+      this.SwitchFocusToTitles();
+      this.BottomBar_mc.addEventListener("OnBottomBarButtonMousePress",Shared.Proxy.create(this,this.OnBottomBarButtonMousePress));
    }
    function endPage()
    {
-      this._showOnMapButton._alpha = 100;
-      this._toggleActiveButton._alpha = 100;
-      this._bottomBar.buttonPanel.clearButtons();
-      this.TitleList.disableInput = true;
+      this.TitleList.removeEventListener("itemPress",this,"onTitleListSelect");
+      this.TitleList.removeEventListener("listMovedUp",this,"onTitleListMoveUp");
+      this.TitleList.removeEventListener("listMovedDown",this,"onTitleListMoveDown");
+      this.TitleList.removeEventListener("selectionChange",this,"onTitleListMouseSelectionChange");
+      this.BottomBar_mc.removeAllEventListeners();
    }
    function get selectedQuestID()
    {
-      return this.TitleList.entryList.length > 0 ? this.TitleList.centeredEntry.formID : undefined;
+      return this.TitleList.entryList.length <= 0 ? undefined : this.TitleList.centeredEntry.formID;
    }
    function get selectedQuestInstance()
    {
-      return this.TitleList.entryList.length > 0 ? this.TitleList.centeredEntry.instance : undefined;
+      return this.TitleList.entryList.length <= 0 ? undefined : this.TitleList.centeredEntry.instance;
    }
    function handleInput(details, pathToFocus)
    {
@@ -88,19 +81,19 @@ class QuestsPage extends MovieClip
       {
          if((details.navEquivalent == gfx.ui.NavigationCode.GAMEPAD_X || details.code == 77) && this.bAllowShowOnMap)
          {
-            this.onShowMap();
+            this.onShowOnMap();
             _loc2_ = true;
          }
          else if(this.TitleList.entryList.length > 0)
          {
             if(details.navEquivalent == gfx.ui.NavigationCode.LEFT && gfx.managers.FocusHandler.instance.getFocus(0) != this.TitleList)
             {
-               this.switchFocusToTitles();
+               this.SwitchFocusToTitles();
                _loc2_ = true;
             }
             else if(details.navEquivalent == gfx.ui.NavigationCode.RIGHT && gfx.managers.FocusHandler.instance.getFocus(0) != this.ObjectiveList)
             {
-               this.switchFocusToObjectives();
+               this.SwitchFocusToObjectives();
                _loc2_ = true;
             }
          }
@@ -111,28 +104,27 @@ class QuestsPage extends MovieClip
       }
       return _loc2_;
    }
-   function onShowMap()
+   function OnBottomBarButtonMousePress(evt)
    {
-      var _loc2_;
-      if(this.ObjectiveList.selectedEntry != undefined && this.ObjectiveList.selectedEntry.questTargetID != undefined)
+      var _loc2_ = evt.target;
+      switch(evt.data)
       {
-         _loc2_ = this.ObjectiveList.selectedEntry;
-      }
-      else
-      {
-         _loc2_ = this.ObjectiveList.entryList[0];
-      }
-      if(_loc2_ != undefined && _loc2_.questTargetID != undefined)
-      {
-         this._parent._parent.CloseMenu();
-         gfx.io.GameDelegate.call("ShowTargetOnMap",[_loc2_.questTargetID]);
-      }
-      else
-      {
-         gfx.io.GameDelegate.call("PlaySound",["UIMenuCancel"]);
+         case 0:
+            if(_loc2_.label == "$Toggle Active")
+            {
+               this.onTitleListSelect();
+            }
+            break;
+         case 1:
+            if(_loc2_.label == "$Show on Map")
+            {
+               this.onShowOnMap();
+            }
+         default:
+            return;
       }
    }
-   function isViewingMiscObjectives()
+   function IsViewingMiscObjectives()
    {
       return this.bHasMiscQuests && this.TitleList.selectedEntry.formID == 0;
    }
@@ -140,89 +132,92 @@ class QuestsPage extends MovieClip
    {
       if(this.TitleList.selectedEntry != undefined && !this.TitleList.selectedEntry.completed)
       {
-         if(!this.isViewingMiscObjectives())
+         if(!this.IsViewingMiscObjectives())
          {
-            gfx.io.GameDelegate.call("ToggleQuestActiveStatus",[this.TitleList.selectedEntry.formID,this.TitleList.selectedEntry.instance],this,"onToggleQuestActive");
-            return undefined;
+            gfx.io.GameDelegate.call("ToggleQuestActiveStatus",[this.TitleList.selectedEntry.formID,this.TitleList.selectedEntry.instance],this,"ToggleQuestActiveCallback");
          }
-         this.TitleList.selectedEntry.active = !this.TitleList.selectedEntry.active;
-         gfx.io.GameDelegate.call("ToggleShowMiscObjectives",[this.TitleList.selectedEntry.active]);
-         this.TitleList.UpdateList();
+         else
+         {
+            this.TitleList.selectedEntry.active = !this.TitleList.selectedEntry.active;
+            gfx.io.GameDelegate.call("ToggleShowMiscObjectives",[this.TitleList.selectedEntry.active]);
+            this.TitleList.UpdateList();
+         }
       }
    }
    function onObjectiveListSelect()
    {
-      if(this.isViewingMiscObjectives())
+      if(this.IsViewingMiscObjectives())
       {
-         gfx.io.GameDelegate.call("ToggleQuestActiveStatus",[this.ObjectiveList.selectedEntry.formID,this.ObjectiveList.selectedEntry.instance],this,"onToggleQuestActive");
+         gfx.io.GameDelegate.call("ToggleQuestActiveStatus",[this.ObjectiveList.selectedEntry.formID,this.ObjectiveList.selectedEntry.instance],this,"ToggleQuestActiveCallback");
       }
    }
-   function switchFocusToTitles()
+   function SwitchFocusToTitles()
    {
       gfx.managers.FocusHandler.instance.setFocus(this.TitleList,0);
       this.Divider.gotoAndStop("Right");
-      this._toggleActiveButton._alpha = 100;
+      this.ToggleActiveButton._alpha = 100;
       this.ObjectiveList.selectedIndex = -1;
       if(this.iPlatform != 0)
       {
          this.ObjectiveList.disableSelection = true;
       }
-      this.updateShowOnMapButtonAlpha(0);
+      this.UpdateShowOnMapButtonAlpha(0);
    }
-   function switchFocusToObjectives()
+   function SwitchFocusToObjectives()
    {
       gfx.managers.FocusHandler.instance.setFocus(this.ObjectiveList,0);
       this.Divider.gotoAndStop("Left");
-      this._toggleActiveButton._alpha = !this.isViewingMiscObjectives() ? 50 : 100;
+      this.ToggleActiveButton._alpha = !this.IsViewingMiscObjectives() ? 50 : 100;
       if(this.iPlatform != 0)
       {
          this.ObjectiveList.disableSelection = false;
       }
       this.ObjectiveList.selectedIndex = 0;
-      this.updateShowOnMapButtonAlpha(0);
+      this.UpdateShowOnMapButtonAlpha(0);
    }
    function onObjectiveListHighlight(event)
    {
-      this.updateShowOnMapButtonAlpha(event.index);
+      this.UpdateShowOnMapButtonAlpha(event.index);
    }
-   function updateShowOnMapButtonAlpha(a_entryIdx)
+   function UpdateShowOnMapButtonAlpha(aiObjIndex)
    {
       var _loc2_ = 50;
-      if(this.bAllowShowOnMap && (a_entryIdx >= 0 && this.ObjectiveList.entryList[a_entryIdx].questTargetID != undefined) || this.ObjectiveList.entryList.length > 0 && this.ObjectiveList.entryList[0].questTargetID != undefined)
+      if(aiObjIndex >= 0 && this.ObjectiveList.entryList[aiObjIndex].questTargetID != undefined || this.ObjectiveList.entryList.length > 0 && this.ObjectiveList.entryList[0].questTargetID != undefined)
       {
          _loc2_ = 100;
       }
-      this._toggleActiveButton._alpha = this.TitleList.selectedEntry.completed ? 50 : 100;
-      this._showOnMapButton._alpha = _loc2_;
+      this.ShowOnMapButton._alpha = _loc2_;
    }
-   function onToggleQuestActive(a_bnewActiveStatus)
+   function ToggleQuestActiveCallback(abNewActiveStatus)
    {
+      var _loc3_;
       var _loc2_;
-      var _loc4_;
-      if(this.isViewingMiscObjectives())
+      if(this.IsViewingMiscObjectives())
       {
-         _loc2_ = this.ObjectiveList.selectedEntry.formID;
-         _loc4_ = this.ObjectiveList.selectedEntry.instance;
+         _loc3_ = this.ObjectiveList.selectedEntry.formID;
+         _loc2_ = this.ObjectiveList.selectedEntry.instance;
          for(var _loc5_ in this.ObjectiveList.entryList)
          {
-            if(this.ObjectiveList.entryList[_loc5_].formID == _loc2_ && this.ObjectiveList.entryList[_loc5_].instance == _loc4_)
+            if(this.ObjectiveList.entryList[_loc5_].formID == _loc3_ && this.ObjectiveList.entryList[_loc5_].instance == _loc2_)
             {
-               this.ObjectiveList.entryList[_loc5_].active = a_bnewActiveStatus;
+               this.ObjectiveList.entryList[_loc5_].active = abNewActiveStatus;
             }
          }
          this.ObjectiveList.UpdateList();
       }
       else
       {
-         this.TitleList.selectedEntry.active = a_bnewActiveStatus;
+         this.TitleList.selectedEntry.active = abNewActiveStatus;
          this.TitleList.UpdateList();
       }
-      if(a_bnewActiveStatus)
+      if(abNewActiveStatus)
       {
          gfx.io.GameDelegate.call("PlaySound",["UIQuestActive"]);
-         return undefined;
       }
-      gfx.io.GameDelegate.call("PlaySound",["UIQuestInactive"]);
+      else
+      {
+         gfx.io.GameDelegate.call("PlaySound",["UIQuestInactive"]);
+      }
    }
    function onQuestsDataComplete(auiSavedFormID, auiSavedInstance, abAddMiscQuest, abMiscQuestActive, abAllowShowOnMap)
    {
@@ -233,8 +228,8 @@ class QuestsPage extends MovieClip
          this.bHasMiscQuests = true;
       }
       var _loc3_;
+      var _loc5_ = false;
       var _loc6_ = false;
-      var _loc4_ = false;
       var _loc2_ = 0;
       while(_loc2_ < this.TitleList.entryList.length)
       {
@@ -252,20 +247,20 @@ class QuestsPage extends MovieClip
             {
                _loc3_ = this.TitleList.entryList[_loc2_].timeIndex - 0.5;
             }
-            _loc6_ = true;
+            _loc5_ = true;
          }
          else
          {
-            _loc4_ = true;
+            _loc6_ = true;
          }
          _loc2_ = _loc2_ + 1;
       }
-      if(_loc3_ != undefined && _loc6_ && _loc4_)
+      if(_loc3_ != undefined && _loc5_ && _loc6_)
       {
          this.TitleList.entryList.push({divider:true,completed:true,timeIndex:_loc3_});
       }
       this.TitleList.entryList.sort(this.completedQuestSort);
-      var _loc5_ = 0;
+      var _loc4_ = 0;
       _loc2_ = 0;
       while(_loc2_ < this.TitleList.entryList.length)
       {
@@ -275,12 +270,12 @@ class QuestsPage extends MovieClip
          }
          if(this.TitleList.entryList[_loc2_].formID == auiSavedFormID && this.TitleList.entryList[_loc2_].instance == auiSavedInstance)
          {
-            _loc5_ = _loc2_;
+            _loc4_ = _loc2_;
          }
          _loc2_ = _loc2_ + 1;
       }
       this.TitleList.InvalidateData();
-      this.TitleList.RestoreScrollPosition(_loc5_,true);
+      this.TitleList.RestoreScrollPosition(_loc4_,true);
       this.TitleList.UpdateList();
       this.onQuestHighlight();
    }
@@ -319,14 +314,14 @@ class QuestsPage extends MovieClip
          this.SetDescriptionText();
          this.questTitleEndpieces.gotoAndStop(_loc2_[this.TitleList.selectedEntry.type]);
          this.questTitleEndpieces._visible = true;
-         this.ObjectivesHeader._visible = !this.isViewingMiscObjectives();
+         this.ObjectivesHeader._visible = !this.IsViewingMiscObjectives();
          this.ObjectiveList.selectedIndex = -1;
          this.ObjectiveList.scrollPosition = 0;
          if(this.iPlatform != 0)
          {
             this.ObjectiveList.disableSelection = true;
          }
-         this.updateShowOnMapButtonAlpha(0);
+         this.UpdateShowOnMapButtonAlpha(0);
       }
       else
       {
@@ -337,33 +332,33 @@ class QuestsPage extends MovieClip
          this.questTitleEndpieces._visible = false;
          this.ObjectivesHeader._visible = false;
       }
-      this.UpdateButtonVisiblity();
+      this.UpdateButtonsVisibility();
       this.ObjectiveList.InvalidateData();
    }
-   function UpdateButtonVisiblity()
+   function UpdateButtonsVisibility()
    {
-      var _loc2_ = this.TitleList.entryList.length > 0 && this.TitleList.entryList.selectedEntry != null;
-      this._toggleActiveButton._visible = _loc2_ && !this.TitleList.selectedEntry.completed;
-      this._showOnMapButton._visible = _loc2_ && !this.TitleList.selectedEntry.completed && this.bAllowShowOnMap;
+      var _loc2_ = this.TitleList.entryList.length > 0 && this.TitleList.selectedEntry != null;
+      this.ToggleActiveButton._visible = _loc2_ && !this.TitleList.selectedEntry.completed;
+      this.ShowOnMapButton._visible = _loc2_ && !this.TitleList.selectedEntry.completed && this.bAllowShowOnMap;
    }
    function SetDescriptionText()
    {
       var _loc2_ = 25;
-      var _loc4_ = 10;
+      var _loc5_ = 10;
       var _loc3_ = 470;
-      var _loc5_ = 40;
+      var _loc4_ = 40;
       this.DescriptionText.SetText(this.TitleList.selectedEntry.description);
       var _loc6_ = this.DescriptionText.getCharBoundaries(this.DescriptionText.getLineOffset(this.DescriptionText.numLines - 1));
       this.ObjectivesHeader._y = this.DescriptionText._y + _loc6_.bottom + _loc2_;
-      if(this.isViewingMiscObjectives())
+      if(this.IsViewingMiscObjectives())
       {
          this.ObjectiveList._y = this.DescriptionText._y;
       }
       else
       {
-         this.ObjectiveList._y = this.ObjectivesHeader._y + this.ObjectivesHeader._height + _loc4_;
+         this.ObjectiveList._y = this.ObjectivesHeader._y + this.ObjectivesHeader._height + _loc5_;
       }
-      this.ObjectiveList.border._height = Math.max(_loc3_ - this.ObjectiveList._y,_loc5_);
+      this.ObjectiveList.border._height = Math.max(_loc3_ - this.ObjectiveList._y,_loc4_);
       this.ObjectiveList.scrollbar.height = this.ObjectiveList.border._height - 20;
    }
    function onTitleListMoveUp(event)
@@ -397,26 +392,37 @@ class QuestsPage extends MovieClip
       if(afY < 0)
       {
          this.ObjectiveList.moveSelectionDown();
-         return undefined;
-      }
-      this.ObjectiveList.moveSelectionUp();
-   }
-   function SetPlatform(a_platform, a_bPS3Switch)
-   {
-      if(a_platform == 0)
-      {
-         this._toggleActiveControls = {keyCode:28};
-         this._showOnMapControls = {keyCode:50};
-         this._deleteControls = {keyCode:45};
       }
       else
       {
-         this._toggleActiveControls = {keyCode:276};
-         this._showOnMapControls = {keyCode:278};
-         this._deleteControls = {keyCode:278};
+         this.ObjectiveList.moveSelectionUp();
       }
-      this.iPlatform = a_platform;
-      this.TitleList.SetPlatform(a_platform,a_bPS3Switch);
-      this.ObjectiveList.SetPlatform(a_platform,a_bPS3Switch);
+   }
+   function onShowOnMap()
+   {
+      var _loc2_;
+      if(this.ObjectiveList.selectedEntry != undefined && this.ObjectiveList.selectedEntry.questTargetID != undefined)
+      {
+         _loc2_ = this.ObjectiveList.selectedEntry;
+      }
+      else
+      {
+         _loc2_ = this.ObjectiveList.entryList[0];
+      }
+      if(_loc2_ != undefined && _loc2_.questTargetID != undefined)
+      {
+         this._parent._parent.CloseMenu();
+         gfx.io.GameDelegate.call("ShowTargetOnMap",[_loc2_.questTargetID]);
+      }
+      else
+      {
+         gfx.io.GameDelegate.call("PlaySound",["UIMenuCancel"]);
+      }
+   }
+   function SetPlatform(aiPlatform, abPS3Switch)
+   {
+      this.iPlatform = aiPlatform;
+      this.TitleList.SetPlatform(aiPlatform,abPS3Switch);
+      this.ObjectiveList.SetPlatform(aiPlatform,abPS3Switch);
    }
 }
