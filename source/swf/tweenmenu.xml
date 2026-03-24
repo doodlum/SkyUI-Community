@@ -971,7 +971,7 @@ Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMi
       </shapes>
     </item>
     <item type="DefineEditTextTag" align="1" autoSize="false" border="false" characterID="19" fontHeight="400" fontId="15" forceWriteAsLong="true" hasFont="true" hasFontClass="false" hasLayout="true" hasMaxLength="false" hasText="true" hasTextColor="true" html="true" indent="0" initialText="&lt;p align=&quot;right&quot;&gt;&lt;font face=&quot;$EverywhereMediumFont&quot; size=&quot;20&quot; color=&quot;#ffffff&quot; letterSpacing=&quot;0.000000&quot; kerning=&quot;1&quot;&gt;Time, Date, Year&lt;/font&gt;&lt;/p&gt;" leading="40" leftMargin="0" maxLength="0" multiline="true" noSelect="true" password="false" readOnly="true" rightMargin="0" useOutlines="true" variableName="" wasStatic="false" wordWrap="true">
-      <bounds type="RECT" Xmax="5960" Xmin="-40" Ymax="557" Ymin="-40" nbits="14"/>
+      <bounds type="RECT" Xmax="6960" Xmin="-40" Ymax="557" Ymin="-40" nbits="14"/>
       <textColor type="RGBA" alpha="255" blue="255" green="255" red="255"/>
     </item>
     <item type="DefineShape3Tag" forceWriteAsLong="true" shapeId="20">
