@@ -295,7 +295,7 @@ class StartMenu extends MovieClip
       }
       if(arguments[_loc12_])
       {
-         this.MainList.entryList.push({text:"$HELP",index:StartMenu.HELP_INDEX,disabled:false});
+         this.MainList.entryList.push({text:"$HELP",index:StartMenu.HELP_INDEX,disabled:skse.version.releaseIdx < 70});
       }
       var _loc3_ = 0;
       while(_loc3_ < this.MainList.entryList.length)
@@ -676,8 +676,12 @@ class StartMenu extends MovieClip
                this.FadeOutAndCall("OpenCreditsMenu");
                return;
             case StartMenu.HELP_INDEX:
-               gfx.io.GameDelegate.call("HELP",[]);
-               gfx.io.GameDelegate.call("PlaySound",["UIMenuOK"]);
+               if (skse.version.releaseIdx >= 70){
+                  gfx.io.GameDelegate.call("HELP",[]);
+                  gfx.io.GameDelegate.call("PlaySound",["UIMenuOK"]);
+                  return;
+               }
+               gfx.io.GameDelegate.call("PlaySound",["UIMenuCancel"]);
                return;
             case StartMenu.MOD_INDEX:
                if(this._ModsAllowedByBnet)
