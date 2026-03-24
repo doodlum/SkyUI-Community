@@ -272,9 +272,9 @@ class StartMenu extends MovieClip
       {
          this.MainList.entryList.push({text:"$DOWNLOADABLE CONTENT",index:StartMenu.DLC_INDEX,disabled:false});
       }
-      if(arguments[_loc9_])
+      if(arguments[_loc9_] && skse.version.releaseIdx >= 70)
       {
-         this.MainList.entryList.push({text:"$CREATION CLUB",disabled:skse.version.releaseIdx < 70,index:StartMenu.CREATION_CLUB_INDEX});
+         this.MainList.entryList.push({text:"$CREATION CLUB",disabled:false,index:StartMenu.CREATION_CLUB_INDEX});
       }
       this.ShowSky10UpsellBanner(false);
       if(arguments[_loc7_] == true && skse.version.releaseIdx >= 70)
@@ -284,18 +284,18 @@ class StartMenu extends MovieClip
       if(!arguments[_loc14_])
       {
       }
-      if(arguments[_loc8_])
+      if(arguments[_loc8_] && skse.version.releaseIdx >= 70)
       {
-         this.MainList.entryList.push({text:"$MOD MANAGER",disabled:skse.version.releaseIdx < 70,index:StartMenu.MOD_INDEX});
+         this.MainList.entryList.push({text:"$MOD MANAGER",disabled:false,index:StartMenu.MOD_INDEX});
       }
       this.MainList.entryList.push({text:"$CREDITS",index:StartMenu.CREDITS_INDEX,disabled:false});
       if(arguments[_loc10_])
       {
          this.MainList.entryList.push({text:"$QUIT",index:StartMenu.QUIT_INDEX,disabled:false});
       }
-      if(arguments[_loc12_])
+      if(arguments[_loc12_] && skse.version.releaseIdx >= 70)
       {
-         this.MainList.entryList.push({text:"$HELP",index:StartMenu.HELP_INDEX,disabled:skse.version.releaseIdx < 70});
+         this.MainList.entryList.push({text:"$HELP",index:StartMenu.HELP_INDEX,disabled:false});
       }
       var _loc3_ = 0;
       while(_loc3_ < this.MainList.entryList.length)
@@ -676,12 +676,8 @@ class StartMenu extends MovieClip
                this.FadeOutAndCall("OpenCreditsMenu");
                return;
             case StartMenu.HELP_INDEX:
-               if (skse.version.releaseIdx >= 70){
-                  gfx.io.GameDelegate.call("HELP",[]);
-                  gfx.io.GameDelegate.call("PlaySound",["UIMenuOK"]);
-                  return;
-               }
-               gfx.io.GameDelegate.call("PlaySound",["UIMenuCancel"]);
+               gfx.io.GameDelegate.call("HELP",[]);
+               gfx.io.GameDelegate.call("PlaySound",["UIMenuOK"]);
                return;
             case StartMenu.MOD_INDEX:
                if(this._ModsAllowedByBnet)
@@ -1140,7 +1136,8 @@ class StartMenu extends MovieClip
       if (skse.version.releaseIdx < 70)
       {
          canAccess = false;
-      }   
+      } 
+
       this._UserCanAccessCreationClub = canAccess;
       this.MainList.GetClipByIndex(StartMenu.CREATION_CLUB_INDEX).alpha = !(this._UserCanAccessCreationClub && this._CClubAllowedByBnet) ? StartMenu.DISABLED_GREY_OUT_ALPHA : 100;
    }
