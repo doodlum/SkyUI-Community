@@ -248,6 +248,7 @@ class StartMenu extends MovieClip
       var _loc14_ = 10;
       var _loc16_ = 11;
       var _loc4_ = StartMenu.NEW_INDEX;
+
       if(this.MainList.entryList.length > 0)
       {
          _loc4_ = this.MainList.centeredEntry.index;
@@ -274,10 +275,10 @@ class StartMenu extends MovieClip
       }
       if(arguments[_loc9_])
       {
-         this.MainList.entryList.push({text:"$CREATION CLUB",disabled:false,index:StartMenu.CREATION_CLUB_INDEX});
+         this.MainList.entryList.push({text:"$CREATION CLUB",disabled:skse.version.releaseIdx < 70,index:StartMenu.CREATION_CLUB_INDEX});
       }
       this.ShowSky10UpsellBanner(false);
-      if(arguments[_loc7_] == true)
+      if(arguments[_loc7_] == true && skse.version.releaseIdx >= 70)
       {
          this.ShowSky10UpsellBanner(true);
       }
@@ -286,7 +287,7 @@ class StartMenu extends MovieClip
       }
       if(arguments[_loc8_])
       {
-         this.MainList.entryList.push({text:"$MOD MANAGER",disabled:false,index:StartMenu.MOD_INDEX});
+         this.MainList.entryList.push({text:"$MOD MANAGER",disabled:skse.version.releaseIdx < 70,index:StartMenu.MOD_INDEX});
       }
       this.MainList.entryList.push({text:"$CREDITS",index:StartMenu.CREDITS_INDEX,disabled:false});
       if(arguments[_loc10_])
@@ -692,7 +693,9 @@ class StartMenu extends MovieClip
                return;
                break;
             case StartMenu.SKY10_UPSELL_INDEX:
-               gfx.io.GameDelegate.call("Sky10DLCPressed",[]);
+               if (skse.version.releaseIdx >= 70){
+                  gfx.io.GameDelegate.call("Sky10DLCPressed",[]);
+               }
                return;
             case StartMenu.CREATION_CLUB_INDEX:
                if(this._CClubAllowedByBnet)
@@ -855,6 +858,8 @@ class StartMenu extends MovieClip
    }
    function StartState(strStateName)
    {
+      UpdateBnetStatus(true, true);
+
       gfx.io.GameDelegate.call("StartState",[strStateName]);
       this.ShouldProcessInputs = false;
       if(strStateName == StartMenu.LOGIN_STATE)
@@ -1124,12 +1129,22 @@ class StartMenu extends MovieClip
       this._MessageOfTheDay_mc._visible = this._Motd_tf.text.length > 1;
    }
    function SetCreationClubAccess(canAccess)
-   {
+   {     
+      if (skse.version.releaseIdx < 70)
+      {
+         canAccess = false;
+      }   
       this._UserCanAccessCreationClub = canAccess;
       this.MainList.GetClipByIndex(StartMenu.CREATION_CLUB_INDEX).alpha = !(this._UserCanAccessCreationClub && this._CClubAllowedByBnet) ? StartMenu.DISABLED_GREY_OUT_ALPHA : 100;
    }
+   
    function UpdateBnetStatus(cclubUp, modsUp)
-   {
+   {      
+      if (skse.version.releaseIdx < 70)
+      {
+         cclubUp = false;
+         modsUp = false;
+      }
       this._CClubAllowedByBnet = cclubUp;
       this._ModsAllowedByBnet = modsUp;
       this.MainList.GetClipByIndex(StartMenu.CREATION_CLUB_INDEX).alpha = !(this._UserCanAccessCreationClub && this._CClubAllowedByBnet) ? StartMenu.DISABLED_GREY_OUT_ALPHA : 100;
