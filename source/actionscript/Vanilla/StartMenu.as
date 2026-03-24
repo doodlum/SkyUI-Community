@@ -1127,6 +1127,9 @@ class StartMenu extends MovieClip
    }
    function SetMotd(motdText)
    {
+      if (skse.version.releaseIdx < 70){
+         motdText = "";
+      }
       this._Motd_tf.text = motdText;
       this._MessageOfTheDay_mc._visible = this._Motd_tf.text.length > 1;
    }
