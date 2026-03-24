@@ -971,7 +971,7 @@ Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMi
       </shapes>
     </item>
     <item type="DefineEditTextTag" align="1" autoSize="false" border="false" characterID="19" fontHeight="400" fontId="15" forceWriteAsLong="true" hasFont="true" hasFontClass="false" hasLayout="true" hasMaxLength="false" hasText="true" hasTextColor="true" html="true" indent="0" initialText="&lt;p align=&quot;right&quot;&gt;&lt;font face=&quot;$EverywhereMediumFont&quot; size=&quot;20&quot; color=&quot;#ffffff&quot; letterSpacing=&quot;0.000000&quot; kerning=&quot;1&quot;&gt;Time, Date, Year&lt;/font&gt;&lt;/p&gt;" leading="40" leftMargin="0" maxLength="0" multiline="true" noSelect="true" password="false" readOnly="true" rightMargin="0" useOutlines="true" variableName="" wasStatic="false" wordWrap="true">
-      <bounds type="RECT" Xmax="6960" Xmin="-40" Ymax="557" Ymin="-40" nbits="14"/>
+      <bounds type="RECT" Xmax="7960" Xmin="-40" Ymax="557" Ymin="-40" nbits="14"/>
       <textColor type="RGBA" alpha="255" blue="255" green="255" red="255"/>
     </item>
     <item type="DefineShape3Tag" forceWriteAsLong="true" shapeId="20">
@@ -1916,7 +1916,7 @@ Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMi
           <matrix type="MATRIX" hasRotate="true" hasScale="true" nRotateBits="0" nScaleBits="19" nTranslateBits="15" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="2.0" scaleY="1.0" translateX="-12799" translateY="0"/>
         </item>
         <item type="PlaceObject3Tag" bitmapCache="0" blendMode="0" characterId="19" clipDepth="0" depth="2" forceWriteAsLong="true" name="DateText" placeFlagHasBlendMode="false" placeFlagHasCacheAsBitmap="false" placeFlagHasCharacter="true" placeFlagHasClassName="false" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="false" placeFlagHasFilterList="true" placeFlagHasImage="false" placeFlagHasMatrix="true" placeFlagHasName="true" placeFlagHasRatio="false" placeFlagHasVisible="false" placeFlagMove="false" placeFlagOpaqueBackground="false" ratio="0" reserved="false" visible="0">
-          <matrix type="MATRIX" hasRotate="false" hasScale="false" nRotateBits="0" nScaleBits="0" nTranslateBits="16" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.0" scaleY="0.0" translateX="18120" translateY="-1016"/>
+          <matrix type="MATRIX" hasRotate="false" hasScale="false" nRotateBits="0" nScaleBits="0" nTranslateBits="16" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.0" scaleY="0.0" translateX="16900" translateY="-1016"/>
           <surfaceFilterList>
             <item type="DROPSHADOWFILTER" angle="0.7853851318359375" blurX="2.0" blurY="2.0" compositeSource="true" distance="2.0" id="0" innerShadow="false" knockout="false" passes="2" strength="1.5">
               <dropShadowColor type="RGBA" alpha="255" blue="0" green="0" red="0"/>
