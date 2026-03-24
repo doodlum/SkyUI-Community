@@ -89,9 +89,8 @@ class StatsMenu extends MovieClip
       while(_loc3_ < StatsMenu.MaxPerkNamesDisplayed)
       {
          _loc4_ = this.attachMovie("PerkName","PerkName" + _loc3_,this.getNextHighestDepth());
-         _loc4_._x = -100 - this._x;
          // Fix: visible text "Perk Name" on 32:9
-         _loc4_._visible = false;
+         _loc4_._x = -1000 - this._x;
          _loc3_ = _loc3_ + 1;
       }
       // Fix: duplicate TopPlayerInfo
