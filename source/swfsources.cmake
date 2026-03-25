@@ -343,6 +343,16 @@ Add_SWF(map
     MapMenu/Map/MarkerDescription.as
 )
 
+Add_SWF(skyui_mapfinderpanel
+    skyui/mapfinderpanel.swf
+    skyui/mapfinderpanel.xml
+    Common/skyui/defines/Input.as
+    Common/skyui/filter/NameFilter.as
+    Common/skyui/filter/SortFilter.as
+    MapMenu/Map/LocationFinder.as
+    MapMenu/Map/LocationListEntry.as
+)
+
 Add_SWF(messagebox
     messagebox.swf
     messagebox.xml

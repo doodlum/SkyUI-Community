@@ -15,6 +15,8 @@ class Map.MapMenu
    var SelectedMarker;
    var YouAreHereMarker;
    var iPlatform;
+   var LocationFinderPanel;
+   var bLocationFinderOpen = false;
    static var REFRESH_SHOW = 0;
    static var REFRESH_X = 1;
    static var REFRESH_Y = 2;
@@ -35,10 +37,13 @@ class Map.MapMenu
       this.MapWidth = 0;
       this.MapHeight = 0;
       this.LocalMapMenu = this.MapMovie.LocalMapFader.MapClip;
+      this.LocationFinderPanel = this.MapMovie.LocationFinderFader.locationFinder;
       if(this.LocalMapMenu != undefined)
       {
          this.LocalMapMenu.SetBottomBar(this.BottomBar);
+         this.LocalMapMenu.setLocationFinder(this.LocationFinderPanel);
          Mouse.addListener(this);
+         gfx.managers.FocusHandler.instance.setFocus(this,0);
       }
       this.MarkerDescriptionHolder = this.MapMovie.attachMovie("DescriptionHolder","MarkerDescriptionHolder",this.MapMovie.getNextHighestDepth());
       this.MarkerDescriptionHolder._visible = false;
@@ -89,6 +94,11 @@ class Map.MapMenu
       Map.MapMarker.TopDepth = aNumMarkers;
       this.NextCreateIndex = 0;
       this.SetSelectedMarker(-1);
+      if(this.LocationFinderPanel != undefined)
+      {
+         this.LocationFinderPanel.list.clearList();
+         this.LocationFinderPanel.setLoading(true);
+      }
    }
    function GetCreatingMarkers()
    {
@@ -96,41 +106,62 @@ class Map.MapMenu
    }
    function CreateMarkers()
    {
-      var _loc5_;
-      var _loc3_;
-      var _loc6_;
-      var _loc7_;
-      var _loc2_;
-      var _loc4_;
+      var _loc5_; 
+      var _loc3_; 
+      var _loc6_; 
+      var _loc7_; 
+      var _loc2_; 
+      var _loc4_; 
+
       if(-1 != this.NextCreateIndex && this.MarkerContainer != undefined)
       {
          _loc5_ = 0;
          _loc3_ = this.NextCreateIndex * Map.MapMenu.CREATE_STRIDE;
          _loc6_ = this.Markers.length;
          _loc7_ = this.MarkerData.length;
+         
          while(this.NextCreateIndex < _loc6_ && _loc3_ < _loc7_ && _loc5_ < Map.MapMenu.MARKER_CREATE_PER_FRAME)
          {
-            _loc2_ = this.MarkerContainer.attachMovie(Map.MapMarker.IconTypes[this.MarkerData[_loc3_ + Map.MapMenu.CREATE_ICONTYPE]],"Marker" + this.NextCreateIndex,this.NextCreateIndex);
+            var iconType = this.MarkerData[_loc3_ + Map.MapMenu.CREATE_ICONTYPE];
+            var markerName = this.MarkerData[_loc3_ + Map.MapMenu.CREATE_NAME];
+            var isUndiscovered = this.MarkerData[_loc3_ + Map.MapMenu.CREATE_UNDISCOVERED];
+
+            _loc2_ = this.MarkerContainer.attachMovie(Map.MapMarker.IconTypes[iconType], "Marker" + this.NextCreateIndex, this.NextCreateIndex);
             this.Markers[this.NextCreateIndex] = _loc2_;
-            if(this.MarkerData[_loc3_ + Map.MapMenu.CREATE_ICONTYPE] == this.PlayerLocationMarkerType)
-            {
-               this.YouAreHereMarker = _loc2_.Icon;
-            }
-            _loc2_.Index = this.NextCreateIndex;
-            _loc2_.label = this.MarkerData[_loc3_ + Map.MapMenu.CREATE_NAME];
-            _loc2_.textField._visible = false;
+            
+            _loc2_.Index = this.NextCreateIndex; 
+            _loc2_.label = markerName;
             _loc2_.visible = false;
+
+            if (this.LocationFinderPanel != undefined && iconType > 0 && iconType < 60)
+            {
+               var entryData = {
+                  label: markerName,
+                  Index: this.NextCreateIndex,
+                  iconFrame: iconType + (isUndiscovered ? 81 : 1),
+                  IconClip: _loc2_.IconClip
+               };
+               this.LocationFinderPanel.list.entryList.push(entryData);
+            }
             if(this.MarkerData[_loc3_ + Map.MapMenu.CREATE_UNDISCOVERED] && _loc2_.IconClip != undefined)
             {
                _loc4_ = _loc2_.IconClip.getNextHighestDepth();
-               _loc2_.IconClip.attachMovie(Map.MapMarker.IconTypes[this.MarkerData[_loc3_ + Map.MapMenu.CREATE_ICONTYPE]] + "Undiscovered","UndiscoveredIcon",_loc4_);
+               _loc2_.IconClip.attachMovie(Map.MapMarker.IconTypes[iconType] + "Undiscovered", "UndiscoveredIcon", _loc4_);
             }
-            _loc5_ = _loc5_ + 1;
+            _loc5_++;
             this.NextCreateIndex++;
             _loc3_ += Map.MapMenu.CREATE_STRIDE;
          }
+         if (this.LocationFinderPanel != undefined)
+         {
+            this.LocationFinderPanel.list.InvalidateData();
+         }
          if(this.NextCreateIndex >= _loc6_)
          {
+            if (this.LocationFinderPanel != undefined)
+            {
+               this.LocationFinderPanel.setLoading(false);
+            }
             this.NextCreateIndex = -1;
          }
       }
@@ -194,6 +225,7 @@ class Map.MapMenu
    function Init()
    {
       this.onResize();
+      Stage.scaleMode = "showAll";
       if(this.BottomBar != undefined)
       {
          this.BottomBar.swapDepths(4);
@@ -205,6 +237,11 @@ class Map.MapMenu
          this.BottomBar.LocalMapButton.addEventListener("click",this,"OnLocalButtonClick");
          this.BottomBar.JournalButton.addEventListener("click",this,"OnJournalButtonClick");
          this.BottomBar.PlayerLocButton.addEventListener("click",this,"OnPlayerLocButtonClick");
+         this.BottomBar.FindLocButton.addEventListener("click",this,"OnFindLocButtonClick");
+      }
+      if(this.MapMovie.LocationFinderFader != undefined)
+      {
+         this.MapMovie.LocationFinderFader.swapDepths(6);
       }
       gfx.io.GameDelegate.addCallBack("RefreshMarkers",this,"RefreshMarkers");
       gfx.io.GameDelegate.addCallBack("SetSelectedMarker",this,"SetSelectedMarker");
@@ -224,6 +261,10 @@ class Map.MapMenu
    {
       gfx.io.GameDelegate.call("CurrentLocationCallback",[]);
    }
+   function OnFindLocButtonClick()
+   {
+      this.LocalMapMenu.showLocationFinder();
+   }
    function SetPlatform(aPlatformNum, abPS3Switch)
    {
       if(this.BottomBar != undefined)
@@ -233,9 +274,12 @@ class Map.MapMenu
          this.BottomBar.JournalButton.SetPlatform(aPlatformNum,abPS3Switch);
          this.BottomBar.PlayerLocButton.SetPlatform(aPlatformNum,abPS3Switch);
          this.BottomBar.LocalMapButton.SetPlatform(aPlatformNum,abPS3Switch);
+         this.BottomBar.FindLocButton.SetPlatform(aPlatformNum,abPS3Switch);
+
          this.BottomBar.JournalButton.disabled = aPlatformNum != Shared.ButtonChange.PLATFORM_PC;
          this.BottomBar.PlayerLocButton.disabled = aPlatformNum != Shared.ButtonChange.PLATFORM_PC;
          this.BottomBar.LocalMapButton.disabled = aPlatformNum != Shared.ButtonChange.PLATFORM_PC;
+         this.BottomBar.FindLocButton.disabled = aPlatformNum != Shared.ButtonChange.PLATFORM_PC;
       }
       this.iPlatform = aPlatformNum;
    }

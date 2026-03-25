@@ -97,7 +97,7 @@ class Map.LocationFinder extends MovieClip
          return undefined;
       }
       this.setFoundMarker(_loc2_);
-      skse.ShowOnMap(_loc2_.index);
+      skse.ShowOnMap(_loc2_.Index);
    }
    function clearFoundMarker()
    {
