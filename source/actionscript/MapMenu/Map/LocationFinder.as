@@ -12,9 +12,9 @@ class Map.LocationFinder extends MovieClip
    {
       super();
       this._nameFilter = new skyui.filter.NameFilter();
-      this._nameFilter.nameAttribute = "_label";
+      this._nameFilter.nameAttribute = "label"; 
       this._sortFilter = new skyui.filter.SortFilter();
-      this._sortFilter.setSortBy(["_label"],[Array.CASEINSENSITIVE]);
+      this._sortFilter.setSortBy(["label"],[Array.CASEINSENSITIVE]);
    }
    function onLoad()
    {
@@ -75,19 +75,41 @@ class Map.LocationFinder extends MovieClip
    }
    function handleInput(details, pathToFocus)
    {
-      if(this._bShown)
+      if (this._bShown)
       {
-         if(Shared.GlobalFunc.IsKeyPressed(details))
+         if (Shared.GlobalFunc.IsKeyPressed(details))
          {
-            if(details.skseKeycode == 57)
+            if (details.skseKeycode == 57 && !this.searchWidget._bActive)
             {
                this.searchWidget.startInput();
                return true;
             }
+
+            if (details.navEquivalent == gfx.ui.NavigationCode.TAB || 
+                details.navEquivalent == gfx.ui.NavigationCode.ESCAPE)
+            {
+               if (this.searchWidget._bActive) 
+               {
+                  this.searchWidget.endInput();
+               } 
+               else 
+               {
+                  _root.WorldMap.OnLocalButtonClick(); 
+               }
+               return true;
+            }
          }
       }
-      var _loc3_ = pathToFocus.shift();
-      return _loc3_.handleInput(details,pathToFocus);
+
+      if (pathToFocus != undefined && pathToFocus.length > 0) 
+      {
+         var _loc3_ = pathToFocus.shift();
+         if (_loc3_ != undefined && typeof(_loc3_.handleInput) == "function") {
+            return _loc3_.handleInput(details, pathToFocus);
+         }
+      }
+
+      return false;
    }
    function onLocationListPress(a_event)
    {
@@ -132,5 +154,6 @@ class Map.LocationFinder extends MovieClip
       this.list.disableInput = this.list.disableSelection = false;
       gfx.managers.InputDelegate.instance.enableControlFixup(true);
       this._nameFilter.filterText = event.data;
+      gfx.managers.FocusHandler.instance.setFocus(this.list, 0);
    }
 }

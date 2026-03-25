@@ -310,12 +310,38 @@ class Map.MapMenu
    }
    function handleInput(details, pathToFocus)
    {
-      if (Shared.GlobalFunc.IsKeyPressed(details)) 
-      {
-         var isPC = (this.iPlatform == 0 || this.iPlatform == undefined);
-         var isGamepad = (this.iPlatform != 0);
+      var isFinderOpen = (this.LocalMapMenu._state == Map.LocalMap.STATE_FINDLOCATION);
+      var isKeyPressed = Shared.GlobalFunc.IsKeyPressed(details);
 
-         if ((isPC && details.skseKeycode == 33) || (isGamepad && details.skseKeycode == 271)) 
+      if (isFinderOpen)
+      {
+         var isTyping = this.LocationFinderPanel.searchWidget._bActive;
+
+         if (isKeyPressed)
+         {
+            if (!isTyping) {
+               if (details.skseKeycode == 33 || details.skseKeycode == 271) {
+                  this.OnLocalButtonClick();
+                  return true;
+               }
+            }
+
+            if (details.skseKeycode == 277)
+            {
+               this.OnLocalButtonClick();
+               return true;
+            }
+         }
+
+         var finderPath = [this.LocationFinderPanel.list];
+         this.LocationFinderPanel.handleInput(details, finderPath);
+         
+         return true; 
+      }
+
+      if (isKeyPressed) 
+      {
+         if (details.skseKeycode == 33 || details.skseKeycode == 271) 
          {
             this.OnFindLocButtonClick();
             return true;
