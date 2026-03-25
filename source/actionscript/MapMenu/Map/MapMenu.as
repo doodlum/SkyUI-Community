@@ -16,7 +16,6 @@ class Map.MapMenu
    var YouAreHereMarker;
    var iPlatform;
    var LocationFinderPanel;
-   var bLocationFinderOpen = false;
    static var REFRESH_SHOW = 0;
    static var REFRESH_X = 1;
    static var REFRESH_Y = 2;
@@ -307,5 +306,21 @@ class Map.MapMenu
       this.BottomBar.JournalButton.XBoxArt = buttonName;
       this.BottomBar.JournalButton.PS3Art = buttonName;
       this.BottomBar.JournalButton.RefreshArt();
+   }
+   function handleInput(details, pathToFocus)
+   {
+      if (Shared.GlobalFunc.IsKeyPressed(details)) 
+      {
+         var isPC = (this.iPlatform == 0 || this.iPlatform == undefined);
+         var isGamepad = (this.iPlatform != 0);
+
+         if ((isPC && details.skseKeycode == 33) || (isGamepad && details.skseKeycode == 271)) 
+         {
+            this.OnFindLocButtonClick();
+            return true;
+         }
+      }
+
+      return false;
    }
 }
