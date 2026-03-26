@@ -9,7 +9,7 @@ cmake_policy(SET CMP0175 OLD)
 
 project(
     SkyUI
-    VERSION 6.5
+    VERSION 6.6
     LANGUAGES NONE
 )
 
