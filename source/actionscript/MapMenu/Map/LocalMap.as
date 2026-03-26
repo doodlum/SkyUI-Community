@@ -1,31 +1,30 @@
 class Map.LocalMap extends MovieClip
 {
-   var BottomBar;
    var ClearedDescription;
    var ClearedText;
    var IconDisplay;
    var LocalMapHolder_mc;
    var LocationDescription;
    var LocationTextClip;
-   var MapImageLoader;
    var TextureHolder;
-   var _TextureHeight;
-   var _TextureWidth;
-   var bUpdated;
+   var _bottomBar;
    var _locationFinder;
+   var _mapImageLoader;
    static var STATE_HIDDEN = 0;
    static var STATE_LOCALMAP = 1;
    static var STATE_FINDLOCATION = 2;
+   var _bUpdated = false;
+   var _bShow = false;
    var _state = Map.LocalMap.STATE_HIDDEN;
    var _bRequestFindLoc = false;
+   var _textureWidth = 800;
+   var _textureHeight = 450;
    function LocalMap()
    {
       super();
       this.IconDisplay = new Map.MapMenu(this);
-      this.MapImageLoader = new MovieClipLoader();
-      this.MapImageLoader.addListener(this);
-      this._TextureWidth = 800;
-      this._TextureHeight = 450;
+      this._mapImageLoader = new MovieClipLoader();
+      this._mapImageLoader.addListener(this);
       this.LocationDescription = this.LocationTextClip.LocationText;
       this.LocationDescription.noTranslate = true;
       this.LocationTextClip.swapDepths(3);
@@ -35,35 +34,34 @@ class Map.LocalMap extends MovieClip
    }
    function get TextureWidth()
    {
-      return this._TextureWidth;
+      return this._textureWidth;
    }
    function get TextureHeight()
    {
-      return this._TextureHeight;
-   }
-   function onLoadInit(TargetClip)
-   {
-      TargetClip._width = this._TextureWidth;
-      TargetClip._height = this._TextureHeight;
+      return this._textureHeight;
    }
    function InitMap()
    {
-      Stage.scaleMode = "showAll";
-      if(!this.bUpdated)
+      if(!this._bUpdated)
       {
-         this.MapImageLoader.loadClip("img://Local_Map",this.TextureHolder);
-         this.bUpdated = true;
+         this._mapImageLoader.loadClip("img://Local_Map",this.TextureHolder);
+         this._bUpdated = true;
       }
       this.updateLocalMapExtends(true);
    }
-   function Show(abShow)
+   function Show(a_bShow)
    {
-      if(abShow)
+      this._bShow = a_bShow;
+      if(a_bShow)
       {
          if(this._bRequestFindLoc)
+         {
             this.setState(Map.LocalMap.STATE_FINDLOCATION);
+         }
          else
+         {
             this.setState(Map.LocalMap.STATE_LOCALMAP);
+         }
       }
       else
       {
@@ -71,13 +69,10 @@ class Map.LocalMap extends MovieClip
       }
       this._bRequestFindLoc = false;
    }
-   function SetBottomBar(aBottomBar)
+   function SetTitle(a_name, a_cleared)
    {
-      this.BottomBar = aBottomBar;
-   }
-   function setLocationFinder(a_locationFinder)
-   {
-      this._locationFinder = a_locationFinder;
+      this.LocationDescription.text = a_name != undefined ? a_name : "";
+      this.ClearedDescription.text = a_cleared != undefined ? "(" + a_cleared + ")" : "";
    }
    function showLocationFinder()
    {
@@ -91,51 +86,90 @@ class Map.LocalMap extends MovieClip
          gfx.io.GameDelegate.call("ToggleMapCallback",[]);
       }
    }
-
+   function setBottomBar(a_bottomBar)
+   {
+      this._bottomBar = a_bottomBar;
+   }
+   function setLocationFinder(a_locationFinder)
+   {
+      this._locationFinder = a_locationFinder;
+   }
+   function onLoadInit(a_targetClip)
+   {
+      a_targetClip._width = this._textureWidth;
+      a_targetClip._height = this._textureHeight;
+   }
    function setState(a_newState)
    {
-      var prevState = this._state;
-      
+      var _loc3_ = this._state;
+      var _loc2_ = this._bottomBar.buttonPanel;
       if(a_newState == Map.LocalMap.STATE_LOCALMAP)
       {
          this.updateLocalMapExtends(true);
          this._parent.gotoAndPlay("fadeIn");
-         this.BottomBar.RightButton.visible = false;
-         this.BottomBar.LocalMapButton.label = "$World Map";
-         
-         if(prevState == Map.LocalMap.STATE_FINDLOCATION)
-            this._locationFinder.hide(false);
+         this._parent._visible = true;
+         _loc2_.button0.label = "$World Map";
+         _loc2_.button2.visible = true;
+         _loc2_.button3.visible = true;
+         if(!_loc2_.button4.disabled)
+         {
+            _loc2_.button4.visible = true;
+         }
+         _loc2_.button5.visible = false;
+         _loc2_.button6.visible = false;
       }
       else if(a_newState == Map.LocalMap.STATE_FINDLOCATION)
       {
          this.updateLocalMapExtends(false);
-         if(prevState == Map.LocalMap.STATE_LOCALMAP)
+         if(_loc3_ == Map.LocalMap.STATE_LOCALMAP)
+         {
             this._parent.gotoAndPlay("fadeOut");
-
+            this._parent._visible = true;
+         }
+         else
+         {
+            this._parent._visible = false;
+         }
          this._locationFinder.show();
-         this.BottomBar.RightButton.visible = false;
-         this.BottomBar.LocalMapButton.label = "$World Map";
+         _loc2_.button0.label = "$World Map";
+         _loc2_.button2.visible = false;
+         _loc2_.button3.visible = false;
+         _loc2_.button4.visible = false;
+         _loc2_.button5.visible = false;
+         _loc2_.button6.visible = true;
       }
       else if(a_newState == Map.LocalMap.STATE_HIDDEN)
       {
-         if(prevState == Map.LocalMap.STATE_LOCALMAP)
+         if(_loc3_ == Map.LocalMap.STATE_LOCALMAP)
+         {
             this._parent.gotoAndPlay("fadeOut");
-         else if(prevState == Map.LocalMap.STATE_FINDLOCATION)
-            this._locationFinder.hide(false);
-
-         this.BottomBar.RightButton.visible = true;
-         this.BottomBar.LocalMapButton.label = "$Local Map";
+         }
+         else if(_loc3_ == Map.LocalMap.STATE_FINDLOCATION)
+         {
+            this._locationFinder.hide();
+         }
+         this._parent._visible = true;
+         _loc2_.button0.label = "$Local Map";
+         _loc2_.button2.visible = true;
+         _loc2_.button3.visible = true;
+         if(!_loc2_.button4.disabled)
+         {
+            _loc2_.button4.visible = true;
+         }
+         _loc2_.button5.visible = true;
+         _loc2_.button6.visible = false;
       }
-      
+      _loc2_.updateButtons(true);
       this._state = a_newState;
    }
-
    function updateLocalMapExtends(a_bEnabled)
    {
+      var _loc3_;
+      var _loc2_;
       if(a_bEnabled)
       {
-         var _loc3_ = {x:this._x,y:this._y};
-         var _loc2_ = {x:this._x + this._TextureWidth,y:this._y + this._TextureHeight};
+         _loc3_ = {x:this._x,y:this._y};
+         _loc2_ = {x:this._x + this._textureWidth,y:this._y + this._textureHeight};
          this._parent.localToGlobal(_loc3_);
          this._parent.localToGlobal(_loc2_);
          gfx.io.GameDelegate.call("SetLocalMapExtents",[_loc3_.x,_loc3_.y,_loc2_.x,_loc2_.y]);
@@ -144,11 +178,5 @@ class Map.LocalMap extends MovieClip
       {
          gfx.io.GameDelegate.call("SetLocalMapExtents",[0,0,0,0]);
       }
-   }
-
-   function SetTitle(aName, aCleared)
-   {
-      this.LocationDescription.text = aName == undefined ? "" : aName;
-      this.ClearedDescription.text = aCleared == undefined ? "" : "(" + aCleared + ")";
    }
 }
