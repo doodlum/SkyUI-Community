@@ -202,6 +202,7 @@ class SystemPage extends MovieClip
       {
          this.currentState = SystemPage.MAIN_STATE;
          gfx.io.GameDelegate.call("SetVersionText",[this.VersionText]);
+         this.ParseVersion();
          gfx.io.GameDelegate.call("ShouldShowKinectTunerOption",[],this,"SetShouldShowKinectTunerOption");
          this.UpdatePermissions();
          this.BottomBar_mc.SetButtonVisibility(1,false,50);
@@ -795,91 +796,82 @@ class SystemPage extends MovieClip
    }
    function onSettingsCategoryPress()
    {
-      var list = this.OptionsListsPanel.OptionsLists.List_mc;
+      var optionsList = this.OptionsListsPanel.OptionsLists.List_mc;
       var entries = [];
-
+      
       switch(this.SettingsList.selectedIndex)
       {
-         case 0:
-            skse.Log(this.VersionText.text);
+         case 0: // Gameplay
             entries = [
-               {text:"$Invert Y",movieType:2},
-               {text:"$Look Sensitivity",movieType:0},
-               {text:"$Vibration",movieType:2},
-               {text:"$360 Controller",movieType:2},
-               {text:"$Survival Mode",movieType:2},
-               {text:"$Difficulty",movieType:1,options:["$Very Easy","$Easy","$Normal","$Hard","$Very Hard","$Legendary"]},
-               {text:"$Show Floating Markers",movieType:2},
-               {text:"$Save on Rest",movieType:2},
-               {text:"$Save on Wait",movieType:2},
-               {text:"$Save on Travel",movieType:2},
-               {text:"$Save on Pause",movieType:1,options:["$5 Mins","$10 Mins","$15 Mins","$30 Mins","$45 Mins","$60 Mins","$Disabled"]},
-               {text:"$Use Kinect Commands",movieType:2}
+               {text:"$Invert Y", movieType:2},
+               {text:"$Look Sensitivity", movieType:0},
+               {text:"$Vibration", movieType:2},
+               {text:"$360 Controller", movieType:2},
+               {text:"$Survival Mode", movieType:2},
+               {text:"$Difficulty", movieType:1, options:["$Very Easy","$Easy","$Normal","$Hard","$Very Hard","$Legendary"]},
+               {text:"$Show Floating Markers", movieType:2},
+               {text:"$Save on Rest", movieType:2},
+               {text:"$Save on Wait", movieType:2},
+               {text:"$Save on Travel", movieType:2},
+               {text:"$Save on Pause", movieType:1, options:["$5 Mins","$10 Mins","$15 Mins","$30 Mins","$45 Mins","$60 Mins","$Disabled"]},
+               {text:"$Use Kinect Commands", movieType:2}
             ];
-
-            if(this.IsVersionAtLeast1126())
+            
+            if(this.IsVersionAtLeast(1, 6, 659))
             {
-               entries.splice(4, 0, {text:"$SaveGameMissingCreationsCheck",movieType:2});
+               entries.splice(4, 0, {text:"$SaveGameMissingCreationsCheck", movieType:2});
             }
-
             gfx.io.GameDelegate.call("RequestGameplayOptions", [entries]);
             break;
-
-         case 1:
+               
+         case 1: // Display
             entries = [
-               {text:"$Brightness",movieType:0},
-               {text:"$HUD Opacity",movieType:0},
-               {text:"$Actor Fade",movieType:0},
-               {text:"$Item Fade",movieType:0},
-               {text:"$Object Fade",movieType:0},
-               {text:"$Grass Fade",movieType:0},
-               {text:"$Shadow Fade",movieType:0},
-               {text:"$Light Fade",movieType:0},
-               {text:"$Specularity Fade",movieType:0},
-               {text:"$Tree LOD Fade",movieType:0},
-               {text:"$Crosshair",movieType:2},
-               {text:"$Dialogue Subtitles",movieType:2},
-               {text:"$General Subtitles",movieType:2},
-               {text:"$DDOF Intensity",movieType:0}
+               {text:"$Brightness", movieType:0},
+               {text:"$HUD Opacity", movieType:0},
+               {text:"$Actor Fade", movieType:0},
+               {text:"$Item Fade", movieType:0},
+               {text:"$Object Fade", movieType:0},
+               {text:"$Grass Fade", movieType:0},
+               {text:"$Shadow Fade", movieType:0},
+               {text:"$Light Fade", movieType:0},
+               {text:"$Specularity Fade", movieType:0},
+               {text:"$Tree LOD Fade", movieType:0},
+               {text:"$Crosshair", movieType:2},
+               {text:"$Dialogue Subtitles", movieType:2},
+               {text:"$General Subtitles", movieType:2},
+               {text:"$DDOF Intensity", movieType:0}
             ];
-
             gfx.io.GameDelegate.call("RequestDisplayOptions", [entries]);
             break;
-
-         case 2:
-            entries = [{text:"$Master",movieType:0}];
-
+               
+         case 2: // Audio
+            entries = [{text:"$Master", movieType:0}];
             gfx.io.GameDelegate.call("RequestAudioOptions", [entries]);
-
             for(var i = 0; i < entries.length; i++)
             {
                entries[i].movieType = 0;
             }
             break;
       }
-
-      var filtered = [];
-      for(var j = 0; j < entries.length; j++)
+      for(var i = entries.length - 1; i >= 0; i--)
       {
-         if(entries[j].ID != undefined)
+         if(entries[i].ID == undefined)
          {
-            filtered.push(entries[j]);
+            entries.splice(i, 1);
          }
       }
-
-      list.entryList = filtered;
-
+      optionsList.entryList = entries;
+      
       if(this.iPlatform != 0)
       {
-         list.selectedIndex = 0;
+         optionsList.selectedIndex = 0;
       }
-
-      list.InvalidateData();
-
+      
+      optionsList.InvalidateData();
       this.SettingsPanel.bCloseToMainState = false;
       this.EndState();
       this.StartState(SystemPage.OPTIONS_LISTS_STATE);
-      gfx.io.GameDelegate.call("PlaySound",["UIMenuOK"]);
+      gfx.io.GameDelegate.call("PlaySound", ["UIMenuOK"]);
       this.bSettingsChanged = true;
    }
    function ResetSettingsToDefaults()
@@ -1484,5 +1476,24 @@ class SystemPage extends MovieClip
       }
 
       this.CategoryList.UpdateList();
+   }
+   function ParseVersion()
+   {
+      var clean = this.VersionText.text.split(" ")[0];
+      var parts = clean.split(".");
+
+      this._skyrimVersion = parseInt(parts[0]);
+      this._skyrimVersionMinor = parseInt(parts[1]);
+      this._skyrimVersionBuild = parseInt(parts[2]);
+   }
+   function IsVersionAtLeast(major, minor, build)
+   {
+      if(this._skyrimVersion > major) return true;
+      if(this._skyrimVersion < major) return false;
+
+      if(this._skyrimVersionMinor > minor) return true;
+      if(this._skyrimVersionMinor < minor) return false;
+
+      return this._skyrimVersionBuild >= build;
    }
 }
