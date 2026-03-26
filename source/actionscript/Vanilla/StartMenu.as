@@ -307,6 +307,7 @@ class StartMenu extends MovieClip
          _loc3_ = _loc3_ + 1;
       }
       this.MainList.InvalidateData();
+      this.MainList.selectedIndex = 0;
       this._NeedsLoginScreen = !arguments[_loc11_] && skse.version.releaseIdx >= 70;
       if(this.currentState == undefined)
       {
