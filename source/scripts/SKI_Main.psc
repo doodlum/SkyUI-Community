@@ -14,6 +14,9 @@ int property		ERR_SKSE_BROKEN			= 7 autoReadonly
 int property		MinSKSERelease	= 53		autoReadonly
 string property		MinSKSEVersion	= "2.0.4"	autoReadonly
 
+int property		ReqSWFRelease	= 2018		autoReadonly
+string property		ReqSWFVersion	= "5.2 SE"	autoReadonly
+
 bool property		ErrorDetected	= false auto
 
 
