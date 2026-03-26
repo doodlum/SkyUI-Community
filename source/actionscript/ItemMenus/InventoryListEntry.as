@@ -154,6 +154,9 @@ class InventoryListEntry extends skyui.components.list.TabularListEntry
    function formatText(a_entryField, a_entryObject, a_state)
    {
       this.formatColor(a_entryField,a_entryObject,a_state);
+      if (a_entryField != this.textField0) {
+         a_entryField.autoSize = "right";
+      }
    }
    function onLoadInit(a_icon)
    {
