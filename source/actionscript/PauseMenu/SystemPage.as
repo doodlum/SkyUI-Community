@@ -133,7 +133,7 @@ class SystemPage extends MovieClip
       this.CategoryList.entryList.push({text:"$QUICKSAVE"});
       this.CategoryList.entryList.push({text:"$SAVE"});
       this.CategoryList.entryList.push({text:"$LOAD"});
-      if (this.IsVersionAtLeast1126()) {
+      if (this.IsVersionAtLeast(1, 6, 1126)) {
          this.CategoryList.entryList.push({text:"$INSTALLED CONTENT"});
       }
       this.CategoryList.entryList.push({text:"$SETTINGS"});
@@ -189,7 +189,7 @@ class SystemPage extends MovieClip
       this._ShowModMenu = bshow;
       if(this._ShowModMenu && this.CategoryList.entryList && this.CategoryList.entryList.length > 0)
       {
-         var insertPos = this.IsVersionAtLeast1126() ? 4 : 3;
+         var insertPos = this.IsVersionAtLeast(1, 6, 1126) ? 4 : 3;
          this.CategoryList.entryList.splice(insertPos,0,{text:"$MOD MANAGER"});
          this.UpdateIndices();
          this.CategoryList.InvalidateData();
@@ -1496,9 +1496,5 @@ class SystemPage extends MovieClip
       if(this._skyrimVersionMinor < minor) return false;
 
       return this._skyrimVersionBuild >= build;
-   }
-   function IsVersionAtLeast1126()
-   {
-      return skse.version.releaseIdx >= 70;
    }
 }
