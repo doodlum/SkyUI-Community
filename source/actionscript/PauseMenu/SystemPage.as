@@ -133,9 +133,6 @@ class SystemPage extends MovieClip
       this.CategoryList.entryList.push({text:"$QUICKSAVE"});
       this.CategoryList.entryList.push({text:"$SAVE"});
       this.CategoryList.entryList.push({text:"$LOAD"});
-      if (this.IsVersionAtLeast1126()) {
-         this.CategoryList.entryList.push({text:"$INSTALLED CONTENT"});
-      }
       this.CategoryList.entryList.push({text:"$SETTINGS"});
       this.CategoryList.entryList.push({text:"$MOD CONFIGURATION"});
       this.CategoryList.entryList.push({text:"$CONTROLS"});
@@ -189,8 +186,7 @@ class SystemPage extends MovieClip
       this._ShowModMenu = bshow;
       if(this._ShowModMenu && this.CategoryList.entryList && this.CategoryList.entryList.length > 0)
       {
-         var insertPos = this.IsVersionAtLeast1126() ? 4 : 3;
-         this.CategoryList.entryList.splice(insertPos,0,{text:"$MOD MANAGER"});
+         this.CategoryList.entryList.splice(3,0,{text:"$MOD MANAGER"});
          this.UpdateIndices();
          this.CategoryList.InvalidateData();
       }
@@ -203,6 +199,11 @@ class SystemPage extends MovieClip
          this.currentState = SystemPage.MAIN_STATE;
          gfx.io.GameDelegate.call("SetVersionText",[this.VersionText]);
          this.ParseVersion();
+         if (this.IsVersionAtLeast1126()) {
+            this.CategoryList.entryList.splice(3, 0, {text:"$INSTALLED CONTENT"});
+            this.UpdateIndices();
+            this.CategoryList.InvalidateData();
+         }
          gfx.io.GameDelegate.call("ShouldShowKinectTunerOption",[],this,"SetShouldShowKinectTunerOption");
          this.UpdatePermissions();
          this.BottomBar_mc.SetButtonVisibility(1,false,50);
