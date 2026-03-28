@@ -85,9 +85,7 @@ class MessageBox extends MovieClip
 
    function IsExitButton(aText)
    {
-      var str = aText;
-      return (str == this._noStr || str == this._cancelStr || str == this._backStr || 
-              str == this._exitStr || str == this._doneStr || str == this._returnStr);
+      return (aText == this._cancelStr || aText == this._backStr || aText == this._exitStr || aText == this._doneStr || aText == this._returnStr);
    }
 
    function handleInput(details, pathToFocus)
