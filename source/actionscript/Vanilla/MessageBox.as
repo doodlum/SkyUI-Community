@@ -27,6 +27,9 @@ class MessageBox extends MovieClip
    static var SELECTION_INDICATOR_WIDTH = 25;
    static var SELECTION_INDICATOR_HEIGHT = 5;
    static var BUTTON_PREFIX = "Button";
+   
+   static var SELECTION_ROLLOVER_ALPHA = 120;
+   static var SELECTION_ROLLOUT_ALPHA = 80;
 
    function MessageBox()
    {
@@ -51,6 +54,7 @@ class MessageBox extends MovieClip
       this.InitLocalization();
    }
 
+   /* Force localized string query to make buttons work in other languages */
    function InitLocalization()
    {
       this.createTextField("temp_txt", this.getNextHighestDepth(), 0, 0, 1, 1);
@@ -85,46 +89,84 @@ class MessageBox extends MovieClip
 
    function IsExitButton(aText)
    {
-      var str = aText;
-      return (str == this._noStr || str == this._cancelStr || str == this._backStr || 
-              str == this._exitStr || str == this._doneStr || str == this._returnStr);
+      return (aText == this._cancelStr || aText == this._backStr || aText == this._exitStr || aText == this._doneStr || aText == this._returnStr);
    }
 
    function handleInput(details, pathToFocus)
    {
-      var bHandled = false;
-      if (Shared.GlobalFunc.IsKeyPressed(details)) 
-      {
-         if (details.navEquivalent == gfx.ui.NavigationCode.ESCAPE) 
-         {
-            for (var i = 0; i < this.MessageButtons.length; i++) {
-               if (this.IsExitButton(this.MessageButtons[i].ButtonText.text)) {
-                  gfx.io.GameDelegate.call("buttonPress", [i]);
-                  return true;
-               }
+      if (!Shared.GlobalFunc.IsKeyPressed(details)) {
+         return pathToFocus[0].handleInput(details, pathToFocus.slice(1));
+      }
+
+      var code = details.code;
+      var nav = details.navEquivalent;
+      
+      var buttons = this.MessageButtons;
+      var buttonsLen = buttons.length;
+
+      var isCancelKey = (nav == gfx.ui.NavigationCode.ESCAPE || 
+                        nav == gfx.ui.NavigationCode.GAMEPAD_B || 
+                        nav == gfx.ui.NavigationCode.TAB || 
+                        code == 9);
+
+      if (isCancelKey) {
+         if (this.IsCancellable && this.CancelOptionIndex != undefined) {
+            this.setFocusToButton(this.CancelOptionIndex);
+            gfx.io.GameDelegate.call("buttonPress", [this.CancelOptionIndex]);
+            return true;
+         }
+
+         var noIdx = -1;
+         var exitIdx = -1;
+
+         for (var k = 0; k < buttonsLen; k++) {
+            var txt = buttons[k].ButtonText.text;
+            if (txt == this._noStr) {
+               noIdx = k;
+               break;
             }
-            if (this.IsCancellable) {
-               gfx.io.GameDelegate.call("buttonPress", [this.CancelOptionIndex]);
-               return true;
+            if (exitIdx == -1 && this.IsExitButton(txt)) {
+               exitIdx = k;
             }
          }
+
+         if (noIdx != -1) {
+            this.setFocusToButton(noIdx);
+            return true;
+         }
          
-         if (details.code == 9) // TAB Key
-         {
-            var currentFocus = Selection.getFocus();
-            for (var i = 0; i < this.MessageButtons.length; i++) {
-               if (this.IsExitButton(this.MessageButtons[i].ButtonText.text)) {
-                  Selection.setFocus(this.MessageButtons[i]);
-                  return true;
-               }
-            }
+         if (exitIdx != -1) {
+            this.setFocusToButton(exitIdx);
+            gfx.io.GameDelegate.call("buttonPress", [exitIdx]);
+            return true;
          }
       }
 
-      if (!bHandled) {
-         bHandled = pathToFocus[0].handleInput(details, pathToFocus.slice(1));
+      for (var i = 0; i < buttonsLen; i++) {
+         var btnTxt = buttons[i].ButtonText.text;
+
+         var isHotKey = (code == 89 && btnTxt == this._yesStr) || 
+                        (code == 78 && btnTxt == this._noStr) || 
+                        (code == 65 && btnTxt == this._yesToAllStr);
+
+         if (isHotKey) {
+            this.setFocusToButton(i);
+            gfx.io.GameDelegate.call("buttonPress", [i]);
+            return true;
+         }
       }
-      return bHandled;
+
+      return pathToFocus[0].handleInput(details, pathToFocus.slice(1));
+   }
+
+   function setFocusToButton(aiIndex) {
+      var btn = this.MessageButtons[aiIndex];
+      if (btn != undefined) {
+         if (Selection.getFocus() != btn) {
+            Selection.setFocus(btn);
+         }
+         btn.focused = 1;
+      }
    }
 
    function setupButtons()
@@ -135,7 +177,7 @@ class MessageBox extends MovieClip
       }
       this.MessageButtons.length = 0;
       
-      var bFocusFirst = arguments[0];
+      // var bFocusFirst = arguments[0];
       var totalWidth = 0;
       var totalHeight = 0;
 
@@ -156,6 +198,8 @@ class MessageBox extends MovieClip
                txt.autoSize = "center";
                txt.html = true;
                txt.SetText(arguments[i], true);
+               
+               txt._alpha = MessageBox.SELECTION_ROLLOUT_ALPHA;
 
                btn.SelectionIndicatorHolder.SelectionIndicator._width = txt._width + MessageBox.SELECTION_INDICATOR_WIDTH;
                
@@ -179,8 +223,9 @@ class MessageBox extends MovieClip
          this.InitButtons();
          this.ResetDimensions();
 
-         Selection.setFocus(this.MessageButtons[0]);
-         this.MessageButtons[0].focused = 1;
+         if (this.MessageButtons.length > 0) {
+            this.setFocusToButton(0);
+         }
       }
    }
 
@@ -190,7 +235,8 @@ class MessageBox extends MovieClip
       {
          this.MessageButtons[i].addEventListener("press", this.ClickCallback);
          this.MessageButtons[i].addEventListener("focusIn", this.FocusCallback);
-         
+         this.MessageButtons[i].addEventListener("rollOver", this.HoverCallback);
+
          this.MessageButtons[i].ButtonText.noTranslate = true;
       }
    }
@@ -267,27 +313,16 @@ class MessageBox extends MovieClip
    function FocusCallback(aEvent)
    {
       gfx.io.GameDelegate.call("PlaySound",["UIMenuFocus"]);
+      
+      for (var i = 0; i < this.MessageButtons.length; i++) {
+         var btn = this.MessageButtons[i];
+         btn.ButtonText._alpha = (btn === aEvent.target) ? MessageBox.SELECTION_ROLLOVER_ALPHA : MessageBox.SELECTION_ROLLOUT_ALPHA;
+      }
    }
 
-   function onKeyDown()
+   function HoverCallback(aEvent)
    {
-      var code = Key.getCode();
-      for (var i = 0; i < this.MessageButtons.length; i++) {
-         var btnText = this.MessageButtons[i].ButtonText.text;
-         
-         if (code == 89 && btnText == this._yesStr) { 
-            gfx.io.GameDelegate.call("buttonPress",[i]); 
-            return; 
-         } 
-         if (code == 78 && btnText == this._noStr) { 
-            gfx.io.GameDelegate.call("buttonPress",[i]); 
-            return; 
-         }
-         if (code == 65 && btnText == this._yesToAllStr) { 
-            gfx.io.GameDelegate.call("buttonPress",[i]); 
-            return; 
-         }
-      }
+      Selection.setFocus(aEvent.target);
    }
 
    function SetPlatform(aiPlatform, abPS3Switch)
@@ -295,8 +330,7 @@ class MessageBox extends MovieClip
       this.iPlatform = aiPlatform;
       
       if(this.MessageButtons.length > 0) {
-         Selection.setFocus(this.MessageButtons[0]);
-         this.MessageButtons[0].focused = 1;
+         this.setFocusToButton(0);
       }
    }
 }
