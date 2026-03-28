@@ -27,7 +27,7 @@ class MessageBox extends MovieClip
    static var SELECTION_INDICATOR_WIDTH = 25;
    static var SELECTION_INDICATOR_HEIGHT = 5;
    static var BUTTON_PREFIX = "Button";
-
+   
    function MessageBox()
    {
       super();
@@ -174,7 +174,7 @@ class MessageBox extends MovieClip
       }
       this.MessageButtons.length = 0;
       
-      var bFocusFirst = arguments[0];
+      // var bFocusFirst = arguments[0];
       var totalWidth = 0;
       var totalHeight = 0;
 
@@ -218,8 +218,9 @@ class MessageBox extends MovieClip
          this.InitButtons();
          this.ResetDimensions();
 
-         Selection.setFocus(this.MessageButtons[0]);
-         this.MessageButtons[0].focused = 1;
+         if (this.MessageButtons.length > 0) {
+            this.setFocusToButton(0);
+         }
       }
    }
 
@@ -319,8 +320,7 @@ class MessageBox extends MovieClip
       this.iPlatform = aiPlatform;
       
       if(this.MessageButtons.length > 0) {
-         Selection.setFocus(this.MessageButtons[0]);
-         this.MessageButtons[0].focused = 1;
+         this.setFocusToButton(0);
       }
    }
 }
