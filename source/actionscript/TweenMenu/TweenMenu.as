@@ -9,10 +9,6 @@ class TweenMenu extends MovieClip
    var SkillsInputRect;
    var bClosing;
    var bLevelUp;
-   static var SKYUI_RELEASE_IDX = 2018;
-   static var SKYUI_VERSION_MAJOR = 5;
-   static var SKYUI_VERSION_MINOR = 2;
-   static var SKYUI_VERSION_STRING = TweenMenu.SKYUI_VERSION_MAJOR + "." + TweenMenu.SKYUI_VERSION_MINOR + " SE";
    static var FrameToLabelMap = ["None","Skills","Magic","Inventory","Map"];
    function TweenMenu()
    {

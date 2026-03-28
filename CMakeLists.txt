@@ -7,11 +7,16 @@ cmake_minimum_required(VERSION 4.2)
 # Reference: https://cmake.org/cmake/help/latest/policy/CMP0175.html
 cmake_policy(SET CMP0175 OLD)
 
+include("${CMAKE_CURRENT_SOURCE_DIR}/Version.cmake")
+
 project(
     SkyUI
-    VERSION 6.7
+    VERSION ${VER_MAJOR}.${VER_MINOR}
     LANGUAGES NONE
 )
+
+set(PROJECT_RELEASE_IDX ${VER_RELEASE_IDX})
+set(PROJECT_VERSION_STRING "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR} ${VER_SUFFIX}")
 
 # ---------------------------------------------------------------------------
 # Options & Core Paths

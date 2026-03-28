@@ -119,6 +119,9 @@ if(NOT CMAKE_SCRIPT_MODE_FILE)
                 "-DAS_SOURCE_DIR=${_AS_SOURCE_DIR}"
                 "-DSKYUI_VERSION_MAJOR=${PROJECT_VERSION_MAJOR}"
                 "-DSKYUI_VERSION_MINOR=${PROJECT_VERSION_MINOR}"
+                "-DSKYUI_RELEASE_IDX=${PROJECT_RELEASE_IDX}"
+                "-DSKYUI_VERSION_STRING=${PROJECT_VERSION_STRING}"
+                "-DVERSION_METADATA_TARGETS=${VERSION_METADATA_TARGETS}"
                 -P "${_AS_IMPORT_MODULE_SCRIPT}"
 
             # 2. Copy Base SWF
@@ -183,14 +186,25 @@ else()
             set(DST "${STAGING_DIR}/__Packages/${CLASSPATH}")
             get_filename_component(DST_DIR "${DST}" DIRECTORY)
             file(MAKE_DIRECTORY "${DST_DIR}")
-            file(COPY_FILE "${SRC}" "${DST}" ONLY_IF_DIFFERENT)
 
-            # Patch version if variables are provided
-            if(DEFINED SKYUI_VERSION_MAJOR AND DEFINED SKYUI_VERSION_MINOR)
-                file(READ "${DST}" _CONTENT)
-                string(REGEX REPLACE "static var SKYUI_VERSION_MAJOR = [0-9]+;" "static var SKYUI_VERSION_MAJOR = ${SKYUI_VERSION_MAJOR};" _CONTENT "${_CONTENT}")
-                string(REGEX REPLACE "static var SKYUI_VERSION_MINOR = [0-9]+;" "static var SKYUI_VERSION_MINOR = ${SKYUI_VERSION_MINOR};" _CONTENT "${_CONTENT}")
-                file(WRITE "${DST}" "${_CONTENT}")
+            list(FIND VERSION_METADATA_TARGETS "${CLASSPATH}" _TARGET_INDEX)
+
+            if(_TARGET_INDEX GREATER -1)
+                file(READ "${SRC}" _CONTENT)
+
+                set(_INJECTION "\n    static var SKYUI_RELEASE_IDX = ${SKYUI_RELEASE_IDX};")
+                string(APPEND _INJECTION "\n    static var SKYUI_VERSION_MAJOR = ${SKYUI_VERSION_MAJOR};")
+                string(APPEND _INJECTION "\n    static var SKYUI_VERSION_MINOR = ${SKYUI_VERSION_MINOR};")
+                string(APPEND _INJECTION "\n    static var SKYUI_VERSION_STRING = \"${SKYUI_VERSION_STRING}\";\n")
+
+                if(_CONTENT MATCHES "class[ \t\r\n]+[^\{]+\\{")
+                    string(REGEX REPLACE "(class[ \t\r\n]+[^\{]+\\{)" "\\1${_INJECTION}" _MODIFIED_CONTENT "${_CONTENT}")
+                    file(WRITE "${DST}" "${_MODIFIED_CONTENT}")
+                else()
+                    file(COPY_FILE "${SRC}" "${DST}")
+                endif()
+            else()
+                file(COPY_FILE "${SRC}" "${DST}" ONLY_IF_DIFFERENT)
             endif()
         endforeach()
     endif()
@@ -202,19 +216,16 @@ else()
             if(SRC AND EXISTS "${SRC}")
                 get_filename_component(FNAME "${SRC}" NAME)
                 set(DST "${STAGING_DIR}/${FNAME}")
-                file(COPY_FILE "${SRC}" "${DST}" ONLY_IF_DIFFERENT)
-
-                # Patch version if variables are provided
-                if(DEFINED SKYUI_VERSION_MAJOR AND DEFINED SKYUI_VERSION_MINOR)
-                    file(READ "${DST}" _CONTENT)
+                
+                file(READ "${SRC}" _CONTENT)
+                if(DEFINED SKYUI_VERSION_MAJOR)
                     string(REGEX REPLACE "static var SKYUI_VERSION_MAJOR = [0-9]+;" "static var SKYUI_VERSION_MAJOR = ${SKYUI_VERSION_MAJOR};" _CONTENT "${_CONTENT}")
                     string(REGEX REPLACE "static var SKYUI_VERSION_MINOR = [0-9]+;" "static var SKYUI_VERSION_MINOR = ${SKYUI_VERSION_MINOR};" _CONTENT "${_CONTENT}")
-                    file(WRITE "${DST}" "${_CONTENT}")
                 endif()
+                file(WRITE "${DST}" "${_CONTENT}")
             endif()
         endforeach()
     endif()
-
 endif()
 
 # ===========================================================================

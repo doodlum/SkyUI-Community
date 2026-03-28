@@ -51,10 +51,6 @@ class ItemCard extends MovieClip
    var _bEditNameMode;
    var bFadedIn;
    var dispatchEvent;
-   static var SKYUI_RELEASE_IDX = 2018;
-   static var SKYUI_VERSION_MAJOR = 5;
-   static var SKYUI_VERSION_MINOR = 2;
-   static var SKYUI_VERSION_STRING = ItemCard.SKYUI_VERSION_MAJOR + "." + ItemCard.SKYUI_VERSION_MINOR + " SE";
    function ItemCard()
    {
       super();

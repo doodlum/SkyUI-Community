@@ -22,10 +22,6 @@ class ContainerMenu extends ItemMenu
    var itemCardFadeHolder;
    var navPanel;
    var shouldProcessItemsListInput;
-   static var SKYUI_RELEASE_IDX = 2018;
-   static var SKYUI_VERSION_MAJOR = 5;
-   static var SKYUI_VERSION_MINOR = 2;
-   static var SKYUI_VERSION_STRING = ContainerMenu.SKYUI_VERSION_MAJOR + "." + ContainerMenu.SKYUI_VERSION_MINOR + " SE";
    static var NULL_HAND = -1;
    static var RIGHT_HAND = 0;
    static var LEFT_HAND = 1;

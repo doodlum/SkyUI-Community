@@ -18,10 +18,6 @@ class Quest_Journal extends MovieClip
    static var PAGE_QUEST = 0;
    static var PAGE_STATS = 1;
    static var PAGE_SYSTEM = 2;
-   static var SKYUI_RELEASE_IDX = 2018;
-   static var SKYUI_VERSION_MAJOR = 5;
-   static var SKYUI_VERSION_MINOR = 2;
-   static var SKYUI_VERSION_STRING = ItemCard.SKYUI_VERSION_MAJOR + "." + ItemCard.SKYUI_VERSION_MINOR + " SE";
    function Quest_Journal()
    {
       super();

@@ -8,10 +8,6 @@ class BottomBar extends MovieClip
    var _staminaMeter;
    var buttonPanel;
    var playerInfoCard;
-   static var SKYUI_RELEASE_IDX = 2018;
-   static var SKYUI_VERSION_MAJOR = 5;
-   static var SKYUI_VERSION_MINOR = 2;
-   static var SKYUI_VERSION_STRING = BottomBar.SKYUI_VERSION_MAJOR + "." + BottomBar.SKYUI_VERSION_MINOR + " SE";
    function BottomBar()
    {
       super();
