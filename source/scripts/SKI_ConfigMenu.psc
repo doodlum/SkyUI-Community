@@ -34,7 +34,9 @@ int			_equipModeKey				= 42
 
 ; Internal
 float		_itemXBase
+float		_itemYBase
 float		_itemXBaseW
+float		_itemYBaseW
 
 
 ; -- Version 2 --
@@ -1552,9 +1554,11 @@ function ApplySettings()
 	_fInventory3DItemPosScale		= Utility.GetINIFloat("fInventory3DItemPosScale:Interface")
 	_fMagic3DItemPosScale			= Utility.GetINIFloat("fMagic3DItemPosScale:Interface")
 
-	float fStageCenter       = 640.0 ; Stage Center (1280 / 2)
-	float fStageUnitsPerUnit = 8.0   ; 1 unit 3DItemPosX = 8px in 1280x720
-	float fTargetX 					 ; ItemCard Center
+	float fStageCenterX      = 640.0 ; Stage Center X (1280 / 2)
+	float fStageCenterY      = 360.0 ; Stage Center Y (720 / 2)
+	float fStageUnitsPerUnit = 8.0   ; 1 unit 3DItemPos = 8px in 1280x720
+	float fTargetX 					 ; ItemCard Center X
+	float fTargetY 					 ; ItemCard Center Y
 
 	float fWidth  = Utility.GetINIInt("iSize W:Display") as float
 	float fHeight = Utility.GetINIInt("iSize H:Display") as float
@@ -1563,14 +1567,20 @@ function ApplySettings()
 
 	if (fAspect > 3.0)     ; 32:9 (Super Ultrawide)
     	fTargetX = 785.5
+		fTargetY = 300.0
 	elseif (fAspect > 2.0) ; 21:9 (Ultrawide)
 		fTargetX = 858.0
+		fTargetY = 275.0
 	else                   ; 16:9 / 16:10 / 4:3 (Standard)
 		fTargetX = 931.225
+		fTargetY = 250.0
 	endif
 
-	_itemXBaseW = -(fTargetX - fStageCenter) / fStageUnitsPerUnit
+	_itemXBaseW = -(fTargetX - fStageCenterX) / fStageUnitsPerUnit
 	_itemXBase  = _itemXBaseW
+
+	_itemYBaseW = -(fTargetY - fStageCenterY) / fStageUnitsPerUnit
+	_itemYBase  = _itemYBaseW
 
 	Apply3DItemXOffset()
 	Apply3DItemYOffset()
@@ -1631,10 +1641,10 @@ function Apply3DItemYOffset()
 		Utility.SetINIFloat("fMagic3DItemPosZWide:Interface", _fMagic3DItemPosZWide)
 		Utility.SetINIFloat("fMagic3DItemPosZ:Interface", _fMagic3DItemPosZ)
 	else
-		Utility.SetINIFloat("fInventory3DItemPosZWide:Interface", (12 + _3DItemYOffset))
-		Utility.SetINIFloat("fInventory3DItemPosZ:Interface", (16 + _3DItemYOffset))
-		Utility.SetINIFloat("fMagic3DItemPosZWide:Interface", (12 + _3DItemYOffset))
-		Utility.SetINIFloat("fMagic3DItemPosZ:Interface", (16 + _3DItemYOffset))
+		Utility.SetINIFloat("fInventory3DItemPosZWide:Interface", (_itemYBaseW + _3DItemYOffset))
+		Utility.SetINIFloat("fInventory3DItemPosZ:Interface", (_itemYBase + _3DItemYOffset))
+		Utility.SetINIFloat("fMagic3DItemPosZWide:Interface", (_itemYBaseW + _3DItemYOffset))
+		Utility.SetINIFloat("fMagic3DItemPosZ:Interface", (_itemYBase + _3DItemYOffset))
 	endIf
 endFunction
 
