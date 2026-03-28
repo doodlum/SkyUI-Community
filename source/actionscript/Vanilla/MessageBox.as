@@ -97,7 +97,9 @@ class MessageBox extends MovieClip
 
       var code = details.code;
       var nav = details.navEquivalent;
-      var bHandled = false;
+      
+      var buttons = this.MessageButtons;
+      var buttonsLen = buttons.length;
 
       var isCancelKey = (nav == gfx.ui.NavigationCode.ESCAPE || 
                         nav == gfx.ui.NavigationCode.GAMEPAD_B || 
@@ -105,42 +107,63 @@ class MessageBox extends MovieClip
                         code == 9);
 
       if (isCancelKey) {
-         var noIndex = -1;
-         for (var k = 0; k < buttonsLen; k++) {
-            if (this.MessageButtons[k].ButtonText.text == this._noStr) {
-               noIndex = k;
-               break;
-            }
-         }
-         if (noIndex != -1) {
-            this.setFocusToButton(noIndex); 
-            gfx.io.GameDelegate.call("buttonPress", [noIndex]);
-            return true;
-         } 
-         else if (this.IsCancellable) {
+         if (this.IsCancellable && this.CancelOptionIndex != undefined) {
             this.setFocusToButton(this.CancelOptionIndex);
             gfx.io.GameDelegate.call("buttonPress", [this.CancelOptionIndex]);
             return true;
          }
+
+         var noIdx = -1;
+         var exitIdx = -1;
+
+         for (var k = 0; k < buttonsLen; k++) {
+            var txt = buttons[k].ButtonText.text;
+            if (txt == this._noStr) {
+               noIdx = k;
+               break;
+            }
+            if (exitIdx == -1 && this.IsExitButton(txt)) {
+               exitIdx = k;
+            }
+         }
+
+         if (noIdx != -1) {
+            this.setFocusToButton(noIdx);
+            return true;
+         }
+         
+         if (exitIdx != -1) {
+            this.setFocusToButton(exitIdx);
+            gfx.io.GameDelegate.call("buttonPress", [exitIdx]);
+            return true;
+         }
       }
 
-      for (var i = 0; i < this.MessageButtons.length; i++) {
-         var btn = this.MessageButtons[i];
-         var btnText = btn.ButtonText.text;
+      for (var i = 0; i < buttonsLen; i++) {
+         var btnTxt = buttons[i].ButtonText.text;
 
-         var isHotKey = (code == 89 && btnText == this._yesStr) || 
-                        (code == 78 && btnText == this._noStr) || 
-                        (code == 65 && btnText == this._yesToAllStr);
+         var isHotKey = (code == 89 && btnTxt == this._yesStr) || 
+                        (code == 78 && btnTxt == this._noStr) || 
+                        (code == 65 && btnTxt == this._yesToAllStr);
 
-         var isExitAction = isCancelKey && this.IsExitButton(btnText);
-
-         if (isHotKey || isExitAction) {
+         if (isHotKey) {
+            this.setFocusToButton(i);
             gfx.io.GameDelegate.call("buttonPress", [i]);
             return true;
          }
       }
 
       return pathToFocus[0].handleInput(details, pathToFocus.slice(1));
+   }
+
+   function setFocusToButton(aiIndex) {
+      var btn = this.MessageButtons[aiIndex];
+      if (btn != undefined) {
+         if (Selection.getFocus() != btn) {
+            Selection.setFocus(btn);
+         }
+         btn.focused = 1;
+      }
    }
 
    function setupButtons()
