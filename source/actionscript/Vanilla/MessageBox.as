@@ -188,6 +188,7 @@ class MessageBox extends MovieClip
       {
          this.MessageButtons[i].addEventListener("press", this.ClickCallback);
          this.MessageButtons[i].addEventListener("focusIn", this.FocusCallback);
+         this.MessageButtons[i].addEventListener("rollOver", this.HoverCallback);
          
          this.MessageButtons[i].ButtonText.noTranslate = true;
       }
@@ -266,7 +267,6 @@ class MessageBox extends MovieClip
    {
       gfx.io.GameDelegate.call("PlaySound",["UIMenuFocus"]);
    }
-
    function onKeyDown()
    {
       var code = Key.getCode();
@@ -286,6 +286,11 @@ class MessageBox extends MovieClip
             return; 
          }
       }
+   }
+
+   function HoverCallback(aEvent)
+   {
+      Selection.setFocus(aEvent.target);
    }
 
    function SetPlatform(aiPlatform, abPS3Switch)
