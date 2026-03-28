@@ -28,6 +28,9 @@ class MessageBox extends MovieClip
    static var SELECTION_INDICATOR_HEIGHT = 5;
    static var BUTTON_PREFIX = "Button";
    
+   static var SELECTION_ROLLOVER_ALPHA = 120;
+   static var SELECTION_ROLLOUT_ALPHA = 80;
+
    function MessageBox()
    {
       super();
@@ -195,6 +198,8 @@ class MessageBox extends MovieClip
                txt.autoSize = "center";
                txt.html = true;
                txt.SetText(arguments[i], true);
+               
+               txt._alpha = MessageBox.SELECTION_ROLLOUT_ALPHA;
 
                btn.SelectionIndicatorHolder.SelectionIndicator._width = txt._width + MessageBox.SELECTION_INDICATOR_WIDTH;
                
@@ -308,6 +313,11 @@ class MessageBox extends MovieClip
    function FocusCallback(aEvent)
    {
       gfx.io.GameDelegate.call("PlaySound",["UIMenuFocus"]);
+      
+      for (var i = 0; i < this.MessageButtons.length; i++) {
+         var btn = this.MessageButtons[i];
+         btn.ButtonText._alpha = (btn === aEvent.target) ? MessageBox.SELECTION_ROLLOVER_ALPHA : MessageBox.SELECTION_ROLLOUT_ALPHA;
+      }
    }
 
    function HoverCallback(aEvent)
