@@ -66,11 +66,6 @@ float		_fInventory3DItemPosX
 float		_fMagic3DItemPosXWide
 float		_fMagic3DItemPosX
 
-float		_fInventory3DItemPosYWide
-float		_fInventory3DItemPosY
-float		_fMagic3DItemPosYWide
-float		_fMagic3DItemPosY
-
 ; Flags
 int			_3DItemFlags
 
@@ -1548,11 +1543,6 @@ function ApplySettings()
 	_fInventory3DItemPosX 			= Utility.GetINIFloat("fInventory3DItemPosX:Interface")
 	_fMagic3DItemPosXWide 			= Utility.GetINIFloat("fMagic3DItemPosXWide:Interface")
 	_fMagic3DItemPosX 				= Utility.GetINIFloat("fMagic3DItemPosX:Interface")
-
-	_fInventory3DItemPosYWide		= Utility.GetINIFloat("fInventory3DItemPosYWide:Interface")
-	_fInventory3DItemPosY 			= Utility.GetINIFloat("fInventory3DItemPosY:Interface")
-	_fMagic3DItemPosYWide 			= Utility.GetINIFloat("fMagic3DItemPosYWide:Interface")
-	_fMagic3DItemPosY 				= Utility.GetINIFloat("fMagic3DItemPosY:Interface")
 
 	_fInventory3DItemPosZWide		= Utility.GetINIFloat("fInventory3DItemPosZWide:Interface")
 	_fInventory3DItemPosZ 			= Utility.GetINIFloat("fInventory3DItemPosZ:Interface")
