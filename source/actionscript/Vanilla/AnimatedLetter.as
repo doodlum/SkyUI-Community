@@ -66,8 +66,6 @@ class AnimatedLetter extends MovieClip
 
          clip._x = this._cursorX;
 
-         var container = clip.Letter_mc;
-
          var clipW:Number = clip._width;
          this._cursorX += clipW + AnimatedLetter.LetterSpacing;
 
