@@ -60,10 +60,6 @@ class AnimatedLetter extends MovieClip
 
          tf._x = 0;
 
-         var bounds:Object = tf.getCharBoundaries(0);
-         var inkW:Number = bounds ? bounds.width : tf._width;
-         var inkH:Number = bounds ? bounds.height : tf._height;
-
          clip._x = this._cursorX;
 
          var clipW:Number = clip._width;
