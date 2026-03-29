@@ -7,8 +7,8 @@ class AnimatedLetter extends MovieClip
    var CustomFormat:TextFormat;
 
    static var ScreenCenterOffset:Number = -94;
-   static var SpaceWidth:Number = 10;
-   static var LetterSpacing:Number = 2;
+   static var SpaceWidth:Number = 15;
+   static var LetterSpacing:Number = 3;
 
    var Letters:Array;
    var _cursorX:Number = 0;
