@@ -3,12 +3,14 @@ class AnimatedLetter extends MovieClip
    var AnimationBase_mc;
    var QuestName;
    var onEnterFrame;
-   var LetterSpacing = 0;
-   var OldWidth = 0;
-   var QuestNameIndex = 0;
-   var Start = 0;
-   var EndPosition = 104;
-   static var SpaceWidth = 15;
+   var QuestNameIndex:Number = 0;
+   var CustomFormat:TextFormat;
+
+   var EndPosition:Number = 0;
+   static var LetterSpacing:Number = 2;
+   static var SpaceWidth:Number = 40;
+   var _cursorX:Number = 0;
+
    function AnimatedLetter()
    {
       super();
@@ -16,84 +18,60 @@ class AnimatedLetter extends MovieClip
    }
    function ShowQuestUpdate(aQuestName, aQuestStatus)
    {
-      var _loc4_;
-      if(aQuestName.length > 0 && aQuestStatus.length > 0)
+      this.QuestName = (aQuestName.length > 0 && aQuestStatus.length > 0)
+         ? (aQuestStatus + ": " + aQuestName)
+         : aQuestName;
+
+      this.CustomFormat = this.AnimationBase_mc.Letter_mc.LetterTextInstance.getTextFormat();
+      this.CustomFormat.letterSpacing = 0;
+      this.CustomFormat.kerning = false;
+
+      var totalWidth:Number = 0;
+      for (var i = 0; i < this.QuestName.length; i++)
       {
-         _loc4_ = new TextField();
-         _loc4_.text = aQuestStatus + ": ";
-         this.QuestName = _loc4_.text + aQuestName;
+         var ch:String = this.QuestName.charAt(i);
+         var isSpace:Boolean = ch.charCodeAt(0) == 32;
+         var metrics:Object = this.CustomFormat.getTextExtent(ch);
+         var w:Number = isSpace ? this.SpaceWidth : metrics.width; 
+         
+         totalWidth += w;
+         if (i < this.QuestName.length - 1) totalWidth += this.LetterSpacing;
       }
-      else
-      {
-         this.QuestName = aQuestName;
-      }
-      this.Start = 0;
-      var _loc2_ = 0;
-      var _loc3_;
-      while(_loc2_ < this.QuestName.length)
-      {
-         this.AnimationBase_mc.Letter_mc.LetterTextInstance.SetText(this.QuestName.substr(_loc2_,1));
-         _loc3_ = this.AnimationBase_mc.Letter_mc.LetterTextInstance.getLineMetrics(0).width - 5;
-         this.Start += _loc3_ <= 0 ? AnimatedLetter.SpaceWidth : _loc3_;
-         _loc2_ = _loc2_ + 1;
-      }
-      this.Start *= -0.5;
-      this.Start -= this.EndPosition;
+
+      this._cursorX = -(totalWidth * 0.5) - this.EndPosition;
+
       this.QuestNameIndex = 0;
-      this.LetterSpacing = 0;
-      this.OldWidth = 0;
       this.AnimationBase_mc.onEnterFrame = this.AnimationBase_mc.ShowLetter;
    }
    function ShowLetter()
    {
-      var _loc6_ = this.QuestName.length;
-      var _loc4_ = this.QuestNameIndex++;
-      var _loc5_;
-      var _loc3_;
-      var _loc2_;
-      if(_loc4_ < _loc6_)
+      var i = this.QuestNameIndex++;
+      if (i < this.QuestName.length)
       {
-         _loc5_ = this.QuestName.substr(_loc4_,1);
-         _loc3_ = this.AnimationBase_mc.duplicateMovieClip("letter" + _loc4_,this._parent.getNextHighestDepth());
-         QuestNotification.AnimationCount = QuestNotification.AnimationCount + 1;
-         _loc3_.Letter_mc.LetterTextInstance.text = _loc5_;
-         _loc2_ = _loc3_.Letter_mc.LetterTextInstance.getLineMetrics(0).width;
-         if(_loc2_ == 0)
-         {
-            _loc2_ = AnimatedLetter.SpaceWidth;
-         }
-         else if(_loc3_ == "M" || _loc3_ == "W")
-         {
-            _loc2_ -= 10;
-         }
-         else if(_loc3_ == "G" || _loc3_ == "O" || _loc3_ == "Q")
-         {
-            _loc2_ -= 8;
-         }
-         else if(_loc3_ == "A" || _loc3_ == "U")
-         {
-            _loc2_ -= 6;
-         }
-         else if(_loc3_ == "L")
-         {
-            _loc2_ -= 3;
-         }
-         else if(_loc3_ == "T")
-         {
-            _loc2_ -= 1;
-         }
-         else if(_loc3_ == "I" || _loc3_ == "J")
-         {
-            _loc2_ += 1;
-         }
-         else
-         {
-            _loc2_ -= 5;
-         }
-         _loc3_._x = this.Start + this.LetterSpacing + this.OldWidth / 2 + (_loc4_ < 0 ? 0 : _loc2_ / 2);
-         this.LetterSpacing = _loc3_._x - this.Start;
-         this.OldWidth = _loc2_;
-         _loc3_.gotoAndPlay("StartAnim");
+         var charStr:String = this.QuestName.charAt(i);
+         var clip = this.AnimationBase_mc.duplicateMovieClip("letter" + i, this._parent.getNextHighestDepth());
+
+         QuestNotification.AnimationCount++;
+
+         var tf = clip.Letter_mc.LetterTextInstance;
+         tf.autoSize = "left";
+         tf.text = charStr;
+         tf.setTextFormat(this.CustomFormat);
+
+         tf._x = 0;
+
+         var bounds:Object = tf.getCharBoundaries(0);
+         var inkW:Number = bounds ? bounds.width : tf._width;
+         var inkH:Number = bounds ? bounds.height : tf._height;
+
+         clip._x = this._cursorX;
+
+         var container = clip.Letter_mc;
+
+         var clipW:Number = clip._width;
+         this._cursorX += clipW + this.Gap;
+
+         clip.gotoAndPlay("StartAnim");
       }
       else
       {
