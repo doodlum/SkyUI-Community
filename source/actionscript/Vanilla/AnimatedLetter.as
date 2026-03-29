@@ -32,10 +32,10 @@ class AnimatedLetter extends MovieClip
          var ch:String = this.QuestName.charAt(i);
          var isSpace:Boolean = ch.charCodeAt(0) == 32;
          var metrics:Object = this.CustomFormat.getTextExtent(ch);
-         var w:Number = isSpace ? this.SpaceWidth : metrics.width; 
+         var w:Number = isSpace ? AnimatedLetter.SpaceWidth : metrics.width; 
          
          totalWidth += w;
-         if (i < this.QuestName.length - 1) totalWidth += this.LetterSpacing;
+         if (i < this.QuestName.length - 1) totalWidth += AnimatedLetter.LetterSpacing;
       }
 
       this._cursorX = -(totalWidth * 0.5) - this.EndPosition;
@@ -69,7 +69,7 @@ class AnimatedLetter extends MovieClip
          var container = clip.Letter_mc;
 
          var clipW:Number = clip._width;
-         this._cursorX += clipW + this.Gap;
+         this._cursorX += clipW + AnimatedLetter.LetterSpacing;
 
          clip.gotoAndPlay("StartAnim");
       }
