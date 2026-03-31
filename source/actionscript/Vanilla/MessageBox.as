@@ -144,6 +144,8 @@ class MessageBox extends MovieClip
 
       var keyCode = details.code;
       var nav = details.navEquivalent;
+
+      // It is necessary to separate ESC from Tab because without SKSE the behavior of Esc = Tab
       var skseKeyCode = !skse ? 0 : skse.GetLastKeycode(true);
       
       var isCancelKey = (skseKeyCode === 1 || nav == gfx.ui.NavigationCode.GAMEPAD_B);
