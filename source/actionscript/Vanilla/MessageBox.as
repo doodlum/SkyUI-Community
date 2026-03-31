@@ -56,7 +56,11 @@ class MessageBox extends MovieClip
       this.InitLocalization();
    }
 
-   /* Force localized string query to make buttons work in other languages */
+   /* 
+   * Forces localized string resolution by using a temporary text field.
+   * This is required because the engine performs localization instantly when assigning "$" strings,
+   * which prevents retrieving their resolved values directly from variables.
+   */
    function InitLocalization()
    {
       this.createTextField("temp_txt", this.getNextHighestDepth(), 0, 0, 1, 1);
