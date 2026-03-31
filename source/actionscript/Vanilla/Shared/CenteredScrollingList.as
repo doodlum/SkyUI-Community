@@ -73,7 +73,7 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
       var currentY = 0;
       var entryIdx = this.filterer.ClampIndex(0);
       
-      var shouldRecenter = this.bRecenterSelection || this.iPlatform != Shared.CenteredScrollingList.PLATFORM_PC || this.bPointerHighlight;
+      var shouldRecenter = (this.bRecenterSelection || this.iPlatform != Shared.CenteredScrollingList.PLATFORM_PC || this.bPointerHighlight) && !this.bNoSelectionMode;
       
       this.iDividerIndex = -1;
       this.iListItemsShown = 0;
@@ -149,12 +149,22 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
       
       var dist = Math.abs(aEntryClip.clipIndex - this.iNumTopHalfEntries);
 
+      var isSelected = (aEntryObject == this.EntriesA[this.iSelectedIndex]);
+      
+      if (this.bIsInactive) {
+         isSelected = false;
+      }
+
       if (this.iPlatform == Shared.CenteredScrollingList.PLATFORM_PC) {
          var isSelected = (aEntryObject == this.EntriesA[this.iSelectedIndex]);
          aEntryClip._alpha = isSelected ? 100 : 60;
       } else {
          var dist = Math.abs(aEntryClip.clipIndex - this.iNumTopHalfEntries);
-         aEntryClip._alpha = (dist == 0) ? 100 : Math.max(20, 60 - dist * 10);
+         if (this.bIsInactive) {
+            aEntryClip._alpha = 60;
+         } else {
+            aEntryClip._alpha = (dist == 0) ? 100 : Math.max(20, 60 - dist * 10);
+         }
       }
       
       this.SetEntryText(aEntryClip, aEntryObject);

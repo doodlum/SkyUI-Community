@@ -130,6 +130,7 @@ class SystemPage extends MovieClip
    }
    function onLoad()
    {
+      this.CategoryList.bAllowUpToTabs = true;
       this.CategoryList.entryList.push({text:"$QUICKSAVE"});
       this.CategoryList.entryList.push({text:"$SAVE"});
       this.CategoryList.entryList.push({text:"$LOAD"});
@@ -349,15 +350,19 @@ class SystemPage extends MovieClip
             gfx.io.GameDelegate.call("OpenKinectTuner",[]);
             _loc3_ = true;
          }
-         else if(!pathToFocus[0].handleInput(details,pathToFocus.slice(1)))
+         else if(pathToFocus != undefined && pathToFocus.length > 0)
          {
-            if(details.navEquivalent == gfx.ui.NavigationCode.ENTER)
-            {
-               _loc3_ = this.onAcceptPress();
-            }
-            else if(details.navEquivalent == gfx.ui.NavigationCode.TAB)
-            {
-               _loc3_ = this.onCancelPress();
+            _loc3_ = pathToFocus[0].handleInput(details, pathToFocus.slice(1));
+            
+            if (!_loc3_) {
+               if(details.navEquivalent == gfx.ui.NavigationCode.ENTER)
+               {
+                  _loc3_ = this.onAcceptPress();
+               }
+               else if(details.navEquivalent == gfx.ui.NavigationCode.TAB)
+               {
+                  _loc3_ = this.onCancelPress();
+               }
             }
          }
       }

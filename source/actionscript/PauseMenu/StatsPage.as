@@ -14,6 +14,7 @@ class StatsPage extends MovieClip
    }
    function onLoad()
    {
+      this.CategoryList.bAllowUpToTabs = true;
       this.CategoryList.entryList.push({text:"$GENERAL",stats:new Array(),savedHighlight:0});
       this.CategoryList.entryList.push({text:"$QUEST",stats:new Array(),savedHighlight:0});
       this.CategoryList.entryList.push({text:"$COMBAT",stats:new Array(),savedHighlight:0});

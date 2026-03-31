@@ -33,6 +33,7 @@ class QuestsPage extends MovieClip
    }
    function onLoad()
    {
+      this.TitleList.bAllowUpToTabs = true;
       this.BottomBar_mc = this._parent._parent.BottomBar_mc;
       this.QuestTitleText.SetText(" ");
       this.DescriptionText.SetText(" ");

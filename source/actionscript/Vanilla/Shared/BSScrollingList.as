@@ -22,6 +22,9 @@ class Shared.BSScrollingList extends MovieClip
    var itemIndex;
    var onMousePress;
    var scrollbar;
+   var bIsInactive = false;
+   var bNoSelectionMode = false;
+   var bAllowUpToTabs = false;
    static var TEXT_OPTION_NONE = 0;
    static var TEXT_OPTION_SHRINK_TO_FIT = 1;
    static var TEXT_OPTION_MULTILINE = 2;
@@ -103,8 +106,18 @@ class Shared.BSScrollingList extends MovieClip
          {
             if(details.navEquivalent == gfx.ui.NavigationCode.UP)
             {
-               this.moveSelectionUp();
-               _loc4_ = true;
+               var bAtTop = (this.iNumTopHalfEntries != undefined) ? (this.iScrollPosition <= 0) : (this.selectedIndex <= 0);
+
+               if (bAtTop) {
+                  if (this.bAllowUpToTabs === true) {
+                     _loc4_ = false;
+                  } else {
+                     _loc4_ = true;
+                  }
+               } else {
+                  this.moveSelectionUp();
+                  _loc4_ = true;
+               }
             }
             else if(details.navEquivalent == gfx.ui.NavigationCode.DOWN)
             {
