@@ -111,24 +111,18 @@ class MessageBox extends MovieClip
 
    function findNextExitButton(iStartFrom)
    {
-      if(iStartFrom === undefined)
-      {
-         iStartFrom = -1;
-      }
+      var len = this.MessageButtons.length;
+      if(len == 0) return -1;
       
-      var i = 1;
-      while(i <= this.MessageButtons.length)
-      {
-         var idx = (iStartFrom + i) % this.MessageButtons.length;
-         if(idx !== iStartFrom)
-         {
-            if(this.IsExitButton(this.MessageBtnLabels[idx]))
-            {
-               this.setFocusToButton(idx);
-               return idx;
-            }
+      var start = (iStartFrom === undefined || iStartFrom < 0) ? 0 : iStartFrom;
+      
+      for(var i = 1; i <= len; i++) {
+         var idx = (start + i) % len;
+         if(idx === start && i < len) continue;
+         
+         if(this.IsExitButton(this.MessageBtnLabels[idx])) {
+            return idx;
          }
-         i++;
       }
       return -1;
    }
@@ -148,10 +142,9 @@ class MessageBox extends MovieClip
       var nav = details.navEquivalent;
       var skseKeyCode = !skse ? 0 : skse.GetLastKeycode(true);
       
-      var buttons = this.MessageButtons;
-      var buttonsLen = buttons.length;
+      var isCancelKey = (skseKeyCode === 1 || nav == gfx.ui.NavigationCode.GAMEPAD_B);
 
-      if (skseKeyCode === 1) {
+      if (isCancelKey) {
          var cancelIdx = -1;
          
          if (this.IsCancellable && this.CancelOptionIndex != undefined) {
@@ -177,24 +170,8 @@ class MessageBox extends MovieClip
          return true;
       }
       
-      var isOtherCancel = (nav == gfx.ui.NavigationCode.GAMEPAD_B || keyCode == 9);
-
-      if (isOtherCancel) {
-         var cancelIdx = -1;
-         
-         if (this.IsCancellable && this.CancelOptionIndex != undefined) {
-            cancelIdx = this.CancelOptionIndex;
-         } else {
-            cancelIdx = this.findNextExitButton(-1);
-         }
-         
-         if (cancelIdx != -1) {
-            this.setFocusToButton(cancelIdx);
-            var btnId = this.getButtonId(this.MessageButtons[cancelIdx]);
-            gfx.io.GameDelegate.call("buttonPress", [btnId]);
-            return true;
-         }
-      }
+      var buttons = this.MessageButtons;
+      var buttonsLen = buttons.length;
       
       for (var i = 0; i < buttonsLen; i++) {
          var btnTxt = buttons[i].ButtonText.text;
@@ -377,6 +354,9 @@ class MessageBox extends MovieClip
       for (var i = 0; i < this.MessageButtons.length; i++) {
          var isTarget = (this.MessageButtons[i] === aEvent.target);
          this.MessageButtons[i].ButtonText._alpha = isTarget ? MessageBox.SELECTION_ROLLOVER_ALPHA : MessageBox.SELECTION_ROLLOUT_ALPHA;
+         if(isTarget) {
+            this.lastTabIndex = i;
+         }
       }
    }
 
