@@ -110,41 +110,17 @@ class MessageBox extends MovieClip
                         code == 9);
 
       if (isCancelKey) {
-         if (this.IsCancellable && this.CancelOptionIndex != undefined) {
-            this.setFocusToButton(this.CancelOptionIndex);
-            gfx.io.GameDelegate.call("buttonPress", [this.CancelOptionIndex]);
-            return true;
-         }
-
-         var noIdx = -1;
-         var exitIdx = -1;
-
-         for (var k = 0; k < buttonsLen; k++) {
-            var txt = buttons[k].ButtonText.text;
-            if (txt == this._noStr) {
-               noIdx = k;
-               break;
-            }
-            if (exitIdx == -1 && this.IsExitButton(txt)) {
-               exitIdx = k;
-            }
-         }
-
-         if (noIdx != -1) {
-            this.setFocusToButton(noIdx);
-            return true;
-         }
-         
-         if (exitIdx != -1) {
-            this.setFocusToButton(exitIdx);
-            gfx.io.GameDelegate.call("buttonPress", [exitIdx]);
+         var cancelIdx = this.findCancelButton(buttons, buttonsLen);
+         if (cancelIdx != -1) {
+            this.setFocusToButton(cancelIdx);
+            gfx.io.GameDelegate.call("buttonPress", [cancelIdx]);
             return true;
          }
       }
 
       for (var i = 0; i < buttonsLen; i++) {
          var btnTxt = buttons[i].ButtonText.text;
-
+         
          var isHotKey = (code == 89 && btnTxt == this._yesStr) || 
                         (code == 78 && btnTxt == this._noStr) || 
                         (code == 65 && btnTxt == this._yesToAllStr);
@@ -157,6 +133,21 @@ class MessageBox extends MovieClip
       }
 
       return pathToFocus[0].handleInput(details, pathToFocus.slice(1));
+   }
+
+   function findCancelButton(buttons, len)
+   {
+      if (this.IsCancellable && this.CancelOptionIndex != undefined) {
+         return this.CancelOptionIndex;
+      }
+
+      for (var i = 0; i < len; i++) {
+         if (buttons[i].ButtonText.text == this._noStr || this.IsExitButton(buttons[i].ButtonText.text)) {
+            return i;
+         }
+      }
+
+      return -1;
    }
 
    function setFocusToButton(aiIndex) {
