@@ -233,6 +233,9 @@ class MessageBox extends MovieClip
    {
       for (var i = 0; i < this.MessageButtons.length; i++)
       {
+         // Vanilla method: This empty handlePress kills the native button activation by Enter/E via Scaleform for all buttons
+         this.MessageButtons[i].handlePress = function() {};
+
          this.MessageButtons[i].addEventListener("press", this.ClickCallback);
          this.MessageButtons[i].addEventListener("focusIn", this.FocusCallback);
          this.MessageButtons[i].addEventListener("rollOver", this.HoverCallback);
