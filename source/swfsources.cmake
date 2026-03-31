@@ -465,6 +465,7 @@ Add_SWF(skyui_inventorylists
     Common/skyui/filter/ItemTypeFilter.as
     Common/skyui/filter/NameFilter.as
     Common/skyui/filter/SortFilter.as
+    Common/skyui/components/list/ScrollingList.as
     ItemMenus/CategoryList.as
     ItemMenus/CategoryListEntry.as
     ItemMenus/InventoryListEntry.as
