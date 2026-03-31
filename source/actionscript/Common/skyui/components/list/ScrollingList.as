@@ -240,6 +240,12 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
                     this.onItemPress();
                 }
             }
+            else
+            {
+                var lastIndex = this.getListEntryIndex(this.getListEnumSize() - 1);
+                this.doSetSelectedIndex(lastIndex, skyui.components.list.BasicList.SELECT_KEYBOARD);
+                this.isMouseDrivenNav = false;
+            }
         }
         else if(a_bScrollPage)
         {
@@ -269,6 +275,12 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
                 {
                     this.onItemPress();
                 }
+            }
+            else
+            {
+                var firstIndex = this.getListEntryIndex(0);
+                this.doSetSelectedIndex(firstIndex, skyui.components.list.BasicList.SELECT_KEYBOARD);
+                this.isMouseDrivenNav = false;
             }
         }
         else if(a_bScrollPage)
