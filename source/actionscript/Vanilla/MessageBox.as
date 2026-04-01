@@ -116,16 +116,24 @@ class MessageBox extends MovieClip
    function findNextExitButton(iStartFrom)
    {
       var len = this.MessageButtons.length;
-      if(len == 0) return -1;
+      if (len == 0) return -1;
       
-      var start = (iStartFrom === undefined || iStartFrom < 0) ? 0 : iStartFrom;
+      var start = (iStartFrom === undefined || iStartFrom < 0) ? -1 : iStartFrom;
       
-      for(var i = 1; i <= len; i++) {
-         var idx = (start + i) % len;
-         if(idx === start && i < len) continue;
-         
-         if(this.IsExitButton(this.MessageBtnLabels[idx])) {
+      for (var i = 0; i < len; i++) {
+         var idx = (start + 1 + i) % len;
+         if (this.IsExitButton(this.MessageBtnLabels[idx])) {
             return idx;
+         }
+      }
+      return -1;
+   }
+
+   function findButtonArrayIndexById(aButtonId)
+   {
+      for (var i = 0; i < this.MessageButtons.length; i++) {
+         if (this.getButtonId(this.MessageButtons[i]) === aButtonId) {
+            return i;
          }
       }
       return -1;
@@ -154,7 +162,7 @@ class MessageBox extends MovieClip
          var cancelIdx = -1;
          
          if (this.IsCancellable && this.CancelOptionIndex != undefined) {
-            cancelIdx = this.CancelOptionIndex;
+            cancelIdx = this.findButtonArrayIndexById(this.CancelOptionIndex);
          } else {
             cancelIdx = this.findNextExitButton(-1);
          }
