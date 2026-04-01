@@ -33,6 +33,11 @@ class MessageBox extends MovieClip
    static var SELECTION_ROLLOVER_ALPHA = 120;
    static var SELECTION_ROLLOUT_ALPHA = 80;
 
+   static var SKSE_KEY_ESC = 1; // Esc
+   static var HOTKEY_YES = 89; // Y
+   static var HOTKEY_NO = 78; // N
+   static var HOTKEY_YES_TO_ALL = 65; // A
+
    function MessageBox()
    {
       super();
@@ -150,13 +155,12 @@ class MessageBox extends MovieClip
          return pathToFocus[0].handleInput(details, pathToFocus.slice(1));
       }
 
+      // It is necessary to separate ESC from Tab because without SKSE the behavior of Esc = Tab
+      var skseKeyCode = !skse ? 0 : skse.GetLastKeycode(true);
       var keyCode = details.code;
       var nav = details.navEquivalent;
 
-      // It is necessary to separate ESC from Tab because without SKSE the behavior of Esc = Tab
-      var skseKeyCode = !skse ? 0 : skse.GetLastKeycode(true);
-      
-      var isCancelKey = (skseKeyCode === 1 || nav == gfx.ui.NavigationCode.GAMEPAD_B);
+      var isCancelKey = (skseKeyCode === MessageBox.SKSE_KEY_ESC || nav == gfx.ui.NavigationCode.GAMEPAD_B);
 
       if (isCancelKey) {
          var cancelIdx = -1;
@@ -191,9 +195,9 @@ class MessageBox extends MovieClip
          var btnTxt = buttons[i].ButtonText.text;
          var btnTxtLower = btnTxt.toLowerCase();
          
-         var isYes      = (skseKeyCode == 89) && (btnTxt == this._yesStr      || btnTxtLower == "yes");
-         var isNo       = (skseKeyCode == 78) && (btnTxt == this._noStr       || btnTxtLower == "no");
-         var isYesToAll = (skseKeyCode == 65) && (btnTxt == this._yesToAllStr || btnTxtLower == "yes to all");
+         var isYes      = (keyCode == MessageBox.HOTKEY_YES) && (btnTxt == this._yesStr || btnTxtLower == "yes");
+         var isNo       = (keyCode == MessageBox.HOTKEY_NO) && (btnTxt == this._noStr || btnTxtLower == "no");
+         var isYesToAll = (keyCode == MessageBox.HOTKEY_YES_TO_ALL) && (btnTxt == this._yesToAllStr || btnTxtLower == "yes to all");
 
          if (isYes || isNo || isYesToAll) {
             this.setFocusToButton(i);
@@ -282,7 +286,7 @@ class MessageBox extends MovieClip
    {
       for (var i = 0; i < this.MessageButtons.length; i++)
       {
-         // Vanilla method: This empty handlePress kills the native button activation by Enter/E via Scaleform for all buttons
+         // Intentional no-op: suppresses Scaleform's native Enter/E button activation.
          this.MessageButtons[i].handlePress = function() {};
 
          this.MessageButtons[i].addEventListener("press", this, "ClickCallback");
