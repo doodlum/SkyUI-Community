@@ -189,12 +189,13 @@ class MessageBox extends MovieClip
       
       for (var i = 0; i < buttonsLen; i++) {
          var btnTxt = buttons[i].ButtonText.text;
+         var btnTxtLower = btnTxt.toLowerCase();
          
-         var isHotKey = (skseKeyCode == 89 && btnTxt == this._yesStr) || 
-                        (skseKeyCode == 78 && btnTxt == this._noStr) || 
-                        (skseKeyCode == 65 && btnTxt == this._yesToAllStr);
+         var isYes      = (skseKeyCode == 89) && (btnTxt == this._yesStr      || btnTxtLower == "yes");
+         var isNo       = (skseKeyCode == 78) && (btnTxt == this._noStr       || btnTxtLower == "no");
+         var isYesToAll = (skseKeyCode == 65) && (btnTxt == this._yesToAllStr || btnTxtLower == "yes to all");
 
-         if (isHotKey) {
+         if (isYes || isNo || isYesToAll) {
             this.setFocusToButton(i);
             var btnId = this.getButtonId(buttons[i]);
             gfx.io.GameDelegate.call("buttonPress", [btnId]);
