@@ -55,12 +55,37 @@ class ItemCard extends MovieClip
    static var SKYUI_VERSION_MAJOR = 5;
    static var SKYUI_VERSION_MINOR = 2;
    static var SKYUI_VERSION_STRING = ItemCard.SKYUI_VERSION_MAJOR + "." + ItemCard.SKYUI_VERSION_MINOR + " SE";
+   
+   var _textExpansion:Number  = 0;
+   var _activeMenuMode:Object = undefined;
+   var _origQuantitySlider:MovieClip;
+   var _origEnchantingSlider:MovieClip;
+
+   static var OFFSCREEN_Y:Number              = -300;
+   static var SHRINK_MAX_EXPANSION:Number     = 0;
+   static var SHRINK_BOTTOM_PADDING:Number    = 0;
+   static var SHRINK_BOTTOM_PADDING_SHOUT:Number = -10;
+
+   static var BOTTOM_PADDING:Number = 40;
+   static var MIN_FONT_SIZE:Number  = 8;
+
+   static var BASE_Y_QUANTITY_SLIDER:Number  = 92;
+   static var BASE_Y_QUANTITY_VALUE:Number   = 80;
+   static var BASE_Y_QUANTITY_BUTTON:Number  = 130;
+   static var BASE_Y_ENCHANT_SLIDER:Number   = 147.3;
+   static var BASE_Y_ENCHANT_BUTTON:Number   = 166;
+   static var BASE_Y_CARD_LIST:Number        = 98;
+
    function ItemCard()
    {
       super();
       Shared.GlobalFunc.MaintainTextFormat();
       Shared.GlobalFunc.AddReverseFunctions();
       gfx.events.EventDispatcher.initialize(this);
+      
+      this._origQuantitySlider = this.QuantitySlider_mc;
+      this._origEnchantingSlider = this.EnchantingSlider_mc;
+      
       this.QuantitySlider_mc = this.QuantitySlider_mc;
       this.ButtonRect_mc = this.ButtonRect;
       this.ItemList = this.CardList_mc.List_mc;
@@ -70,14 +95,17 @@ class ItemCard extends MovieClip
       this._bEditNameMode = false;
       Key.addListener(this);
    }
+   
    function get bEditNameMode()
    {
       return this._bEditNameMode;
    }
+   
    function GetItemName()
    {
       return this.ItemName;
    }
+   
    function SetupItemName(aPrevName)
    {
       this.ItemName = this.ItemText.ItemTextField;
@@ -88,6 +116,7 @@ class ItemCard extends MovieClip
          this.ItemName.selectable = false;
       }
    }
+   
    function onLoad()
    {
       this.QuantitySlider_mc.addEventListener("change",this,"onSliderChange");
@@ -96,6 +125,7 @@ class ItemCard extends MovieClip
       this.ButtonRect_mc.AcceptMouseButton.SetPlatform(0,false);
       this.ButtonRect_mc.CancelMouseButton.SetPlatform(0,false);
    }
+   
    function SetPlatform(aiPlatform, abPS3Switch)
    {
       this.ButtonRect_mc.AcceptGamepadButton._visible = aiPlatform != 0;
@@ -109,6 +139,7 @@ class ItemCard extends MovieClip
       }
       this.ItemList.SetPlatform(aiPlatform,abPS3Switch);
    }
+   
    function onAcceptMouseClick()
    {
       var _loc2_;
@@ -118,6 +149,7 @@ class ItemCard extends MovieClip
          this.InputHandler(_loc2_);
       }
    }
+   
    function onCancelMouseClick()
    {
       var _loc2_;
@@ -127,6 +159,7 @@ class ItemCard extends MovieClip
          this.InputHandler(_loc2_);
       }
    }
+   
    function FadeInCard()
    {
       if(this.bFadedIn)
@@ -137,6 +170,7 @@ class ItemCard extends MovieClip
       this._parent.gotoAndPlay("fadeIn");
       this.bFadedIn = true;
    }
+   
    function FadeOutCard()
    {
       if(this.bFadedIn)
@@ -145,20 +179,27 @@ class ItemCard extends MovieClip
          this.bFadedIn = false;
       }
    }
+   
    function get quantitySlider()
    {
       return this.QuantitySlider_mc;
    }
+   
    function get weaponChargeMeter()
    {
       return this.ItemCardMeters[skyui.defines.Inventory.ICT_WEAPON];
    }
+   
    function get itemInfo()
    {
       return this.LastUpdateObj;
    }
+   
    function set itemInfo(aUpdateObj)
    {
+      this._textExpansion = 0;
+      this._activeMenuMode = undefined;
+
       this.ItemCardMeters = new Array();
       var _loc3_ = this.ItemName != undefined ? this.ItemName.htmlText : "";
       var _loc4_ = aUpdateObj.type;
@@ -170,6 +211,7 @@ class ItemCard extends MovieClip
       var _loc10_;
       var _loc11_;
       var _loc12_;
+      
       switch(_loc4_)
       {
          case skyui.defines.Inventory.ICT_ARMOR:
@@ -200,6 +242,7 @@ class ItemCard extends MovieClip
             this.ShrinkToFit(this.ApparelEnchantedLabel);
             this.SkillTextInstance.text = aUpdateObj.skillText;
             break;
+            
          case skyui.defines.Inventory.ICT_WEAPON:
             if(aUpdateObj.effects.length == 0)
             {
@@ -230,6 +273,7 @@ class ItemCard extends MovieClip
             this.WeaponEnchantedLabel.htmlText = aUpdateObj.effects;
             this.ShrinkToFit(this.WeaponEnchantedLabel);
             break;
+            
          case skyui.defines.Inventory.ICT_BOOK:
             if(aUpdateObj.description != undefined && aUpdateObj.description != "")
             {
@@ -240,6 +284,7 @@ class ItemCard extends MovieClip
             }
             this.gotoAndStop("Books_reg");
             break;
+            
          case skyui.defines.Inventory.ICT_POTION:
          case skyui.defines.Inventory.ICT_FOOD:
             this.gotoAndStop("Potions_reg");
@@ -247,6 +292,7 @@ class ItemCard extends MovieClip
             this.ShrinkToFit(this.PotionsLabel);
             this.SkillTextInstance.text = aUpdateObj.skillName != undefined ? aUpdateObj.skillName : "";
             break;
+            
          case skyui.defines.Inventory.ICT_SPELL_DEFAULT:
             this.gotoAndStop("Power_reg");
             this.MagicEffectsLabel.SetText(aUpdateObj.effects,true);
@@ -264,6 +310,7 @@ class ItemCard extends MovieClip
             this.MagicCostLabel._alpha = 100;
             this.MagicCostValue.text = aUpdateObj.spellCost.toString();
             break;
+            
          case skyui.defines.Inventory.ICT_SPELL:
             _loc6_ = aUpdateObj.castTime == 0;
             if(_loc6_)
@@ -286,6 +333,7 @@ class ItemCard extends MovieClip
             }
             this.MagicCostValue.text = aUpdateObj.spellCost.toString();
             break;
+            
          case skyui.defines.Inventory.ICT_INGREDIENT:
             this.gotoAndStop("Ingredients_reg");
             _loc7_ = 0;
@@ -309,9 +357,11 @@ class ItemCard extends MovieClip
                _loc7_ += 1;
             }
             break;
+            
          case skyui.defines.Inventory.ICT_MISC:
             this.gotoAndStop("Misc_reg");
             break;
+            
          case skyui.defines.Inventory.ICT_SHOUT:
             this.gotoAndStop("Shouts_reg");
             _loc8_ = 0;
@@ -354,6 +404,7 @@ class ItemCard extends MovieClip
             this.ShrinkToFit(this.ShoutEffectsLabel);
             this.ShoutCostValue.text = aUpdateObj.spellCost.toString();
             break;
+            
          case skyui.defines.Inventory.ICT_ACTIVE_EFFECT:
             this.gotoAndStop("ActiveEffects");
             this.MagicEffectsLabel.SetText(aUpdateObj.effects,true);
@@ -399,10 +450,12 @@ class ItemCard extends MovieClip
             this.ActiveEffectTimeValue._alpha = 0;
             this.SecsText._alpha = 0;
             break;
+            
          case skyui.defines.Inventory.ICT_SOUL_GEMS:
             this.gotoAndStop("SoulGem");
             this.SoulLevel.text = aUpdateObj.soulLVL;
             break;
+            
          case skyui.defines.Inventory.ICT_LIST:
             this.gotoAndStop("Item_list");
             if(aUpdateObj.listItems != undefined)
@@ -415,6 +468,7 @@ class ItemCard extends MovieClip
                this.OpenListMenu();
             }
             break;
+            
          case skyui.defines.Inventory.ICT_CRAFT_ENCHANTING:
          case skyui.defines.Inventory.ICT_HOUSE_PART:
             if(aUpdateObj.type == skyui.defines.Inventory.ICT_HOUSE_PART)
@@ -499,11 +553,13 @@ class ItemCard extends MovieClip
             this.Enchanting_Slim_Background._alpha = 60;
             this.Enchanting_Background._alpha = 0;
             break;
+            
          case skyui.defines.Inventory.ICT_KEY:
          case skyui.defines.Inventory.ICT_NONE:
          default:
             this.gotoAndStop("Empty");
       }
+      
       this.SetupItemName(_loc3_);
       var _loc13_;
       if(aUpdateObj.name != undefined)
@@ -525,69 +581,67 @@ class ItemCard extends MovieClip
       this.StolenTextInstance._visible = aUpdateObj.stolen == true;
       this.LastUpdateObj = aUpdateObj;
    }
+   
    function RoundDecimal(aNumber, aPrecision)
    {
       var _loc3_ = Math.pow(10,aPrecision);
       return Math.round(_loc3_ * aNumber) / _loc3_;
    }
+   
    function PrepareInputElements(aActiveClip)
    {
-      var _loc3_ = 92;
-      var _loc4_ = 98;
-      var _loc5_ = 147.3;
-      var _loc6_ = 130;
-      var _loc7_ = 166;
-      switch(aActiveClip)
+      this._activeMenuMode = aActiveClip;
+      var exp:Number = this._textExpansion;
+
+      this._origQuantitySlider._y   = ItemCard.OFFSCREEN_Y;
+      this._origEnchantingSlider._y = ItemCard.OFFSCREEN_Y;
+      this.SliderValueText._y       = ItemCard.OFFSCREEN_Y;
+      this.ButtonRect._y            = ItemCard.OFFSCREEN_Y;
+      this.CardList_mc._y           = ItemCard.OFFSCREEN_Y;
+
+      this._origQuantitySlider._alpha   = 0;
+      this._origEnchantingSlider._alpha = 0;
+      this.ButtonRect._alpha            = 0;
+      this.CardList_mc._alpha           = 0;
+
+      if (aActiveClip == undefined) return;
+
+      if (aActiveClip == this._origEnchantingSlider)
       {
-         case this.EnchantingSlider_mc:
-            this.QuantitySlider_mc._y = -100;
-            this.ButtonRect._y = _loc7_;
-            this.EnchantingSlider_mc._y = _loc5_;
-            this.CardList_mc._y = -100;
-            this.QuantitySlider_mc._alpha = 0;
-            this.ButtonRect._alpha = 100;
-            this.EnchantingSlider_mc._alpha = 100;
-            this.CardList_mc._alpha = 0;
-            break;
-         case this.QuantitySlider_mc:
-            this.QuantitySlider_mc._y = _loc3_;
-            this.ButtonRect._y = _loc6_;
-            this.EnchantingSlider_mc._y = -100;
-            this.CardList_mc._y = -100;
-            this.QuantitySlider_mc._alpha = 100;
-            this.ButtonRect._alpha = 100;
-            this.EnchantingSlider_mc._alpha = 0;
-            this.CardList_mc._alpha = 0;
-            break;
-         case this.CardList_mc:
-            this.QuantitySlider_mc._y = -100;
-            this.ButtonRect._y = -100;
-            this.EnchantingSlider_mc._y = -100;
-            this.CardList_mc._y = _loc4_;
-            this.QuantitySlider_mc._alpha = 0;
-            this.ButtonRect._alpha = 0;
-            this.EnchantingSlider_mc._alpha = 0;
-            this.CardList_mc._alpha = 100;
-            break;
-         case this.ButtonRect:
-            this.QuantitySlider_mc._y = -100;
-            this.ButtonRect._y = _loc6_;
-            this.EnchantingSlider_mc._y = -100;
-            this.CardList_mc._y = -100;
-            this.QuantitySlider_mc._alpha = 0;
-            this.ButtonRect._alpha = 100;
-            this.EnchantingSlider_mc._alpha = 0;
-            this.CardList_mc._alpha = 0;
-         default:
-            return;
+         this._origEnchantingSlider._y    = ItemCard.BASE_Y_ENCHANT_SLIDER  + exp;
+         this.ButtonRect._y               = ItemCard.BASE_Y_ENCHANT_BUTTON  + exp;
+         this._origEnchantingSlider._alpha = 100;
+         this.ButtonRect._alpha           = 100;
+      }
+      else if (aActiveClip == this._origQuantitySlider)
+      {
+         this._origQuantitySlider._y  = ItemCard.BASE_Y_QUANTITY_SLIDER + exp;
+         this.SliderValueText._y      = ItemCard.BASE_Y_QUANTITY_VALUE  + exp;
+         this.ButtonRect._y           = ItemCard.BASE_Y_QUANTITY_BUTTON + exp;
+         this._origQuantitySlider._alpha = 100;
+         this.ButtonRect._alpha          = 100;
+      }
+      else if (aActiveClip == this.CardList_mc)
+      {
+         this.CardList_mc._y     = ItemCard.BASE_Y_CARD_LIST + exp;
+         this.CardList_mc._alpha = 100;
+      }
+      else if (aActiveClip == this.ButtonRect)
+      {
+         this.ButtonRect._y     = ItemCard.BASE_Y_QUANTITY_BUTTON + exp;
+         this.ButtonRect._alpha = 100;
       }
    }
+   
    function ShowEnchantingSlider(aiMaxValue, aiMinValue, aiCurrentValue)
    {
       this.gotoAndStop("Craft_Enchanting");
-      this.QuantitySlider_mc = this.EnchantingSlider_mc;
+      
+      this.QuantitySlider_mc = this._origEnchantingSlider; 
       this.QuantitySlider_mc.addEventListener("change",this,"onSliderChange");
-      this.PrepareInputElements(this.EnchantingSlider_mc);
+      
+      this.PrepareInputElements(this._origEnchantingSlider);
+      
       this.QuantitySlider_mc.maximum = aiMaxValue;
       this.QuantitySlider_mc.minimum = aiMinValue;
       this.QuantitySlider_mc.value = aiCurrentValue;
@@ -596,10 +650,15 @@ class ItemCard extends MovieClip
       this.InputHandler = this.HandleQuantityMenuInput;
       this.dispatchEvent({type:"subMenuAction",opening:true,menu:"quantity"});
    }
+
    function ShowQuantityMenu(aiMaxAmount)
    {
       this.gotoAndStop("Quantity");
-      this.PrepareInputElements(this.QuantitySlider_mc);
+      
+      this.QuantitySlider_mc = this._origQuantitySlider;
+      
+      this.PrepareInputElements(this._origQuantitySlider);
+      
       this.QuantitySlider_mc.maximum = aiMaxAmount;
       this.QuantitySlider_mc.value = aiMaxAmount;
       this.SliderValueText.textAutoSize = "shrink";
@@ -609,14 +668,17 @@ class ItemCard extends MovieClip
       this.InputHandler = this.HandleQuantityMenuInput;
       this.dispatchEvent({type:"subMenuAction",opening:true,menu:"quantity"});
    }
+   
    function HideQuantityMenu(abCanceled)
    {
       gfx.managers.FocusHandler.instance.setFocus(this.PrevFocus,0);
+      this.PrepareInputElements(undefined);
       this.QuantitySlider_mc._alpha = 0;
       this.ButtonRect_mc._alpha = 0;
       this.InputHandler = undefined;
       this.dispatchEvent({type:"subMenuAction",opening:false,canceled:abCanceled,menu:"quantity"});
    }
+   
    function OpenListMenu()
    {
       this.PrevFocus = gfx.managers.FocusHandler.instance.getFocus(0);
@@ -631,6 +693,7 @@ class ItemCard extends MovieClip
       this.InputHandler = this.HandleListMenuInput;
       this.dispatchEvent({type:"subMenuAction",opening:true,menu:"list"});
    }
+   
    function HideListMenu()
    {
       gfx.managers.FocusHandler.instance.setFocus(this.PrevFocus,0);
@@ -641,6 +704,7 @@ class ItemCard extends MovieClip
       this.ItemList._visible = true;
       this.dispatchEvent({type:"subMenuAction",opening:false,menu:"list"});
    }
+   
    function ShowConfirmMessage(astrMessage)
    {
       this.gotoAndStop("ConfirmMessage");
@@ -653,6 +717,7 @@ class ItemCard extends MovieClip
       this.InputHandler = this.HandleConfirmMessageInput;
       this.dispatchEvent({type:"subMenuAction",opening:true,menu:"message"});
    }
+   
    function HideConfirmMessage()
    {
       gfx.managers.FocusHandler.instance.setFocus(this.PrevFocus,0);
@@ -660,6 +725,7 @@ class ItemCard extends MovieClip
       this.InputHandler = undefined;
       this.dispatchEvent({type:"subMenuAction",opening:false,menu:"message"});
    }
+   
    function StartEditName(aInitialText, aiMaxChars)
    {
       if(Selection.getFocus() != this.ItemName)
@@ -680,6 +746,7 @@ class ItemCard extends MovieClip
          this._bEditNameMode = true;
       }
    }
+   
    function EndEditName()
    {
       this.ItemName.type = "dynamic";
@@ -694,6 +761,7 @@ class ItemCard extends MovieClip
       this.dispatchEvent({type:"subMenuAction",opening:false,menu:"editName"});
       this._bEditNameMode = false;
    }
+   
    function handleInput(details, pathToFocus)
    {
       var _loc4_ = false;
@@ -707,6 +775,7 @@ class ItemCard extends MovieClip
       }
       return _loc4_;
    }
+   
    function HandleQuantityMenuInput(details)
    {
       var _loc3_ = false;
@@ -734,6 +803,7 @@ class ItemCard extends MovieClip
       }
       return _loc3_;
    }
+   
    function HandleListMenuInput(details)
    {
       var _loc3_ = false;
@@ -744,6 +814,7 @@ class ItemCard extends MovieClip
       }
       return _loc3_;
    }
+   
    function HandleConfirmMessageInput(details)
    {
       var _loc3_ = false;
@@ -765,6 +836,7 @@ class ItemCard extends MovieClip
       }
       return _loc3_;
    }
+   
    function HandleEditNameInput(details)
    {
       Selection.setFocus(this.ItemName,0);
@@ -781,6 +853,7 @@ class ItemCard extends MovieClip
       }
       return true;
    }
+   
    function onSliderChange()
    {
       var _loc2_ = this.EnchantingSlider_mc._alpha > 0 ? this.TotalChargesValue : this.SliderValueText;
@@ -793,11 +866,13 @@ class ItemCard extends MovieClip
          this.dispatchEvent({type:"sliderChange",value:_loc4_});
       }
    }
+   
    function onListItemPress(event)
    {
       this.dispatchEvent(event);
       this.HideListMenu();
    }
+   
    function onListMouseSelectionChange(event)
    {
       if(event.keyboardOrMouse == 0)
@@ -805,91 +880,160 @@ class ItemCard extends MovieClip
          this.onListSelectionChange(event);
       }
    }
+   
    function onListSelectionChange(event)
    {
       this.ItemCardMeters[skyui.defines.Inventory.ICT_LIST].SetDeltaPercent(this.ItemList.selectedEntry.chargeAdded + this.LastUpdateObj.currentCharge);
    }
+
+
+
+   /* @extension */
    function ShrinkToFit(tf:TextField)
    {
-      var MAX_EXPANSION:Number = 40;
-      var MIN_FONT_SIZE:Number = 8;
-      var BOTTOM_PADDING:Number = 0;
-      var BOTTOM_PADDING_SHOUT:Number = -10;
-
       if (tf == undefined || tf.text == "") return;
 
       if (tf.origHeight == undefined) tf.origHeight = tf._height;
-      if (tf.origY == undefined) tf.origY = tf._y;
+      if (tf.origY      == undefined) tf.origY      = tf._y;
+
+      this._restoreStaticElements();
+
+      tf._height      = tf.origHeight;
+      tf.multiline    = true;
+      tf.wordWrap     = true;
+      tf.textAutoSize = "none";
+      tf.SetText(tf.htmlText, true);
+
+      if (tf.numLines <= 0) return;
+      var lineHeight:Number = tf.getLineMetrics(0).height;
+      var neededHeight:Number = lineHeight * tf.numLines;
+
+      var baseHeight:Number = tf.origHeight;
+
+      if (neededHeight > baseHeight) {
+         var textDelta:Number = neededHeight - baseHeight;
+         var actualExpansion:Number = Math.min(textDelta, ItemCard.SHRINK_MAX_EXPANSION);
+
+         tf._height = tf.origHeight + actualExpansion;
+         this._textExpansion = actualExpansion;
+
+         var isShout:Boolean = (tf == this.ShoutEffectsLabel);
+         var extraPadding:Number = isShout ? ItemCard.SHRINK_BOTTOM_PADDING_SHOUT : ItemCard.SHRINK_BOTTOM_PADDING;
+
+         this._pushStaticElementsDown(tf.origY, actualExpansion, extraPadding);
+      }
+
+      this._shrinkFont(tf);
+
+      if (this._activeMenuMode != undefined) {
+         this.PrepareInputElements(this._activeMenuMode);
+      }
+   }
+   
+   // ── Helpers ───────────────────────────────────────────────────────────────
+   function _getLayoutLimit(tf:TextField)
+   {
+      var bg:MovieClip = this._getBackground();
+      var limitY:Number = (bg != undefined && bg.origHeight != undefined) ? bg.origHeight - ItemCard.BOTTOM_PADDING : 230;
 
       for (var prop in this) {
          var obj = this[prop];
-         if ((obj instanceof MovieClip || obj instanceof TextField) && obj._parent == this) {
-            if (obj != this.ItemText && obj != this.ItemText.ItemTextField && obj.origY != undefined) {
-               obj._y = obj.origY;
-            }
-         }
-      }
-
-      if (this.background != undefined && this.background.origHeight != undefined) {
-         this.background._height = this.background.origHeight;
-      }
-      
-      tf._height = tf.origHeight;
-      tf.multiline = true;
-      tf.wordWrap = true;
-      tf.textAutoSize = "none";
-
-      var tfText:String = tf.htmlText;
-      var formatSize = tf.getTextFormat().size;
-      var fontSize:Number = (formatSize != undefined) ? formatSize : 20;
-
-      tf.SetText(tfText, true);
-      
-      var tfHeight:Number = tf.getLineMetrics(0).height * tf.numLines;
-      var baseHeight:Number = tf.origHeight;
-      var bg:MovieClip = (this.background != undefined) ? this.background : this.Enchanting_Background;
-
-      if (tfHeight > baseHeight)
-      {
-         var textDelta:Number = (tfHeight - baseHeight);
-         var actualExpansion:Number = Math.min(textDelta, MAX_EXPANSION);
-         
-         tf._height = tf.origHeight + actualExpansion;
-
-         var isShout:Boolean = (tf == this.ShoutEffectsLabel);
-         var activePadding:Number = isShout ? BOTTOM_PADDING_SHOUT : BOTTOM_PADDING;
-
-         var totalPush:Number = actualExpansion + activePadding;
-
-         if (bg != undefined) {
-            if (bg.origHeight == undefined) bg.origHeight = bg._height;
-            bg._height = bg.origHeight + totalPush;
-         }
-
-         for (var prop in this)
-         {
-            var obj = this[prop];
-            if ((obj instanceof MovieClip || obj instanceof TextField) 
-               && obj._parent == this && obj != tf && obj != bg 
-               && obj != this.ItemText && obj != this.ItemText.ItemTextField)
-            {
-               if (obj.origY == undefined) obj.origY = obj._y;
-               
-               if (obj.origY > tf.origY) {
-                  obj._y = obj.origY + totalPush;
+         if (this._isLayoutChild(obj) && !this._isInputElement(obj) && obj != tf && obj != bg) {
+            if (obj.origY != undefined && obj.origY > tf.origY && obj._alpha > 0) {
+               if (obj.origY < limitY) {
+                  limitY = obj.origY - 4;
                }
             }
          }
-         tfHeight = tf.getLineMetrics(0).height * tf.numLines;
+      }
+      return limitY;
+   }
+
+   function _isInputElement(obj)
+   {
+      return obj == this._origQuantitySlider
+          || obj == this._origEnchantingSlider
+          || obj == this.ButtonRect
+          || obj == this.SliderValueText
+          || obj == this.CardList_mc;
+   }
+   
+   function _isLayoutChild(obj)
+   {
+      return (obj instanceof MovieClip || obj instanceof TextField)
+          && obj._parent == this
+          && obj != this.ItemText
+          && obj != this.ItemText.ItemTextField;
+   }
+
+   function _getBackground()
+   {
+      return (this.background != undefined) ? this.background : this.Enchanting_Background;
+   }
+   
+   function _restoreStaticElements()
+   {
+      this._textExpansion = 0;
+
+      for (var prop in this) {
+         var obj = this[prop];
+         if (!this._isLayoutChild(obj)) continue;
+         if (this._isInputElement(obj)) continue;
+
+         if (obj.origY != undefined) obj._y = obj.origY;
+         if (obj.origHeight != undefined && obj != this._getBackground()) {
+            obj._height = obj.origHeight;
+         }
       }
 
-      while (tfHeight > tf._height && fontSize > MIN_FONT_SIZE)
-      {
-         var beforeHtmlSize:String = "SIZE=\"" + fontSize.toString() + "\"";
-         fontSize -= 1;
-         var htmlSize:String = "SIZE=\"" + fontSize.toString() + "\"";
-         var newText:String = tfText.split(beforeHtmlSize).join(htmlSize);
+      var bg = this._getBackground();
+      if (bg != undefined && bg.origHeight != undefined) {
+         bg._height = bg.origHeight;
+      }
+   }
+
+   function _pushStaticElementsDown(belowY:Number, amount:Number, extraPadding:Number)
+   {
+      var bg = this._getBackground();
+      var totalPush = amount + extraPadding;
+
+      if (bg != undefined) {
+         if (bg.origHeight == undefined) bg.origHeight = bg._height;
+         bg._height = bg.origHeight + totalPush;
+      }
+
+      for (var prop in this) {
+         var obj = this[prop];
+         if (!this._isLayoutChild(obj)) continue;
+         if (this._isInputElement(obj)) continue;
+         if (obj == bg) continue;
+         if (obj == tf) continue;
+
+         if (obj.origY == undefined) obj.origY = obj._y;
+         if (obj.origY > belowY) {
+               obj._y = obj.origY + totalPush;
+         }
+      }
+   }
+
+   function _shrinkFont(tf:TextField)
+   {
+      if (tf.numLines <= 0) return;
+
+      var fmt = tf.getTextFormat();
+      var fontSize:Number = (fmt.size != undefined) ? Number(fmt.size) : 20;
+      var tfText:String = tf.htmlText;
+
+      var tfHeight:Number = tf.getLineMetrics(0).height * tf.numLines;
+
+      while (tfHeight > tf._height && fontSize > ItemCard.MIN_FONT_SIZE) {
+         var before:String = "SIZE=\"" + fontSize + "\"";
+         fontSize--;
+         var after:String = "SIZE=\"" + fontSize + "\"";
+
+         var newText:String = tfText.split(before).join(after);
          if (newText == tfText) break;
+
          tfText = newText;
          tf.SetText(tfText, true);
          tfHeight = tf.getLineMetrics(0).height * tf.numLines;
