@@ -68,6 +68,7 @@ class ItemCard extends MovieClip
       this.bFadedIn = false;
       this.InputHandler = undefined;
       this._bEditNameMode = false;
+      Key.addListener(this);
    }
    function get bEditNameMode()
    {
@@ -892,6 +893,132 @@ class ItemCard extends MovieClip
          tfText = newText;
          tf.SetText(tfText, true);
          tfHeight = tf.getLineMetrics(0).height * tf.numLines;
+      }
+   }
+   
+   function onKeyDown()
+   {
+      var keyCode = Key.getCode();
+
+      if (keyCode == 49) {
+         this.itemInfo = {
+            type: skyui.defines.Inventory.ICT_ARMOR,
+            name: "Iron Armor",
+            armor: "25",
+            weight: 30,
+            value: 125,
+            effects: "Basic protection.",
+            stolen: false
+         };
+      }
+      else if (keyCode == 50) {
+         this.itemInfo = {
+            type: skyui.defines.Inventory.ICT_ARMOR,
+            name: "Godly Plate of the Whale",
+            armor: "150",
+            weight: 45,
+            value: 15000,
+            effects: "This is a very long enchantment description designed to test if the ShrinkToFit function properly expands the background and pushes the weight and value labels further down without breaking the layout of the card. It should wrap into multiple lines and trigger the expansion logic.",
+            warmth: 20,
+            stolen: true
+         };
+      }
+      else if (keyCode == 51) {
+         this.itemInfo = {
+            type: skyui.defines.Inventory.ICT_WEAPON,
+            name: "Chillrend",
+            damage: "45",
+            weight: 12,
+            value: 1400,
+            effects: "Target takes 30 points of frost damage. Low chance to paralyze the target for 2 seconds.",
+            usedCharge: 40,
+            charge: 100,
+            poisoned: true
+         };
+      }
+      else if (keyCode == 52) {
+         this.itemInfo = {
+            type: skyui.defines.Inventory.ICT_CRAFT_ENCHANTING,
+            name: "Dragonscale Boots of Extreme Stamina",
+            armor: "40",
+            weight: 5,
+            value: 2000,
+            effects: "Increases your Stamina by 70 points. Increases your Stamina by 70 points. Increases your Stamina by 70 points. Increases your Stamina by 70 points.Increases your Stamina by 70 points. Increases your Stamina by 70 points. Increases your Stamina by 70 points. Increases your Stamina by 70 points.Increases your Stamina by 70 points. Increases your Stamina by 70 points. Increases your Stamina by 70 points. Increases your Stamina by 70 points. Increases your Stamina by 70 points. Increases your Stamina by 70 points. Also increases stamina regeneration by 20% and allows you to sprint for much longer periods of time without getting exhausted. This text is intentionally long to push the UI elements down.",
+            sliderShown: true,
+            totalCharges: 500,
+            usedCharge: 0
+         };
+         this.ShowEnchantingSlider(500, 10, 250);
+      }
+      else if (keyCode == 53) {
+         this.itemInfo = {
+            type: skyui.defines.Inventory.ICT_MISC,
+            name: "Gold Ingot",
+            weight: 1,
+            value: 100
+         };
+         this.ShowQuantityMenu(123);
+      }
+      else if (keyCode == 54) {
+         this.itemInfo = {
+            type: skyui.defines.Inventory.ICT_SHOUT,
+            name: "Unrelenting Force",
+            weight: 0,
+            value: 0,
+            effects: "Your voice is raw power, pushing aside anything - or anyone - who stands in your path. Your voice is raw power, pushing aside anything - or anyone - who stands in your path.",
+            spellCost: 1,
+            dragonWord0: "Fus",
+            word0: "Force",
+            unlocked0: true,
+            dragonWord1: "Ro",
+            word1: "Balance",
+            unlocked1: true,
+            dragonWord2: "Dah",
+            word2: "Push",
+            unlocked2: true,
+            soulSpent: false
+         };
+      }
+      else if (keyCode == 55) {
+         this.itemInfo = {
+            type: skyui.defines.Inventory.ICT_SPELL,
+            name: "Fireball",
+            weight: 0,
+            value: 0,
+            effects: "A ball of fire that explodes on impact, dealing 40 points of fire damage to all nearby targets. Deals extra damage to targets already on fire.",
+            spellCost: 42,
+            castTime: 1.5,
+            castLevel: "Adept"
+         };
+      }
+      else if (keyCode == 56) {
+         this.itemInfo = {
+            type: skyui.defines.Inventory.ICT_POTION,
+            name: "Potion of Ultimate Healing",
+            weight: 0.5,
+            value: 250,
+            effects: "Restore 150 points of Health. Also cures all diseases and poisons. This potion was brewed using rare ingredients found only in the deepest caves of Skyrim. The alchemist spent years perfecting the formula.",
+            skillName: "Alchemy"
+         };
+      }
+      else if (keyCode == 57) {
+         this.itemInfo = {
+            type: skyui.defines.Inventory.ICT_INGREDIENT,
+            name: "Nirnroot",
+            weight: 0.2,
+            value: 10,
+            numItemEffects: 4,
+            itemEffect0: "Damage Health",
+            itemEffect1: "Damage Stamina",
+            itemEffect2: "Invisibility",
+            itemEffect3: "Resist Magic"
+         };
+      }
+      else if (keyCode == 48) {
+         this.itemInfo = { type: skyui.defines.Inventory.ICT_NONE, name: "" };
+         if (this.InputHandler != undefined) {
+            this.HideQuantityMenu(true);
+         }
       }
    }
 }
