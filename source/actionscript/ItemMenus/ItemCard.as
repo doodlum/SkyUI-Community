@@ -60,14 +60,17 @@ class ItemCard extends MovieClip
    var _activeMenuMode:Object = undefined;
    var _origQuantitySlider:MovieClip;
    var _origEnchantingSlider:MovieClip;
+   var _hadSlider:Boolean = false;
+   var _lastShrinkField:TextField = undefined;
 
-   static var OFFSCREEN_Y:Number              = -300;
-   static var SHRINK_MAX_EXPANSION:Number     = 0;
-   static var SHRINK_BOTTOM_PADDING:Number    = 0;
-   static var SHRINK_BOTTOM_PADDING_SHOUT:Number = -10;
+   static var OFFSCREEN_Y:Number         = -300;
+   static var MIN_FONT_SIZE:Number       = 8;
 
-   static var BOTTOM_PADDING:Number = 40;
-   static var MIN_FONT_SIZE:Number  = 8;
+   static var TF_MAX_EXPANSION:Number    = 0;
+   static var BG_BOTTOM_PADDING:Number   = 0;
+
+   static var SLIDER_MARGIN:Number       = 0;
+   static var SLIDER_HIDDEN_PADDING:Number = 90;
 
    static var BASE_Y_QUANTITY_SLIDER:Number  = 92;
    static var BASE_Y_QUANTITY_VALUE:Number   = 80;
@@ -197,8 +200,10 @@ class ItemCard extends MovieClip
    
    function set itemInfo(aUpdateObj)
    {
-      this._textExpansion = 0;
+      this._lastShrinkField = undefined;
+      this._textExpansion  = 0;
       this._activeMenuMode = undefined;
+      this._hadSlider      = false;
 
       this.ItemCardMeters = new Array();
       var _loc3_ = this.ItemName != undefined ? this.ItemName.htmlText : "";
@@ -604,22 +609,31 @@ class ItemCard extends MovieClip
       this.ButtonRect._alpha            = 0;
       this.CardList_mc._alpha           = 0;
 
-      if (aActiveClip == undefined) return;
+      var sliderActive:Boolean = false;
+
+      if (aActiveClip == undefined) {
+         this._applyBackgroundHeight(exp, false);
+         return;
+      }
+
+      var sm:Number = ItemCard.SLIDER_MARGIN;
 
       if (aActiveClip == this._origEnchantingSlider)
       {
-         this._origEnchantingSlider._y    = ItemCard.BASE_Y_ENCHANT_SLIDER  + exp;
-         this.ButtonRect._y               = ItemCard.BASE_Y_ENCHANT_BUTTON  + exp;
+         this._origEnchantingSlider._y     = ItemCard.BASE_Y_ENCHANT_SLIDER  + exp + sm;
+         this.ButtonRect._y                = ItemCard.BASE_Y_ENCHANT_BUTTON  + exp + sm;
          this._origEnchantingSlider._alpha = 100;
-         this.ButtonRect._alpha           = 100;
+         this.ButtonRect._alpha            = 100;
+         sliderActive = true;
       }
       else if (aActiveClip == this._origQuantitySlider)
       {
-         this._origQuantitySlider._y  = ItemCard.BASE_Y_QUANTITY_SLIDER + exp;
-         this.SliderValueText._y      = ItemCard.BASE_Y_QUANTITY_VALUE  + exp;
-         this.ButtonRect._y           = ItemCard.BASE_Y_QUANTITY_BUTTON + exp;
+         this._origQuantitySlider._y     = ItemCard.BASE_Y_QUANTITY_SLIDER + exp + sm;
+         this.SliderValueText._y         = ItemCard.BASE_Y_QUANTITY_VALUE  + exp + sm;
+         this.ButtonRect._y              = ItemCard.BASE_Y_QUANTITY_BUTTON + exp + sm;
          this._origQuantitySlider._alpha = 100;
          this.ButtonRect._alpha          = 100;
+         sliderActive = true;
       }
       else if (aActiveClip == this.CardList_mc)
       {
@@ -631,12 +645,15 @@ class ItemCard extends MovieClip
          this.ButtonRect._y     = ItemCard.BASE_Y_QUANTITY_BUTTON + exp;
          this.ButtonRect._alpha = 100;
       }
+
+      this._applyBackgroundHeight(exp, sliderActive);
    }
    
    function ShowEnchantingSlider(aiMaxValue, aiMinValue, aiCurrentValue)
    {
+      this._hadSlider = true;
       this.gotoAndStop("Craft_Enchanting");
-      
+
       this.QuantitySlider_mc = this._origEnchantingSlider; 
       this.QuantitySlider_mc.addEventListener("change",this,"onSliderChange");
       
@@ -653,6 +670,7 @@ class ItemCard extends MovieClip
 
    function ShowQuantityMenu(aiMaxAmount)
    {
+      this._hadSlider = true;
       this.gotoAndStop("Quantity");
       
       this.QuantitySlider_mc = this._origQuantitySlider;
@@ -891,7 +909,9 @@ class ItemCard extends MovieClip
    /* @extension */
    function ShrinkToFit(tf:TextField)
    {
-      if (tf == undefined || tf.text == "") return;
+      if (tf == undefined || tf.text == "") {
+         return;
+      }
 
       if (tf.origHeight == undefined) tf.origHeight = tf._height;
       if (tf.origY      == undefined) tf.origY      = tf._y;
@@ -904,139 +924,144 @@ class ItemCard extends MovieClip
       tf.textAutoSize = "none";
       tf.SetText(tf.htmlText, true);
 
-      if (tf.numLines <= 0) return;
-      var lineHeight:Number = tf.getLineMetrics(0).height;
-      var neededHeight:Number = lineHeight * tf.numLines;
+      if (tf.numLines <= 0) {
+         return;
+      }
 
-      var baseHeight:Number = tf.origHeight;
+      var lineH:Number     = tf.getLineMetrics(0).height;
+      var neededH:Number   = lineH * tf.numLines;
+      var expansion:Number = 0;
 
-      if (neededHeight > baseHeight) {
-         var textDelta:Number = neededHeight - baseHeight;
-         var actualExpansion:Number = Math.min(textDelta, ItemCard.SHRINK_MAX_EXPANSION);
-
-         tf._height = tf.origHeight + actualExpansion;
-         this._textExpansion = actualExpansion;
-
-         var isShout:Boolean = (tf == this.ShoutEffectsLabel);
-         var extraPadding:Number = isShout ? ItemCard.SHRINK_BOTTOM_PADDING_SHOUT : ItemCard.SHRINK_BOTTOM_PADDING;
-
-         this._pushStaticElementsDown(tf.origY, actualExpansion, extraPadding);
+      var maxExp:Number = ItemCard.TF_MAX_EXPANSION + (this._hadSlider && this._activeMenuMode == undefined ? ItemCard.SLIDER_HIDDEN_PADDING : 0);
+      if (neededH > tf.origHeight) {
+         expansion  = Math.min(neededH - tf.origHeight, maxExp);
+         tf._height = tf.origHeight + expansion;
       }
 
       this._shrinkFont(tf);
 
+      this._textExpansion = expansion;
+      if (expansion > 0) {
+         this._pushStaticElementsDown(tf.origY, expansion);
+      }
+
+      this._applyBackgroundHeight(expansion, false);
       if (this._activeMenuMode != undefined) {
          this.PrepareInputElements(this._activeMenuMode);
       }
-   }
-   
-   // ── Helpers ───────────────────────────────────────────────────────────────
-   function _getLayoutLimit(tf:TextField)
-   {
-      var bg:MovieClip = this._getBackground();
-      var limitY:Number = (bg != undefined && bg.origHeight != undefined) ? bg.origHeight - ItemCard.BOTTOM_PADDING : 230;
 
-      for (var prop in this) {
-         var obj = this[prop];
-         if (this._isLayoutChild(obj) && !this._isInputElement(obj) && obj != tf && obj != bg) {
-            if (obj.origY != undefined && obj.origY > tf.origY && obj._alpha > 0) {
-               if (obj.origY < limitY) {
-                  limitY = obj.origY - 4;
-               }
-            }
-         }
+      this._lastShrinkField = tf;
+   }
+
+   function _getSliderBaseY()
+   {
+      if (this._activeMenuMode == this._origQuantitySlider)   return ItemCard.BASE_Y_QUANTITY_SLIDER;
+      if (this._activeMenuMode == this._origEnchantingSlider) return ItemCard.BASE_Y_ENCHANT_SLIDER;
+      return 10000;
+   }
+
+   function _getBackground()
+   {
+      if (this.Enchanting_Slim_Background != undefined && this.Enchanting_Slim_Background._alpha > 0) {
+         return this.Enchanting_Slim_Background;
       }
-      return limitY;
+      if (this.Enchanting_Background != undefined && this.Enchanting_Background._alpha > 0) {
+         return this.Enchanting_Background;
+      }
+      return this.background;
+   }
+
+   function _applyBackgroundHeight(expansion:Number, sliderActive:Boolean)
+   {
+      var bg = this._getBackground();
+      if (bg == undefined) {
+         return;
+      }
+      if (bg.origHeight == undefined) bg.origHeight = bg._height;
+
+      var extra:Number;
+      if (sliderActive) {
+         extra = ItemCard.SLIDER_MARGIN;
+      } else if (this._hadSlider) {
+         extra = ItemCard.SLIDER_HIDDEN_PADDING;
+      } else {
+         extra = 0;
+      }
+
+      bg._height = bg.origHeight + expansion + extra + ItemCard.BG_BOTTOM_PADDING;
    }
 
    function _isInputElement(obj)
    {
       return obj == this._origQuantitySlider
-          || obj == this._origEnchantingSlider
-          || obj == this.ButtonRect
-          || obj == this.SliderValueText
-          || obj == this.CardList_mc;
+         || obj == this._origEnchantingSlider
+         || obj == this.ButtonRect
+         || obj == this.SliderValueText
+         || obj == this.CardList_mc;
    }
-   
+
    function _isLayoutChild(obj)
    {
       return (obj instanceof MovieClip || obj instanceof TextField)
-          && obj._parent == this
-          && obj != this.ItemText
-          && obj != this.ItemText.ItemTextField;
-   }
-
-   function _getBackground()
-   {
-      return (this.background != undefined) ? this.background : this.Enchanting_Background;
+         && obj._parent == this
+         && obj != this.ItemText
+         && obj != this.ItemText.ItemTextField;
    }
    
    function _restoreStaticElements()
    {
       this._textExpansion = 0;
 
+      var bg = this._getBackground();
+      if (bg != undefined) {
+         if (bg.origHeight == undefined) bg.origHeight = bg._height;
+         if (bg.origY      == undefined) bg.origY      = bg._y;
+         bg._height = bg.origHeight;
+      }
+
       for (var prop in this) {
          var obj = this[prop];
          if (!this._isLayoutChild(obj)) continue;
          if (this._isInputElement(obj)) continue;
+         if (obj == bg)                 continue;
 
-         if (obj.origY != undefined) obj._y = obj.origY;
-         if (obj.origHeight != undefined && obj != this._getBackground()) {
-            obj._height = obj.origHeight;
-         }
-      }
-
-      var bg = this._getBackground();
-      if (bg != undefined && bg.origHeight != undefined) {
-         bg._height = bg.origHeight;
+         if (obj.origY      == undefined) obj.origY      = obj._y;
+         if (obj.origHeight == undefined) obj.origHeight  = obj._height;
+         obj._y      = obj.origY;
+         obj._height = obj.origHeight;
       }
    }
 
-   function _pushStaticElementsDown(belowY:Number, amount:Number, extraPadding:Number)
+   function _pushStaticElementsDown(belowY:Number, amount:Number)
    {
       var bg = this._getBackground();
-      var totalPush = amount + extraPadding;
-
-      if (bg != undefined) {
-         if (bg.origHeight == undefined) bg.origHeight = bg._height;
-         bg._height = bg.origHeight + totalPush;
-      }
 
       for (var prop in this) {
          var obj = this[prop];
          if (!this._isLayoutChild(obj)) continue;
          if (this._isInputElement(obj)) continue;
-         if (obj == bg) continue;
-         if (obj == tf) continue;
+         if (obj == bg)                 continue;
 
          if (obj.origY == undefined) obj.origY = obj._y;
          if (obj.origY > belowY) {
-               obj._y = obj.origY + totalPush;
+            obj._y = obj.origY + amount;
          }
       }
    }
 
    function _shrinkFont(tf:TextField)
    {
-      if (tf.numLines <= 0) return;
+      if (tf.numLines == 0) return;
 
       var fmt = tf.getTextFormat();
-      var fontSize:Number = (fmt.size != undefined) ? Number(fmt.size) : 20;
-      var tfText:String = tf.htmlText;
+      var fontSize = fmt.size;
+      var originalText = tf.text;
 
-      var tfHeight:Number = tf.getLineMetrics(0).height * tf.numLines;
-
-      while (tfHeight > tf._height && fontSize > ItemCard.MIN_FONT_SIZE) {
-         var before:String = "SIZE=\"" + fontSize + "\"";
+      while (tf.textHeight > tf._height && fontSize > ItemCard.MIN_FONT_SIZE)
+      {
          fontSize--;
-         var after:String = "SIZE=\"" + fontSize + "\"";
-
-         var newText:String = tfText.split(before).join(after);
-         if (newText == tfText) break;
-
-         tfText = newText;
-         tf.SetText(tfText, true);
-         tfHeight = tf.getLineMetrics(0).height * tf.numLines;
+         fmt.size = fontSize;
+         tf.setTextFormat(fmt);
       }
    }
    
@@ -1051,7 +1076,7 @@ class ItemCard extends MovieClip
             armor: "25",
             weight: 30,
             value: 125,
-            effects: "Basic protection.",
+            effects: "<font color='#FF0000'>Burns</font> the target for <font color='#FFFFFF'>50</font> points of fire damage. Targets on fire take extra damage. <font color='#00FFFF'>Freezes</font> the target for 50 points of frost damage to Health and Stamina. If the target dies within 10 seconds, fills a soul gem. This description is intentionally long to test the expansion of the weapon card and the font shrinking logic.",
             stolen: false
          };
       }
@@ -1087,7 +1112,7 @@ class ItemCard extends MovieClip
             armor: "40",
             weight: 5,
             value: 2000,
-            effects: "Increases your Stamina by 70 points. Increases your Stamina by 70 points. Increases your Stamina by 70 points. Increases your Stamina by 70 points.Increases your Stamina by 70 points. Increases your Stamina by 70 points. Increases your Stamina by 70 points. Increases your Stamina by 70 points.Increases your Stamina by 70 points. Increases your Stamina by 70 points. Increases your Stamina by 70 points. Increases your Stamina by 70 points. Increases your Stamina by 70 points. Increases your Stamina by 70 points. Also increases stamina regeneration by 20% and allows you to sprint for much longer periods of time without getting exhausted. This text is intentionally long to push the UI elements down.",
+            effects: "Increases your Stamina by 70 points. Increases your Stamina by 70 points. Increases your Stamina by 70 points. Increases your Stamina by 70 points.Increases your Stamina by 70 points.",
             sliderShown: true,
             totalCharges: 500,
             usedCharge: 0
@@ -1129,8 +1154,8 @@ class ItemCard extends MovieClip
             name: "Fireball",
             weight: 0,
             value: 0,
-            effects: "A ball of fire that explodes on impact, dealing 40 points of fire damage to all nearby targets. Deals extra damage to targets already on fire.",
-            spellCost: 42,
+            effects: "A ball of fire that explodes on impact, dealing 40 points of fire damage to all nearby targets. Deals extra damage to targets already on fire. A ball of fire that explodes on impact, dealing 40 points of fire damage to all nearby targets. Deals extra damage to targets already on fire.",
+            spellCost: 12345,
             castTime: 1.5,
             castLevel: "Adept"
          };
