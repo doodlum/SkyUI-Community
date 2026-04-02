@@ -11519,6 +11519,7 @@ Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMi
           <matrix type="MATRIX" hasRotate="false" hasScale="false" nRotateBits="0" nScaleBits="0" nTranslateBits="0" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.0" scaleY="0.0" translateX="0" translateY="0"/>
           <colorTransform type="CXFORM" blueAddTerm="0" blueMultTerm="0" greenAddTerm="0" greenMultTerm="0" hasAddTerms="false" hasMultTerms="false" nbits="1" redAddTerm="0" redMultTerm="0"/>
         </item>
+        <item type="ShowFrameTag" forceWriteAsLong="false"/>
       </subTags>
     </item>
   </tags>
