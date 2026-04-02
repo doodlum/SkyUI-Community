@@ -144,6 +144,10 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
    {
       if (!aEntryClip) return;
       
+      if (aEntryClip.textField != undefined) {
+         aEntryClip.textField.textColor = 0xFFFFFF;
+      }
+      
       var isDivider = this.IsDivider(aEntryObject);
       aEntryClip.gotoAndStop(isDivider ? "Divider" : "Normal");
       
