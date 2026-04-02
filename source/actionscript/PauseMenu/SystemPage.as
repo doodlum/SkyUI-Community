@@ -562,6 +562,7 @@ class SystemPage extends MovieClip
    }
    function onCategoryButtonPress(event)
    {
+      this.CategoryList.setInteractive(false);
       if(event.entry.disabled)
       {
          gfx.io.GameDelegate.call("PlaySound",["UIMenuCancel"]);
@@ -1314,6 +1315,7 @@ class SystemPage extends MovieClip
       switch(aiNewState)
       {
          case SystemPage.MAIN_STATE:
+            this.CategoryList.setInteractive(true);
             gfx.managers.FocusHandler.instance.setFocus(this.CategoryList,0);
             break;
          case SystemPage.SETTINGS_CATEGORY_STATE:
