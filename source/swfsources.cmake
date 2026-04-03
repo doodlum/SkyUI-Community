@@ -1,4 +1,17 @@
 macro(Add_SWF _TARGET_NAME _SWF_REL _XML_PATH)
+    set(_SKIP_IN_RELEASE FALSE)
+    set(_SOURCES ${ARGN})
+    list(FIND _SOURCES "SKIP_IN_RELEASE" _idx)
+    if(_idx GREATER -1)
+        set(_SKIP_IN_RELEASE TRUE)
+        list(REMOVE_AT _SOURCES ${_idx})
+    endif()
+
+    if(_SKIP_IN_RELEASE AND CMAKE_BUILD_TYPE STREQUAL "Release")
+        message(STATUS "[Build] Skipping ${_TARGET_NAME} (release build)")
+        return()
+    endif()
+
     set(_BASE_SWF "${CMAKE_CURRENT_BINARY_DIR}/interface/base/${_SWF_REL}")
     set(_FINAL_SWF "${CMAKE_CURRENT_BINARY_DIR}/interface/${_SWF_REL}")
 
@@ -14,7 +27,7 @@ macro(Add_SWF _TARGET_NAME _SWF_REL _XML_PATH)
         SWF_REL      "${_SWF_REL}"
         SWF_INPUT    "${_BASE_SWF}"
         SWF_OUTPUT   "${_FINAL_SWF}"
-        SOURCES      ${ARGN}
+        SOURCES      ${_SOURCES}
     )
 
     list(APPEND AS_TARGETS           AS_${_TARGET_NAME})
@@ -592,4 +605,11 @@ Add_SWF(tweenmenu
     Vanilla/Shared/ButtonChange.as
     Vanilla/Shared/GlobalFunc.as
     Vanilla/Shared/Proxy.as
+)
+
+# Only for design debug mode
+Add_SWF(gfxfontlib
+    gfxfontlib.swf
+    gfxfontlib.xml
+    SKIP_IN_RELEASE
 )
