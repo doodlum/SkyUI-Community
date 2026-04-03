@@ -11148,6 +11148,7 @@ Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMi
         </item>
         <item type="ShowFrameTag" forceWriteAsLong="false"/>
         <item type="RemoveObject2Tag" depth="1" forceWriteAsLong="false"/>
+        <item type="RemoveObject2Tag" depth="4" forceWriteAsLong="false"/>
         <item type="RemoveObject2Tag" depth="20" forceWriteAsLong="false"/>
         <item type="PlaceObject3Tag" bitmapCache="0" blendMode="0" characterId="207" clipDepth="0" depth="1" forceWriteAsLong="true" name="background" placeFlagHasBlendMode="true" placeFlagHasCacheAsBitmap="false" placeFlagHasCharacter="true" placeFlagHasClassName="false" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="true" placeFlagHasFilterList="false" placeFlagHasImage="false" placeFlagHasMatrix="true" placeFlagHasName="true" placeFlagHasRatio="false" placeFlagHasVisible="false" placeFlagMove="false" placeFlagOpaqueBackground="false" ratio="0" reserved="false" visible="0">
           <matrix type="MATRIX" hasRotate="false" hasScale="true" nRotateBits="0" nScaleBits="18" nTranslateBits="0" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="1.0" scaleY="0.9684143" translateX="0" translateY="0"/>
