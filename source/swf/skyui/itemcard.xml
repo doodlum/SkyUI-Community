@@ -10918,6 +10918,7 @@ Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMi
         </item>
         <item type="ShowFrameTag" forceWriteAsLong="false"/>
         <item type="RemoveObject2Tag" depth="1" forceWriteAsLong="false"/>
+        <item type="RemoveObject2Tag" depth="2" forceWriteAsLong="false"/>
         <item type="RemoveObject2Tag" depth="20" forceWriteAsLong="false"/>
         <item type="RemoveObject2Tag" depth="21" forceWriteAsLong="false"/>
         <item type="RemoveObject2Tag" depth="24" forceWriteAsLong="false"/>
@@ -10927,15 +10928,17 @@ Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMi
           <matrix type="MATRIX" hasRotate="false" hasScale="true" nRotateBits="0" nScaleBits="18" nTranslateBits="9" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="1.0" scaleY="0.83306885" translateX="0" translateY="-200"/>
           <colorTransform type="CXFORMWITHALPHA" alphaAddTerm="0" alphaMultTerm="156" blueAddTerm="0" blueMultTerm="256" greenAddTerm="0" greenMultTerm="256" hasAddTerms="false" hasMultTerms="true" nbits="10" redAddTerm="0" redMultTerm="256"/>
         </item>
-        <item type="PlaceObject3Tag" bitmapCache="0" blendMode="0" characterId="207" className="" clipDepth="0" depth="4" forceWriteAsLong="true" name="Enchanting_Slim_Background" placeFlagHasBlendMode="true" placeFlagHasCacheAsBitmap="false" placeFlagHasCharacter="true" placeFlagHasClassName="false" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="true" placeFlagHasFilterList="false" placeFlagHasImage="false" placeFlagHasMatrix="true" placeFlagHasName="true" placeFlagHasRatio="false" placeFlagHasVisible="false" placeFlagMove="false" placeFlagOpaqueBackground="false" ratio="0" reserved="false" visible="0">
+        <item type="PlaceObject3Tag" bitmapCache="0" blendMode="0" characterId="207" clipDepth="0" depth="4" forceWriteAsLong="true" name="Enchanting_Slim_Background" placeFlagHasBlendMode="true" placeFlagHasCacheAsBitmap="false" placeFlagHasCharacter="true" placeFlagHasClassName="false" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="true" placeFlagHasFilterList="false" placeFlagHasImage="false" placeFlagHasMatrix="true" placeFlagHasName="true" placeFlagHasRatio="false" placeFlagHasVisible="false" placeFlagMove="false" placeFlagOpaqueBackground="false" ratio="0" reserved="false" visible="0">
           <matrix type="MATRIX" hasRotate="false" hasScale="true" nRotateBits="0" nScaleBits="18" nTranslateBits="9" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="1.0" scaleY="0.83306885" translateX="0" translateY="-200"/>
           <colorTransform type="CXFORMWITHALPHA" alphaAddTerm="0" alphaMultTerm="0" blueAddTerm="0" blueMultTerm="256" greenAddTerm="0" greenMultTerm="256" hasAddTerms="false" hasMultTerms="true" nbits="10" redAddTerm="0" redMultTerm="256"/>
-          <surfaceFilterList/>
+        </item>
+        <item type="PlaceObject2Tag" characterId="276" clipDepth="0" depth="5" forceWriteAsLong="false" name="line" placeFlagHasCharacter="true" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="true" placeFlagHasMatrix="true" placeFlagHasName="true" placeFlagHasRatio="false" placeFlagMove="false" ratio="0">
+          <matrix type="MATRIX" hasRotate="false" hasScale="false" nRotateBits="0" nScaleBits="0" nTranslateBits="12" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.0" scaleY="0.0" translateX="644" translateY="1258"/>
+          <colorTransform type="CXFORMWITHALPHA" alphaAddTerm="0" alphaMultTerm="156" blueAddTerm="0" blueMultTerm="256" greenAddTerm="0" greenMultTerm="256" hasAddTerms="false" hasMultTerms="true" nbits="10" redAddTerm="0" redMultTerm="256"/>
           <clipActions type="CLIPACTIONS" reserved="0">
             <allEventFlags type="CLIPEVENTFLAGS" clipEventConstruct="false" clipEventData="false" clipEventDragOut="false" clipEventDragOver="false" clipEventEnterFrame="false" clipEventInitialize="false" clipEventKeyDown="false" clipEventKeyPress="false" clipEventKeyUp="false" clipEventLoad="false" clipEventMouseDown="false" clipEventMouseMove="false" clipEventMouseUp="false" clipEventPress="false" clipEventRelease="false" clipEventReleaseOutside="false" clipEventRollOut="false" clipEventRollOver="false" clipEventUnload="false" reserved="0" reserved2="0"/>
             <clipActionRecords/>
           </clipActions>
-          <backgroundColor type="RGBA" alpha="0" blue="0" green="0" red="0"/>
         </item>
         <item type="PlaceObject3Tag" bitmapCache="0" blendMode="0" characterId="228" clipDepth="0" depth="20" forceWriteAsLong="true" name="EnchantmentLabel" placeFlagHasBlendMode="false" placeFlagHasCacheAsBitmap="false" placeFlagHasCharacter="true" placeFlagHasClassName="false" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="false" placeFlagHasFilterList="true" placeFlagHasImage="false" placeFlagHasMatrix="true" placeFlagHasName="true" placeFlagHasRatio="true" placeFlagHasVisible="false" placeFlagMove="false" placeFlagOpaqueBackground="false" ratio="212" reserved="false" visible="0">
           <matrix type="MATRIX" hasRotate="false" hasScale="false" nRotateBits="0" nScaleBits="0" nTranslateBits="13" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.0" scaleY="0.0" translateX="620" translateY="2680"/>
