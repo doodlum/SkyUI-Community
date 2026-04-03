@@ -9297,7 +9297,7 @@ Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMi
       </subTags>
     </item>
     <item type="DefineScalingGridTag" characterId="207" forceWriteAsLong="false">
-      <splitter type="RECT" Xmax="7885" Xmin="583" Ymax="3778" Ymin="608" nbits="14"/>
+      <splitter type="RECT" Xmax="7980" Xmin="540" Ymax="3860" Ymin="540" nbits="14"/>
     </item>
     <item type="DefineEditTextTag" align="2" autoSize="false" border="false" characterID="208" fontHeight="600" fontId="37" forceWriteAsLong="true" hasFont="true" hasFontClass="false" hasLayout="true" hasMaxLength="false" hasText="true" hasTextColor="true" html="true" indent="0" initialText="&lt;p align=&quot;center&quot;&gt;&lt;font face=&quot;$EverywhereMediumFont&quot; size=&quot;30&quot; color=&quot;#ffffff&quot; letterSpacing=&quot;1.000000&quot; kerning=&quot;1&quot;&gt;Confirm message text&lt;/font&gt;&lt;/p&gt;" leading="20" leftMargin="0" maxLength="0" multiline="true" noSelect="true" password="false" readOnly="true" rightMargin="0" useOutlines="true" variableName="" wasStatic="false" wordWrap="true">
       <bounds type="RECT" Xmax="8180" Xmin="-40" Ymax="3139" Ymin="-40" nbits="14"/>
