@@ -60,7 +60,7 @@ Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMi
         <item type="ShowFrameTag" forceWriteAsLong="false"/>
       </subTags>
     </item>
-    <item type="ImportAssets2Tag" downloadNow="1" forceWriteAsLong="true" hasDigest="0" url="gfxfontlib.swf">
+    <item type="ImportAssets2Tag" downloadNow="1" forceWriteAsLong="true" hasDigest="0" url="../gfxfontlib.swf">
       <tags>
         <item>3</item>
       </tags>
@@ -161,7 +161,7 @@ Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMi
       <bounds type="RECT" Xmax="1697" Xmin="-40" Ymax="419" Ymin="-40" nbits="12"/>
       <textColor type="RGBA" alpha="255" blue="153" green="153" red="153"/>
     </item>
-    <item type="ImportAssets2Tag" downloadNow="1" forceWriteAsLong="true" hasDigest="0" url="gfxfontlib.swf">
+    <item type="ImportAssets2Tag" downloadNow="1" forceWriteAsLong="true" hasDigest="0" url="../gfxfontlib.swf">
       <tags>
         <item>8</item>
       </tags>

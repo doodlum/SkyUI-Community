@@ -56,7 +56,7 @@ Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMi
     <item type="DefineScalingGridTag" characterId="2" forceWriteAsLong="false">
       <splitter type="RECT" Xmax="10229" Xmin="0" Ymax="472" Ymin="68" nbits="15"/>
     </item>
-    <item type="ImportAssets2Tag" downloadNow="1" forceWriteAsLong="true" hasDigest="0" url="gfxfontlib.swf">
+    <item type="ImportAssets2Tag" downloadNow="1" forceWriteAsLong="true" hasDigest="0" url="../gfxfontlib.swf">
       <tags>
         <item>3</item>
       </tags>
