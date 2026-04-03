@@ -7,31 +7,30 @@ macro(Add_SWF _TARGET_NAME _SWF_REL _XML_PATH)
         list(REMOVE_AT _SOURCES ${_idx})
     endif()
 
-    if(_SKIP_IN_RELEASE AND CMAKE_BUILD_TYPE STREQUAL "Release")
+    if(NOT (_SKIP_IN_RELEASE AND CMAKE_BUILD_TYPE STREQUAL "Release"))
+        set(_BASE_SWF "${CMAKE_CURRENT_BINARY_DIR}/interface/base/${_SWF_REL}")
+        set(_FINAL_SWF "${CMAKE_CURRENT_BINARY_DIR}/interface/${_SWF_REL}")
+
+        # Rebuild base from XML
+        Add_XML_Base(
+            OUTPUT_SWF "${_BASE_SWF}"
+            XML_PATH   "${_XML_PATH}"
+        )
+
+        # Inject ActionScript sources into that base
+        Add_AS(
+            TARGET_NAME  AS_${_TARGET_NAME}
+            SWF_REL      "${_SWF_REL}"
+            SWF_INPUT    "${_BASE_SWF}"
+            SWF_OUTPUT   "${_FINAL_SWF}"
+            SOURCES      ${_SOURCES}
+        )
+
+        list(APPEND AS_TARGETS           AS_${_TARGET_NAME})
+        list(APPEND SWF_COMPILED_OUTPUTS ${AS_${_TARGET_NAME}_OUTPUT})
+    else()
         message(STATUS "[Build] Skipping ${_TARGET_NAME} (release build)")
-        return()
     endif()
-
-    set(_BASE_SWF "${CMAKE_CURRENT_BINARY_DIR}/interface/base/${_SWF_REL}")
-    set(_FINAL_SWF "${CMAKE_CURRENT_BINARY_DIR}/interface/${_SWF_REL}")
-
-    # Rebuild base from XML
-    Add_XML_Base(
-        OUTPUT_SWF "${_BASE_SWF}"
-        XML_PATH   "${_XML_PATH}"
-    )
-
-    # Inject ActionScript sources into that base
-    Add_AS(
-        TARGET_NAME  AS_${_TARGET_NAME}
-        SWF_REL      "${_SWF_REL}"
-        SWF_INPUT    "${_BASE_SWF}"
-        SWF_OUTPUT   "${_FINAL_SWF}"
-        SOURCES      ${_SOURCES}
-    )
-
-    list(APPEND AS_TARGETS           AS_${_TARGET_NAME})
-    list(APPEND SWF_COMPILED_OUTPUTS ${AS_${_TARGET_NAME}_OUTPUT})
 endmacro()
 
 Add_SWF(bartermenu
