@@ -20,6 +20,96 @@ string property		ReqSWFVersion	= "5.2 SE"	autoReadonly
 bool property		ErrorDetected	= false auto
 
 
+; PROPERTIES (Deprecated) --------------------------------------------------------------------------------------
+
+; @return empty string, -1, or FALSE if object is 'turned off' or no longer in use
+string property		HUD_MENU		= "" autoReadOnly
+string property		INVENTORY_MENU	= "" autoReadonly
+string property		MAGIC_MENU		= "" autoReadonly
+string property		CONTAINER_MENU	= "" autoReadonly
+string property		BARTER_MENU		= "" autoReadonly
+string property		GIFT_MENU		= "" autoReadonly
+string property		JOURNAL_MENU	= "" autoReadonly
+string property		MAP_MENU		= "" autoReadonly
+string property		FAVORITES_MENU	= "" autoReadonly
+string property		CRAFTING_MENU	= "" autoReadonly
+
+int property		ERR_SWF_INVALID			= -1 autoReadonly
+int property		ERR_SWF_VERSION			= -1 autoReadonly
+
+bool property InventoryMenuCheckEnabled
+	bool function get()
+		return FALSE
+	endFunction
+
+	function set(bool a_val)
+	endFunction
+endProperty
+
+bool property MagicMenuCheckEnabled
+	bool function get()
+		return FALSE
+	endFunction
+
+	function set(bool a_val)
+	endFunction
+endProperty
+
+bool property BarterMenuCheckEnabled
+	bool function get()
+		return FALSE
+	endFunction
+
+	function set(bool a_val)
+	endFunction
+endProperty
+
+bool property ContainerMenuCheckEnabled
+	bool function get()
+		return FALSE
+	endFunction
+
+	function set(bool a_val)
+	endFunction
+endProperty
+
+bool property GiftMenuCheckEnabled
+	bool function get()
+		return FALSE
+	endFunction
+
+	function set(bool a_val)
+	endFunction
+endProperty
+
+bool property MapMenuCheckEnabled
+	bool function get()
+		return FALSE
+	endFunction
+
+	function set(bool a_val)
+	endFunction
+endProperty
+
+bool property FavoritesMenuCheckEnabled
+	bool function get()
+		return FALSE
+	endFunction
+
+	function set(bool a_val)
+	endFunction
+endProperty
+
+bool property CraftingMenuCheckEnabled
+	bool function get()
+		return FALSE
+	endFunction
+
+	function set(bool a_val)
+	endFunction
+endProperty
+
+
 ; INITIALIZATION ----------------------------------------------------------------------------------
 
 event OnInit()
