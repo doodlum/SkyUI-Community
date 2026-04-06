@@ -565,15 +565,21 @@ class SystemPage extends MovieClip
       if(event.entry.disabled)
       {
          gfx.io.GameDelegate.call("PlaySound",["UIMenuCancel"]);
+         return;
       }
-      else if(this.iCurrentState == SystemPage.MAIN_STATE)
+      if(this.iCurrentState == SystemPage.MAIN_STATE)
       {
+         this.CategoryList.setInteractive(false);
+      }
+      
          switch(event.index)
          {
             case this.IDX_QUICKSAVE:
                gfx.io.GameDelegate.call("PlaySound",["UIMenuOK"]);
                gfx.io.GameDelegate.call("QuickSave",[]);
+               this.CategoryList.setInteractive(true);
                return;
+               
             case this.IDX_SAVE:
                gfx.io.GameDelegate.call("UseCurrentCharacterFilter",[]);
                this.SaveLoadListHolder.isSaving = true;
@@ -584,11 +590,12 @@ class SystemPage extends MovieClip
                }
                gfx.io.GameDelegate.call("SAVE",[this.SaveLoadListHolder.List_mc.entryList,this.SaveLoadListHolder.batchSize]);
                return;
-               break;
+               
             case this.IDX_LOAD:
                this.SaveLoadListHolder.isSaving = false;
                gfx.io.GameDelegate.call("LOAD",[this.SaveLoadListHolder.List_mc.entryList,this.SaveLoadListHolder.batchSize]);
                return;
+               
             case this.IDX_INSTALLED_CONTENT:
                if(this.CreationsList.entryList.length == 0)
                {
@@ -603,18 +610,24 @@ class SystemPage extends MovieClip
                   return;
                }
                gfx.io.GameDelegate.call("PlaySound",["UIMenuCancel"]);
+               this.CategoryList.setInteractive(true);
                return;
-               break;
+               
             case this.IDX_CREATIONS:
                gfx.io.GameDelegate.call("ModManager",[]);
+               this.CategoryList.setInteractive(true);
                return;
+               
             case this.IDX_SETTINGS:
                this.StartState(SystemPage.SETTINGS_CATEGORY_STATE);
                gfx.io.GameDelegate.call("PlaySound",["UIMenuOK"]);
                return;
+               
             case this.IDX_MOD_CONFIG:
                _root.QuestJournalFader.Menu_mc.ConfigPanelOpen();
+               this.CategoryList.setInteractive(true);
                return;
+               
             case this.IDX_CONTROLS:
                if(this.MappingList.entryList.length == 0)
                {
@@ -625,6 +638,7 @@ class SystemPage extends MovieClip
                this.StartState(SystemPage.INPUT_MAPPING_STATE);
                gfx.io.GameDelegate.call("PlaySound",["UIMenuOK"]);
                return;
+               
             case this.IDX_HELP:
                if(this.HelpList.entryList.length == 0)
                {
@@ -640,16 +654,19 @@ class SystemPage extends MovieClip
                else
                {
                   gfx.io.GameDelegate.call("PlaySound",["UIMenuCancel"]);
+                  this.CategoryList.setInteractive(true);
                }
                return;
+               
             case this.IDX_QUIT:
                gfx.io.GameDelegate.call("PlaySound",["UIMenuOK"]);
                gfx.io.GameDelegate.call("RequestIsOnPC",[],this,"populateQuitList");
                return;
+               
             default:
                gfx.io.GameDelegate.call("PlaySound",["UIMenuCancel"]);
+               this.CategoryList.setInteractive(true);
                return;
-         }
       }
    }
    function onCategoryListPress(event)
@@ -1314,6 +1331,7 @@ class SystemPage extends MovieClip
       switch(aiNewState)
       {
          case SystemPage.MAIN_STATE:
+            this.CategoryList.setInteractive(true);
             gfx.managers.FocusHandler.instance.setFocus(this.CategoryList,0);
             break;
          case SystemPage.SETTINGS_CATEGORY_STATE:
