@@ -1924,10 +1924,10 @@ Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMi
           </surfaceFilterList>
         </item>
         <item type="PlaceObject2Tag" characterId="29" clipDepth="0" depth="3" forceWriteAsLong="true" name="LevelProgressBar" placeFlagHasCharacter="true" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="false" placeFlagHasMatrix="true" placeFlagHasName="true" placeFlagHasRatio="false" placeFlagMove="false" ratio="0">
-          <matrix type="MATRIX" hasRotate="false" hasScale="false" nRotateBits="0" nScaleBits="0" nTranslateBits="15" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.0" scaleY="0.0" translateX="12095" translateY="-772"/>
+          <matrix type="MATRIX" hasRotate="false" hasScale="false" nRotateBits="0" nScaleBits="0" nTranslateBits="15" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.0" scaleY="0.0" translateX="12845" translateY="-772"/>
         </item>
         <item type="PlaceObject3Tag" bitmapCache="0" blendMode="0" characterId="30" clipDepth="0" depth="15" forceWriteAsLong="true" placeFlagHasBlendMode="false" placeFlagHasCacheAsBitmap="false" placeFlagHasCharacter="true" placeFlagHasClassName="false" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="false" placeFlagHasFilterList="true" placeFlagHasImage="false" placeFlagHasMatrix="true" placeFlagHasName="false" placeFlagHasRatio="false" placeFlagHasVisible="false" placeFlagMove="false" placeFlagOpaqueBackground="false" ratio="0" reserved="false" visible="0">
-          <matrix type="MATRIX" hasRotate="false" hasScale="false" nRotateBits="0" nScaleBits="0" nTranslateBits="14" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.0" scaleY="0.0" translateX="7351" translateY="-959"/>
+          <matrix type="MATRIX" hasRotate="false" hasScale="false" nRotateBits="0" nScaleBits="0" nTranslateBits="14" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.0" scaleY="0.0" translateX="8101" translateY="-959"/>
           <surfaceFilterList>
             <item type="DROPSHADOWFILTER" angle="0.7853851318359375" blurX="2.0" blurY="2.0" compositeSource="true" distance="2.0" id="0" innerShadow="false" knockout="false" passes="1" strength="1.5">
               <dropShadowColor type="RGBA" alpha="255" blue="0" green="0" red="0"/>
@@ -1935,7 +1935,7 @@ Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMi
           </surfaceFilterList>
         </item>
         <item type="PlaceObject3Tag" bitmapCache="0" blendMode="0" characterId="32" clipDepth="0" depth="16" forceWriteAsLong="true" name="LevelNumberLabel" placeFlagHasBlendMode="false" placeFlagHasCacheAsBitmap="false" placeFlagHasCharacter="true" placeFlagHasClassName="false" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="false" placeFlagHasFilterList="true" placeFlagHasImage="false" placeFlagHasMatrix="true" placeFlagHasName="true" placeFlagHasRatio="false" placeFlagHasVisible="false" placeFlagMove="false" placeFlagOpaqueBackground="false" ratio="0" reserved="false" visible="0">
-          <matrix type="MATRIX" hasRotate="false" hasScale="false" nRotateBits="0" nScaleBits="0" nTranslateBits="15" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.0" scaleY="0.0" translateX="9346" translateY="-1070"/>
+          <matrix type="MATRIX" hasRotate="false" hasScale="false" nRotateBits="0" nScaleBits="0" nTranslateBits="15" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.0" scaleY="0.0" translateX="10096" translateY="-1070"/>
           <surfaceFilterList>
             <item type="DROPSHADOWFILTER" angle="0.7853851318359375" blurX="2.0" blurY="2.0" compositeSource="true" distance="2.0" id="0" innerShadow="false" knockout="false" passes="1" strength="1.5">
               <dropShadowColor type="RGBA" alpha="255" blue="0" green="0" red="0"/>

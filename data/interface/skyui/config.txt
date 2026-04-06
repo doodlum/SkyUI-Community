@@ -518,8 +518,8 @@ columns.timeRemainingColumn.type = TEXT
 columns.timeRemainingColumn.name = '$TIME LEFT'
 columns.timeRemainingColumn.states = 2
 columns.timeRemainingColumn.width = 0.333
-columns.timeRemainingColumn.label.textFormat.align = center
-columns.timeRemainingColumn.entry.textFormat.align = center
+columns.timeRemainingColumn.label.textFormat.align = right
+columns.timeRemainingColumn.entry.textFormat.align = right
 
 columns.timeRemainingColumn.state1.label.text = '$TIME LEFT'
 columns.timeRemainingColumn.state1.label.arrowDown = false

@@ -144,6 +144,10 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
    {
       if (!aEntryClip) return;
       
+      if (aEntryClip.textField != undefined) {
+         aEntryClip.textField.textColor = 0xFFFFFF;
+      }
+      
       var isDivider = this.IsDivider(aEntryObject);
       aEntryClip.gotoAndStop(isDivider ? "Divider" : "Normal");
       
@@ -220,12 +224,20 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
       this.bMouseDrivenNav = true;
       
       var oldScroll = this.iScrollPosition;
+      var oldSelectedIndex = this.iSelectedIndex;
       var direction = (delta > 0) ? -1 : 1;
       
       this.iScrollPosition = Math.max(0, Math.min(this.iMaxScrollPosition, this.iScrollPosition + direction));
       
       if (oldScroll != this.iScrollPosition) {
          this.UpdateList();
+         if (this.iSelectedIndex != oldSelectedIndex && this.iSelectedIndex != -1) {
+            this.dispatchEvent({
+               type: "selectionChange",
+               index: this.iSelectedIndex,
+               keyboardOrMouse: 0
+            });
+         }
       }
    }
    function GetItemUnderMouse()
@@ -308,5 +320,11 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
       {
          super.onItemPress(aiKeyboardOrMouse);
       }
+   }
+
+   /* @extension */
+   function setInteractive(abInteractive:Boolean) {
+      this.bDisableInput = !abInteractive;
+      this.disableSelection = !abInteractive;
    }
 }
