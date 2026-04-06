@@ -223,6 +223,10 @@ class Map.MapMenu
          this.SelectedMarker.MarkerClick();
       }
    }
+   function InitExtensions()
+   {
+      skse.EnableMapMenuMouseWheel(true);
+   }
    function Init()
    {
       this.onResize();
