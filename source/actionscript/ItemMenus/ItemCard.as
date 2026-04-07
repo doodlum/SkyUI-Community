@@ -3,6 +3,7 @@ class ItemCard extends MovieClip
    var ActiveEffectTimeValue;
    var ApparelArmorValue;
    var ApparelEnchantedLabel;
+   var ApparelWarmthValue;
    var BookDescriptionLabel;
    var ButtonRect;
    var ButtonRect_mc;
