@@ -9,6 +9,7 @@ class InventoryListEntry extends skyui.components.list.TabularListEntry
    var itemIcon;
    var poisonIcon;
    var readIcon;
+   var selectIndicator;
    var stolenIcon;
    static var STATES = ["None","Equipped","LeftEquip","RightEquip","LeftAndRightEquip"];
    function InventoryListEntry()
@@ -28,6 +29,99 @@ class InventoryListEntry extends skyui.components.list.TabularListEntry
       {
          this["textField" + _loc3_]._visible = false;
          _loc3_ = _loc3_ + 1;
+      }
+   }
+   // HACK: specific workaround for tab-delimited translation text (e.g. BOOBIES Potions).
+   // TODO: replace with a cleaner generic solution if SkyUI handles this case centrally later.
+   function __rf_cleanDisplayText(a_text)
+   {
+      var _loc2_;
+      var _loc3_;
+      if(a_text == undefined)
+      {
+         return a_text;
+      }
+      _loc2_ = a_text.indexOf("\t");
+      if(_loc2_ == -1)
+      {
+         return a_text;
+      }
+      _loc3_ = _loc2_;
+      while(_loc3_ > 0 && (a_text.charCodeAt(_loc3_ - 1) == 32 || a_text.charCodeAt(_loc3_ - 1) == 160))
+      {
+         _loc3_ -= 1;
+      }
+      return a_text.substring(0,_loc3_);
+   }
+   function setEntry(a_entryObject, a_state)
+   {
+      var _loc4_ = skyui.components.list.TabularList(a_state.list).layout;
+      this.selectIndicator._visible = a_entryObject == a_state.list.selectedEntry;
+      var _loc5_ = _loc4_.layoutUpdateCount;
+      if(this._layoutUpdateCount != _loc5_)
+      {
+         this._layoutUpdateCount = _loc5_;
+         this.setEntryLayout(a_entryObject,a_state);
+         this.setSpecificEntryLayout(a_entryObject,a_state);
+      }
+      var _loc6_ = 0;
+      var _loc7_;
+      var _loc8_;
+      var _loc9_;
+      var _loc10_;
+      var _loc11_;
+      var _loc12_;
+      while(_loc6_ < _loc4_.columnCount)
+      {
+         _loc7_ = _loc4_.columnLayoutData[_loc6_];
+         _loc8_ = this[_loc7_.stageName];
+         _loc9_ = _loc7_.entryValue;
+         if(_loc9_ != undefined)
+         {
+            if(_loc9_.charAt(0) == "@")
+            {
+               _loc10_ = a_entryObject[_loc9_.slice(1)];
+               _loc12_ = _loc10_ == undefined ? "-" : _loc10_;
+               if(_loc7_.stageName == "textField1")
+               {
+                  _loc12_ = this.__rf_cleanDisplayText(_loc12_);
+               }
+               _loc8_.SetText(_loc12_);
+            }
+            else
+            {
+               _loc12_ = _loc9_;
+               if(_loc7_.stageName == "textField1")
+               {
+                  _loc12_ = this.__rf_cleanDisplayText(_loc12_);
+               }
+               _loc8_.SetText(_loc12_);
+            }
+         }
+         switch(_loc7_.type)
+         {
+            case skyui.components.list.ListLayout.COL_TYPE_EQUIP_ICON:
+               this.formatEquipIcon(_loc8_,a_entryObject,a_state);
+               break;
+            case skyui.components.list.ListLayout.COL_TYPE_ITEM_ICON:
+               this.formatItemIcon(_loc8_,a_entryObject,a_state);
+               break;
+            case skyui.components.list.ListLayout.COL_TYPE_NAME:
+               this.formatName(_loc8_,a_entryObject,a_state);
+               break;
+            case skyui.components.list.ListLayout.COL_TYPE_TEXT:
+            default:
+               this.formatText(_loc8_,a_entryObject,a_state);
+         }
+         if(_loc7_.colorAttribute != undefined)
+         {
+            _loc11_ = a_entryObject[_loc7_.colorAttribute];
+            if(_loc11_ != undefined)
+            {
+               _loc8_.textColor = _loc11_;
+            }
+         }
+         _loc6_ += 1;
       }
    }
    function setSpecificEntryLayout(a_entryObject, a_state)
