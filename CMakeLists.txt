@@ -16,7 +16,11 @@ project(
 )
 
 set(PROJECT_RELEASE_IDX ${VER_RELEASE_IDX})
-set(PROJECT_VERSION_STRING "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR} ${VER_SUFFIX}")
+if(VER_SUFFIX)
+    set(PROJECT_VERSION_STRING "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR} ${VER_SUFFIX}")
+else()
+    set(PROJECT_VERSION_STRING "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
+endif()
 
 # ---------------------------------------------------------------------------
 # Options & Core Paths
