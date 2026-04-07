@@ -52,21 +52,8 @@ class ItemCard extends MovieClip
    var bFadedIn;
    var dispatchEvent;
 
-   var _textExpansion = 0;
-   var _activeMenuMode;
-   var _origQuantitySlider;
-   var _origEnchantingSlider;
-
    static var MIN_FONT_SIZE:Number       = 12;
    static var TF_MAX_EXPANSION:Number    = 0;
-   static var SLIDER_MARGIN:Number       = 0;
-
-   static var BASE_Y_QUANTITY_SLIDER:Number  = 92;
-   static var BASE_Y_QUANTITY_VALUE:Number   = 80;
-   static var BASE_Y_QUANTITY_BUTTON:Number  = 130;
-   static var BASE_Y_ENCHANT_SLIDER:Number   = 147.3;
-   static var BASE_Y_ENCHANT_BUTTON:Number   = 166;
-   static var BASE_Y_CARD_LIST:Number        = 98;
 
    static var SKYUI_RELEASE_IDX = 2018;
    static var SKYUI_VERSION_MAJOR = 5;
@@ -78,10 +65,6 @@ class ItemCard extends MovieClip
       Shared.GlobalFunc.MaintainTextFormat();
       Shared.GlobalFunc.AddReverseFunctions();
       gfx.events.EventDispatcher.initialize(this);
-      
-      this._origQuantitySlider = this.QuantitySlider_mc;
-      this._origEnchantingSlider = this.EnchantingSlider_mc;
-
       this.QuantitySlider_mc = this.QuantitySlider_mc;
       this.ButtonRect_mc = this.ButtonRect;
       this.ItemList = this.CardList_mc.List_mc;
@@ -178,10 +161,7 @@ class ItemCard extends MovieClip
       return this.LastUpdateObj;
    }
    function set itemInfo(aUpdateObj)
-   {
-      this._textExpansion  = 0;
-      this._activeMenuMode = undefined;
-      
+   {  
       this.ItemCardMeters = new Array();
       var _loc3_ = this.ItemName != undefined ? this.ItemName.htmlText : "";
       var _loc4_ = aUpdateObj.type;
@@ -555,40 +535,54 @@ class ItemCard extends MovieClip
    }
    function PrepareInputElements(aActiveClip)
    {
-      this._activeMenuMode = aActiveClip;
-      var exp:Number = this._textExpansion;
-
-      this._origQuantitySlider._alpha   = 0;
-      this._origEnchantingSlider._alpha = 0;
-      this.ButtonRect._alpha            = 0;
-      this.CardList_mc._alpha           = 0;
-
-      var sm:Number = ItemCard.SLIDER_MARGIN;
-
-      if (aActiveClip == this._origEnchantingSlider)
+      var _loc3_ = 92;
+      var _loc4_ = 98;
+      var _loc5_ = 147.3;
+      var _loc6_ = 130;
+      var _loc7_ = 166;
+      switch(aActiveClip)
       {
-         this._origEnchantingSlider._y     = ItemCard.BASE_Y_ENCHANT_SLIDER  + exp + sm;
-         this.ButtonRect._y                = ItemCard.BASE_Y_ENCHANT_BUTTON  + exp + sm;
-         this._origEnchantingSlider._alpha = 100;
-         this.ButtonRect._alpha            = 100;
-      }
-      else if (aActiveClip == this._origQuantitySlider)
-      {
-         this._origQuantitySlider._y     = ItemCard.BASE_Y_QUANTITY_SLIDER + exp + sm;
-         this.SliderValueText._y         = ItemCard.BASE_Y_QUANTITY_VALUE  + exp + sm;
-         this.ButtonRect._y              = ItemCard.BASE_Y_QUANTITY_BUTTON + exp + sm;
-         this._origQuantitySlider._alpha = 100;
-         this.ButtonRect._alpha          = 100;
-      }
-      else if (aActiveClip == this.CardList_mc)
-      {
-         this.CardList_mc._y     = ItemCard.BASE_Y_CARD_LIST + exp;
-         this.CardList_mc._alpha = 100;
-      }
-      else if (aActiveClip == this.ButtonRect)
-      {
-         this.ButtonRect._y     = ItemCard.BASE_Y_QUANTITY_BUTTON + exp;
-         this.ButtonRect._alpha = 100;
+         case this.EnchantingSlider_mc:
+            this.QuantitySlider_mc._y = -100;
+            this.ButtonRect._y = _loc7_;
+            this.EnchantingSlider_mc._y = _loc5_;
+            this.CardList_mc._y = -100;
+            this.QuantitySlider_mc._alpha = 0;
+            this.ButtonRect._alpha = 100;
+            this.EnchantingSlider_mc._alpha = 100;
+            this.CardList_mc._alpha = 0;
+            break;
+         case this.QuantitySlider_mc:
+            this.QuantitySlider_mc._y = _loc3_;
+            this.ButtonRect._y = _loc6_;
+            this.EnchantingSlider_mc._y = -100;
+            this.CardList_mc._y = -100;
+            this.QuantitySlider_mc._alpha = 100;
+            this.ButtonRect._alpha = 100;
+            this.EnchantingSlider_mc._alpha = 0;
+            this.CardList_mc._alpha = 0;
+            break;
+         case this.CardList_mc:
+            this.QuantitySlider_mc._y = -100;
+            this.ButtonRect._y = -100;
+            this.EnchantingSlider_mc._y = -100;
+            this.CardList_mc._y = _loc4_;
+            this.QuantitySlider_mc._alpha = 0;
+            this.ButtonRect._alpha = 0;
+            this.EnchantingSlider_mc._alpha = 0;
+            this.CardList_mc._alpha = 100;
+            break;
+         case this.ButtonRect:
+            this.QuantitySlider_mc._y = -100;
+            this.ButtonRect._y = _loc6_;
+            this.EnchantingSlider_mc._y = -100;
+            this.CardList_mc._y = -100;
+            this.QuantitySlider_mc._alpha = 0;
+            this.ButtonRect._alpha = 100;
+            this.EnchantingSlider_mc._alpha = 0;
+            this.CardList_mc._alpha = 0;
+         default:
+            return;
       }
    }
    function ShowEnchantingSlider(aiMaxValue, aiMinValue, aiCurrentValue)
@@ -608,10 +602,7 @@ class ItemCard extends MovieClip
    function ShowQuantityMenu(aiMaxAmount)
    {
       this.gotoAndStop("Quantity");
-      this.QuantitySlider_mc = this._origQuantitySlider;
-      
-      this.PrepareInputElements(this._origQuantitySlider);
-      
+      this.PrepareInputElements(this.QuantitySlider_mc);
       this.QuantitySlider_mc.maximum = aiMaxAmount;
       this.QuantitySlider_mc.value = aiMaxAmount;
       this.SliderValueText.textAutoSize = "shrink";
@@ -855,13 +846,7 @@ class ItemCard extends MovieClip
          tf._height = tf.origHeight + expansion;
       }
 
-      this._textExpansion = expansion;
-
       this._shrinkFont(tf);
-      
-      if (this._activeMenuMode != undefined) {
-         this.PrepareInputElements(this._activeMenuMode);
-      }
    }
 
    function _shrinkFont(tf:TextField)
