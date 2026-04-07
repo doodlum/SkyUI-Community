@@ -61,6 +61,10 @@ class Quest_Journal extends MovieClip
       gfx.io.GameDelegate.call("ShouldShowMod",[],this,"SetShowMod");
       this.BottomBar_mc.InitBar();
       this.ConfigPanel.initExtensions();
+
+      this.SetupTabMouseOver(this.QuestsTab);
+      this.SetupTabMouseOver(this.StatsTab);
+      this.SetupTabMouseOver(this.SystemTab);
    }
    function SetShowMod()
    {
@@ -295,5 +299,20 @@ class Quest_Journal extends MovieClip
           }
          list.UpdateList();
       }
+   }
+
+   function SetupTabMouseOver(aTab: MovieClip)
+   {
+      var root = this;
+      aTab.onRollOver = function() {
+         if (!this.disabled) {
+            this._alpha = 100;
+            gfx.io.GameDelegate.call("PlaySound", ["UIMenuFocus"]);
+         }
+      };
+      
+      aTab.onRollOut = aTab.onReleaseOutside = function() {
+         root.UpdateFocusVisuals();
+      };
    }
 }
