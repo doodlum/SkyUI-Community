@@ -284,21 +284,7 @@ class Quest_Journal extends MovieClip
       this.StatsTab._alpha = (this.iCurrentTab == 1) ? currentTabAlpha : 80;
       this.SystemTab._alpha = (this.iCurrentTab == 2) ? currentTabAlpha : 80;
 
-      var currentPage = this.PageArray[this.iCurrentTab];
-      var list = (currentPage.TitleList != undefined) ? currentPage.TitleList : currentPage.CategoryList;
-
-      if (list != undefined) {
-         if (this.bTabFocused) {
-            list.bNoSelectionMode = true;
-            list.selectedIndex = -1;
-         } else {
-            list.bNoSelectionMode = false;
-            if (list.selectedIndex == -1 && list.entryList.length > 0) {
-               list.selectedIndex = 0;
-            }
-          }
-         list.UpdateList();
-      }
+      this.ConfigureCurrentPageList(this.bTabFocused);
    }
 
    function SetupTabMouseOver(aTab: MovieClip)
@@ -314,5 +300,41 @@ class Quest_Journal extends MovieClip
       aTab.onRollOut = aTab.onReleaseOutside = function() {
          root.UpdateFocusVisuals();
       };
+   }
+
+   function ResetCurrentPageList()
+   {
+      this.ConfigureCurrentPageList(false);
+   }
+
+   function ConfigureCurrentPageList(abNoSelectionMode: Boolean)
+   {
+      var currentPage = this.PageArray[this.iCurrentTab];
+      var list = (currentPage.TitleList != undefined) ? currentPage.TitleList : currentPage.CategoryList;
+
+      if (list != undefined) {
+         if (list.bNoSelectionMode !== undefined) {
+            list.bNoSelectionMode = abNoSelectionMode;
+         }
+
+         if (!abNoSelectionMode) {
+            if (list.bPointerHighlight !== undefined) {
+               list.bPointerHighlight = false;
+               list.bMouseDrivenNav = false;
+            }
+
+            if (list.iNumTopHalfEntries != undefined) {
+               list.selectedIndex = list.scrollPosition;
+            } else {
+               if (list.selectedIndex == -1 && list.entryList.length > 0) {
+                  list.selectedIndex = 0;
+               }
+            }
+         } else {
+            list.selectedIndex = -1;
+         }
+
+         list.UpdateList();
+      }
    }
 }

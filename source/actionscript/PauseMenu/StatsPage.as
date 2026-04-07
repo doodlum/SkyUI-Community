@@ -32,6 +32,7 @@ class StatsPage extends MovieClip
          gfx.io.GameDelegate.call("updateStats",[],this,"PopulateStatsList");
          this.bUpdated = true;
       }
+      this.onCategoryHighlight();
       this.CategoryList.addEventListener("listMovedUp",this,"onCategoryListMoveUp");
       this.CategoryList.addEventListener("listMovedDown",this,"onCategoryListMoveDown");
       this.CategoryList.addEventListener("selectionChange",this,"onCategoryListMouseSelectionChange");
