@@ -52,7 +52,7 @@ class ItemCard extends MovieClip
    var bFadedIn;
    var dispatchEvent;
 
-   static var MIN_FONT_SIZE:Number       = 12;
+   static var MIN_FONT_SIZE:Number       = 10;
    static var TF_MAX_EXPANSION:Number    = 0;
 
    static var SKYUI_RELEASE_IDX = 2018;
@@ -832,18 +832,16 @@ class ItemCard extends MovieClip
 
       if (tf.numLines <= 0) return;
 
-      var lineH:Number   = tf.getLineMetrics(0).height;
-      var neededH:Number = lineH * tf.numLines;
-
       var maxExp:Number = ItemCard.TF_MAX_EXPANSION;
       var expansion:Number = 0;
 
-      if (neededH > tf.origHeight) {
-         expansion = Math.min(neededH - tf.origHeight, maxExp);
-         tf._height = tf.origHeight + expansion;
-      }
-
+      tf._height = tf.origHeight + maxExp;
       this._shrinkFont(tf);
+
+      if (tf.textHeight > tf.origHeight) {
+         expansion = Math.min(tf.textHeight - tf.origHeight, maxExp);
+      }
+      tf._height = tf.origHeight + expansion;
 
       if (tf.textHeight > tf._height) {
          this._applyEllipsis(tf);
