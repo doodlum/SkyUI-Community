@@ -8,9 +8,11 @@ class MessageBox extends MovieClip
    var IsCancellable;
    var IsVertical;
    var Message;
+   var MessageBtnLabels;
    var MessageButtons;
    var MessageText;
    var iPlatform;
+   var lastTabIndex = -1;
    
    var _yesStr;
    var _noStr;
@@ -27,6 +29,14 @@ class MessageBox extends MovieClip
    static var SELECTION_INDICATOR_WIDTH = 25;
    static var SELECTION_INDICATOR_HEIGHT = 5;
    static var BUTTON_PREFIX = "Button";
+   
+   static var SELECTION_ROLLOVER_ALPHA = 120;
+   static var SELECTION_ROLLOUT_ALPHA = 80;
+
+   static var SKSE_KEY_ESC = 1; // Esc
+   static var HOTKEY_YES = 89; // Y
+   static var HOTKEY_NO = 78; // N
+   static var HOTKEY_YES_TO_ALL = 65; // A
 
    function MessageBox()
    {
@@ -51,6 +61,11 @@ class MessageBox extends MovieClip
       this.InitLocalization();
    }
 
+   /* 
+   * Forces localized string resolution by using a temporary text field.
+   * This is required because the engine performs localization instantly when assigning "$" strings,
+   * which prevents retrieving their resolved values directly from variables.
+   */
    function InitLocalization()
    {
       this.createTextField("temp_txt", this.getNextHighestDepth(), 0, 0, 1, 1);
@@ -85,46 +100,124 @@ class MessageBox extends MovieClip
 
    function IsExitButton(aText)
    {
-      var str = aText;
-      return (str == this._noStr || str == this._cancelStr || str == this._backStr || 
-              str == this._exitStr || str == this._doneStr || str == this._returnStr);
+      if (aText == this._cancelStr || 
+          aText == this._backStr || 
+          aText == this._exitStr || 
+          aText == this._doneStr || 
+          aText == this._returnStr ||
+          aText == this._noStr) {
+         return true;
+      }
+      
+      var lower = aText.toLowerCase();
+      return (lower == "cancel" || 
+              lower == "back" || 
+              lower == "exit" || 
+              lower == "done" || 
+              lower == "return" ||
+              lower == "no");
+   }
+
+   function findNextExitButton(iStartFrom)
+   {
+      var len = this.MessageButtons.length;
+      if (len == 0) return -1;
+      
+      var start = (iStartFrom === undefined || iStartFrom < 0) ? -1 : iStartFrom;
+      
+      for (var i = 0; i < len; i++) {
+         var idx = (start + 1 + i) % len;
+         if (this.IsExitButton(this.MessageBtnLabels[idx])) {
+            return idx;
+         }
+      }
+      return -1;
+   }
+
+   function findButtonArrayIndexById(aButtonId)
+   {
+      for (var i = 0; i < this.MessageButtons.length; i++) {
+         if (this.getButtonId(this.MessageButtons[i]) === aButtonId) {
+            return i;
+         }
+      }
+      return -1;
+   }
+
+   function getButtonId(button)
+   {
+      return Number(button._name.split(MessageBox.BUTTON_PREFIX)[1]);
    }
 
    function handleInput(details, pathToFocus)
    {
-      var bHandled = false;
-      if (Shared.GlobalFunc.IsKeyPressed(details)) 
-      {
-         if (details.navEquivalent == gfx.ui.NavigationCode.ESCAPE) 
-         {
-            for (var i = 0; i < this.MessageButtons.length; i++) {
-               if (this.IsExitButton(this.MessageButtons[i].ButtonText.text)) {
-                  gfx.io.GameDelegate.call("buttonPress", [i]);
-                  return true;
-               }
-            }
-            if (this.IsCancellable) {
-               gfx.io.GameDelegate.call("buttonPress", [this.CancelOptionIndex]);
-               return true;
-            }
+      if (!Shared.GlobalFunc.IsKeyPressed(details)) {
+         return pathToFocus[0].handleInput(details, pathToFocus.slice(1));
+      }
+
+      // It is necessary to separate ESC from Tab because without SKSE the behavior of Esc = Tab
+      var skseKeyCode = !skse ? 0 : skse.GetLastKeycode(true);
+      var keyCode = details.code;
+      var nav = details.navEquivalent;
+
+      var isCancelKey = (skseKeyCode === MessageBox.SKSE_KEY_ESC || nav == gfx.ui.NavigationCode.GAMEPAD_B);
+
+      if (isCancelKey) {
+         var cancelIdx = -1;
+         
+         if (this.IsCancellable && this.CancelOptionIndex != undefined) {
+            cancelIdx = this.findButtonArrayIndexById(this.CancelOptionIndex);
+         } else {
+            cancelIdx = this.findNextExitButton(-1);
          }
          
-         if (details.code == 9) // TAB Key
-         {
-            var currentFocus = Selection.getFocus();
-            for (var i = 0; i < this.MessageButtons.length; i++) {
-               if (this.IsExitButton(this.MessageButtons[i].ButtonText.text)) {
-                  Selection.setFocus(this.MessageButtons[i]);
-                  return true;
-               }
-            }
+         if (cancelIdx != -1) {
+            this.setFocusToButton(cancelIdx);
+            var btnId = this.getButtonId(this.MessageButtons[cancelIdx]);
+            gfx.io.GameDelegate.call("buttonPress", [btnId]);
+            return true;
          }
       }
 
-      if (!bHandled) {
-         bHandled = pathToFocus[0].handleInput(details, pathToFocus.slice(1));
+      if (nav == gfx.ui.NavigationCode.TAB) {
+         var tabIdx = this.findNextExitButton(this.lastTabIndex);
+         if (tabIdx != -1) {
+            this.setFocusToButton(tabIdx);
+            this.lastTabIndex = tabIdx;
+         }
+         return true;
       }
-      return bHandled;
+      
+      var buttons = this.MessageButtons;
+      var buttonsLen = buttons.length;
+      
+      for (var i = 0; i < buttonsLen; i++) {
+         var btnTxt = buttons[i].ButtonText.text;
+         var btnTxtLower = btnTxt.toLowerCase();
+         
+         var isYes      = (keyCode == MessageBox.HOTKEY_YES) && (btnTxt == this._yesStr || btnTxtLower == "yes");
+         var isNo       = (keyCode == MessageBox.HOTKEY_NO) && (btnTxt == this._noStr || btnTxtLower == "no");
+         var isYesToAll = (keyCode == MessageBox.HOTKEY_YES_TO_ALL) && (btnTxt == this._yesToAllStr || btnTxtLower == "yes to all");
+
+         if (isYes || isNo || isYesToAll) {
+            this.setFocusToButton(i);
+            var btnId = this.getButtonId(buttons[i]);
+            gfx.io.GameDelegate.call("buttonPress", [btnId]);
+            return true;
+         }
+      }
+
+      return pathToFocus[0].handleInput(details, pathToFocus.slice(1));
+   }
+
+   function setFocusToButton(aiIndex) {
+      var btn = this.MessageButtons[aiIndex];
+      if (btn != undefined) {
+         if (Selection.getFocus() != btn) {
+            Selection.setFocus(btn);
+         }
+         btn.focused = 1;
+      }
    }
 
    function setupButtons()
@@ -133,9 +226,9 @@ class MessageBox extends MovieClip
          this.ButtonContainer.removeMovieClip();
          this.ButtonContainer = undefined;
       }
-      this.MessageButtons.length = 0;
+      this.MessageButtons = [];
+      this.MessageBtnLabels = [];
       
-      var bFocusFirst = arguments[0];
       var totalWidth = 0;
       var totalHeight = 0;
 
@@ -156,6 +249,8 @@ class MessageBox extends MovieClip
                txt.autoSize = "center";
                txt.html = true;
                txt.SetText(arguments[i], true);
+               
+               txt._alpha = MessageBox.SELECTION_ROLLOUT_ALPHA;
 
                btn.SelectionIndicatorHolder.SelectionIndicator._width = txt._width + MessageBox.SELECTION_INDICATOR_WIDTH;
                
@@ -172,15 +267,18 @@ class MessageBox extends MovieClip
                   btn._x = totalWidth + btn._width / 2;
                   totalWidth += btn._width + MessageBox.SELECTION_INDICATOR_WIDTH;
                }
+               
                this.MessageButtons.push(btn);
+               this.MessageBtnLabels.push(arguments[i]);
             }
          }
          
          this.InitButtons();
          this.ResetDimensions();
 
-         Selection.setFocus(this.MessageButtons[0]);
-         this.MessageButtons[0].focused = 1;
+         if (this.MessageButtons.length > 0) {
+            this.setFocusToButton(0);
+         }
       }
    }
 
@@ -188,9 +286,12 @@ class MessageBox extends MovieClip
    {
       for (var i = 0; i < this.MessageButtons.length; i++)
       {
-         this.MessageButtons[i].addEventListener("press", this.ClickCallback);
-         this.MessageButtons[i].addEventListener("focusIn", this.FocusCallback);
-         
+         // Intentional no-op: suppresses Scaleform's native Enter/E button activation.
+         this.MessageButtons[i].handlePress = function() {};
+
+         this.MessageButtons[i].addEventListener("press", this, "ClickCallback");
+         this.MessageButtons[i].addEventListener("focusIn", this, "FocusCallback");
+         this.MessageButtons[i].addEventListener("rollOver", this, "HoverCallback");
          this.MessageButtons[i].ButtonText.noTranslate = true;
       }
    }
@@ -220,7 +321,7 @@ class MessageBox extends MovieClip
       this.PositionElements();
       var bounds = this.getBounds(this._parent);
       var diff = Stage.height * 0.85 - bounds.yMax;
-      if(0 > diff) {
+      if(diff < 0) {
          this.Message.autoSize = false;
          this.Message.textAutoSize = "shrink";
          this.Message._height += (diff * 100 / this._yscale);
@@ -232,6 +333,7 @@ class MessageBox extends MovieClip
    {
       var bg = this.Background_mc;
       var maxLineWidth = 0;
+      
       for (var i = 0; i < this.Message.numLines; i++) {
          maxLineWidth = Math.max(maxLineWidth, this.Message.getLineMetrics(i).width);
       }
@@ -267,27 +369,19 @@ class MessageBox extends MovieClip
    function FocusCallback(aEvent)
    {
       gfx.io.GameDelegate.call("PlaySound",["UIMenuFocus"]);
-   }
-
-   function onKeyDown()
-   {
-      var code = Key.getCode();
+      
       for (var i = 0; i < this.MessageButtons.length; i++) {
-         var btnText = this.MessageButtons[i].ButtonText.text;
-         
-         if (code == 89 && btnText == this._yesStr) { 
-            gfx.io.GameDelegate.call("buttonPress",[i]); 
-            return; 
-         } 
-         if (code == 78 && btnText == this._noStr) { 
-            gfx.io.GameDelegate.call("buttonPress",[i]); 
-            return; 
-         }
-         if (code == 65 && btnText == this._yesToAllStr) { 
-            gfx.io.GameDelegate.call("buttonPress",[i]); 
-            return; 
+         var isTarget = (this.MessageButtons[i] === aEvent.target);
+         this.MessageButtons[i].ButtonText._alpha = isTarget ? MessageBox.SELECTION_ROLLOVER_ALPHA : MessageBox.SELECTION_ROLLOUT_ALPHA;
+         if(isTarget) {
+            this.lastTabIndex = i;
          }
       }
+   }
+
+   function HoverCallback(aEvent)
+   {
+      Selection.setFocus(aEvent.target);
    }
 
    function SetPlatform(aiPlatform, abPS3Switch)
@@ -295,8 +389,7 @@ class MessageBox extends MovieClip
       this.iPlatform = aiPlatform;
       
       if(this.MessageButtons.length > 0) {
-         Selection.setFocus(this.MessageButtons[0]);
-         this.MessageButtons[0].focused = 1;
+         this.setFocusToButton(0);
       }
    }
 }
