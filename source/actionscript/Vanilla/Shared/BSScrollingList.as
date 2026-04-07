@@ -106,7 +106,14 @@ class Shared.BSScrollingList extends MovieClip
          {
             if(details.navEquivalent == gfx.ui.NavigationCode.UP)
             {
-               var bAtTop = (this.iNumTopHalfEntries != undefined) ? (this.iScrollPosition <= 0) : (this.selectedIndex <= 0);
+               var bAtTop;
+               if (this.iNumTopHalfEntries != undefined) {
+                  bAtTop = this.iScrollPosition <= 0;
+               } else if (this.selectedIndex == -1) {
+                  bAtTop = this.iScrollPosition <= 0;
+               } else {
+                  bAtTop = this.selectedIndex <= 0;
+               }
 
                if (bAtTop) {
                   if (this.bAllowUpToTabs === true) {

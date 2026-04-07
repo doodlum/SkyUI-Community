@@ -126,7 +126,7 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
          currentY += clip._height;
       }
 
-      if (this.bMouseDrivenNav && !shouldRecenter) {
+      if (this.bMouseDrivenNav && !shouldRecenter && !this.bNoSelectionMode) {
          var mouseTarget = Mouse.getTopMostEntity();
          while (mouseTarget != undefined) {
             if (mouseTarget._parent == this && mouseTarget._visible && mouseTarget.itemIndex != undefined) {

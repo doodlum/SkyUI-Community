@@ -289,8 +289,10 @@ class Quest_Journal extends MovieClip
             list.selectedIndex = -1;
          } else {
             list.bNoSelectionMode = false;
-            list.selectedIndex = 0;
-         }
+            if (list.selectedIndex == -1 && list.entryList.length > 0) {
+               list.selectedIndex = 0;
+            }
+          }
          list.UpdateList();
       }
    }
