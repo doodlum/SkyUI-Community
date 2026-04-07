@@ -818,22 +818,19 @@ class ItemCard extends MovieClip
    /* @extension */
    function ShrinkToFit(tf:TextField)
    {
-      if (tf == undefined || tf.text == "") {
-         return;
-      }
+      if (tf == undefined || tf.text == "") return;
 
       if (tf.origHeight == undefined) tf.origHeight = tf._height;
 
       tf._height      = tf.origHeight;
+      tf.textAutoSize = "none";
+      tf.SetText(tf.htmlText, true);
       tf.multiline    = true;
       tf.wordWrap     = true;
-      tf.textAutoSize = "none";
 
       tf.SetText(tf.htmlText, true);
 
-      if (tf.numLines <= 0) {
-         return;
-      }
+      if (tf.numLines <= 0) return;
 
       var lineH:Number   = tf.getLineMetrics(0).height;
       var neededH:Number = lineH * tf.numLines;
@@ -847,20 +844,38 @@ class ItemCard extends MovieClip
       }
 
       this._shrinkFont(tf);
+
+      if (tf.textHeight > tf._height) {
+         this._applyEllipsis(tf);
+      }
    }
 
    function _shrinkFont(tf:TextField)
    {
       if (tf.numLines == 0) return;
 
-      var fmt = tf.getTextFormat();
-      var fontSize = fmt.size;
-      var originalText = tf.text;
+      var fmt:TextFormat = tf.getTextFormat();
+      var fontSize:Number = fmt.size;
 
       while (tf.textHeight > tf._height && fontSize > ItemCard.MIN_FONT_SIZE)
       {
          fontSize--;
          fmt.size = fontSize;
+         tf.setTextFormat(fmt);
+      }
+   }
+
+   function _applyEllipsis(tf:TextField)
+   {
+      var text:String = tf.htmlText;
+      var ellipsis:String = "...";
+
+      var fmt:TextFormat = tf.getTextFormat();
+
+      while (tf.textHeight > tf._height && text.length > 0)
+      {
+         text = text.substr(0, text.length - 1);
+         tf.htmlText = text + ellipsis;
          tf.setTextFormat(fmt);
       }
    }
