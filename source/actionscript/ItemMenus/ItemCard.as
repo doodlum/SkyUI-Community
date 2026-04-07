@@ -57,10 +57,9 @@ class ItemCard extends MovieClip
    var _origQuantitySlider;
    var _origEnchantingSlider;
 
-   static var MIN_FONT_SIZE:Number       = 8;
+   static var MIN_FONT_SIZE:Number       = 12;
    static var TF_MAX_EXPANSION:Number    = 0;
    static var SLIDER_MARGIN:Number       = 0;
-   static var MIN_FONT_SIZE:Number       = 12;
 
    static var BASE_Y_QUANTITY_SLIDER:Number  = 92;
    static var BASE_Y_QUANTITY_VALUE:Number   = 80;
