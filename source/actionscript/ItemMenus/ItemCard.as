@@ -843,7 +843,7 @@ class ItemCard extends MovieClip
       }
       tf._height = tf.origHeight + expansion;
 
-      if (tf.textHeight > tf._height) {
+      if (tf.textHeight >= tf._height) {
          this._applyEllipsis(tf);
       }
    }
@@ -855,7 +855,7 @@ class ItemCard extends MovieClip
       var fmt:TextFormat = tf.getTextFormat();
       var fontSize:Number = fmt.size;
 
-      while (tf.textHeight > tf._height && fontSize > ItemCard.MIN_FONT_SIZE)
+      while (tf.textHeight >= tf._height && fontSize > ItemCard.MIN_FONT_SIZE)
       {
          fontSize--;
          fmt.size = fontSize;
@@ -870,7 +870,7 @@ class ItemCard extends MovieClip
 
       var fmt:TextFormat = tf.getTextFormat();
 
-      while (tf.textHeight > tf._height && text.length > 0)
+      while (tf.textHeight >= tf._height && text.length > 0)
       {
          text = text.substr(0, text.length - 1);
          tf.htmlText = text + ellipsis;
