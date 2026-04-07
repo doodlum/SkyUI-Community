@@ -161,7 +161,7 @@ class ItemCard extends MovieClip
       return this.LastUpdateObj;
    }
    function set itemInfo(aUpdateObj)
-   {  
+   {
       this.ItemCardMeters = new Array();
       var _loc3_ = this.ItemName != undefined ? this.ItemName.htmlText : "";
       var _loc4_ = aUpdateObj.type;
