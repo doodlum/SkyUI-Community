@@ -3,7 +3,6 @@ class ItemCard extends MovieClip
    var ActiveEffectTimeValue;
    var ApparelArmorValue;
    var ApparelEnchantedLabel;
-   var ApparelWarmthValue;
    var BookDescriptionLabel;
    var ButtonRect;
    var ButtonRect_mc;
@@ -51,26 +50,16 @@ class ItemCard extends MovieClip
    var _bEditNameMode;
    var bFadedIn;
    var dispatchEvent;
-   static var SKYUI_RELEASE_IDX = 2018;
-   static var SKYUI_VERSION_MAJOR = 5;
-   static var SKYUI_VERSION_MINOR = 2;
-   static var SKYUI_VERSION_STRING = ItemCard.SKYUI_VERSION_MAJOR + "." + ItemCard.SKYUI_VERSION_MINOR + " SE";
-   
-   var _textExpansion:Number  = 0;
-   var _activeMenuMode:Object = undefined;
-   var _origQuantitySlider:MovieClip;
-   var _origEnchantingSlider:MovieClip;
-   var _hadSlider:Boolean = false;
-   var _lastShrinkField:TextField = undefined;
 
-   static var OFFSCREEN_Y:Number         = -300;
+   var _textExpansion = 0;
+   var _activeMenuMode;
+   var _origQuantitySlider;
+   var _origEnchantingSlider;
+
    static var MIN_FONT_SIZE:Number       = 8;
-
    static var TF_MAX_EXPANSION:Number    = 0;
-   static var BG_BOTTOM_PADDING:Number   = 0;
-
    static var SLIDER_MARGIN:Number       = 0;
-   static var SLIDER_HIDDEN_PADDING:Number = 90;
+   static var MIN_FONT_SIZE:Number       = 12;
 
    static var BASE_Y_QUANTITY_SLIDER:Number  = 92;
    static var BASE_Y_QUANTITY_VALUE:Number   = 80;
@@ -79,6 +68,10 @@ class ItemCard extends MovieClip
    static var BASE_Y_ENCHANT_BUTTON:Number   = 166;
    static var BASE_Y_CARD_LIST:Number        = 98;
 
+   static var SKYUI_RELEASE_IDX = 2018;
+   static var SKYUI_VERSION_MAJOR = 5;
+   static var SKYUI_VERSION_MINOR = 2;
+   static var SKYUI_VERSION_STRING = ItemCard.SKYUI_VERSION_MAJOR + "." + ItemCard.SKYUI_VERSION_MINOR + " SE";
    function ItemCard()
    {
       super();
@@ -88,7 +81,7 @@ class ItemCard extends MovieClip
       
       this._origQuantitySlider = this.QuantitySlider_mc;
       this._origEnchantingSlider = this.EnchantingSlider_mc;
-      
+
       this.QuantitySlider_mc = this.QuantitySlider_mc;
       this.ButtonRect_mc = this.ButtonRect;
       this.ItemList = this.CardList_mc.List_mc;
@@ -96,19 +89,15 @@ class ItemCard extends MovieClip
       this.bFadedIn = false;
       this.InputHandler = undefined;
       this._bEditNameMode = false;
-      Key.addListener(this);
    }
-   
    function get bEditNameMode()
    {
       return this._bEditNameMode;
    }
-   
    function GetItemName()
    {
       return this.ItemName;
    }
-   
    function SetupItemName(aPrevName)
    {
       this.ItemName = this.ItemText.ItemTextField;
@@ -119,7 +108,6 @@ class ItemCard extends MovieClip
          this.ItemName.selectable = false;
       }
    }
-   
    function onLoad()
    {
       this.QuantitySlider_mc.addEventListener("change",this,"onSliderChange");
@@ -128,7 +116,6 @@ class ItemCard extends MovieClip
       this.ButtonRect_mc.AcceptMouseButton.SetPlatform(0,false);
       this.ButtonRect_mc.CancelMouseButton.SetPlatform(0,false);
    }
-   
    function SetPlatform(aiPlatform, abPS3Switch)
    {
       this.ButtonRect_mc.AcceptGamepadButton._visible = aiPlatform != 0;
@@ -142,7 +129,6 @@ class ItemCard extends MovieClip
       }
       this.ItemList.SetPlatform(aiPlatform,abPS3Switch);
    }
-   
    function onAcceptMouseClick()
    {
       var _loc2_;
@@ -152,7 +138,6 @@ class ItemCard extends MovieClip
          this.InputHandler(_loc2_);
       }
    }
-   
    function onCancelMouseClick()
    {
       var _loc2_;
@@ -162,7 +147,6 @@ class ItemCard extends MovieClip
          this.InputHandler(_loc2_);
       }
    }
-   
    function FadeInCard()
    {
       if(this.bFadedIn)
@@ -173,7 +157,6 @@ class ItemCard extends MovieClip
       this._parent.gotoAndPlay("fadeIn");
       this.bFadedIn = true;
    }
-   
    function FadeOutCard()
    {
       if(this.bFadedIn)
@@ -182,29 +165,23 @@ class ItemCard extends MovieClip
          this.bFadedIn = false;
       }
    }
-   
    function get quantitySlider()
    {
       return this.QuantitySlider_mc;
    }
-   
    function get weaponChargeMeter()
    {
       return this.ItemCardMeters[skyui.defines.Inventory.ICT_WEAPON];
    }
-   
    function get itemInfo()
    {
       return this.LastUpdateObj;
    }
-   
    function set itemInfo(aUpdateObj)
    {
-      this._lastShrinkField = undefined;
       this._textExpansion  = 0;
       this._activeMenuMode = undefined;
-      this._hadSlider      = false;
-
+      
       this.ItemCardMeters = new Array();
       var _loc3_ = this.ItemName != undefined ? this.ItemName.htmlText : "";
       var _loc4_ = aUpdateObj.type;
@@ -216,7 +193,6 @@ class ItemCard extends MovieClip
       var _loc10_;
       var _loc11_;
       var _loc12_;
-      
       switch(_loc4_)
       {
          case skyui.defines.Inventory.ICT_ARMOR:
@@ -247,7 +223,6 @@ class ItemCard extends MovieClip
             this.ShrinkToFit(this.ApparelEnchantedLabel);
             this.SkillTextInstance.text = aUpdateObj.skillText;
             break;
-            
          case skyui.defines.Inventory.ICT_WEAPON:
             if(aUpdateObj.effects.length == 0)
             {
@@ -278,7 +253,6 @@ class ItemCard extends MovieClip
             this.WeaponEnchantedLabel.htmlText = aUpdateObj.effects;
             this.ShrinkToFit(this.WeaponEnchantedLabel);
             break;
-            
          case skyui.defines.Inventory.ICT_BOOK:
             if(aUpdateObj.description != undefined && aUpdateObj.description != "")
             {
@@ -289,7 +263,6 @@ class ItemCard extends MovieClip
             }
             this.gotoAndStop("Books_reg");
             break;
-            
          case skyui.defines.Inventory.ICT_POTION:
          case skyui.defines.Inventory.ICT_FOOD:
             this.gotoAndStop("Potions_reg");
@@ -297,7 +270,6 @@ class ItemCard extends MovieClip
             this.ShrinkToFit(this.PotionsLabel);
             this.SkillTextInstance.text = aUpdateObj.skillName != undefined ? aUpdateObj.skillName : "";
             break;
-            
          case skyui.defines.Inventory.ICT_SPELL_DEFAULT:
             this.gotoAndStop("Power_reg");
             this.MagicEffectsLabel.SetText(aUpdateObj.effects,true);
@@ -315,7 +287,6 @@ class ItemCard extends MovieClip
             this.MagicCostLabel._alpha = 100;
             this.MagicCostValue.text = aUpdateObj.spellCost.toString();
             break;
-            
          case skyui.defines.Inventory.ICT_SPELL:
             _loc6_ = aUpdateObj.castTime == 0;
             if(_loc6_)
@@ -338,7 +309,6 @@ class ItemCard extends MovieClip
             }
             this.MagicCostValue.text = aUpdateObj.spellCost.toString();
             break;
-            
          case skyui.defines.Inventory.ICT_INGREDIENT:
             this.gotoAndStop("Ingredients_reg");
             _loc7_ = 0;
@@ -362,11 +332,9 @@ class ItemCard extends MovieClip
                _loc7_ += 1;
             }
             break;
-            
          case skyui.defines.Inventory.ICT_MISC:
             this.gotoAndStop("Misc_reg");
             break;
-            
          case skyui.defines.Inventory.ICT_SHOUT:
             this.gotoAndStop("Shouts_reg");
             _loc8_ = 0;
@@ -409,7 +377,6 @@ class ItemCard extends MovieClip
             this.ShrinkToFit(this.ShoutEffectsLabel);
             this.ShoutCostValue.text = aUpdateObj.spellCost.toString();
             break;
-            
          case skyui.defines.Inventory.ICT_ACTIVE_EFFECT:
             this.gotoAndStop("ActiveEffects");
             this.MagicEffectsLabel.SetText(aUpdateObj.effects,true);
@@ -455,12 +422,10 @@ class ItemCard extends MovieClip
             this.ActiveEffectTimeValue._alpha = 0;
             this.SecsText._alpha = 0;
             break;
-            
          case skyui.defines.Inventory.ICT_SOUL_GEMS:
             this.gotoAndStop("SoulGem");
             this.SoulLevel.text = aUpdateObj.soulLVL;
             break;
-            
          case skyui.defines.Inventory.ICT_LIST:
             this.gotoAndStop("Item_list");
             if(aUpdateObj.listItems != undefined)
@@ -473,7 +438,6 @@ class ItemCard extends MovieClip
                this.OpenListMenu();
             }
             break;
-            
          case skyui.defines.Inventory.ICT_CRAFT_ENCHANTING:
          case skyui.defines.Inventory.ICT_HOUSE_PART:
             if(aUpdateObj.type == skyui.defines.Inventory.ICT_HOUSE_PART)
@@ -558,13 +522,11 @@ class ItemCard extends MovieClip
             this.Enchanting_Slim_Background._alpha = 60;
             this.Enchanting_Background._alpha = 0;
             break;
-            
          case skyui.defines.Inventory.ICT_KEY:
          case skyui.defines.Inventory.ICT_NONE:
          default:
             this.gotoAndStop("Empty");
       }
-      
       this.SetupItemName(_loc3_);
       var _loc13_;
       if(aUpdateObj.name != undefined)
@@ -586,35 +548,20 @@ class ItemCard extends MovieClip
       this.StolenTextInstance._visible = aUpdateObj.stolen == true;
       this.LastUpdateObj = aUpdateObj;
    }
-   
    function RoundDecimal(aNumber, aPrecision)
    {
       var _loc3_ = Math.pow(10,aPrecision);
       return Math.round(_loc3_ * aNumber) / _loc3_;
    }
-   
    function PrepareInputElements(aActiveClip)
    {
       this._activeMenuMode = aActiveClip;
       var exp:Number = this._textExpansion;
 
-      this._origQuantitySlider._y   = ItemCard.OFFSCREEN_Y;
-      this._origEnchantingSlider._y = ItemCard.OFFSCREEN_Y;
-      this.SliderValueText._y       = ItemCard.OFFSCREEN_Y;
-      this.ButtonRect._y            = ItemCard.OFFSCREEN_Y;
-      this.CardList_mc._y           = ItemCard.OFFSCREEN_Y;
-
       this._origQuantitySlider._alpha   = 0;
       this._origEnchantingSlider._alpha = 0;
       this.ButtonRect._alpha            = 0;
       this.CardList_mc._alpha           = 0;
-
-      var sliderActive:Boolean = false;
-
-      if (aActiveClip == undefined) {
-         this._applyBackgroundHeight(exp, false);
-         return;
-      }
 
       var sm:Number = ItemCard.SLIDER_MARGIN;
 
@@ -624,7 +571,6 @@ class ItemCard extends MovieClip
          this.ButtonRect._y                = ItemCard.BASE_Y_ENCHANT_BUTTON  + exp + sm;
          this._origEnchantingSlider._alpha = 100;
          this.ButtonRect._alpha            = 100;
-         sliderActive = true;
       }
       else if (aActiveClip == this._origQuantitySlider)
       {
@@ -633,7 +579,6 @@ class ItemCard extends MovieClip
          this.ButtonRect._y              = ItemCard.BASE_Y_QUANTITY_BUTTON + exp + sm;
          this._origQuantitySlider._alpha = 100;
          this.ButtonRect._alpha          = 100;
-         sliderActive = true;
       }
       else if (aActiveClip == this.CardList_mc)
       {
@@ -645,20 +590,13 @@ class ItemCard extends MovieClip
          this.ButtonRect._y     = ItemCard.BASE_Y_QUANTITY_BUTTON + exp;
          this.ButtonRect._alpha = 100;
       }
-
-      this._applyBackgroundHeight(exp, sliderActive);
    }
-   
    function ShowEnchantingSlider(aiMaxValue, aiMinValue, aiCurrentValue)
    {
-      this._hadSlider = true;
       this.gotoAndStop("Craft_Enchanting");
-
-      this.QuantitySlider_mc = this._origEnchantingSlider; 
+      this.QuantitySlider_mc = this.EnchantingSlider_mc;
       this.QuantitySlider_mc.addEventListener("change",this,"onSliderChange");
-      
-      this.PrepareInputElements(this._origEnchantingSlider);
-      
+      this.PrepareInputElements(this.EnchantingSlider_mc);
       this.QuantitySlider_mc.maximum = aiMaxValue;
       this.QuantitySlider_mc.minimum = aiMinValue;
       this.QuantitySlider_mc.value = aiCurrentValue;
@@ -667,12 +605,9 @@ class ItemCard extends MovieClip
       this.InputHandler = this.HandleQuantityMenuInput;
       this.dispatchEvent({type:"subMenuAction",opening:true,menu:"quantity"});
    }
-
    function ShowQuantityMenu(aiMaxAmount)
    {
-      this._hadSlider = true;
       this.gotoAndStop("Quantity");
-      
       this.QuantitySlider_mc = this._origQuantitySlider;
       
       this.PrepareInputElements(this._origQuantitySlider);
@@ -686,17 +621,14 @@ class ItemCard extends MovieClip
       this.InputHandler = this.HandleQuantityMenuInput;
       this.dispatchEvent({type:"subMenuAction",opening:true,menu:"quantity"});
    }
-   
    function HideQuantityMenu(abCanceled)
    {
       gfx.managers.FocusHandler.instance.setFocus(this.PrevFocus,0);
-      this.PrepareInputElements(undefined);
       this.QuantitySlider_mc._alpha = 0;
       this.ButtonRect_mc._alpha = 0;
       this.InputHandler = undefined;
       this.dispatchEvent({type:"subMenuAction",opening:false,canceled:abCanceled,menu:"quantity"});
    }
-   
    function OpenListMenu()
    {
       this.PrevFocus = gfx.managers.FocusHandler.instance.getFocus(0);
@@ -711,7 +643,6 @@ class ItemCard extends MovieClip
       this.InputHandler = this.HandleListMenuInput;
       this.dispatchEvent({type:"subMenuAction",opening:true,menu:"list"});
    }
-   
    function HideListMenu()
    {
       gfx.managers.FocusHandler.instance.setFocus(this.PrevFocus,0);
@@ -722,7 +653,6 @@ class ItemCard extends MovieClip
       this.ItemList._visible = true;
       this.dispatchEvent({type:"subMenuAction",opening:false,menu:"list"});
    }
-   
    function ShowConfirmMessage(astrMessage)
    {
       this.gotoAndStop("ConfirmMessage");
@@ -735,7 +665,6 @@ class ItemCard extends MovieClip
       this.InputHandler = this.HandleConfirmMessageInput;
       this.dispatchEvent({type:"subMenuAction",opening:true,menu:"message"});
    }
-   
    function HideConfirmMessage()
    {
       gfx.managers.FocusHandler.instance.setFocus(this.PrevFocus,0);
@@ -743,7 +672,6 @@ class ItemCard extends MovieClip
       this.InputHandler = undefined;
       this.dispatchEvent({type:"subMenuAction",opening:false,menu:"message"});
    }
-   
    function StartEditName(aInitialText, aiMaxChars)
    {
       if(Selection.getFocus() != this.ItemName)
@@ -764,7 +692,6 @@ class ItemCard extends MovieClip
          this._bEditNameMode = true;
       }
    }
-   
    function EndEditName()
    {
       this.ItemName.type = "dynamic";
@@ -779,7 +706,6 @@ class ItemCard extends MovieClip
       this.dispatchEvent({type:"subMenuAction",opening:false,menu:"editName"});
       this._bEditNameMode = false;
    }
-   
    function handleInput(details, pathToFocus)
    {
       var _loc4_ = false;
@@ -793,7 +719,6 @@ class ItemCard extends MovieClip
       }
       return _loc4_;
    }
-   
    function HandleQuantityMenuInput(details)
    {
       var _loc3_ = false;
@@ -821,7 +746,6 @@ class ItemCard extends MovieClip
       }
       return _loc3_;
    }
-   
    function HandleListMenuInput(details)
    {
       var _loc3_ = false;
@@ -832,7 +756,6 @@ class ItemCard extends MovieClip
       }
       return _loc3_;
    }
-   
    function HandleConfirmMessageInput(details)
    {
       var _loc3_ = false;
@@ -854,7 +777,6 @@ class ItemCard extends MovieClip
       }
       return _loc3_;
    }
-   
    function HandleEditNameInput(details)
    {
       Selection.setFocus(this.ItemName,0);
@@ -871,7 +793,6 @@ class ItemCard extends MovieClip
       }
       return true;
    }
-   
    function onSliderChange()
    {
       var _loc2_ = this.EnchantingSlider_mc._alpha > 0 ? this.TotalChargesValue : this.SliderValueText;
@@ -884,13 +805,11 @@ class ItemCard extends MovieClip
          this.dispatchEvent({type:"sliderChange",value:_loc4_});
       }
    }
-   
    function onListItemPress(event)
    {
       this.dispatchEvent(event);
       this.HideListMenu();
    }
-   
    function onListMouseSelectionChange(event)
    {
       if(event.keyboardOrMouse == 0)
@@ -898,7 +817,6 @@ class ItemCard extends MovieClip
          this.onListSelectionChange(event);
       }
    }
-   
    function onListSelectionChange(event)
    {
       this.ItemCardMeters[skyui.defines.Inventory.ICT_LIST].SetDeltaPercent(this.ItemList.selectedEntry.chargeAdded + this.LastUpdateObj.currentCharge);
@@ -914,138 +832,35 @@ class ItemCard extends MovieClip
       }
 
       if (tf.origHeight == undefined) tf.origHeight = tf._height;
-      if (tf.origY      == undefined) tf.origY      = tf._y;
-
-      this._restoreStaticElements();
 
       tf._height      = tf.origHeight;
       tf.multiline    = true;
       tf.wordWrap     = true;
       tf.textAutoSize = "none";
+
       tf.SetText(tf.htmlText, true);
 
       if (tf.numLines <= 0) {
          return;
       }
 
-      var lineH:Number     = tf.getLineMetrics(0).height;
-      var neededH:Number   = lineH * tf.numLines;
+      var lineH:Number   = tf.getLineMetrics(0).height;
+      var neededH:Number = lineH * tf.numLines;
+
+      var maxExp:Number = ItemCard.TF_MAX_EXPANSION;
       var expansion:Number = 0;
 
-      var maxExp:Number = ItemCard.TF_MAX_EXPANSION + (this._hadSlider && this._activeMenuMode == undefined ? ItemCard.SLIDER_HIDDEN_PADDING : 0);
       if (neededH > tf.origHeight) {
-         expansion  = Math.min(neededH - tf.origHeight, maxExp);
+         expansion = Math.min(neededH - tf.origHeight, maxExp);
          tf._height = tf.origHeight + expansion;
       }
 
-      this._shrinkFont(tf);
-
       this._textExpansion = expansion;
-      if (expansion > 0) {
-         this._pushStaticElementsDown(tf.origY, expansion);
-      }
 
-      this._applyBackgroundHeight(expansion, false);
+      this._shrinkFont(tf);
+      
       if (this._activeMenuMode != undefined) {
          this.PrepareInputElements(this._activeMenuMode);
-      }
-
-      this._lastShrinkField = tf;
-   }
-
-   function _getSliderBaseY()
-   {
-      if (this._activeMenuMode == this._origQuantitySlider)   return ItemCard.BASE_Y_QUANTITY_SLIDER;
-      if (this._activeMenuMode == this._origEnchantingSlider) return ItemCard.BASE_Y_ENCHANT_SLIDER;
-      return 10000;
-   }
-
-   function _getBackground()
-   {
-      if (this.Enchanting_Slim_Background != undefined && this.Enchanting_Slim_Background._alpha > 0) {
-         return this.Enchanting_Slim_Background;
-      }
-      if (this.Enchanting_Background != undefined && this.Enchanting_Background._alpha > 0) {
-         return this.Enchanting_Background;
-      }
-      return this.background;
-   }
-
-   function _applyBackgroundHeight(expansion:Number, sliderActive:Boolean)
-   {
-      var bg = this._getBackground();
-      if (bg == undefined) {
-         return;
-      }
-      if (bg.origHeight == undefined) bg.origHeight = bg._height;
-
-      var extra:Number;
-      if (sliderActive) {
-         extra = ItemCard.SLIDER_MARGIN;
-      } else if (this._hadSlider) {
-         extra = ItemCard.SLIDER_HIDDEN_PADDING;
-      } else {
-         extra = 0;
-      }
-
-      bg._height = bg.origHeight + expansion + extra + ItemCard.BG_BOTTOM_PADDING;
-   }
-
-   function _isInputElement(obj)
-   {
-      return obj == this._origQuantitySlider
-         || obj == this._origEnchantingSlider
-         || obj == this.ButtonRect
-         || obj == this.SliderValueText
-         || obj == this.CardList_mc;
-   }
-
-   function _isLayoutChild(obj)
-   {
-      return (obj instanceof MovieClip || obj instanceof TextField)
-         && obj._parent == this
-         && obj != this.ItemText
-         && obj != this.ItemText.ItemTextField;
-   }
-   
-   function _restoreStaticElements()
-   {
-      this._textExpansion = 0;
-
-      var bg = this._getBackground();
-      if (bg != undefined) {
-         if (bg.origHeight == undefined) bg.origHeight = bg._height;
-         if (bg.origY      == undefined) bg.origY      = bg._y;
-         bg._height = bg.origHeight;
-      }
-
-      for (var prop in this) {
-         var obj = this[prop];
-         if (!this._isLayoutChild(obj)) continue;
-         if (this._isInputElement(obj)) continue;
-         if (obj == bg)                 continue;
-
-         if (obj.origY      == undefined) obj.origY      = obj._y;
-         if (obj.origHeight == undefined) obj.origHeight  = obj._height;
-         obj._y      = obj.origY;
-         obj._height = obj.origHeight;
-      }
-   }
-
-   function _pushStaticElementsDown(belowY:Number, amount:Number)
-   {
-      var bg = this._getBackground();
-
-      for (var prop in this) {
-         var obj = this[prop];
-         if (!this._isLayoutChild(obj)) continue;
-         if (this._isInputElement(obj)) continue;
-         if (obj == bg)                 continue;
-
-         if (obj.origY == undefined) obj.origY = obj._y;
-         if (obj.origY > belowY) {
-            obj._y = obj.origY + amount;
-         }
       }
    }
 
@@ -1062,132 +877,6 @@ class ItemCard extends MovieClip
          fontSize--;
          fmt.size = fontSize;
          tf.setTextFormat(fmt);
-      }
-   }
-   
-   function onKeyDown()
-   {
-      var keyCode = Key.getCode();
-
-      if (keyCode == 49) {
-         this.itemInfo = {
-            type: skyui.defines.Inventory.ICT_ARMOR,
-            name: "Iron Armor",
-            armor: "25",
-            weight: 30,
-            value: 125,
-            effects: "<font color='#FF0000'>Burns</font> the target for <font color='#FFFFFF'>50</font> points of fire damage. Targets on fire take extra damage. <font color='#00FFFF'>Freezes</font> the target for 50 points of frost damage to Health and Stamina. If the target dies within 10 seconds, fills a soul gem. This description is intentionally long to test the expansion of the weapon card and the font shrinking logic.",
-            stolen: false
-         };
-      }
-      else if (keyCode == 50) {
-         this.itemInfo = {
-            type: skyui.defines.Inventory.ICT_ARMOR,
-            name: "Godly Plate of the Whale",
-            armor: "150",
-            weight: 45,
-            value: 15000,
-            effects: "This is a very long enchantment description designed to test if the ShrinkToFit function properly expands the background and pushes the weight and value labels further down without breaking the layout of the card. It should wrap into multiple lines and trigger the expansion logic.",
-            warmth: 20,
-            stolen: true
-         };
-      }
-      else if (keyCode == 51) {
-         this.itemInfo = {
-            type: skyui.defines.Inventory.ICT_WEAPON,
-            name: "Chillrend",
-            damage: "45",
-            weight: 12,
-            value: 1400,
-            effects: "Target takes 30 points of frost damage. Low chance to paralyze the target for 2 seconds.",
-            usedCharge: 40,
-            charge: 100,
-            poisoned: true
-         };
-      }
-      else if (keyCode == 52) {
-         this.itemInfo = {
-            type: skyui.defines.Inventory.ICT_CRAFT_ENCHANTING,
-            name: "Dragonscale Boots of Extreme Stamina",
-            armor: "40",
-            weight: 5,
-            value: 2000,
-            effects: "Increases your Stamina by 70 points. Increases your Stamina by 70 points. Increases your Stamina by 70 points. Increases your Stamina by 70 points.Increases your Stamina by 70 points.",
-            sliderShown: true,
-            totalCharges: 500,
-            usedCharge: 0
-         };
-         this.ShowEnchantingSlider(500, 10, 250);
-      }
-      else if (keyCode == 53) {
-         this.itemInfo = {
-            type: skyui.defines.Inventory.ICT_MISC,
-            name: "Gold Ingot",
-            weight: 1,
-            value: 100
-         };
-         this.ShowQuantityMenu(123);
-      }
-      else if (keyCode == 54) {
-         this.itemInfo = {
-            type: skyui.defines.Inventory.ICT_SHOUT,
-            name: "Unrelenting Force",
-            weight: 0,
-            value: 0,
-            effects: "Your voice is raw power, pushing aside anything - or anyone - who stands in your path. Your voice is raw power, pushing aside anything - or anyone - who stands in your path.",
-            spellCost: 1,
-            dragonWord0: "Fus",
-            word0: "Force",
-            unlocked0: true,
-            dragonWord1: "Ro",
-            word1: "Balance",
-            unlocked1: true,
-            dragonWord2: "Dah",
-            word2: "Push",
-            unlocked2: true,
-            soulSpent: false
-         };
-      }
-      else if (keyCode == 55) {
-         this.itemInfo = {
-            type: skyui.defines.Inventory.ICT_SPELL,
-            name: "Fireball",
-            weight: 0,
-            value: 0,
-            effects: "A ball of fire that explodes on impact, dealing 40 points of fire damage to all nearby targets. Deals extra damage to targets already on fire. A ball of fire that explodes on impact, dealing 40 points of fire damage to all nearby targets. Deals extra damage to targets already on fire.",
-            spellCost: 12345,
-            castTime: 1.5,
-            castLevel: "Adept"
-         };
-      }
-      else if (keyCode == 56) {
-         this.itemInfo = {
-            type: skyui.defines.Inventory.ICT_POTION,
-            name: "Potion of Ultimate Healing",
-            weight: 0.5,
-            value: 250,
-            effects: "Restore 150 points of Health. Also cures all diseases and poisons. This potion was brewed using rare ingredients found only in the deepest caves of Skyrim. The alchemist spent years perfecting the formula.",
-            skillName: "Alchemy"
-         };
-      }
-      else if (keyCode == 57) {
-         this.itemInfo = {
-            type: skyui.defines.Inventory.ICT_INGREDIENT,
-            name: "Nirnroot",
-            weight: 0.2,
-            value: 10,
-            numItemEffects: 4,
-            itemEffect0: "Damage Health",
-            itemEffect1: "Damage Stamina",
-            itemEffect2: "Invisibility",
-            itemEffect3: "Resist Magic"
-         };
-      }
-      else if (keyCode == 48) {
-         this.itemInfo = { type: skyui.defines.Inventory.ICT_NONE, name: "" };
-         if (this.InputHandler != undefined) {
-            this.HideQuantityMenu(true);
-         }
       }
    }
 }
