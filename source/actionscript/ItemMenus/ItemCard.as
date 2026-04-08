@@ -822,27 +822,32 @@ class ItemCard extends MovieClip
 
       if (tf.origHeight == undefined) tf.origHeight = tf._height;
 
-      tf._height      = tf.origHeight;
+      tf._height = tf.origHeight;
       tf.textAutoSize = "none";
-      tf.multiline    = true;
-      tf.wordWrap     = true;
+      tf.multiline = true;
+      tf.wordWrap = true;
 
       tf.SetText(tf.htmlText, true);
 
-      if (tf.numLines <= 0) return;
-
       var maxExp:Number = ItemCard.TF_MAX_EXPANSION;
-      var expansion:Number = 0;
-
+      
       tf._height = tf.origHeight + maxExp;
-      this._shrinkFont(tf);
 
-      if (tf.textHeight > tf.origHeight) {
-         expansion = Math.min(tf.textHeight - tf.origHeight, maxExp);
+      if (tf.textHeight >= tf._height)
+      {
+         this._shrinkFont(tf);
       }
+
+      var expansion:Number = Math.min(
+         Math.max(tf.textHeight - tf.origHeight, 0),
+         maxExp
+      );
       tf._height = tf.origHeight + expansion;
 
-      if (tf.textHeight >= tf._height) {
+      var needsEllipsis:Boolean = (tf.maxscroll > 1) || (tf.bottomScroll < tf.maxscroll);
+
+      if (needsEllipsis)
+      {
          this._applyEllipsis(tf);
       }
    }
@@ -852,28 +857,61 @@ class ItemCard extends MovieClip
       if (tf.numLines == 0) return;
 
       var fmt:TextFormat = tf.getTextFormat();
-      var fontSize:Number = fmt.size;
+      var minSize:Number = ItemCard.MIN_FONT_SIZE;
+      var maxSize:Number = fmt.size;
+      var bestSize:Number = minSize;
 
-      while (tf.textHeight >= tf._height && fontSize > ItemCard.MIN_FONT_SIZE)
+      while (minSize <= maxSize)
       {
-         fontSize--;
-         fmt.size = fontSize;
+         var mid:Number = Math.floor((minSize + maxSize) / 2);
+         fmt.size = mid;
          tf.setTextFormat(fmt);
+
+         if (tf.textHeight <= tf._height)
+         {
+            bestSize = mid;
+            minSize = mid + 1;
+         }
+         else
+         {
+            maxSize = mid - 1;
+         }
       }
+
+      fmt.size = bestSize;
+      tf.setTextFormat(fmt);
    }
 
    function _applyEllipsis(tf:TextField)
    {
-      var text:String = tf.htmlText;
+      var original:String = tf.htmlText;
       var ellipsis:String = "...";
-
       var fmt:TextFormat = tf.getTextFormat();
+      
+      var left:Number = 0;
+      var right:Number = original.length;
+      var best:String = original;
 
-      while (tf.textHeight >= tf._height && text.length > 0)
+      while (left <= right)
       {
-         text = text.substr(0, text.length - 1);
-         tf.htmlText = text + ellipsis;
+         var mid:Number = Math.floor((left + right) / 2);
+         var test:String = original.substr(0, mid) + ellipsis;
+
+         tf.htmlText = test;
          tf.setTextFormat(fmt);
+
+         if (tf.maxscroll == 1)
+         {
+            best = test;
+            left = mid + 1;
+         }
+         else
+         {
+            right = mid - 1;
+         }
       }
+
+      tf.htmlText = best;
+      tf.setTextFormat(fmt);
    }
 }
