@@ -824,7 +824,6 @@ class ItemCard extends MovieClip
 
       tf._height      = tf.origHeight;
       tf.textAutoSize = "none";
-      tf.SetText(tf.htmlText, true);
       tf.multiline    = true;
       tf.wordWrap     = true;
 
