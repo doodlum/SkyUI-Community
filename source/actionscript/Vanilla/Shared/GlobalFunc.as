@@ -294,11 +294,15 @@ class Shared.GlobalFunc
          var availableHeight:Number = tf.origHeight + tf.maxHeightExpand;
          tf._height = availableHeight;
 
-         if (tf.textHeight >= tf._height) {
+         var fmt:TextFormat = tf.getTextFormat();
+         var metrics:Object = fmt.getTextExtent(tf.text, tf._width);
+
+         if (metrics.textFieldHeight > tf._height) {
             Shared.GlobalFunc._shrinkFontToFit(tf);
          }
 
-         var expansion:Number = Math.min(Math.max(tf.textHeight - tf.origHeight, 0), tf.maxHeightExpand);
+         metrics = tf.getTextFormat().getTextExtent(tf.text, tf._width);
+         var expansion:Number = Math.min(Math.max(metrics.textFieldHeight - tf.origHeight, 0), tf.maxHeightExpand);
          tf._height = tf.origHeight + expansion;
       }
 
@@ -319,7 +323,8 @@ class Shared.GlobalFunc
          fmt.size = mid;
          tf.setTextFormat(fmt);
 
-         if (tf.textHeight < tf._height) {
+         // +4 (2 pixel gutter) = textFieldHeight
+         if ((tf.textHeight + 4) < tf._height) {
             bestSize = mid;
             minSize = mid + 1;
          } else {
