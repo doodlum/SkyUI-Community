@@ -51,10 +51,6 @@ class ItemCard extends MovieClip
    var _bEditNameMode;
    var bFadedIn;
    var dispatchEvent;
-
-   static var MIN_FONT_SIZE:Number       = 10;
-   static var TF_MAX_EXPANSION:Number    = 0;
-
    static var SKYUI_RELEASE_IDX = 2018;
    static var SKYUI_VERSION_MAJOR = 5;
    static var SKYUI_VERSION_MINOR = 2;
@@ -200,7 +196,9 @@ class ItemCard extends MovieClip
             this.ApparelArmorValue.textAutoSize = "shrink";
             this.ApparelArmorValue.SetText(aUpdateObj.armor);
             this.ApparelEnchantedLabel.htmlText = aUpdateObj.effects;
-            this.ShrinkToFit(this.ApparelEnchantedLabel);
+            this.ApparelEnchantedLabel.enableShrinkToFit = true;
+            this.ApparelEnchantedLabel.overflowMode = "ellipsis";
+            this.ApparelEnchantedLabel.SetText(aUpdateObj.effects, true);
             this.SkillTextInstance.text = aUpdateObj.skillText;
             break;
          case skyui.defines.Inventory.ICT_WEAPON:
@@ -231,14 +229,17 @@ class ItemCard extends MovieClip
             this.WeaponDamageValue.textAutoSize = "shrink";
             this.WeaponDamageValue.SetText(aUpdateObj.damage);
             this.WeaponEnchantedLabel.htmlText = aUpdateObj.effects;
-            this.ShrinkToFit(this.WeaponEnchantedLabel);
+            this.WeaponEnchantedLabel.enableShrinkToFit = true;
+            this.WeaponEnchantedLabel.overflowMode = "ellipsis";
+            this.WeaponEnchantedLabel.SetText(aUpdateObj.effects, true);
             break;
          case skyui.defines.Inventory.ICT_BOOK:
             if(aUpdateObj.description != undefined && aUpdateObj.description != "")
             {
                this.gotoAndStop("Books_Description");
+               this.BookDescriptionLabel.enableShrinkToFit = true;
+               this.BookDescriptionLabel.overflowMode = "ellipsis";
                this.BookDescriptionLabel.SetText(aUpdateObj.description, true);
-               this.ShrinkToFit(this.BookDescriptionLabel);
                break;
             }
             this.gotoAndStop("Books_reg");
@@ -247,13 +248,16 @@ class ItemCard extends MovieClip
          case skyui.defines.Inventory.ICT_FOOD:
             this.gotoAndStop("Potions_reg");
             this.PotionsLabel.htmlText = aUpdateObj.effects;
-            this.ShrinkToFit(this.PotionsLabel);
+            this.PotionsLabel.enableShrinkToFit = true;
+            this.PotionsLabel.overflowMode = "ellipsis";
+            this.PotionsLabel.SetText(aUpdateObj.effects, true);
             this.SkillTextInstance.text = aUpdateObj.skillName != undefined ? aUpdateObj.skillName : "";
             break;
          case skyui.defines.Inventory.ICT_SPELL_DEFAULT:
             this.gotoAndStop("Power_reg");
+            this.MagicEffectsLabel.enableShrinkToFit = true;
+            this.MagicEffectsLabel.overflowMode = "ellipsis";
             this.MagicEffectsLabel.SetText(aUpdateObj.effects,true);
-            this.ShrinkToFit(this.MagicEffectsLabel);
             if(aUpdateObj.spellCost <= 0)
             {
                this.MagicCostValue._alpha = 0;
@@ -278,8 +282,9 @@ class ItemCard extends MovieClip
                this.gotoAndStop("Magic_reg");
             }
             this.SkillLevelText.text = aUpdateObj.castLevel.toString();
+            this.MagicEffectsLabel.enableShrinkToFit = true;
+            this.MagicEffectsLabel.overflowMode = "ellipsis";
             this.MagicEffectsLabel.SetText(aUpdateObj.effects,true);
-            this.ShrinkToFit(this.MagicEffectsLabel);
             this.MagicCostValue.textAutoSize = "shrink";
             this.MagicCostTimeValue.textAutoSize = "shrink";
             if(_loc6_)
@@ -354,13 +359,16 @@ class ItemCard extends MovieClip
                _loc7_ += 1;
             }
             this.ShoutEffectsLabel.htmlText = aUpdateObj.effects;
-            this.ShrinkToFit(this.ShoutEffectsLabel);
+            this.ShoutEffectsLabel.enableShrinkToFit = true;
+            this.ShoutEffectsLabel.overflowMode = "ellipsis";
+            this.ShoutEffectsLabel.SetText(aUpdateObj.effects, true);
             this.ShoutCostValue.text = aUpdateObj.spellCost.toString();
             break;
          case skyui.defines.Inventory.ICT_ACTIVE_EFFECT:
             this.gotoAndStop("ActiveEffects");
+            this.MagicEffectsLabel.enableShrinkToFit = true;
+            this.MagicEffectsLabel.overflowMode = "ellipsis";
             this.MagicEffectsLabel.SetText(aUpdateObj.effects,true);
-            this.ShrinkToFit(this.MagicEffectsLabel);
             if(aUpdateObj.timeRemaining > 0)
             {
                _loc12_ = Math.floor(aUpdateObj.timeRemaining);
@@ -486,8 +494,9 @@ class ItemCard extends MovieClip
             {
                if(this.EnchantmentLabel != undefined)
                {
+                  this.EnchantmentLabel.enableShrinkToFit = true;
+                  this.EnchantmentLabel.overflowMode = "ellipsis";
                   this.EnchantmentLabel.SetText(aUpdateObj.effects,true);
-                  this.ShrinkToFit(this.EnchantmentLabel);
                }
                this.WeaponChargeMeter._alpha = 100;
                this.Enchanting_Background._alpha = 60;
@@ -904,7 +913,7 @@ class ItemCard extends MovieClip
          {
             best = test;
             left = mid + 1;
-         }
+      }
          else
          {
             right = mid - 1;
