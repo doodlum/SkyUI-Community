@@ -19,7 +19,6 @@
         {
             "name": "debug",
             "displayName": "Debug",
-            "generator": "Ninja",
             "description": "Compile scripts and SWFs, deploy directly to MOD_DEBUG_PATH. No BSA, no ZIP.",
             "inherits": "_base",
             "binaryDir": "${sourceDir}/build/debug",
@@ -37,7 +36,6 @@
         {
             "name": "release",
             "displayName": "Release",
-            "generator": "Ninja",
             "description": "Full pipeline: compile -> BSA -> SkyUI_SE-<version>.zip",
             "inherits": "_base",
             "binaryDir": "${sourceDir}/build/release",
