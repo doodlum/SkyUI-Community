@@ -302,11 +302,8 @@ class Shared.GlobalFunc
          tf._height = tf.origHeight + expansion;
       }
 
-      if (tf.overflowMode == "ellipsis") {
-         var needsEllipsis:Boolean = (tf.maxscroll > 1) || (tf.bottomScroll < tf.maxscroll);
-         if (needsEllipsis) {
-            Shared.GlobalFunc._applyEllipsis(tf);
-         }
+      if (tf.overflowMode == "ellipsis" && tf.maxscroll > 1) {
+         Shared.GlobalFunc._applyEllipsis(tf);
       }
    }
    
@@ -322,7 +319,7 @@ class Shared.GlobalFunc
          fmt.size = mid;
          tf.setTextFormat(fmt);
 
-         if (tf.textHeight <= tf._height) {
+         if (tf.textHeight < tf._height) {
             bestSize = mid;
             minSize = mid + 1;
          } else {

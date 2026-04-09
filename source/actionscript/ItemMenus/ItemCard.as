@@ -195,7 +195,6 @@ class ItemCard extends MovieClip
             this.ApparelWarmthValue.SetText(aUpdateObj.warmth);
             this.ApparelArmorValue.textAutoSize = "shrink";
             this.ApparelArmorValue.SetText(aUpdateObj.armor);
-            this.ApparelEnchantedLabel.htmlText = aUpdateObj.effects;
             this.ApparelEnchantedLabel.enableShrinkToFit = true;
             this.ApparelEnchantedLabel.overflowMode = "ellipsis";
             this.ApparelEnchantedLabel.SetText(aUpdateObj.effects, true);
@@ -228,7 +227,6 @@ class ItemCard extends MovieClip
             this.PoisonInstance.gotoAndStop(_loc5_);
             this.WeaponDamageValue.textAutoSize = "shrink";
             this.WeaponDamageValue.SetText(aUpdateObj.damage);
-            this.WeaponEnchantedLabel.htmlText = aUpdateObj.effects;
             this.WeaponEnchantedLabel.enableShrinkToFit = true;
             this.WeaponEnchantedLabel.overflowMode = "ellipsis";
             this.WeaponEnchantedLabel.SetText(aUpdateObj.effects, true);
@@ -247,7 +245,6 @@ class ItemCard extends MovieClip
          case skyui.defines.Inventory.ICT_POTION:
          case skyui.defines.Inventory.ICT_FOOD:
             this.gotoAndStop("Potions_reg");
-            this.PotionsLabel.htmlText = aUpdateObj.effects;
             this.PotionsLabel.enableShrinkToFit = true;
             this.PotionsLabel.overflowMode = "ellipsis";
             this.PotionsLabel.SetText(aUpdateObj.effects, true);
@@ -358,7 +355,6 @@ class ItemCard extends MovieClip
                }
                _loc7_ += 1;
             }
-            this.ShoutEffectsLabel.htmlText = aUpdateObj.effects;
             this.ShoutEffectsLabel.enableShrinkToFit = true;
             this.ShoutEffectsLabel.overflowMode = "ellipsis";
             this.ShoutEffectsLabel.SetText(aUpdateObj.effects, true);
