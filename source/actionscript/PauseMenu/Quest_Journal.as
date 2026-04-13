@@ -269,9 +269,9 @@ class Quest_Journal extends MovieClip
    {
       var focusedAlpha = this.bTabFocused ? 100 : 85;
 
-      this.QuestsTab._alpha = (this.iCurrentTab == 0) ? focusedAlpha : 60;
-      this.StatsTab._alpha  = (this.iCurrentTab == 1) ? focusedAlpha : 60;
-      this.SystemTab._alpha = (this.iCurrentTab == 2) ? focusedAlpha : 60;
+      this.QuestsTab._alpha = (this.iCurrentTab == this.PAGE_QUEST)  ? focusedAlpha : 60;
+      this.StatsTab._alpha  = (this.iCurrentTab == this.PAGE_STATS)  ? focusedAlpha : 60;
+      this.SystemTab._alpha = (this.iCurrentTab == this.PAGE_SYSTEM) ? focusedAlpha : 60;
    }
 
    function SetupTabMouseOver(aTab: MovieClip)
