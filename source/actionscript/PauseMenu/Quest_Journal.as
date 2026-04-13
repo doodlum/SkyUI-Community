@@ -135,7 +135,7 @@ class Quest_Journal extends MovieClip
          switch(details.navEquivalent)
          {
             case gfx.ui.NavigationCode.UP:
-               if (!this.bTabFocused) {
+               if (!this.bTabFocused && this.IsFocusOnRootList(pathToFocus)) {
                   this.SetTabFocus(true);
                   _loc6_ = true;
                }
@@ -332,5 +332,25 @@ class Quest_Journal extends MovieClip
 
          list.UpdateList();
       }
+   }
+
+   function IsFocusOnRootList(pathToFocus: Array)
+   {
+      var currentPage = this.PageArray[this.iCurrentTab];
+      var rootList = (currentPage.TitleList != undefined) ? currentPage.TitleList : currentPage.CategoryList;
+      
+      if (rootList == undefined) {
+         return true;
+      }
+      
+      if (pathToFocus != undefined) {
+         for (var i = 0; i < pathToFocus.length; i++) {
+            if (pathToFocus[i] == rootList) {
+               return true;
+            }
+         }
+      }
+      
+      return false;
    }
 }
