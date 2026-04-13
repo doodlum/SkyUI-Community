@@ -96,40 +96,11 @@ class Quest_Journal extends MovieClip
    {
       var _loc6_ = false;
 
-      if (this.bTabFocused && Shared.GlobalFunc.IsKeyPressed(details, true))
+      if (this.bTabFocused && this.HandleTabFocusedInput(details))
       {
-         if (details.navEquivalent == gfx.ui.NavigationCode.LEFT)
-         {
-            this.ShiftTab(-1);
-            return true;
-         }
-         else if (details.navEquivalent == gfx.ui.NavigationCode.RIGHT)
-         {
-            this.ShiftTab(1);
-            return true;
-         }
-         else if (details.navEquivalent == gfx.ui.NavigationCode.DOWN)
-         {
-            this.bTabFocused = false;
-            this.UpdateFocusVisuals();
-
-            var currentPage = this.PageArray[this.iCurrentTab];
-            var list = (currentPage.TitleList != undefined) ? currentPage.TitleList : currentPage.CategoryList;
-
-            if (list != undefined)
-            {
-               gfx.managers.FocusHandler.instance.setFocus(list, 0);
-
-               if (list.selectedIndex == -1 && list.entryList.length > 0)
-               {
-                  list.doSetSelectedIndex(0, 0);
-               }
-            }
-
-            gfx.io.GameDelegate.call("PlaySound", ["UIMenuFocus"]);
-            return true;
-         }
+         return true;
       }
+
       if(!this.bTabFocused && pathToFocus != undefined && pathToFocus.length > 0)
       {
          _loc6_ = pathToFocus[0].handleInput(details,pathToFocus.slice(1));
@@ -261,21 +232,24 @@ class Quest_Journal extends MovieClip
 
    function ShiftTab(direction)
    {
-      if(!this.bTabsDisabled)
-      {
-         this.PageArray[this.iCurrentTab].endPage();
-         this.iCurrentTab += direction;
-         if(this.iCurrentTab < 0)
-         {
-            this.iCurrentTab = this.TabButtonGroup.length - 1;
-         }
-         if(this.iCurrentTab >= this.TabButtonGroup.length)
-         {
-            this.iCurrentTab = 0;
-         }
-         this.SwitchPageToFront(this.iCurrentTab, false);
-         this.TabButtonGroup.setSelectedButton(this.TabButtonGroup.getButtonAt(this.iCurrentTab));
-      }
+      if (this.bTabsDisabled)
+         return;
+
+      this.PageArray[this.iCurrentTab].endPage();
+
+      this.iCurrentTab += direction;
+
+      if (this.iCurrentTab < 0)
+         this.iCurrentTab = this.TabButtonGroup.length - 1;
+
+      if (this.iCurrentTab >= this.TabButtonGroup.length)
+         this.iCurrentTab = 0;
+
+      this.SwitchPageToFront(this.iCurrentTab, false);
+
+      this.TabButtonGroup.setSelectedButton(
+         this.TabButtonGroup.getButtonAt(this.iCurrentTab)
+      );
    }
 
    function SetTabFocus(abFocus)
@@ -288,13 +262,16 @@ class Quest_Journal extends MovieClip
    }
    function UpdateFocusVisuals()
    {
-      var currentTabAlpha = this.bTabFocused ? 100 : 80;
-      
-      this.QuestsTab._alpha = (this.iCurrentTab == 0) ? currentTabAlpha : 80;
-      this.StatsTab._alpha = (this.iCurrentTab == 1) ? currentTabAlpha : 80;
-      this.SystemTab._alpha = (this.iCurrentTab == 2) ? currentTabAlpha : 80;
+      this.UpdateTabVisuals();
+      this.ActivatePageList(this.GetCurrentPageList(), this.bTabFocused);
+   }
+   function UpdateTabVisuals()
+   {
+      var focusedAlpha = this.bTabFocused ? 100 : 85;
 
-      this.ConfigureCurrentPageList(this.bTabFocused);
+      this.QuestsTab._alpha = (this.iCurrentTab == 0) ? focusedAlpha : 60;
+      this.StatsTab._alpha  = (this.iCurrentTab == 1) ? focusedAlpha : 60;
+      this.SystemTab._alpha = (this.iCurrentTab == 2) ? focusedAlpha : 60;
    }
 
    function SetupTabMouseOver(aTab: MovieClip)
@@ -312,48 +289,114 @@ class Quest_Journal extends MovieClip
       };
    }
 
-   function ConfigureCurrentPageList(abNoSelectionMode: Boolean)
+   function HandleTabFocusedInput(details)
+   {
+      if (!Shared.GlobalFunc.IsKeyPressed(details, true))
+         return false;
+
+      if (details.navEquivalent == gfx.ui.NavigationCode.LEFT)
+      {
+         this.ShiftTab(-1);
+         return true;
+      }
+      else if (details.navEquivalent == gfx.ui.NavigationCode.RIGHT)
+      {
+         this.ShiftTab(1);
+         return true;
+      }
+      else if (details.navEquivalent == gfx.ui.NavigationCode.DOWN)
+      {
+         this.ActivateCurrentListFromTab();
+         return true;
+      }
+
+      return false;
+   }
+   function ActivateCurrentListFromTab()
+   {
+      var list = this.GetCurrentPageList();
+      
+      if (list == undefined || list.entryList.length == 0) {
+         this.bTabFocused = false;
+         this.UpdateFocusVisuals();
+         return;
+      }
+
+      this.bTabFocused = false;
+      this.UpdateFocusVisuals();
+
+      gfx.managers.FocusHandler.instance.setFocus(list, 0);
+
+      if (list.iNumTopHalfEntries != undefined) 
+      {
+         list.iSelectedIndex = -1; 
+         list.doSetSelectedIndex(list.scrollPosition, 0);
+      }
+      else 
+      {
+         if (list.selectedIndex == -1) {
+            list.doSetSelectedIndex(0, 0);
+         }
+      }
+
+      gfx.io.GameDelegate.call("PlaySound", ["UIMenuFocus"]);
+   }
+
+   function ActivatePageList(list, abNoSelectionMode)
+   {
+      if (list == undefined)
+         return;
+
+      list.bNoSelectionMode = abNoSelectionMode;
+
+      if (list.bPointerHighlight !== undefined)
+      {
+         list.bPointerHighlight = false;
+         list.bMouseDrivenNav = false;
+      }
+
+      if (abNoSelectionMode)
+      {
+         list.selectedIndex = -1;
+      }
+      else
+      {
+         if (list.selectedIndex == -1 && list.entryList.length > 0)
+         {
+            list.doSetSelectedIndex(0, 0);
+         }
+      }
+
+      list.UpdateList();
+   }
+   function GetCurrentPageList()
    {
       var currentPage = this.PageArray[this.iCurrentTab];
-      var list = (currentPage.TitleList != undefined) ? currentPage.TitleList : currentPage.CategoryList;
 
-      if (list != undefined)
-      {
-         if (list.bNoSelectionMode !== undefined) {
-            list.bNoSelectionMode = abNoSelectionMode;
-         }
+      if (currentPage == undefined)
+         return undefined;
 
-         if (list.bPointerHighlight !== undefined) {
-            list.bPointerHighlight = false;
-            list.bMouseDrivenNav = false;
-         }
-
-         if (abNoSelectionMode)
-         {
-            list.selectedIndex = -1;
-         }
-
-         list.UpdateList();
-      }
+      return (currentPage.TitleList != undefined)
+         ? currentPage.TitleList
+         : currentPage.CategoryList;
    }
 
    function IsFocusOnRootList(pathToFocus: Array)
    {
-      var currentPage = this.PageArray[this.iCurrentTab];
-      var rootList = (currentPage.TitleList != undefined) ? currentPage.TitleList : currentPage.CategoryList;
-      
-      if (rootList == undefined) {
+      var rootList = this.GetCurrentPageList();
+
+      if (rootList == undefined)
          return true;
+
+      if (pathToFocus == undefined)
+         return false;
+
+      for (var i = 0; i < pathToFocus.length; i++)
+      {
+         if (pathToFocus[i] == rootList)
+            return true;
       }
-      
-      if (pathToFocus != undefined) {
-         for (var i = 0; i < pathToFocus.length; i++) {
-            if (pathToFocus[i] == rootList) {
-               return true;
-            }
-         }
-      }
-      
+
       return false;
    }
 }
