@@ -263,15 +263,15 @@ class Quest_Journal extends MovieClip
    function UpdateFocusVisuals()
    {
       this.UpdateTabVisuals();
-      this.ActivatePageList(this.GetCurrentPageList(), this.bTabFocused);
+      this.ActivatePageList(this.bTabFocused);
    }
    function UpdateTabVisuals()
    {
       var focusedAlpha = this.bTabFocused ? 100 : 85;
 
-      this.QuestsTab._alpha = (this.iCurrentTab == this.PAGE_QUEST)  ? focusedAlpha : 60;
-      this.StatsTab._alpha  = (this.iCurrentTab == this.PAGE_STATS)  ? focusedAlpha : 60;
-      this.SystemTab._alpha = (this.iCurrentTab == this.PAGE_SYSTEM) ? focusedAlpha : 60;
+      this.QuestsTab._alpha = (this.iCurrentTab == Quest_Journal.PAGE_QUEST)  ? focusedAlpha : 60;
+      this.StatsTab._alpha  = (this.iCurrentTab == Quest_Journal.PAGE_STATS)  ? focusedAlpha : 60;
+      this.SystemTab._alpha = (this.iCurrentTab == Quest_Journal.PAGE_SYSTEM) ? focusedAlpha : 60;
    }
 
    function SetupTabMouseOver(aTab: MovieClip)
@@ -294,36 +294,31 @@ class Quest_Journal extends MovieClip
       if (!Shared.GlobalFunc.IsKeyPressed(details, true))
          return false;
 
-      if (details.navEquivalent == gfx.ui.NavigationCode.LEFT)
+      switch(details.navEquivalent)
       {
-         this.ShiftTab(-1);
-         return true;
-      }
-      else if (details.navEquivalent == gfx.ui.NavigationCode.RIGHT)
-      {
-         this.ShiftTab(1);
-         return true;
-      }
-      else if (details.navEquivalent == gfx.ui.NavigationCode.DOWN)
-      {
-         this.ActivateCurrentListFromTab();
-         return true;
+         case gfx.ui.NavigationCode.LEFT:
+            this.ShiftTab(-1);
+            return true;
+
+         case gfx.ui.NavigationCode.RIGHT:
+            this.ShiftTab(1);
+            return true;
+
+         case gfx.ui.NavigationCode.DOWN:
+            this.ActivateCurrentListFromTab();
+            return true;
       }
 
       return false;
    }
    function ActivateCurrentListFromTab()
    {
-      var list = this.GetCurrentPageList();
-      
-      if (list == undefined || list.entryList.length == 0) {
-         this.bTabFocused = false;
-         this.UpdateFocusVisuals();
-         return;
-      }
+      this.SetTabFocus(false);
 
-      this.bTabFocused = false;
-      this.UpdateFocusVisuals();
+      var list = this.GetCurrentPageList();
+
+      if (list == undefined || list.entryList.length == 0)
+         return;
 
       gfx.managers.FocusHandler.instance.setFocus(list, 0);
 
@@ -342,8 +337,9 @@ class Quest_Journal extends MovieClip
       gfx.io.GameDelegate.call("PlaySound", ["UIMenuFocus"]);
    }
 
-   function ActivatePageList(list, abNoSelectionMode)
+   function ActivatePageList(abNoSelectionMode)
    {
+      var list = this.GetCurrentPageList();
       if (list == undefined)
          return;
 
@@ -371,14 +367,8 @@ class Quest_Journal extends MovieClip
    }
    function GetCurrentPageList()
    {
-      var currentPage = this.PageArray[this.iCurrentTab];
-
-      if (currentPage == undefined)
-         return undefined;
-
-      return (currentPage.TitleList != undefined)
-         ? currentPage.TitleList
-         : currentPage.CategoryList;
+      var page = this.PageArray[this.iCurrentTab];
+      return page ? (page.TitleList || page.CategoryList) : undefined;
    }
 
    function IsFocusOnRootList(pathToFocus: Array)
