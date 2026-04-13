@@ -26,10 +26,6 @@ class ConfigPanel extends MovieClip
    var bottomBar;
    var contentHolder;
    var titlebar;
-   static var SKYUI_RELEASE_IDX = 2018;
-   static var SKYUI_VERSION_MAJOR = 5;
-   static var SKYUI_VERSION_MINOR = 2;
-   static var SKYUI_VERSION_STRING = ConfigPanel.SKYUI_VERSION_MAJOR + "." + ConfigPanel.SKYUI_VERSION_MINOR + " SE";
    static var READY = 0;
    static var WAIT_FOR_OPTION_DATA = 1;
    static var WAIT_FOR_SLIDER_DATA = 2;

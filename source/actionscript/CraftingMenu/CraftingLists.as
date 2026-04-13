@@ -17,10 +17,6 @@ class CraftingLists extends MovieClip
    var onUnsuspend;
    var panelContainer;
    var searchWidget;
-   static var SKYUI_RELEASE_IDX = 2018;
-   static var SKYUI_VERSION_MAJOR = 5;
-   static var SKYUI_VERSION_MINOR = 2;
-   static var SKYUI_VERSION_STRING = CraftingLists.SKYUI_VERSION_MAJOR + "." + CraftingLists.SKYUI_VERSION_MINOR + " SE";
    static var HIDE_PANEL = 0;
    static var SHOW_PANEL = 1;
    static var TRANSITIONING_TO_HIDE_PANEL = 2;

@@ -26,10 +26,6 @@ class FavoritesMenu extends MovieClip
    var onInvalidate;
    var rightHandItemId;
    var scrollPosition;
-   static var SKYUI_RELEASE_IDX = 2018;
-   static var SKYUI_VERSION_MAJOR = 5;
-   static var SKYUI_VERSION_MINOR = 2;
-   static var SKYUI_VERSION_STRING = FavoritesMenu.SKYUI_VERSION_MAJOR + "." + FavoritesMenu.SKYUI_VERSION_MINOR + " SE";
    static var ITEM_SELECT = 0;
    static var GROUP_ASSIGN = 1;
    static var GROUP_ASSIGN_SYNC = 2;

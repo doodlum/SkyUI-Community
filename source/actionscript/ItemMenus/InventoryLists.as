@@ -19,10 +19,6 @@ class InventoryLists extends MovieClip
    var panelContainer;
    var searchWidget;
    var tabBar;
-   static var SKYUI_RELEASE_IDX = 2018;
-   static var SKYUI_VERSION_MAJOR = 5;
-   static var SKYUI_VERSION_MINOR = 2;
-   static var SKYUI_VERSION_STRING = InventoryLists.SKYUI_VERSION_MAJOR + "." + InventoryLists.SKYUI_VERSION_MINOR + " SE";
    static var HIDE_PANEL = 0;
    static var SHOW_PANEL = 1;
    static var TRANSITIONING_TO_HIDE_PANEL = 2;

@@ -12,10 +12,6 @@ class BarterMenu extends ItemMenu
    var inventoryLists;
    var itemCard;
    var navPanel;
-   static var SKYUI_RELEASE_IDX = 2018;
-   static var SKYUI_VERSION_MAJOR = 5;
-   static var SKYUI_VERSION_MINOR = 2;
-   static var SKYUI_VERSION_STRING = BarterMenu.SKYUI_VERSION_MAJOR + "." + BarterMenu.SKYUI_VERSION_MINOR + " SE";
    var _buyMult = 1;
    var _sellMult = 1;
    var _confirmAmount = 0;

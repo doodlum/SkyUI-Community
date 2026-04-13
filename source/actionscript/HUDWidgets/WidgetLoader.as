@@ -4,10 +4,6 @@ class WidgetLoader extends MovieClip
    var _hudModeDispatcher;
    var _mcLoader;
    var _widgetContainer;
-   static var SKYUI_RELEASE_IDX = 2018;
-   static var SKYUI_VERSION_MAJOR = 5;
-   static var SKYUI_VERSION_MINOR = 2;
-   static var SKYUI_VERSION_STRING = WidgetLoader.SKYUI_VERSION_MAJOR + "." + WidgetLoader.SKYUI_VERSION_MINOR + " SE";
    var _rootPath = "";
    function WidgetLoader()
    {

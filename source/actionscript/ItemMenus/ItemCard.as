@@ -51,10 +51,6 @@ class ItemCard extends MovieClip
    var _bEditNameMode;
    var bFadedIn;
    var dispatchEvent;
-   static var SKYUI_RELEASE_IDX = 2018;
-   static var SKYUI_VERSION_MAJOR = 5;
-   static var SKYUI_VERSION_MINOR = 2;
-   static var SKYUI_VERSION_STRING = ItemCard.SKYUI_VERSION_MAJOR + "." + ItemCard.SKYUI_VERSION_MINOR + " SE";
    function ItemCard()
    {
       super();
@@ -195,8 +191,9 @@ class ItemCard extends MovieClip
             this.ApparelWarmthValue.SetText(aUpdateObj.warmth);
             this.ApparelArmorValue.textAutoSize = "shrink";
             this.ApparelArmorValue.SetText(aUpdateObj.armor);
-            this.ApparelEnchantedLabel.htmlText = aUpdateObj.effects;
-            this.ShrinkToFit(this.ApparelEnchantedLabel);
+            this.ApparelEnchantedLabel.enableShrinkToFit = true;
+            this.ApparelEnchantedLabel.overflowMode = "ellipsis";
+            this.ApparelEnchantedLabel.SetText(aUpdateObj.effects, true);
             this.SkillTextInstance.text = aUpdateObj.skillText;
             break;
          case skyui.defines.Inventory.ICT_WEAPON:
@@ -226,15 +223,17 @@ class ItemCard extends MovieClip
             this.PoisonInstance.gotoAndStop(_loc5_);
             this.WeaponDamageValue.textAutoSize = "shrink";
             this.WeaponDamageValue.SetText(aUpdateObj.damage);
-            this.WeaponEnchantedLabel.htmlText = aUpdateObj.effects;
-            this.ShrinkToFit(this.WeaponEnchantedLabel);
+            this.WeaponEnchantedLabel.enableShrinkToFit = true;
+            this.WeaponEnchantedLabel.overflowMode = "ellipsis";
+            this.WeaponEnchantedLabel.SetText(aUpdateObj.effects, true);
             break;
          case skyui.defines.Inventory.ICT_BOOK:
             if(aUpdateObj.description != undefined && aUpdateObj.description != "")
             {
                this.gotoAndStop("Books_Description");
+               this.BookDescriptionLabel.enableShrinkToFit = true;
+               this.BookDescriptionLabel.overflowMode = "ellipsis";
                this.BookDescriptionLabel.SetText(aUpdateObj.description, true);
-               this.ShrinkToFit(this.BookDescriptionLabel);
                break;
             }
             this.gotoAndStop("Books_reg");
@@ -242,14 +241,16 @@ class ItemCard extends MovieClip
          case skyui.defines.Inventory.ICT_POTION:
          case skyui.defines.Inventory.ICT_FOOD:
             this.gotoAndStop("Potions_reg");
-            this.PotionsLabel.htmlText = aUpdateObj.effects;
-            this.ShrinkToFit(this.PotionsLabel);
+            this.PotionsLabel.enableShrinkToFit = true;
+            this.PotionsLabel.overflowMode = "ellipsis";
+            this.PotionsLabel.SetText(aUpdateObj.effects, true);
             this.SkillTextInstance.text = aUpdateObj.skillName != undefined ? aUpdateObj.skillName : "";
             break;
          case skyui.defines.Inventory.ICT_SPELL_DEFAULT:
             this.gotoAndStop("Power_reg");
+            this.MagicEffectsLabel.enableShrinkToFit = true;
+            this.MagicEffectsLabel.overflowMode = "ellipsis";
             this.MagicEffectsLabel.SetText(aUpdateObj.effects,true);
-            this.ShrinkToFit(this.MagicEffectsLabel);
             if(aUpdateObj.spellCost <= 0)
             {
                this.MagicCostValue._alpha = 0;
@@ -274,8 +275,9 @@ class ItemCard extends MovieClip
                this.gotoAndStop("Magic_reg");
             }
             this.SkillLevelText.text = aUpdateObj.castLevel.toString();
+            this.MagicEffectsLabel.enableShrinkToFit = true;
+            this.MagicEffectsLabel.overflowMode = "ellipsis";
             this.MagicEffectsLabel.SetText(aUpdateObj.effects,true);
-            this.ShrinkToFit(this.MagicEffectsLabel);
             this.MagicCostValue.textAutoSize = "shrink";
             this.MagicCostTimeValue.textAutoSize = "shrink";
             if(_loc6_)
@@ -349,14 +351,16 @@ class ItemCard extends MovieClip
                }
                _loc7_ += 1;
             }
-            this.ShoutEffectsLabel.htmlText = aUpdateObj.effects;
-            this.ShrinkToFit(this.ShoutEffectsLabel);
+            this.ShoutEffectsLabel.enableShrinkToFit = true;
+            this.ShoutEffectsLabel.overflowMode = "ellipsis";
+            this.ShoutEffectsLabel.SetText(aUpdateObj.effects, true);
             this.ShoutCostValue.text = aUpdateObj.spellCost.toString();
             break;
          case skyui.defines.Inventory.ICT_ACTIVE_EFFECT:
             this.gotoAndStop("ActiveEffects");
+            this.MagicEffectsLabel.enableShrinkToFit = true;
+            this.MagicEffectsLabel.overflowMode = "ellipsis";
             this.MagicEffectsLabel.SetText(aUpdateObj.effects,true);
-            this.ShrinkToFit(this.MagicEffectsLabel);
             if(aUpdateObj.timeRemaining > 0)
             {
                _loc12_ = Math.floor(aUpdateObj.timeRemaining);
@@ -482,8 +486,9 @@ class ItemCard extends MovieClip
             {
                if(this.EnchantmentLabel != undefined)
                {
+                  this.EnchantmentLabel.enableShrinkToFit = true;
+                  this.EnchantmentLabel.overflowMode = "ellipsis";
                   this.EnchantmentLabel.SetText(aUpdateObj.effects,true);
-                  this.ShrinkToFit(this.EnchantmentLabel);
                }
                this.WeaponChargeMeter._alpha = 100;
                this.Enchanting_Background._alpha = 60;
@@ -807,91 +812,5 @@ class ItemCard extends MovieClip
    function onListSelectionChange(event)
    {
       this.ItemCardMeters[skyui.defines.Inventory.ICT_LIST].SetDeltaPercent(this.ItemList.selectedEntry.chargeAdded + this.LastUpdateObj.currentCharge);
-   }
-   function ShrinkToFit(tf:TextField)
-   {
-      var MAX_EXPANSION:Number = 40;
-      var MIN_FONT_SIZE:Number = 8;
-      var BOTTOM_PADDING:Number = 0;
-      var BOTTOM_PADDING_SHOUT:Number = -10;
-
-      if (tf == undefined || tf.text == "") return;
-
-      if (tf.origHeight == undefined) tf.origHeight = tf._height;
-      if (tf.origY == undefined) tf.origY = tf._y;
-
-      for (var prop in this) {
-         var obj = this[prop];
-         if ((obj instanceof MovieClip || obj instanceof TextField) && obj._parent == this) {
-            if (obj != this.ItemText && obj != this.ItemText.ItemTextField && obj.origY != undefined) {
-               obj._y = obj.origY;
-            }
-         }
-      }
-
-      if (this.background != undefined && this.background.origHeight != undefined) {
-         this.background._height = this.background.origHeight;
-      }
-      
-      tf._height = tf.origHeight;
-      tf.multiline = true;
-      tf.wordWrap = true;
-      tf.textAutoSize = "none";
-
-      var tfText:String = tf.htmlText;
-      var formatSize = tf.getTextFormat().size;
-      var fontSize:Number = (formatSize != undefined) ? formatSize : 20;
-
-      tf.SetText(tfText, true);
-      
-      var tfHeight:Number = tf.getLineMetrics(0).height * tf.numLines;
-      var baseHeight:Number = tf.origHeight;
-      var bg:MovieClip = (this.background != undefined) ? this.background : this.Enchanting_Background;
-
-      if (tfHeight > baseHeight)
-      {
-         var textDelta:Number = (tfHeight - baseHeight);
-         var actualExpansion:Number = Math.min(textDelta, MAX_EXPANSION);
-         
-         tf._height = tf.origHeight + actualExpansion;
-
-         var isShout:Boolean = (tf == this.ShoutEffectsLabel);
-         var activePadding:Number = isShout ? BOTTOM_PADDING_SHOUT : BOTTOM_PADDING;
-
-         var totalPush:Number = actualExpansion + activePadding;
-
-         if (bg != undefined) {
-            if (bg.origHeight == undefined) bg.origHeight = bg._height;
-            bg._height = bg.origHeight + totalPush;
-         }
-
-         for (var prop in this)
-         {
-            var obj = this[prop];
-            if ((obj instanceof MovieClip || obj instanceof TextField) 
-               && obj._parent == this && obj != tf && obj != bg 
-               && obj != this.ItemText && obj != this.ItemText.ItemTextField)
-            {
-               if (obj.origY == undefined) obj.origY = obj._y;
-               
-               if (obj.origY > tf.origY) {
-                  obj._y = obj.origY + totalPush;
-               }
-            }
-         }
-         tfHeight = tf.getLineMetrics(0).height * tf.numLines;
-      }
-
-      while (tfHeight > tf._height && fontSize > MIN_FONT_SIZE)
-      {
-         var beforeHtmlSize:String = "SIZE=\"" + fontSize.toString() + "\"";
-         fontSize -= 1;
-         var htmlSize:String = "SIZE=\"" + fontSize.toString() + "\"";
-         var newText:String = tfText.split(beforeHtmlSize).join(htmlSize);
-         if (newText == tfText) break;
-         tfText = newText;
-         tf.SetText(tfText, true);
-         tfHeight = tf.getLineMetrics(0).height * tf.numLines;
-      }
    }
 }

@@ -17,10 +17,6 @@ class MagicMenu extends ItemMenu
    var navPanel;
    var saveIndices;
    var shouldProcessItemsListInput;
-   static var SKYUI_RELEASE_IDX = 2018;
-   static var SKYUI_VERSION_MAJOR = 5;
-   static var SKYUI_VERSION_MINOR = 2;
-   static var SKYUI_VERSION_STRING = MagicMenu.SKYUI_VERSION_MAJOR + "." + MagicMenu.SKYUI_VERSION_MINOR + " SE";
    var _hideButtonFlag = 0;
    var _bMenuClosing = false;
    var _bSwitchMenus = false;
