@@ -108,10 +108,24 @@ class Quest_Journal extends MovieClip
             this.ShiftTab(1);
             return true;
          }
-         else if (details.navEquivalent == gfx.ui.NavigationCode.DOWN || details.navEquivalent == gfx.ui.NavigationCode.ENTER)
+         else if (details.navEquivalent == gfx.ui.NavigationCode.DOWN)
          {
             this.bTabFocused = false;
             this.UpdateFocusVisuals();
+
+            var currentPage = this.PageArray[this.iCurrentTab];
+            var list = (currentPage.TitleList != undefined) ? currentPage.TitleList : currentPage.CategoryList;
+
+            if (list != undefined)
+            {
+               gfx.managers.FocusHandler.instance.setFocus(list, 0);
+
+               if (list.selectedIndex == -1 && list.entryList.length > 0)
+               {
+                  list.doSetSelectedIndex(0, 0);
+               }
+            }
+
             gfx.io.GameDelegate.call("PlaySound", ["UIMenuFocus"]);
             return true;
          }
@@ -298,36 +312,24 @@ class Quest_Journal extends MovieClip
       };
    }
 
-   function ResetCurrentPageList()
-   {
-      this.ConfigureCurrentPageList(false);
-   }
-
    function ConfigureCurrentPageList(abNoSelectionMode: Boolean)
    {
       var currentPage = this.PageArray[this.iCurrentTab];
       var list = (currentPage.TitleList != undefined) ? currentPage.TitleList : currentPage.CategoryList;
 
-      if (list != undefined) {
+      if (list != undefined)
+      {
          if (list.bNoSelectionMode !== undefined) {
             list.bNoSelectionMode = abNoSelectionMode;
          }
 
-         if (!abNoSelectionMode) {
-            if (list.bPointerHighlight !== undefined) {
-               list.bPointerHighlight = false;
-               list.bMouseDrivenNav = false;
-            }
-            if (list.iNumTopHalfEntries != undefined) {
-               if (this.iCurrentTab == Quest_Journal.PAGE_SYSTEM) {
-                  list.bRecenterSelection = true;
-               }
-            } else {
-               if (list.selectedIndex == -1 && list.entryList.length > 0) {
-                  list.selectedIndex = 0;
-               }
-            }
-         } else {
+         if (list.bPointerHighlight !== undefined) {
+            list.bPointerHighlight = false;
+            list.bMouseDrivenNav = false;
+         }
+
+         if (abNoSelectionMode)
+         {
             list.selectedIndex = -1;
          }
 
