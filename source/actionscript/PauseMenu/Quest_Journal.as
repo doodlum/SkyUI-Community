@@ -318,9 +318,10 @@ class Quest_Journal extends MovieClip
                list.bPointerHighlight = false;
                list.bMouseDrivenNav = false;
             }
-
             if (list.iNumTopHalfEntries != undefined) {
-               list.selectedIndex = list.scrollPosition;
+               if (this.iCurrentTab == Quest_Journal.PAGE_SYSTEM) {
+                  list.bRecenterSelection = true;
+               }
             } else {
                if (list.selectedIndex == -1 && list.entryList.length > 0) {
                   list.selectedIndex = 0;
