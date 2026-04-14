@@ -93,6 +93,10 @@ class StatsPage extends MovieClip
    }
    function onCategoryListMouseSelectionChange(event)
    {
+      if (event.index == -1) {
+         this.onCategoryHighlight();
+         return;
+      }
       if(event.keyboardOrMouse == 0 && event.index != -1)
       {
          this.onCategoryHighlight();

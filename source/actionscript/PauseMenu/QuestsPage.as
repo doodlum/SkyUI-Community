@@ -383,6 +383,10 @@ class QuestsPage extends MovieClip
    }
    function onTitleListMouseSelectionChange(event)
    {
+      if (event.index == -1) {
+         this.onQuestHighlight();
+         return;
+      }
       if(event.keyboardOrMouse == 0 && event.index != -1)
       {
          this.onQuestHighlight();

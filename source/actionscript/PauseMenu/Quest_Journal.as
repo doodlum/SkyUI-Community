@@ -2,7 +2,6 @@ class Quest_Journal extends MovieClip
 {
    var BottomBar;
    var BottomBar_mc;
-   var ConfigPanel;
    var PageArray;
    var QuestsFader;
    var QuestsTab;
@@ -14,11 +13,15 @@ class Quest_Journal extends MovieClip
    var TabButtonHelp;
    var TopmostPage;
    var bTabsDisabled;
-   var bTabFocused;
    var iCurrentTab;
    static var PAGE_QUEST = 0;
    static var PAGE_STATS = 1;
    static var PAGE_SYSTEM = 2;
+   
+   // SkyUI vars
+   var ConfigPanel;
+   var bTabFocused;
+
    function Quest_Journal()
    {
       super();
@@ -35,14 +38,8 @@ class Quest_Journal extends MovieClip
    {
       Stage.scaleMode = "showAll";
       Shared.GlobalFunc.SetLockFunction();
-
-      var marginBottomBar = 12;
-
       MovieClip(this.BottomBar_mc).Lock("B");
-      this.BottomBar_mc._y += Stage.safeRect.y + marginBottomBar;
-
-      this.ConfigPanel = _root.ConfigPanelFader.configPanel;
-      _root.ConfigPanelFader._visible = false;
+      this.BottomBar_mc._y += Stage.safeRect.y + 12;
       this.QuestsTab.disableFocus = true;
       this.StatsTab.disableFocus = true;
       this.SystemTab.disableFocus = true;
@@ -56,11 +53,7 @@ class Quest_Journal extends MovieClip
       gfx.io.GameDelegate.addCallBack("StartCloseMenu",this,"CloseMenu");
       gfx.io.GameDelegate.call("ShouldShowMod",[],this,"SetShowMod");
       this.BottomBar_mc.InitBar();
-      this.ConfigPanel.initExtensions();
-
-      this.SetupTabMouseOver(this.QuestsTab);
-      this.SetupTabMouseOver(this.StatsTab);
-      this.SetupTabMouseOver(this.SystemTab);
+      this.InitSkyUIExtensions();
    }
    function SetShowMod()
    {
@@ -89,7 +82,7 @@ class Quest_Journal extends MovieClip
       }
       this.TopmostPage.gotoAndPlay(!abForceFade ? "fadeIn" : "ForceFade");
       this.BottomBar_mc.SetMode(this.iCurrentTab);
-      
+
       this.UpdateFocusVisuals();
    }
    function handleInput(details, pathToFocus)
@@ -192,8 +185,9 @@ class Quest_Journal extends MovieClip
          }
       }
       this.BottomBar_mc.SetPlatform(aiPlatform,abPS3Switch);
-      this.ConfigPanel.setPlatform(aiPlatform,abPS3Switch);
       this.TabButtonHelp.gotoAndStop(aiPlatform + 1);
+
+      this.ConfigPanel.setPlatform(aiPlatform,abPS3Switch);
    }
    function DoHideMenu()
    {
@@ -203,12 +197,45 @@ class Quest_Journal extends MovieClip
    {
       this._parent.gotoAndPlay("fadeIn");
    }
+   function ShiftTab(direction)
+   {
+      if (this.bTabsDisabled) return;
+
+      this.PageArray[this.iCurrentTab].endPage();
+      this.iCurrentTab += direction;
+
+      if (this.iCurrentTab < 0) {
+         this.iCurrentTab = this.TabButtonGroup.length - 1;
+      }
+      if (this.iCurrentTab >= this.TabButtonGroup.length) {
+         this.iCurrentTab = 0;
+      }
+
+      this.SwitchPageToFront(this.iCurrentTab, false);
+      this.TabButtonGroup.setSelectedButton(this.TabButtonGroup.getButtonAt(this.iCurrentTab));
+   }
+
+   
+   
+   /* ─── SkyUI Extensions ─── */
+   function InitSkyUIExtensions()
+   {
+      this.ConfigPanel = _root.ConfigPanelFader.configPanel;
+      _root.ConfigPanelFader._visible = false;
+      this.ConfigPanel.initExtensions();
+
+      this.SetupTabMouseOver(this.QuestsTab);
+      this.SetupTabMouseOver(this.StatsTab);
+      this.SetupTabMouseOver(this.SystemTab);
+   }
+
    function DisableTabs(abEnable)
    {
       this.QuestsTab.disabled = abEnable;
       this.StatsTab.disabled = abEnable;
       this.SystemTab.disabled = abEnable;
    }
+
    function ConfigPanelOpen()
    {
       this.DisableTabs(true);
@@ -219,6 +246,7 @@ class Quest_Journal extends MovieClip
       gfx.managers.FocusHandler.instance.setFocus(this.ConfigPanel,0);
       this.ConfigPanel.startPage();
    }
+
    function ConfigPanelClose()
    {
       this.ConfigPanel.endPage();
@@ -230,28 +258,6 @@ class Quest_Journal extends MovieClip
       this.DisableTabs(false);
    }
 
-   function ShiftTab(direction)
-   {
-      if (this.bTabsDisabled)
-         return;
-
-      this.PageArray[this.iCurrentTab].endPage();
-
-      this.iCurrentTab += direction;
-
-      if (this.iCurrentTab < 0)
-         this.iCurrentTab = this.TabButtonGroup.length - 1;
-
-      if (this.iCurrentTab >= this.TabButtonGroup.length)
-         this.iCurrentTab = 0;
-
-      this.SwitchPageToFront(this.iCurrentTab, false);
-
-      this.TabButtonGroup.setSelectedButton(
-         this.TabButtonGroup.getButtonAt(this.iCurrentTab)
-      );
-   }
-
    function SetTabFocus(abFocus)
    {
       if (this.bTabFocused == abFocus) return;
@@ -260,11 +266,13 @@ class Quest_Journal extends MovieClip
       this.UpdateFocusVisuals();
       gfx.io.GameDelegate.call("PlaySound",["UIMenuFocus"]);
    }
+
    function UpdateFocusVisuals()
    {
       this.UpdateTabVisuals();
       this.ActivatePageList(this.bTabFocused);
    }
+
    function UpdateTabVisuals()
    {
       var focusedAlpha = this.bTabFocused ? 100 : 85;
@@ -291,8 +299,7 @@ class Quest_Journal extends MovieClip
 
    function HandleTabFocusedInput(details)
    {
-      if (!Shared.GlobalFunc.IsKeyPressed(details, true))
-         return false;
+      if (!Shared.GlobalFunc.IsKeyPressed(details, true)) return false;
 
       switch(details.navEquivalent)
       {
@@ -311,14 +318,14 @@ class Quest_Journal extends MovieClip
 
       return false;
    }
+
    function ActivateCurrentListFromTab()
    {
       this.SetTabFocus(false);
 
       var list = this.GetCurrentPageList();
 
-      if (list == undefined || list.entryList.length == 0)
-         return;
+      if (list == undefined || list.entryList.length == 0) return;
 
       gfx.managers.FocusHandler.instance.setFocus(list, 0);
 
@@ -340,8 +347,7 @@ class Quest_Journal extends MovieClip
    function ActivatePageList(abNoSelectionMode)
    {
       var list = this.GetCurrentPageList();
-      if (list == undefined)
-         return;
+      if (list == undefined) return;
 
       list.bNoSelectionMode = abNoSelectionMode;
 
@@ -353,11 +359,11 @@ class Quest_Journal extends MovieClip
 
       if (abNoSelectionMode)
       {
-         list.selectedIndex = -1;
+         list.doSetSelectedIndex(-1, 0);
       }
       else
       {
-         if (list.selectedIndex == -1 && list.entryList.length > 0)
+         if (list.iSelectedIndex == -1 && list.entryList.length > 0)
          {
             list.doSetSelectedIndex(0, 0);
          }
@@ -365,6 +371,7 @@ class Quest_Journal extends MovieClip
 
       list.UpdateList();
    }
+
    function GetCurrentPageList()
    {
       var page = this.PageArray[this.iCurrentTab];
@@ -375,16 +382,12 @@ class Quest_Journal extends MovieClip
    {
       var rootList = this.GetCurrentPageList();
 
-      if (rootList == undefined)
-         return true;
-
-      if (pathToFocus == undefined)
-         return false;
+      if (rootList == undefined) return true;
+      if (pathToFocus == undefined) return false;
 
       for (var i = 0; i < pathToFocus.length; i++)
       {
-         if (pathToFocus[i] == rootList)
-            return true;
+         if (pathToFocus[i] == rootList) return true;
       }
 
       return false;
