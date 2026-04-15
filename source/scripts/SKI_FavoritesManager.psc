@@ -15,6 +15,8 @@ import Math
 ; 4:    - EDC - Added repeat find to InvalidateItem()
 ;
 ; 5:	- UnequipHand function will also unequip shields
+;
+; 6:	- Fix to prevent hotkeys from triggering in non-pausing menus and text input fields (e.g. the search box in the crafting menu)
 
 int function GetVersion()
 	return 4
@@ -334,7 +336,9 @@ event OnKeyDown(int a_keyCode)
 	gotoState("PROCESSING")
 
 	int groupIndex = _groupHotkeys.Find(a_keyCode)
-	if (groupIndex != -1 && !Utility.IsInMenuMode())
+	
+	; Fix #6
+	if (groupIndex != -1 && !Utility.IsInMenuMode() && !UI.IsTextInputEnabled() && !UI.IsMenuOpen("Crafting Menu"))
 		GroupUse(groupIndex)
 	endIf
 
