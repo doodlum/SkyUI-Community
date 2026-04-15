@@ -312,7 +312,7 @@ class ConfigPanel extends MovieClip
    }
    function showMessageDialog(a_text, a_acceptLabel, a_cancelLabel)
    {
-      if(this._state == ConfigPanel.READY)
+      if(this._state != ConfigPanel.READY)
       {
          skse.SendModEvent("SKICP_messageDialogClosed",null,0);
          return undefined;
