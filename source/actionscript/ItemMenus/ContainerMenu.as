@@ -66,11 +66,13 @@ class ContainerMenu extends ItemMenu
    function handleInput(details, pathToFocus)
    {
       super.handleInput(details,pathToFocus);
-      if(this.shouldProcessItemsListInput(false))
+      
+      if(this._platform == 0 && details.skseKeycode == this._equipModeKey)
       {
-         if(this._platform == 0 && details.skseKeycode == this._equipModeKey && this.inventoryLists.itemList.selectedIndex != -1)
+         this._bEquipMode = details.value != "keyUp";
+         
+         if(this.shouldProcessItemsListInput(false))
          {
-            this._bEquipMode = details.value != "keyUp";
             this.updateBottomBar(true);
          }
       }
