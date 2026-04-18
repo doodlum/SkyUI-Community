@@ -323,10 +323,10 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
         
         if (this.hitTest(_root._xmouse, _root._ymouse, true)) 
         {
+            this.isMouseDrivenNav = true;
             if (a_delta < 0)      this.scrollPosition += this.scrollDelta;
             else if (a_delta > 0) this.scrollPosition -= this.scrollDelta;
         }
-        this.isMouseDrivenNav = true;
     }
     function onScroll(event)
     {

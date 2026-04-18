@@ -463,10 +463,10 @@ class ItemMenu extends MovieClip
       if(this._platform != 0) return true;
       
       var list = this.inventoryLists.itemList;
-      if(list.selectedIndex != -1 && list.selectedEntry != undefined) 
+      if(list.selectedIndex != -1 && list.selectedEntry != undefined && list.selectedEntry.clipIndex != undefined) 
       {
          var clip = list.getClipByIndex(list.selectedEntry.clipIndex);
-         if (clip != undefined && clip.hitTest(_root._xmouse, _root._ymouse, true))
+         if (clip != undefined && clip._visible && clip.hitTest(_root._xmouse, _root._ymouse, true))
             return true;
       }
       return false;

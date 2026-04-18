@@ -64,7 +64,7 @@ class Shared.CenteredList extends MovieClip
    }
    function onMouseWheel(delta)
    {
-      if (gfx.managers.FocusHandler.instance.getFocus(0) == this && this.hitTest(_root._xmouse, _root._ymouse, true))
+      if (this.hitTest(_root._xmouse, _root._ymouse, true))
       {
          if (delta < 0)      this.moveListUp();
          else if (delta > 0) this.moveListDown();
