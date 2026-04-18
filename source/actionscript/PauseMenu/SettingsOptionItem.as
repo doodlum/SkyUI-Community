@@ -164,14 +164,10 @@ class SettingsOptionItem extends MovieClip
       switch(this.iMovieType)
       {
          case 0: // ScrollBar
-            if (this.ScrollBar_mc.thumb.hitTest(x, y, true))
-               this.ScrollBar_mc.thumb.onPress();
-            else if (this.ScrollBar_mc.upArrow.hitTest(x, y, true))
-               this.ScrollBar_mc.upArrow.onPress();
-            else if (this.ScrollBar_mc.downArrow.hitTest(x, y, true))
-               this.ScrollBar_mc.downArrow.onPress();
-            else if (this.ScrollBar_mc.track.hitTest(x, y, true))
-               this.ScrollBar_mc.track.onPress();
+            if      (this.ScrollBar_mc.thumb.hitTest(x, y, true))     this.ScrollBar_mc.thumb.onPress();
+            else if (this.ScrollBar_mc.upArrow.hitTest(x, y, true))   this.ScrollBar_mc.upArrow.onPress();
+            else if (this.ScrollBar_mc.downArrow.hitTest(x, y, true)) this.ScrollBar_mc.downArrow.onPress();
+            else if (this.ScrollBar_mc.track.hitTest(x, y, true))     this.ScrollBar_mc.track.onPress();
             break;
          case 1: // OptionStepper
             if (this.OptionStepper_mc.nextBtn.hitTest(x, y, true) || this.OptionStepper_mc.textField.hitTest(x, y, true))
