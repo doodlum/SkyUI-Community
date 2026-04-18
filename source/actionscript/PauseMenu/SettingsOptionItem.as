@@ -158,81 +158,52 @@ class SettingsOptionItem extends MovieClip
    }
    function onMousePress()
    {
-      var _loc2_ = Mouse.getTopMostEntity();
+      var x = _root._xmouse;
+      var y = _root._ymouse;
+
       switch(this.iMovieType)
       {
-         case 0:
-            if(_loc2_ == this.ScrollBar_mc.thumb)
-            {
+         case 0: // ScrollBar
+            if (this.ScrollBar_mc.thumb.hitTest(x, y, true))
                this.ScrollBar_mc.thumb.onPress();
-            }
-            else if(_loc2_._parent == this.ScrollBar_mc.upArrow)
-            {
+            else if (this.ScrollBar_mc.upArrow.hitTest(x, y, true))
                this.ScrollBar_mc.upArrow.onPress();
-            }
-            else if(_loc2_._parent == this.ScrollBar_mc.downArrow)
-            {
+            else if (this.ScrollBar_mc.downArrow.hitTest(x, y, true))
                this.ScrollBar_mc.downArrow.onPress();
-            }
-            else if(_loc2_ == this.ScrollBar_mc.track)
-            {
+            else if (this.ScrollBar_mc.track.hitTest(x, y, true))
                this.ScrollBar_mc.track.onPress();
-            }
             break;
-         case 1:
-            if(_loc2_ == this.OptionStepper_mc.nextBtn || _loc2_ == this.OptionStepper_mc.textField)
-            {
+         case 1: // OptionStepper
+            if (this.OptionStepper_mc.nextBtn.hitTest(x, y, true) || this.OptionStepper_mc.textField.hitTest(x, y, true))
                this.OptionStepper_mc.nextBtn.onPress();
-            }
-            else if(_loc2_ == this.OptionStepper_mc.prevBtn)
-            {
+            else if (this.OptionStepper_mc.prevBtn.hitTest(x, y, true))
                this.OptionStepper_mc.prevBtn.onPress();
-            }
-         case 2:
-         default:
-            return;
+            break;
       }
    }
    function onRelease()
    {
-      var _loc2_ = Mouse.getTopMostEntity();
+      var x = _root._xmouse;
+      var y = _root._ymouse;
+
       switch(this.iMovieType)
       {
-         case 0:
-            if(_loc2_ == this.ScrollBar_mc.thumb)
-            {
-               this.ScrollBar_mc.thumb.onRelease();
-            }
-            else if(_loc2_._parent == this.ScrollBar_mc.upArrow)
-            {
-               this.ScrollBar_mc.upArrow.onRelease();
-            }
-            else if(_loc2_._parent == this.ScrollBar_mc.downArrow)
-            {
-               this.ScrollBar_mc.downArrow.onRelease();
-            }
-            else if(_loc2_ == this.ScrollBar_mc.track)
-            {
-               this.ScrollBar_mc.track.onRelease();
-            }
+         case 0: // ScrollBar
+            if      (this.ScrollBar_mc.thumb.hitTest(x, y, true))     this.ScrollBar_mc.thumb.onRelease();
+            else if (this.ScrollBar_mc.upArrow.hitTest(x, y, true))   this.ScrollBar_mc.upArrow.onRelease();
+            else if (this.ScrollBar_mc.downArrow.hitTest(x, y, true)) this.ScrollBar_mc.downArrow.onRelease();
+            else if (this.ScrollBar_mc.track.hitTest(x, y, true))     this.ScrollBar_mc.track.onRelease();
             break;
-         case 1:
-            if(_loc2_ == this.OptionStepper_mc.nextBtn || _loc2_ == this.OptionStepper_mc.textField)
-            {
+         case 1: // Stepper
+            if (this.OptionStepper_mc.nextBtn.hitTest(x, y, true) || this.OptionStepper_mc.textField.hitTest(x, y, true))
                this.OptionStepper_mc.nextBtn.onRelease();
-            }
-            else if(_loc2_ == this.OptionStepper_mc.prevBtn)
-            {
+            else if (this.OptionStepper_mc.prevBtn.hitTest(x, y, true))
                this.OptionStepper_mc.prevBtn.onRelease();
-            }
             break;
-         case 2:
-            if(_loc2_._parent == this.CheckBox_mc)
-            {
+         case 2: // CheckBox
+            if (this.CheckBox_mc.hitTest(x, y, true))
                this.ToggleCheckbox();
-            }
-         default:
-            return;
+            break;
       }
    }
    function ToggleCheckbox()

@@ -142,25 +142,14 @@ class Shared.BSScrollingList extends MovieClip
    }
    function onMouseWheel(delta)
    {
-      var _loc3_;
-      if(!this.bDisableInput)
+      if (!this.bDisableInput)
       {
-         _loc3_ = Mouse.getTopMostEntity();
-         while(_loc3_ && _loc3_ != undefined)
+         if (this.hitTest(_root._xmouse, _root._ymouse, true))
          {
-            if(_loc3_ == this)
-            {
-               this.doSetSelectedIndex(-1,0);
-               if(delta < 0)
-               {
-                  this.scrollPosition += 1;
-               }
-               else if(delta > 0)
-               {
-                  this.scrollPosition -= 1;
-               }
-            }
-            _loc3_ = _loc3_._parent;
+            this.doSetSelectedIndex(-1, 0);
+            
+            if (delta < 0)      this.scrollPosition += 1;
+            else if (delta > 0) this.scrollPosition -= 1;
          }
       }
    }

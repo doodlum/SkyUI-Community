@@ -127,13 +127,9 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
       }
 
       if (this.bMouseDrivenNav && !shouldRecenter && !this.bNoSelectionMode) {
-         var mouseTarget = Mouse.getTopMostEntity();
-         while (mouseTarget != undefined) {
-            if (mouseTarget._parent == this && mouseTarget._visible && mouseTarget.itemIndex != undefined) {
-               this.doSetSelectedIndex(mouseTarget.itemIndex, 0);
-               break;
-            }
-            mouseTarget = mouseTarget._parent;
+         var hoveredItem = this.GetItemUnderMouse();
+         if (hoveredItem != null) {
+            this.doSetSelectedIndex(hoveredItem.itemIndex, 0);
          }
       }
       
@@ -224,11 +220,7 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
    {
       if (this.bDisableInput) return;
       
-      var target = Mouse.getTopMostEntity();
-      while (target != undefined && target != this) {
-         target = target._parent;
-      }
-      if (target != this) return;
+      if (!this.hitTest(_root._xmouse, _root._ymouse, true)) return;
 
       this.bPointerHighlight = true;
       this.bMouseDrivenNav = true;
@@ -252,12 +244,10 @@ class Shared.CenteredScrollingList extends Shared.BSScrollingList
    }
    function GetItemUnderMouse()
    {
-      var mouseTarget = Mouse.getTopMostEntity();
-      while (mouseTarget != undefined) {
-         if (mouseTarget._parent == this && mouseTarget._visible && mouseTarget.itemIndex != undefined) {
-            return mouseTarget;
-         }
-         mouseTarget = mouseTarget._parent;
+      for (var i = 0; i < this.iMaxItemsShown; i++) {
+         var clip = this.GetClipByIndex(i);
+         if (clip && clip._visible && clip.itemIndex != undefined && clip.hitTest(_root._xmouse, _root._ymouse, true))
+            return clip;
       }
       return null;
    }

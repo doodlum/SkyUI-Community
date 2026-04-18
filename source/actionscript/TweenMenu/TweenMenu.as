@@ -35,49 +35,29 @@ class TweenMenu extends MovieClip
 
       MovieClip(this.BottomBarTweener_mc).Lock("B");
       this.BottomBarTweener_mc._y += Stage.safeRect.y + marginBottomBar;
-      this.SkillsInputRect.onRollOver = function()
-      {
-         this._parent.onInputRectMouseOver(1);
-      };
-      this.SkillsInputRect.onMouseDown = function()
-      {
-         if(Mouse.getTopMostEntity() == this)
-         {
+      
+      this.SkillsInputRect.onRollOver = function() { this._parent.onInputRectMouseOver(1); };
+      this.SkillsInputRect.onMouseDown = function() {
+         if (this.hitTest(_root._xmouse, _root._ymouse, true))
             this._parent.onInputRectClick(1);
-         }
       };
-      this.MagicInputRect.onRollOver = function()
-      {
-         this._parent.onInputRectMouseOver(2);
-      };
-      this.MagicInputRect.onMouseDown = function()
-      {
-         if(Mouse.getTopMostEntity() == this)
-         {
+
+      this.MagicInputRect.onRollOver = function() { this._parent.onInputRectMouseOver(2); };
+      this.MagicInputRect.onMouseDown = function() {
+         if (this.hitTest(_root._xmouse, _root._ymouse, true))
             this._parent.onInputRectClick(2);
-         }
       };
-      this.ItemsInputRect.onRollOver = function()
-      {
-         this._parent.onInputRectMouseOver(3);
-      };
-      this.ItemsInputRect.onMouseDown = function()
-      {
-         if(Mouse.getTopMostEntity() == this)
-         {
+
+      this.ItemsInputRect.onRollOver = function() { this._parent.onInputRectMouseOver(3); };
+      this.ItemsInputRect.onMouseDown = function() {
+         if (this.hitTest(_root._xmouse, _root._ymouse, true))
             this._parent.onInputRectClick(3);
-         }
       };
-      this.MapInputRect.onRollOver = function()
-      {
-         this._parent.onInputRectMouseOver(4);
-      };
-      this.MapInputRect.onMouseDown = function()
-      {
-         if(Mouse.getTopMostEntity() == this)
-         {
+
+      this.MapInputRect.onRollOver = function() { this._parent.onInputRectMouseOver(4); };
+      this.MapInputRect.onMouseDown = function() {
+         if (this.hitTest(_root._xmouse, _root._ymouse, true))
             this._parent.onInputRectClick(4);
-         }
       };
    }
    function onInputRectMouseOver(aiSelection)

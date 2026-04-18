@@ -250,15 +250,12 @@ class ItemMenu extends MovieClip
    }
    function onMouseWheel(delta)
    {
-      var _loc2_ = Mouse.getTopMostEntity();
-      while(_loc2_ != undefined)
+      if(this.mouseRotationRect != undefined && this.mouseRotationRect.hitTest(_root._xmouse, _root._ymouse, true))
       {
-         if(_loc2_ == this.mouseRotationRect && this.shouldProcessItemsListInput(false) || !this.bFadedIn && delta == -1)
+         if(this.shouldProcessItemsListInput(false) || (!this.bFadedIn && delta == -1))
          {
             gfx.io.GameDelegate.call("ZoomItemModel",[delta]);
-            break;
          }
-         _loc2_ = _loc2_._parent;
       }
    }
    function onExitMenuRectClick()
@@ -450,39 +447,27 @@ class ItemMenu extends MovieClip
    }
    function shouldProcessItemsListInput(abCheckIfOverRect)
    {
-      var _loc4_ = this.bFadedIn == true && this.inventoryLists.currentState == InventoryLists.SHOW_PANEL && this.inventoryLists.itemList.itemCount > 0 && !this.inventoryLists.itemList.disableSelection && !this.inventoryLists.itemList.disableInput;
-      var _loc2_;
-      var _loc3_;
-      if(_loc4_ && this._platform == 0 && abCheckIfOverRect)
-      {
-         _loc2_ = Mouse.getTopMostEntity();
-         _loc3_ = false;
-         while(!_loc3_ && _loc2_ != undefined)
-         {
-            if(_loc2_ == this.inventoryLists.itemList)
-            {
-               _loc3_ = true;
-            }
-            _loc2_ = _loc2_._parent;
-         }
-         _loc4_ = _loc4_ && _loc3_;
-      }
-      return _loc4_;
+      var bCanProcess = this.bFadedIn == true && 
+                        this.inventoryLists.currentState == InventoryLists.SHOW_PANEL && 
+                        this.inventoryLists.itemList.itemCount > 0 && 
+                        !this.inventoryLists.itemList.disableSelection && 
+                        !this.inventoryLists.itemList.disableInput;
+
+      if (bCanProcess && this._platform == 0 && abCheckIfOverRect)
+         bCanProcess = this.inventoryLists.itemList.hitTest(_root._xmouse, _root._ymouse, true);
+      
+      return bCanProcess;
    }
    function confirmSelectedEntry()
    {
-      if(this._platform != 0)
+      if(this._platform != 0) return true;
+      
+      var list = this.inventoryLists.itemList;
+      if(list.selectedIndex != -1 && list.selectedEntry != undefined) 
       {
-         return true;
-      }
-      var _loc2_ = Mouse.getTopMostEntity();
-      while(_loc2_ != undefined)
-      {
-         if(_loc2_.itemIndex == this.inventoryLists.itemList.selectedIndex)
-         {
+         var clip = list.getClipByIndex(list.selectedEntry.clipIndex);
+         if (clip != undefined && clip.hitTest(_root._xmouse, _root._ymouse, true))
             return true;
-         }
-         _loc2_ = _loc2_._parent;
       }
       return false;
    }
