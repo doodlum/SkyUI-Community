@@ -146,6 +146,7 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
 
 /* LIST RENDERING */
 
+    // @override
     function UpdateList()
     {
         if (this._bSuspended) {
@@ -154,6 +155,10 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
         }
 
         this.setClipCount(this._maxListIndex);
+
+        for (var i = 0; i < this._entryList.length; i++) {
+            this._entryList[i].clipIndex = undefined;
+        }
 
         var enumSize  = this.getListEnumSize();
         var scrollPos = this._scrollPosition;
@@ -213,19 +218,49 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
         if (this.scrollDownButton != undefined) this.scrollDownButton._visible = scrollPos < this._maxScrollPosition;
     }
 
+    // @override
     function InvalidateData()
     {
-        super.InvalidateData();
-        this.calculateMaxScrollPosition();
+        if (this._bSuspended) {
+            this._bRequestInvalidate = true;
+            return;
+        }
 
-        var savedRowIndex = (this.selectedEntry != undefined) ? this.selectedEntry.clipIndex : -1;
-        if (savedRowIndex != -1 && this._listIndex > 0) {
-            var targetRow = Math.min(savedRowIndex, this._listIndex - 1);
-            var targetClip = this.getClipByIndex(targetRow);
-            
-            if (targetClip != undefined && targetClip.itemIndex != undefined) {
-                this.doSetSelectedIndex(targetClip.itemIndex, skyui.components.list.BasicList.SELECT_MOUSE);
+        var i = 0;
+        while (i < this._entryList.length) {
+            this._entryList[i].itemIndex = i;
+            this._entryList[i].clipIndex = undefined;
+            i++;
+        }
+
+        i = 0;
+        while (i < this._dataProcessors.length) {
+            this._dataProcessors[i].processList(this);
+            i++;
+        }
+
+        this.listEnumeration.invalidate();
+
+        if (this._selectedIndex >= this.listEnumeration.size()) {
+            this._selectedIndex = this.listEnumeration.size() - 1;
+        }
+        if (this.listEnumeration.lookupEnumIndex(this._selectedIndex) == null) {
+            this._selectedIndex = -1;
+        }
+
+        this.calculateMaxScrollPosition();
+        this.UpdateList();
+
+        if (this._curClipIndex != undefined && this._curClipIndex != -1 && this._listIndex > 0) {
+            if (this._curClipIndex >= this._listIndex) {
+                this._curClipIndex = this._listIndex - 1;
             }
+            var targetClip = this.getClipByIndex(this._curClipIndex);
+            this.doSetSelectedIndex(targetClip.itemIndex, skyui.components.list.BasicList.SELECT_MOUSE);
+        }
+
+        if (this.onInvalidate) {
+            this.onInvalidate();
         }
     }
 
@@ -331,6 +366,10 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
                     selClip.setEntry(this.selectedEntry, this.listState);
                 }
             }
+            
+            this._curClipIndex = this.selectedEntry.clipIndex;
+        } else {
+            this._curClipIndex = -1;
         }
 
         this.dispatchEvent({
