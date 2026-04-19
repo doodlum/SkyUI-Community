@@ -248,16 +248,25 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
             this._selectedIndex = -1;
         }
 
+        if (this._curClipIndex != -1 && this.getListEnumSize() > 0) {
+            var targetRow = Math.min(this._curClipIndex, this._maxListIndex - 1);
+            var entryAtRow = this.getListEnumEntry(this._scrollPosition + targetRow);
+            if (entryAtRow != undefined) {
+                this._selectedIndex = entryAtRow.itemIndex;
+            }
+        }
+
         this.calculateMaxScrollPosition();
+
+        InventoryListEntry.bDisableAnim = true;
+        
         this.UpdateList();
 
-        if (this._curClipIndex != undefined && this._curClipIndex != -1 && this._listIndex > 0) {
-            if (this._curClipIndex >= this._listIndex) {
-                this._curClipIndex = this._listIndex - 1;
-            }
-            var targetClip = this.getClipByIndex(this._curClipIndex);
-            this.doSetSelectedIndex(targetClip.itemIndex, skyui.components.list.BasicList.SELECT_MOUSE);
+        if (this._selectedIndex != -1 && this.selectedEntry != undefined) {
+            this._curClipIndex = this.selectedEntry.clipIndex;
         }
+
+        InventoryListEntry.bDisableAnim = false;
 
         if (this.onInvalidate) {
             this.onInvalidate();
