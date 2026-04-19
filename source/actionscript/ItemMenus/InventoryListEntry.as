@@ -11,6 +11,10 @@ class InventoryListEntry extends skyui.components.list.TabularListEntry
    var readIcon;
    var selectIndicator;
    var stolenIcon;
+
+   static var _lastClipY: Number = -1; 
+   static var bDisableAnim: Boolean = false;
+
    static var STATES = ["None","Equipped","LeftEquip","RightEquip","LeftAndRightEquip"];
    function InventoryListEntry()
    {
@@ -56,7 +60,8 @@ class InventoryListEntry extends skyui.components.list.TabularListEntry
    function setEntry(a_entryObject, a_state)
    {
       var _loc4_ = skyui.components.list.TabularList(a_state.list).layout;
-      this.selectIndicator._visible = a_entryObject == a_state.list.selectedEntry;
+      var isSelected = (a_entryObject == a_state.list.selectedEntry);
+      this.updateSelectionAnimation(isSelected);
       var _loc5_ = _loc4_.layoutUpdateCount;
       if(this._layoutUpdateCount != _loc5_)
       {
@@ -285,6 +290,71 @@ class InventoryListEntry extends skyui.components.list.TabularListEntry
             _loc1_.rgb = a_rgb != undefined ? a_rgb : 16777215;
             _loc3_.colorTransform = _loc1_;
          }
+      }
+   }
+
+
+   function updateSelectionAnimation(isSelected: Boolean)
+   {
+      this.selectIndicator.hitTestDisable = true;
+      
+      if (this.background != undefined) {
+         this.hitArea = this.background;
+      }
+      
+      if (isSelected) {
+         this.selectIndicator._visible = true;
+
+         if (InventoryListEntry._lastClipY == -1) {
+            this.selectIndicator._y = 0;
+            this.selectIndicator._alpha = 0;
+            InventoryListEntry._lastClipY = this._y;
+
+            this.onEnterFrame = function() {
+               this.selectIndicator._alpha += 10; 
+               
+               if (this.selectIndicator._alpha >= 100) {
+                  this.selectIndicator._alpha = 100;
+                  delete this.onEnterFrame;
+               }
+            };
+            return;
+         }
+
+         var prevY = InventoryListEntry._lastClipY;
+         var diffY = prevY - this._y;
+
+         InventoryListEntry._lastClipY = this._y;
+
+         if (InventoryListEntry.bDisableAnim) {
+            delete this.onEnterFrame;
+            this.selectIndicator._y = 0;
+            this.selectIndicator._alpha = 100;
+            return;
+         }
+
+         if (diffY != 0 && Math.abs(diffY) < 600) {
+            this.selectIndicator._y = diffY;
+            this.selectIndicator._alpha = 100;
+            
+            this.onEnterFrame = function() {
+               this.selectIndicator._y *= 0.6; 
+               if (Math.abs(this.selectIndicator._y) < 0.5) {
+                  this.selectIndicator._y = 0;
+                  delete this.onEnterFrame;
+               }
+            };
+         } else {
+            delete this.onEnterFrame;
+            this.selectIndicator._y = 0;
+            this.selectIndicator._alpha = 100;
+         }
+      } 
+      else {
+         delete this.onEnterFrame;
+         this.selectIndicator._visible = false;
+         this.selectIndicator._y = 0;
+         this.selectIndicator._alpha = 100;
       }
    }
 }

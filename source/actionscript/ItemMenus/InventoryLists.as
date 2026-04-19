@@ -214,6 +214,7 @@ class InventoryLists extends MovieClip
          this.itemList.layout.changeFilterFlag(this.categoryList.selectedEntry.flag);
       }
       this.itemList.requestUpdate();
+      InventoryListEntry._lastClipY = -1; 
       this.dispatchEvent({type:"itemHighlightChange",index:this.itemList.selectedIndex});
       this.itemList.disableInput = false;
    }
