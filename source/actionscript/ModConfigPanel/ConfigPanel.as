@@ -312,11 +312,6 @@ class ConfigPanel extends MovieClip
    }
    function showMessageDialog(a_text, a_acceptLabel, a_cancelLabel)
    {
-      // if(this._state == ConfigPanel.READY)
-      // {
-      //    skse.SendModEvent("SKICP_messageDialogClosed",null,0);
-      //    return undefined;
-      // }
       var _loc2_ = {_x:719,_y:265,platform:this._platform,messageText:a_text,acceptLabel:a_acceptLabel,cancelLabel:a_cancelLabel};
       var _loc3_ = skyui.util.DialogManager.open(this,"MessageDialog",_loc2_);
       _loc3_.addEventListener("dialogClosing",this,"onMessageDialogClosing");
