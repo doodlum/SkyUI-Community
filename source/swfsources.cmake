@@ -434,6 +434,7 @@ Add_SWF(skyui_configpanel
     ModConfigPanel/MenuDialog.as
     ModConfigPanel/MessageDialog.as
     ModConfigPanel/ModListPanel.as
+    ModConfigPanel/MultiColumnScrollBar.as
     ModConfigPanel/MultiColumnScrollingList.as
     ModConfigPanel/OptionDialog.as
     ModConfigPanel/OptionsListEntry.as
