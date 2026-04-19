@@ -11,6 +11,9 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
     static var KEY_REPEAT_DELAY: Number        = 300;
     static var KEY_REPEAT_INTERVAL: Number     = 25;
 
+    static var SCROLL_BRIGHTNESS_DIM: Number       = 0.9;
+    static var SCROLL_BRIGHTNESS_HIGHLIGHT: Number = 1.25;
+
 
 /* VARIABLES */
 
@@ -90,6 +93,8 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
             this.scrollbar.addEventListener("scroll", this, "onScroll");
             this.scrollbar._y = this.background._y + this.topBorder;
             this.scrollbar.height = this._listHeight;
+
+            this.initScrollbarHighlights();
         }
     }
 
@@ -261,7 +266,7 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
         InventoryListEntry.bDisableAnim = true;
         
         this.UpdateList();
-
+        
         if (this._selectedIndex != -1 && this.selectedEntry != undefined) {
             this._curClipIndex = this.selectedEntry.clipIndex;
         }
@@ -548,7 +553,17 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
     {
         if (this.scrollbar != undefined) {
             this.scrollbar._visible = this._maxScrollPosition > 0;
-            this.scrollbar.setScrollProperties(this._maxListIndex, 0, this._maxScrollPosition);
+
+            var pageSize = this._maxListIndex; 
+            
+            this.scrollbar.setScrollProperties(pageSize, 0, this._maxScrollPosition);
+
+            this.scrollbar.lineScrollSize = this.scrollDelta;
+            this.scrollbar.pageScrollSize = pageSize;
+            
+            if (this.scrollbar.trackScrollPageSize != undefined) {
+                this.scrollbar.trackScrollPageSize = pageSize;
+            }
         }
     }
 
@@ -556,5 +571,67 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
     {
         if (a_index < 0 || a_index >= this._maxListIndex) return undefined;
         return super.getClipByIndex(a_index);
+    }
+
+    function initScrollbarHighlights()
+    {
+        var sb = this.scrollbar;
+        if (sb == undefined) return;
+
+        sb.trackClickEnabled = true;
+        sb.trackMode = "scrollPage";
+        sb.buttonRepeatDelay = 150; 
+        sb.buttonRepeatDuration = 10;
+
+        var dimVal = skyui.components.list.ScrollingList.SCROLL_BRIGHTNESS_DIM;
+        var highVal = skyui.components.list.ScrollingList.SCROLL_BRIGHTNESS_HIGHLIGHT;
+
+        var dimTransform = new flash.geom.ColorTransform();
+        dimTransform.redMultiplier = dimTransform.greenMultiplier = dimTransform.blueMultiplier = dimVal;
+
+        var brightTransform = new flash.geom.ColorTransform();
+        brightTransform.redMultiplier = brightTransform.greenMultiplier = brightTransform.blueMultiplier = highVal;
+
+        sb._alpha = 100;
+        var parts = [sb.upArrow, sb.downArrow, sb.thumb, sb.track];
+        for (var i = 0; i < parts.length; i++) {
+            if (parts[i] != undefined) {
+                parts[i]._alpha = 100;
+                parts[i].transform.colorTransform = dimTransform;
+            }
+        }
+
+        var scope = this;
+        var mouseListener = new Object();
+        
+        mouseListener.onMouseMove = function() {
+            var scroll = scope.scrollbar;
+            if (scroll != undefined && scroll._visible) {
+                var mx = _root._xmouse;
+                var my = _root._ymouse;
+
+                var updatePartBrightness = function(a_part, a_isThumb) {
+                    if (a_part == undefined) return;
+
+                    var isHighlighted = a_part.hitTest(mx, my, true) || (a_isThumb && a_part.state == "down");
+
+                    if (isHighlighted) {
+                        if (a_part.transform.colorTransform.redMultiplier < highVal) {
+                            a_part.transform.colorTransform = brightTransform;
+                        }
+                    } else {
+                        if (a_part.transform.colorTransform.redMultiplier > dimVal) {
+                            a_part.transform.colorTransform = dimTransform;
+                        }
+                    }
+                };
+
+                updatePartBrightness(scroll.upArrow, false);
+                updatePartBrightness(scroll.downArrow, false);
+                updatePartBrightness(scroll.thumb, true);
+            }
+        };
+        
+        Mouse.addListener(mouseListener);
     }
 }
