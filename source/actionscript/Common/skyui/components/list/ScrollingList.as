@@ -308,6 +308,10 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
 
     function doSetSelectedIndex(a_newIndex, a_keyboardOrMouse)
     {
+        if (this._selectedIndex == -1 && a_newIndex != -1) {
+            InventoryListEntry._lastClipY = -1;
+        }
+
         if (this.disableSelection || a_newIndex == this._selectedIndex) {
             return undefined;
         }
