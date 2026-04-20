@@ -309,7 +309,7 @@ class CraftingMenu extends MovieClip
       var rightOffset = Stage.visibleRect.x + Stage.visibleRect.width - Stage.safeRect.x;
       var listBounds = this.CategoryList.getContentBounds();
       var listRightEdge = this.CategoryList._x + listBounds[0] + listBounds[2] + 25;
-      this.MenuDescriptionHolder._x = listRightEdge + (rightOffset - listRightEdge) / 2 + this.MenuDescriptionHolder._width / 2;
+      this.MenuDescriptionHolder._x = 7 + listRightEdge + (rightOffset - listRightEdge) / 2 + this.MenuDescriptionHolder._width / 2;
 
       var marginBottomBarInfo = 17;
       
