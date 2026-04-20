@@ -429,6 +429,8 @@ Add_SWF(skyui_configpanel
     skyui/configpanel.swf
     skyui/configpanel.xml
     Common/skyui/defines/Input.as
+    Common/skyui/components/dialog/BasicDialog.as
+    Common/skyui/util/DialogManager.as
     ModConfigPanel/ColorDialog.as
     ModConfigPanel/ConfigPanel.as
     ModConfigPanel/MenuDialog.as
