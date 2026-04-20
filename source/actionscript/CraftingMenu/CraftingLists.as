@@ -490,4 +490,22 @@ class CraftingLists extends MovieClip
       this.itemList.disableSelection = this.itemList.disableInput = false;
       this._nameFilter.filterText = event.data;
    }
+
+   function applyDynamicWidth(a_newWidth: Number)
+   {
+      var defaultWidth = 530;
+      var delta = a_newWidth - defaultWidth;
+
+      this.panelContainer.ListBackground._width += delta;
+      this.itemList.header.seperator._width += delta;
+      this.CategoriesList.background._width += delta;
+
+      this.itemList.scrollbar._x += delta;
+      this.searchWidget._x += delta;
+      this.columnSelectButton._x += delta;
+
+      if (this._parent.MenuDescriptionHolder != undefined) {
+         this._parent.MenuDescriptionHolder._x += delta / 2;
+      }
+   }
 }

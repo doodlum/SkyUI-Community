@@ -78,6 +78,13 @@ class ItemMenu extends MovieClip
    function setConfig(a_config)
    {
       this._config = a_config;
+   
+      var customWidth = a_config.ListLayout.defaults.entryWidth;
+      
+      if (customWidth != undefined && customWidth > 0) {
+         this.inventoryLists.applyDynamicWidth(customWidth);
+      }
+
       this.positionFloatingElements();
       var _loc3_ = this.inventoryLists.itemList.listState;
       var _loc8_ = this.inventoryLists.categoryList.listState;

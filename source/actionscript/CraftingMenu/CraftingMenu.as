@@ -373,6 +373,12 @@ class CraftingMenu extends MovieClip
    function setConfig(a_config)
    {
       this._config = a_config;
+      
+      var customWidth = a_config.ListLayout.defaults.entryWidth;
+      
+      if (customWidth != undefined && customWidth > 0) {
+         this.InventoryLists.applyDynamicWidth(customWidth);
+      }
       this.ItemList.addDataProcessor(new CraftingDataSetter());
       this.ItemList.addDataProcessor(new CraftingIconSetter(a_config.Appearance));
       this.positionFloatingElements();
