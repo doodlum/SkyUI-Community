@@ -34,6 +34,11 @@ class InventoryListEntry extends skyui.components.list.TabularListEntry
          this["textField" + _loc3_]._visible = false;
          _loc3_ = _loc3_ + 1;
       }
+
+      this.selectIndicator.hitTestDisable = true;
+      if (this.background != undefined) {
+         this.hitArea = this.background;
+      }
    }
    // HACK: specific workaround for tab-delimited translation text (e.g. BOOBIES Potions).
    // TODO: replace with a cleaner generic solution if SkyUI handles this case centrally later.
@@ -296,14 +301,16 @@ class InventoryListEntry extends skyui.components.list.TabularListEntry
 
    function updateSelectionAnimation(isSelected: Boolean)
    {
-      this.selectIndicator.hitTestDisable = true;
-      
-      if (this.background != undefined) {
-         this.hitArea = this.background;
-      }
-      
       if (isSelected) {
          this.selectIndicator._visible = true;
+
+         if (InventoryListEntry.bDisableAnim) {
+            delete this.onEnterFrame;
+            this.selectIndicator._y = 0;
+            this.selectIndicator._alpha = 100;
+            InventoryListEntry._lastClipY = this._y;
+            return;
+         }
 
          if (InventoryListEntry._lastClipY == -1) {
             this.selectIndicator._y = 0;
@@ -312,7 +319,6 @@ class InventoryListEntry extends skyui.components.list.TabularListEntry
 
             this.onEnterFrame = function() {
                this.selectIndicator._alpha += 10; 
-               
                if (this.selectIndicator._alpha >= 100) {
                   this.selectIndicator._alpha = 100;
                   delete this.onEnterFrame;
@@ -323,20 +329,12 @@ class InventoryListEntry extends skyui.components.list.TabularListEntry
 
          var prevY = InventoryListEntry._lastClipY;
          var diffY = prevY - this._y;
-
          InventoryListEntry._lastClipY = this._y;
-
-         if (InventoryListEntry.bDisableAnim) {
-            delete this.onEnterFrame;
-            this.selectIndicator._y = 0;
-            this.selectIndicator._alpha = 100;
-            return;
-         }
 
          if (diffY != 0 && Math.abs(diffY) < 600) {
             this.selectIndicator._y = diffY;
             this.selectIndicator._alpha = 100;
-            
+
             this.onEnterFrame = function() {
                this.selectIndicator._y *= 0.6; 
                if (Math.abs(this.selectIndicator._y) < 0.5) {
@@ -349,7 +347,7 @@ class InventoryListEntry extends skyui.components.list.TabularListEntry
             this.selectIndicator._y = 0;
             this.selectIndicator._alpha = 100;
          }
-      } 
+      }
       else {
          delete this.onEnterFrame;
          this.selectIndicator._visible = false;

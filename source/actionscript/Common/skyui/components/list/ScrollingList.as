@@ -41,6 +41,8 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
     var _keyRepeatTimeout;
     var _keyRepeatInterval;
     var _heldNavDirection       = -1;
+    
+    var _scrollbarMouseListener;
 
 
 /* CONSTRUCTOR */
@@ -98,6 +100,15 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
         }
     }
 
+    function onUnload()
+    {
+        if (this._scrollbarMouseListener != undefined) {
+            Mouse.removeListener(this._scrollbarMouseListener);
+            this._scrollbarMouseListener = undefined;
+        }
+        this.stopKeyRepeat();
+        this.stopSmoothScroll();
+    }
 
 
 /* INPUT HANDLING */
@@ -357,7 +368,7 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
         var prevEntry = this.selectedEntry; 
         this._selectedIndex = a_newIndex;
 
-        if (prevEntry.clipIndex != undefined) {
+        if (prevEntry != undefined && prevEntry.clipIndex != undefined) {
             var prevClip = this.getClipByIndex(prevEntry.clipIndex);
             if (prevClip != undefined) {
                 prevClip.setEntry(prevEntry, this.listState);
@@ -520,6 +531,10 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
 
     function onKeyRepeatTick()
     {
+        if (this._heldNavDirection == -1) {
+            this.stopKeyRepeat();
+            return;
+        }
         this.executeNavDirection(this._heldNavDirection);
     }
 
@@ -602,7 +617,8 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
         }
 
         var scope = this;
-        var mouseListener = new Object();
+        this._scrollbarMouseListener = new Object();
+        var mouseListener = this._scrollbarMouseListener;
         
         mouseListener.onMouseMove = function() {
             var scroll = scope.scrollbar;
