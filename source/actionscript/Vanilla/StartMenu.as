@@ -278,21 +278,21 @@ class StartMenu extends MovieClip
       {
          this.MainList.entryList.push({text:"$DOWNLOADABLE CONTENT",index:StartMenu.DLC_INDEX,disabled:false,showIcon:false});
       }
-      if(arguments[_loc10_]  && skse.version.releaseIdx >= 70)
+      if(arguments[_loc10_] && skse.version.releaseIdx >= 70)
       {
          this.MainList.entryList.push({text:"$CREATIONS",disabled:!arguments[_loc6_],index:StartMenu.CREATION_CLUB_INDEX,showIcon:arguments[_loc17_]});
       }
       var canAccess = skse.version.releaseIdx >= 70 ? arguments[_loc6_] : false;
       this.SetCreationClubAccess(canAccess);
       this.ShowSky10UpsellBanner(false);
-      if(arguments[_loc8_] == true  && skse.version.releaseIdx >= 70)
+      if(arguments[_loc8_] == true && skse.version.releaseIdx >= 70)
       {
          this.ShowSky10UpsellBanner(true);
       }
       if(!arguments[_loc15_])
       {
       }
-      if(arguments[_loc9_]  && skse.version.releaseIdx >= 70)
+      if(arguments[_loc9_] && skse.version.releaseIdx >= 70)
       {
          this.MainList.entryList.push({text:"$MOD MANAGER",disabled:false,index:StartMenu.MOD_INDEX,showIcon:false});
       }
@@ -301,7 +301,7 @@ class StartMenu extends MovieClip
       {
          this.MainList.entryList.push({text:"$QUIT",index:StartMenu.QUIT_INDEX,disabled:false,showIcon:false});
       }
-      if(arguments[_loc13_]  && skse.version.releaseIdx >= 70)
+      if(arguments[_loc13_] && skse.version.releaseIdx >= 70)
       {
          this.MainList.entryList.push({text:"$HELP",index:StartMenu.HELP_INDEX,disabled:false,showIcon:false});
       }
@@ -316,7 +316,7 @@ class StartMenu extends MovieClip
       }
       this.MainList.selectedIndex = 0;
       this.MainList.InvalidateData();
-      this._NeedsLoginScreen = !arguments[_loc12_]  && skse.version.releaseIdx >= 70;
+      this._NeedsLoginScreen = !arguments[_loc12_] && skse.version.releaseIdx >= 70;
       if(this.currentState == undefined)
       {
          if(arguments[_loc14_])
