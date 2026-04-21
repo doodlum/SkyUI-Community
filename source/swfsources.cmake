@@ -121,6 +121,7 @@ Add_SWF(craftingmenu
     Common/skyui/filter/ItemTypeFilter.as
     Common/skyui/filter/NameFilter.as
     Common/skyui/filter/SortFilter.as
+    Common/skyui/components/list/ScrollingList.as
     CraftingMenu/CraftingDataSetter.as
     CraftingMenu/CraftingIconSetter.as
     CraftingMenu/CraftingListEntry.as
