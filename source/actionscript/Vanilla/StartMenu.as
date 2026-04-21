@@ -134,6 +134,7 @@ class StartMenu extends MovieClip
    }
    function Init()
    {
+      trace("StartMenu::Init" + this.iPlatform.toString() + ", PS3Switch = " + this.PS3Switch.toString());
       this._BottomButtons_mc.SetPlatform(this.iPlatform,this.PS3Switch);
       this._BottomButtons_mc.Margin = this._Margin;
       this.onEnterFrame = null;
@@ -145,6 +146,7 @@ class StartMenu extends MovieClip
    }
    function OnLoginLoadInitFinished(mc)
    {
+      trace("StartMenu::OnLoginLoadInitFinished" + this.iPlatform.toString() + ", PS3Switch = " + this.PS3Switch.toString());
       if(this._LoginHolder_mc.LoginMenu_mc.Constructed)
       {
          this._LoginHolder_mc.onEnterFrame = null;
@@ -180,6 +182,7 @@ class StartMenu extends MovieClip
    }
    function InitExtensions()
    {
+      trace("StartMenu::InitExtensions");
       Shared.GlobalFunc.SetLockFunction();
       this._parent.Lock("BR");
       this.Logo_mc.Lock("BL");
@@ -235,18 +238,21 @@ class StartMenu extends MovieClip
    }
    function setupMainMenu()
    {
-      var _loc10_ = 0;
+      trace("StartMenu::setupMainMenu" + this.iPlatform.toString() + ", PS3Switch = " + this.PS3Switch.toString());
+      var _loc11_ = 0;
       var _loc5_ = 1;
-      var _loc6_ = 2;
-      var _loc13_ = 3;
-      var _loc7_ = 4;
-      var _loc15_ = 5;
-      var _loc12_ = 6;
-      var _loc8_ = 7;
-      var _loc9_ = 8;
-      var _loc11_ = 9;
-      var _loc14_ = 10;
-      var _loc16_ = 11;
+      var _loc7_ = 2;
+      var _loc14_ = 3;
+      var _loc8_ = 4;
+      var _loc16_ = 5;
+      var _loc13_ = 6;
+      var _loc9_ = 7;
+      var _loc10_ = 8;
+      var _loc12_ = 9;
+      var _loc15_ = 10;
+      var _loc18_ = 11;
+      var _loc17_ = 12;
+      var _loc6_ = 13;
       var _loc4_ = StartMenu.NEW_INDEX;
       if(this.MainList.entryList.length > 0)
       {
@@ -256,46 +262,48 @@ class StartMenu extends MovieClip
       if(arguments[_loc5_])
       {
          this.hasContinueButton = true;
-         this.MainList.entryList.push({text:"$CONTINUE",index:StartMenu.CONTINUE_INDEX,disabled:false});
+         this.MainList.entryList.push({text:"$CONTINUE",index:StartMenu.CONTINUE_INDEX,disabled:false,showIcon:false});
          if(_loc4_ == StartMenu.NEW_INDEX)
          {
             _loc4_ = StartMenu.CONTINUE_INDEX;
          }
       }
-      this.MainList.entryList.push({text:"$NEW",index:StartMenu.NEW_INDEX,disabled:false});
-      this.MainList.entryList.push({text:"$LOAD",disabled:!arguments[_loc5_],index:StartMenu.LOAD_INDEX});
-      if(arguments[_loc16_] && this.iPlatform == StartMenu.PLATFORM_PROSPERO)
+      this.MainList.entryList.push({text:"$NEW",index:StartMenu.NEW_INDEX,disabled:false,showIcon:false});
+      this.MainList.entryList.push({text:"$LOAD",disabled:!arguments[_loc5_],index:StartMenu.LOAD_INDEX,showIcon:false});
+      if(arguments[_loc18_] && this.iPlatform == StartMenu.PLATFORM_PROSPERO)
       {
-         this.MainList.entryList.push({text:"$TRANSFER DATA",index:StartMenu.PS5_DATA_TRANSFER_INDEX,disabled:false});
+         this.MainList.entryList.push({text:"$TRANSFER DATA",index:StartMenu.PS5_DATA_TRANSFER_INDEX,disabled:false,showIcon:false});
       }
-      if(arguments[_loc15_] == true)
+      if(arguments[_loc16_] == true)
       {
-         this.MainList.entryList.push({text:"$DOWNLOADABLE CONTENT",index:StartMenu.DLC_INDEX,disabled:false});
+         this.MainList.entryList.push({text:"$DOWNLOADABLE CONTENT",index:StartMenu.DLC_INDEX,disabled:false,showIcon:false});
       }
-      if(arguments[_loc9_] && skse.version.releaseIdx >= 70)
+      if(arguments[_loc10_]  && skse.version.releaseIdx >= 70)
       {
-         this.MainList.entryList.push({text:"$CREATION CLUB",disabled:false,index:StartMenu.CREATION_CLUB_INDEX});
+         this.MainList.entryList.push({text:"$CREATIONS",disabled:!arguments[_loc6_],index:StartMenu.CREATION_CLUB_INDEX,showIcon:arguments[_loc17_]});
       }
+      var canAccess = skse.version.releaseIdx >= 70 ? arguments[_loc6_] : false;
+      this.SetCreationClubAccess(canAccess);
       this.ShowSky10UpsellBanner(false);
-      if(arguments[_loc7_] == true && skse.version.releaseIdx >= 70)
+      if(arguments[_loc8_] == true  && skse.version.releaseIdx >= 70)
       {
          this.ShowSky10UpsellBanner(true);
       }
-      if(!arguments[_loc14_])
+      if(!arguments[_loc15_])
       {
       }
-      if(arguments[_loc8_] && skse.version.releaseIdx >= 70)
+      if(arguments[_loc9_]  && skse.version.releaseIdx >= 70)
       {
-         this.MainList.entryList.push({text:"$MOD MANAGER",disabled:false,index:StartMenu.MOD_INDEX});
+         this.MainList.entryList.push({text:"$MOD MANAGER",disabled:false,index:StartMenu.MOD_INDEX,showIcon:false});
       }
-      this.MainList.entryList.push({text:"$CREDITS",index:StartMenu.CREDITS_INDEX,disabled:false});
-      if(arguments[_loc10_])
+      this.MainList.entryList.push({text:"$CREDITS",index:StartMenu.CREDITS_INDEX,disabled:false,showIcon:false});
+      if(arguments[_loc11_])
       {
-         this.MainList.entryList.push({text:"$QUIT",index:StartMenu.QUIT_INDEX,disabled:false});
+         this.MainList.entryList.push({text:"$QUIT",index:StartMenu.QUIT_INDEX,disabled:false,showIcon:false});
       }
-      if(arguments[_loc12_] && skse.version.releaseIdx >= 70)
+      if(arguments[_loc13_]  && skse.version.releaseIdx >= 70)
       {
-         this.MainList.entryList.push({text:"$HELP",index:StartMenu.HELP_INDEX,disabled:false});
+         this.MainList.entryList.push({text:"$HELP",index:StartMenu.HELP_INDEX,disabled:false,showIcon:false});
       }
       var _loc3_ = 0;
       while(_loc3_ < this.MainList.entryList.length)
@@ -308,10 +316,10 @@ class StartMenu extends MovieClip
       }
       this.MainList.selectedIndex = 0;
       this.MainList.InvalidateData();
-      this._NeedsLoginScreen = !arguments[_loc11_] && skse.version.releaseIdx >= 70;
+      this._NeedsLoginScreen = !arguments[_loc12_]  && skse.version.releaseIdx >= 70;
       if(this.currentState == undefined)
       {
-         if(arguments[_loc13_])
+         if(arguments[_loc14_])
          {
             this.StartState(StartMenu.PRESS_START_STATE);
          }
@@ -328,9 +336,9 @@ class StartMenu extends MovieClip
       {
          this.StartState(StartMenu.MAIN_STATE);
       }
-      if(arguments[_loc6_] != undefined)
+      if(arguments[_loc7_] != undefined)
       {
-         this.VersionText.SetText("v " + arguments[_loc6_]);
+         this.VersionText.SetText("v " + arguments[_loc7_]);
       }
       else
       {
@@ -360,7 +368,7 @@ class StartMenu extends MovieClip
    }
    function OnDeleteSaveUISanityCheck(aHasRecentSave, aCanLoadGame)
    {
-      var _loc7_ = false;
+      var _loc8_ = false;
       if(this.hasContinueButton)
       {
          if(!aHasRecentSave)
@@ -370,7 +378,7 @@ class StartMenu extends MovieClip
                this.MainList.entryList.shift();
             }
             this.MainList.RestoreScrollPosition(1,true);
-            _loc7_ = true;
+            _loc8_ = true;
          }
       }
       var _loc2_;
@@ -381,15 +389,15 @@ class StartMenu extends MovieClip
          {
             if(this.MainList.entryList[_loc2_].index == StartMenu.LOAD_INDEX)
             {
-               this.MainList.entryList.splice(_loc2_,1,{text:"$LOAD",disabled:true,index:StartMenu.LOAD_INDEX,textColor:6316128});
-               _loc7_ = true;
+               this.MainList.entryList.splice(_loc2_,1,{text:"$LOAD",disabled:true,index:StartMenu.LOAD_INDEX,textColor:6316128,showIcon:false});
+               _loc8_ = true;
                this.MainList.RestoreScrollPosition(0,false);
                break;
             }
             _loc2_ = _loc2_ + 1;
          }
       }
-      if(_loc7_)
+      if(_loc8_)
       {
          this.MainList.InvalidateData();
       }
@@ -518,7 +526,7 @@ class StartMenu extends MovieClip
             else if(details.navEquivalent == gfx.ui.NavigationCode.GAMEPAD_Y && this.currentState == StartMenu.DLC_STATE && this.MarketplaceButton._visible && this.MarketplaceButton._alpha == StartMenu.ALPHA_AVAILABLE)
             {
                this.SaveLoadConfirmText.textField.SetText("$Open Xbox LIVE Marketplace?");
-               this.SetPlatform(this.iPlatform);
+               this.SetPlatform(this.iPlatform,this.PS3Switch);
                this.StartState(StartMenu.MARKETPLACE_CONFIRM_STATE);
             }
             else if(details.navEquivalent == gfx.ui.NavigationCode.GAMEPAD_Y && this.currentState == StartMenu.MAIN_STATE && this.ChangeUserButton._visible)
@@ -694,7 +702,6 @@ class StartMenu extends MovieClip
                break;
             case StartMenu.SKY10_UPSELL_INDEX:
                gfx.io.GameDelegate.call("Sky10DLCPressed",[]);
-         
                return;
             case StartMenu.CREATION_CLUB_INDEX:
                if(this._CClubAllowedByBnet)
@@ -813,7 +820,7 @@ class StartMenu extends MovieClip
          this.ButtonRect.AcceptGamepadButton.SetPlatform(aiPlatform,abPS3Switch);
          this.ButtonRect.CancelGamepadButton.SetPlatform(aiPlatform,abPS3Switch);
       }
-      this.CharacterSelectionHint.SetPlatform(aiPlatform);
+      this.CharacterSelectionHint.SetPlatform(aiPlatform,abPS3Switch);
       this.MarketplaceButton._visible = false;
       if(this.iPlatform == undefined)
       {
@@ -821,7 +828,7 @@ class StartMenu extends MovieClip
          this.LoadingContentMessage.Message_mc.textField.SetText("$Loading extra content." + (!this.IsPlatformSony() ? "" : "_PS3"));
       }
       this.iPlatform = aiPlatform;
-      this.SaveLoadListHolder.platform = this.iPlatform;
+      this.SaveLoadListHolder.SetPlatform(aiPlatform,abPS3Switch);
       this.PS3Switch = abPS3Switch;
       this.MainList.SetPlatform(aiPlatform,abPS3Switch);
    }
@@ -862,7 +869,6 @@ class StartMenu extends MovieClip
          this._CClubAllowedByBnet = false;
          this._ModsAllowedByBnet  = false;
       }
-
       gfx.io.GameDelegate.call("StartState",[strStateName]);
       this.ShouldProcessInputs = false;
       if(strStateName == StartMenu.LOGIN_STATE)
@@ -954,7 +960,7 @@ class StartMenu extends MovieClip
    function ShowConfirmScreen(astrConfirmText)
    {
       this.ConfirmPanel_mc.textField.SetText(astrConfirmText);
-      this.SetPlatform(this.iPlatform);
+      this.SetPlatform(this.iPlatform,this.PS3Switch);
       this.StartState(StartMenu.MAIN_CONFIRM_STATE);
    }
    function OnSaveListOpenSuccess()
@@ -1009,14 +1015,14 @@ class StartMenu extends MovieClip
    {
       this.SaveLoadListHolder.List_mc.disableSelection = true;
       this.SaveLoadConfirmText.textField.SetText("$Load this game?");
-      this.SetPlatform(this.iPlatform);
+      this.SetPlatform(this.iPlatform,this.PS3Switch);
       this.StartState(StartMenu.SAVE_LOAD_CONFIRM_STATE);
    }
    function ConfirmDeleteSave()
    {
       this.SaveLoadListHolder.List_mc.disableSelection = true;
       this.SaveLoadConfirmText.textField.SetText("$Delete this save?");
-      this.SetPlatform(this.iPlatform);
+      this.SetPlatform(this.iPlatform,this.PS3Switch);
       this.StartState(StartMenu.DELETE_SAVE_CONFIRM_STATE);
    }
    function ShowDeleteButtonHelp(abFlag)
@@ -1136,23 +1142,19 @@ class StartMenu extends MovieClip
    }
    function SetCreationClubAccess(canAccess)
    {     
-      if (skse.version.releaseIdx < 70)
-      {
-         canAccess = false;
-      } 
-
       this._UserCanAccessCreationClub = canAccess;
+      trace("StartMenu::setupMainMenu Can access Marketplace = " + this._UserCanAccessCreationClub.toString());
       this.MainList.GetClipByIndex(StartMenu.CREATION_CLUB_INDEX).alpha = !(this._UserCanAccessCreationClub && this._CClubAllowedByBnet) ? StartMenu.DISABLED_GREY_OUT_ALPHA : 100;
    }
    
    function UpdateBnetStatus(cclubUp, modsUp)
-   {      
+   {
       if (skse.version.releaseIdx < 70)
       {
          cclubUp = false;
          modsUp = false;
       }
-
+      trace("StartMenu::UpdateBnetStatus:  CC = " + cclubUp.toString() + ", Mods = " + modsUp.toString());
       this._CClubAllowedByBnet = cclubUp;
       this._ModsAllowedByBnet = modsUp;
       this.MainList.GetClipByIndex(StartMenu.CREATION_CLUB_INDEX).alpha = !(this._UserCanAccessCreationClub && this._CClubAllowedByBnet) ? StartMenu.DISABLED_GREY_OUT_ALPHA : 100;
