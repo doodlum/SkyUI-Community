@@ -3,16 +3,29 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
 
 /*  CONSTANTS & CONFIGURATION */
     
-    static var SMOOTH_SCROLL_LERP: Number      = 0.25;
-    static var SMOOTH_SCROLL_THRESHOLD: Number = 0.05;
-    static var WHEEL_ACCEL_THRESHOLD: Number   = 200;
-    static var WHEEL_ACCEL_MAX: Number         = 12.0;
+    public var smoothScrollLerp: Number      = 0.25;
+    public var smoothScrollThreshold: Number = 0.05;
 
-    static var KEY_REPEAT_DELAY: Number        = 300;
-    static var KEY_REPEAT_INTERVAL: Number     = 25;
+    public var wheelAccelThreshold: Number   = 200;
+    public var wheelAccelMax: Number         = 12.0;
+
+    public var keyRepeatDelay: Number        = 300;
+    public var keyRepeatInterval: Number     = 25;
 
     static var SCROLL_BRIGHTNESS_DIM: Number       = 0.9;
     static var SCROLL_BRIGHTNESS_HIGHLIGHT: Number = 1.25;
+
+    public function applyScrollConfig(a_config: Object)
+    {
+        if (a_config == undefined) return;
+
+        if (a_config.smoothScrollLerp != undefined)      this.smoothScrollLerp = a_config.smoothScrollLerp;
+        if (a_config.smoothScrollThreshold != undefined) this.smoothScrollThreshold = a_config.smoothScrollThreshold;
+        if (a_config.wheelAccelThreshold != undefined)   this.wheelAccelThreshold = a_config.wheelAccelThreshold;
+        if (a_config.wheelAccelMax != undefined)         this.wheelAccelMax = a_config.wheelAccelMax;
+        if (a_config.keyRepeatDelay != undefined)        this.keyRepeatDelay = a_config.keyRepeatDelay;
+        if (a_config.keyRepeatInterval != undefined)     this.keyRepeatInterval = a_config.keyRepeatInterval;
+    }
 
 
 /* VARIABLES */
@@ -410,13 +423,10 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
 
     function onMouseWheel(a_delta)
     {
-        if (this.disableInput) return undefined;
-
-        if (!this.hitTest(_root._xmouse, _root._ymouse, true)) return undefined;
+        if (this.disableInput || !this.hitTest(_root._xmouse, _root._ymouse, true)) return;
 
         this.isMouseDrivenNav = true;
-
-        var now       = getTimer();
+        var now = getTimer();
         var deltaTime = now - (this._lastWheelTime || 0);
         this._lastWheelTime = now;
 
@@ -426,15 +436,14 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
         }
 
         var accel = 1;
-        if (deltaTime > 0 && deltaTime < skyui.components.list.ScrollingList.WHEEL_ACCEL_THRESHOLD) {
-            accel = Math.min(skyui.components.list.ScrollingList.WHEEL_ACCEL_THRESHOLD / deltaTime, skyui.components.list.ScrollingList.WHEEL_ACCEL_MAX);
+        if (deltaTime > 0 && deltaTime < this.wheelAccelThreshold) {
+            accel = Math.min(this.wheelAccelThreshold / deltaTime, this.wheelAccelMax);
         }
 
-        var dir        = (a_delta > 0) ? -1 : 1;
+        var dir = (a_delta > 0) ? -1 : 1;
         var moveAmount = dir * this.scrollDelta * accel;
 
-        this._targetScrollPosition = Math.max(0,
-            Math.min(this._targetScrollPosition + moveAmount, this._maxScrollPosition));
+        this._targetScrollPosition = Math.max(0, Math.min(this._targetScrollPosition + moveAmount, this._maxScrollPosition));
 
         if (this._targetScrollPosition != this._scrollPosition && !this._isSmoothScrolling) {
             this._isSmoothScrolling = true;
@@ -476,9 +485,9 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
             return;
         }
 
-        this._floatScrollPosition += (this._targetScrollPosition - this._floatScrollPosition) * skyui.components.list.ScrollingList.SMOOTH_SCROLL_LERP;
+        this._floatScrollPosition += (this._targetScrollPosition - this._floatScrollPosition) * this.smoothScrollLerp;
 
-        var reached = Math.abs(this._targetScrollPosition - this._floatScrollPosition) < skyui.components.list.ScrollingList.SMOOTH_SCROLL_THRESHOLD;
+        var reached = Math.abs(this._targetScrollPosition - this._floatScrollPosition) < this.smoothScrollThreshold;
         var nextPos = reached
             ? Math.round(this._targetScrollPosition)
             : Math.max(0, Math.min(Math.round(this._floatScrollPosition), this._maxScrollPosition));
@@ -520,13 +529,13 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
     {
         this.stopKeyRepeat();  
         this._heldNavDirection = navCode;
-        this._keyRepeatTimeout = setInterval(this, "onKeyRepeatStart", skyui.components.list.ScrollingList.KEY_REPEAT_DELAY);
+        this._keyRepeatTimeout = setInterval(this, "onKeyRepeatStart", this.keyRepeatDelay);
     }
 
     function onKeyRepeatStart()
     {
         clearInterval(this._keyRepeatTimeout);
-        this._keyRepeatInterval = setInterval(this, "onKeyRepeatTick", skyui.components.list.ScrollingList.KEY_REPEAT_INTERVAL);
+        this._keyRepeatInterval = setInterval(this, "onKeyRepeatTick", this.keyRepeatInterval);
     }
 
     function onKeyRepeatTick()

@@ -758,3 +758,15 @@ layouts.smithingListLayout.views = <defaultCraftingView>
 
 layouts.alchemyListLayout.name = 'AlchemyListLayout'
 layouts.alchemyListLayout.views = <alchemyView>
+
+; =====================================================================================================================
+[ScrollingList]
+; =====================================================================================================================
+smoothScrollLerp = 0.25 ; Smooth scroll speed (lower = slower)
+smoothScrollThreshold = 0.05 ; Threshold to stop the scroll animation
+
+wheelAccelThreshold = 200 ; Time threshold between wheel scrolls for acceleration (ms)
+wheelAccelMax = 12.0 ; Maximum multiplier for wheel acceleration
+
+keyRepeatDelay = 300 ; Delay before key auto-repeat starts (ms)
+keyRepeatInterval = 25 ; Interval between auto-repeat steps (ms)
