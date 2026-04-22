@@ -405,9 +405,7 @@ class CraftingMenu extends MovieClip
          _loc5_.entryWidth -= CraftingLists.SHORT_LIST_OFFSET;
       }
       this.ItemList.layout = _loc5_;
-      if (a_config.ScrollingList != undefined) {
-         this.ItemList.applyScrollConfig(a_config.ScrollingList);
-      }
+      this.ItemList.applyScrollConfig(a_config.ScrollingList);
       var _loc7_ = a_config.Input.controls.gamepad.prevColumn;
       var _loc6_ = a_config.Input.controls.gamepad.nextColumn;
       var _loc8_ = a_config.Input.controls.gamepad.sortOrder;

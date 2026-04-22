@@ -43,9 +43,7 @@ class MagicMenu extends ItemMenu
       _loc3_.addDataProcessor(new skyui.props.PropertyDataExtender(a_config.Appearance,a_config.Properties,"magicProperties","magicIcons","magicCompoundProperties"));
       var _loc5_ = skyui.components.list.ListLayoutManager.createLayout(a_config.ListLayout,"MagicListLayout");
       _loc3_.layout = _loc5_;
-      if (a_config.ScrollingList != undefined) {
-         _loc3_.applyScrollConfig(a_config.ScrollingList);
-      }
+      _loc3_.applyScrollConfig(a_config.ScrollingList);
       if(this.inventoryLists.categoryList.selectedEntry)
       {
          _loc5_.changeFilterFlag(this.inventoryLists.categoryList.selectedEntry.flag);
