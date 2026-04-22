@@ -118,9 +118,10 @@ class skyui.components.list.TabularListEntry extends skyui.components.list.Basic
 
             var prevY: Number = a_list.lastSelectionAnimY;
             var diffY: Number = prevY - this._y;
+            if (diffY == 0) return;
             a_list.lastSelectionAnimY = this._y;
-
-            if (diffY != 0 && Math.abs(diffY) < skyui.components.list.TabularListEntry.ANIM_MAX_JUMP_Y) {
+            
+            if (Math.abs(diffY) < skyui.components.list.TabularListEntry.ANIM_MAX_JUMP_Y) {
                 this.selectIndicator._y = diffY;
                 this.selectIndicator._alpha = 100;
 
