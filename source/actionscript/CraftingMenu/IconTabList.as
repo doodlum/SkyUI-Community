@@ -1,6 +1,6 @@
 class IconTabList extends skyui.components.list.BasicList
 {
-   var __get__selectedEntry;
+   var selectedEntry;
    var _bFastSwitch;
    var _bRequestInvalidate;
    var _bRequestUpdate;

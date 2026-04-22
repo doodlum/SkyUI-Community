@@ -304,12 +304,9 @@ class CraftingMenu extends MovieClip
       this.CategoryList._y -= Stage.safeRect.y;
       this.MenuNameHolder.Lock("L");
       this.MenuNameHolder._x -= CraftingMenu.LIST_OFFSET;
-      this.MenuDescriptionHolder.Lock("TR");
+
       var leftOffset = Stage.visibleRect.x + Stage.safeRect.x;
       var rightOffset = Stage.visibleRect.x + Stage.visibleRect.width - Stage.safeRect.x;
-      var _loc3_ = this.CategoryList.getContentBounds();
-      var _loc4_ = this.CategoryList._x + _loc3_[0] + _loc3_[2] + 25;
-      this.MenuDescriptionHolder._x = 10 + _loc4_ + (_loc2_ - _loc4_) / 2 + this.MenuDescriptionHolder._width / 2;
 
       var marginBottomBarInfo = 17;
       
@@ -360,6 +357,10 @@ class CraftingMenu extends MovieClip
          _loc2_._x = _loc6_ + _loc3_.xOffset + (Stage.visibleRect.x + Stage.visibleRect.width - _loc6_ - _loc5_) / 2;
       }
       _loc2_._y += _loc3_.yOffset;
+      
+      this.MenuDescriptionHolder.Lock("TR");
+      this.MenuDescriptionHolder._x = _loc2_._x + _loc2_._width - 17;
+
       MovieClip(this.MouseRotationRect).Lock("T");
       this.MouseRotationRect._x = this.ItemInfo._parent._x;
       this.MouseRotationRect._width = this.ItemInfo._parent._width;

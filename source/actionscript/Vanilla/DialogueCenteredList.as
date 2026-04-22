@@ -90,13 +90,6 @@ class DialogueCenteredList extends Shared.CenteredScrollingList
          _loc7_ = _loc7_ + 1;
       }
 
-      this.bRecenterSelection = false;
-      this.RepositionEntries();
-
-      var _locIndicatorLimit = 3;
-      this._parent.ScrollIndicators.Up._visible = this.scrollPosition > this.iNumTopHalfEntries;
-      this._parent.ScrollIndicators.Down._visible = this.EntriesA.length - this.scrollPosition - 1 > _locIndicatorLimit || _loc6_ > this.fListHeight;
-
       if(!this.bPointerHighlight && !this.bRecenterSelection)
       {
          for (var i = 0; i < this.iMaxItemsShown; i++) {
@@ -107,6 +100,14 @@ class DialogueCenteredList extends Shared.CenteredScrollingList
             }
          }
       }
+      
+      this.bRecenterSelection = false;
+      this.RepositionEntries();
+
+      var _locIndicatorLimit = 3;
+      this._parent.ScrollIndicators.Up._visible = this.scrollPosition > this.iNumTopHalfEntries;
+      this._parent.ScrollIndicators.Down._visible = this.EntriesA.length - this.scrollPosition - 1 > _locIndicatorLimit || _loc6_ > this.fListHeight;
+
    }
 
    function RepositionEntries()
