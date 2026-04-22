@@ -294,7 +294,6 @@ class CraftingMenu extends MovieClip
       }
 
       this.ItemList.listHeight = heightItemList;
-      this.ItemList.requestUpdate();
    }
    function positionFixedElements()
    {

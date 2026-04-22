@@ -379,7 +379,6 @@ class ItemMenu extends MovieClip
          heightItemList -= tab._height;
       }
       this.inventoryLists.itemList.listHeight = heightItemList;
-      this.inventoryLists.itemList.requestUpdate();
    }
 
    function positionFixedElements()

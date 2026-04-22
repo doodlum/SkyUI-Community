@@ -115,9 +115,12 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
     function set listHeight(a_height)
     {
         this._listHeight = this.background._height = a_height;
+        this._maxListIndex = Math.floor(this._listHeight / this.entryHeight);
         if (this.scrollbar != undefined) {
             this.scrollbar.height = this._listHeight;
         }
+        this.calculateMaxScrollPosition();
+        this.requestUpdate();
     }
 
 
