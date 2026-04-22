@@ -77,6 +77,9 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
     
     var _scrollbarMouseListener;
 
+    public var bDisableAnim: Boolean = false;
+    public var lastSelectionAnimY: Number = -1;
+
 
 /* CONSTRUCTOR */
 
@@ -307,7 +310,7 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
 
         this.calculateMaxScrollPosition();
 
-        InventoryListEntry.bDisableAnim = true;
+        this.bDisableAnim = true;
         
         this.UpdateList();
         
@@ -315,7 +318,7 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
             this._curClipIndex = this.selectedEntry.clipIndex;
         }
 
-        InventoryListEntry.bDisableAnim = false;
+        this.bDisableAnim = false;
 
         if (this.onInvalidate) {
             this.onInvalidate();
@@ -388,7 +391,7 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
     function doSetSelectedIndex(a_newIndex, a_keyboardOrMouse)
     {
         if (this._selectedIndex == -1 && a_newIndex != -1) {
-            InventoryListEntry._lastClipY = -1;
+            this.lastSelectionAnimY = -1;
         }
 
         if (this.disableSelection || a_newIndex == this._selectedIndex) {
@@ -480,9 +483,9 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
         if (this._bSmoothing) return;
         this.stopSmoothScroll();
         
-        InventoryListEntry.bDisableAnim = true;
+        this.bDisableAnim = true;
         this.updateScrollPosition(Math.round(event.position));
-        InventoryListEntry.bDisableAnim = false;
+        this.bDisableAnim = false;
     }
 
 
@@ -521,9 +524,9 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
                 this._bSmoothing        = false;
             }
 
-            InventoryListEntry.bDisableAnim = true;
+            this.bDisableAnim = true;
             this.UpdateList();
-            InventoryListEntry.bDisableAnim = false;
+            this.bDisableAnim = false;
         }
 
         if (reached) {

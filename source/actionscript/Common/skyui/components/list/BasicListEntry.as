@@ -52,7 +52,7 @@ class skyui.components.list.BasicListEntry extends MovieClip
     // This is called after the object is added to the stage since the constructor does not accept any parameters.
     public function initialize(a_index: Number, a_list: BasicList)
     {
-        // Do nothing.
+        this.hitArea = this.background;
     }
 
     // @abstract
