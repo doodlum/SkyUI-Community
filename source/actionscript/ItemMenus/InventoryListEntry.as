@@ -213,10 +213,10 @@ class InventoryListEntry extends skyui.components.list.TabularListEntry
          element = a_icon[e];
          if (element instanceof MovieClip) {
             //Note: Could check if all values of RGBA mult and .rgb are all the same then skip
-            var ct: ColorTransform = new ColorTransform();
-            var tf: Transform = new Transform(MovieClip(element));
+            var ct: ColorTransform = new flash.geom.ColorTransform();
+            var tf: Transform = new flash.geom.Transform(MovieClip(element));
             // Could return here if (a_rgb == tf.colorTransform.rgb && a_rgb != undefined)
-            ct.rgb = (a_rgb == undefined)? 0xFFFFFF: a_rgb;
+            ct.rgb = (a_rgb == undefined) ? 0xFFFFFF : a_rgb;
             tf.colorTransform = ct;
             // Shouldn't be necessary to recurse since we don't expect multiple clip depths for an icon
             //this.changeIconColor(element, a_rgb);
