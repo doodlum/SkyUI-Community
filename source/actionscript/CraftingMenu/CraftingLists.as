@@ -499,7 +499,7 @@ class CraftingLists extends MovieClip
       this.panelContainer.ListBackground._width += delta;
       this.itemList.header.seperator._width += delta;
       this.CategoriesList.background._width += delta;
-
+      this.panelContainer.selectorLeft._width += delta;
       this.itemList.scrollbar._x += delta;
       this.searchWidget._x += delta;
       this.columnSelectButton._x += delta;
