@@ -1,6 +1,7 @@
 class InventoryLists extends MovieClip
 {
    var _columnSelectDialog;
+   var _columnSelectDialogX;
    var _columnSelectInterval;
    var _currCategoryIndex;
    var _currentState;
@@ -337,7 +338,7 @@ class InventoryLists extends MovieClip
       this.categoryList.disableSelection = this.categoryList.disableInput = true;
       this.itemList.disableSelection = this.itemList.disableInput = true;
       this.searchWidget.isDisabled = true;
-      this._columnSelectDialog = skyui.util.DialogManager.open(this.panelContainer,"ColumnSelectDialog",{_x:554,_y:35,layout:this.itemList.layout});
+      this._columnSelectDialog = skyui.util.DialogManager.open(this.panelContainer,"ColumnSelectDialog",{_x:this._columnSelectDialogX != undefined ? this._columnSelectDialogX : 554,_y:35,layout:this.itemList.layout});
       this._columnSelectDialog.addEventListener("dialogClosed",this,"onColumnSelectDialogClosed");
    }
    function onColumnSelectDialogClosed(event)
@@ -434,5 +435,6 @@ class InventoryLists extends MovieClip
       this.itemList.scrollbar._x += delta;
       this.searchWidget._x += delta;
       this.columnSelectButton._x += delta;
+      this._columnSelectDialogX = 554 + delta;
    }
 }
