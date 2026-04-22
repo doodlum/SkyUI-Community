@@ -19,12 +19,32 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
     {
         if (a_config == undefined) return;
 
-        if (a_config.smoothScrollLerp != undefined)      this.smoothScrollLerp = a_config.smoothScrollLerp;
-        if (a_config.smoothScrollThreshold != undefined) this.smoothScrollThreshold = a_config.smoothScrollThreshold;
-        if (a_config.wheelAccelThreshold != undefined)   this.wheelAccelThreshold = a_config.wheelAccelThreshold;
-        if (a_config.wheelAccelMax != undefined)         this.wheelAccelMax = a_config.wheelAccelMax;
-        if (a_config.keyRepeatDelay != undefined)        this.keyRepeatDelay = a_config.keyRepeatDelay;
-        if (a_config.keyRepeatInterval != undefined)     this.keyRepeatInterval = a_config.keyRepeatInterval;
+        var value;
+
+        if (a_config.smoothScrollLerp != undefined) {
+            value = Number(a_config.smoothScrollLerp);
+            if (!isNaN(value)) this.smoothScrollLerp = Math.max(0.01, Math.min(value, 1));
+        }
+        if (a_config.smoothScrollThreshold != undefined) {
+            value = Number(a_config.smoothScrollThreshold);
+            if (!isNaN(value)) this.smoothScrollThreshold = Math.max(0.01, value);
+        }
+        if (a_config.wheelAccelThreshold != undefined) {
+            value = Number(a_config.wheelAccelThreshold);
+            if (!isNaN(value)) this.wheelAccelThreshold = Math.max(1, value);
+        }
+        if (a_config.wheelAccelMax != undefined) {
+            value = Number(a_config.wheelAccelMax);
+            if (!isNaN(value)) this.wheelAccelMax = Math.max(1, value);
+        }
+        if (a_config.keyRepeatDelay != undefined) {
+            value = Number(a_config.keyRepeatDelay);
+            if (!isNaN(value)) this.keyRepeatDelay = Math.max(0, value);
+        }
+        if (a_config.keyRepeatInterval != undefined) {
+            value = Number(a_config.keyRepeatInterval);
+            if (!isNaN(value)) this.keyRepeatInterval = Math.max(1, value);
+        }
     }
 
 
