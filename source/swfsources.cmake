@@ -350,6 +350,7 @@ Add_SWF(map
     Common/skyui/defines/Input.as
     Common/skyui/filter/NameFilter.as
     Common/skyui/filter/SortFilter.as
+    Common/skyui/components/list/ScrollingList.as
     MapMenu/Map/LocalMap.as
     MapMenu/Map/LocationFinder.as
     MapMenu/Map/LocationListEntry.as
