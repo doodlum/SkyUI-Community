@@ -1,6 +1,14 @@
 // @abstract
 class skyui.components.list.TabularListEntry extends skyui.components.list.BasicListEntry
 {
+  /* CONSTANTS */
+	
+	private static var ANIM_FADE_STEP: Number = 10;
+	private static var ANIM_MAX_JUMP_Y: Number = 600;
+	private static var ANIM_Y_DECAY: Number = 0.6;
+	private static var ANIM_Y_EPSILON: Number = 0.5;
+
+
   /* PRIVATE VARIABLES */
 
     private var _layoutUpdateCount: Number = -1;
@@ -86,22 +94,20 @@ class skyui.components.list.TabularListEntry extends skyui.components.list.Basic
     {
         if (isSelected) {
             this.selectIndicator._visible = true;
-            
+
             if (a_list.bDisableAnim) {
-                delete this.onEnterFrame;
-                this.selectIndicator._y = 0;
-                this.selectIndicator._alpha = 100;
+                this.resetSelectionAnim(true);
                 a_list.lastSelectionAnimY = this._y;
                 return;
             }
-            
+
             if (a_list.lastSelectionAnimY == undefined || a_list.lastSelectionAnimY == -1) {
                 this.selectIndicator._y = 0;
                 this.selectIndicator._alpha = 0;
                 a_list.lastSelectionAnimY = this._y;
 
                 this.onEnterFrame = function() {
-                    this.selectIndicator._alpha += 10; 
+                    this.selectIndicator._alpha += skyui.components.list.TabularListEntry.ANIM_FADE_STEP; 
                     if (this.selectIndicator._alpha >= 100) {
                         this.selectIndicator._alpha = 100;
                         delete this.onEnterFrame;
@@ -110,31 +116,26 @@ class skyui.components.list.TabularListEntry extends skyui.components.list.Basic
                 return;
             }
 
-            var prevY = a_list.lastSelectionAnimY;
-            var diffY = prevY - this._y;
+            var prevY: Number = a_list.lastSelectionAnimY;
+            var diffY: Number = prevY - this._y;
             a_list.lastSelectionAnimY = this._y;
 
-            if (diffY != 0 && Math.abs(diffY) < 600) {
+            if (diffY != 0 && Math.abs(diffY) < skyui.components.list.TabularListEntry.ANIM_MAX_JUMP_Y) {
                 this.selectIndicator._y = diffY;
                 this.selectIndicator._alpha = 100;
 
                 this.onEnterFrame = function() {
-                    this.selectIndicator._y *= 0.6; 
-                    if (Math.abs(this.selectIndicator._y) < 0.5) {
+                    this.selectIndicator._y *= skyui.components.list.TabularListEntry.ANIM_Y_DECAY; 
+                    if (Math.abs(this.selectIndicator._y) < skyui.components.list.TabularListEntry.ANIM_Y_EPSILON) {
                         this.selectIndicator._y = 0;
                         delete this.onEnterFrame;
                     }
                 };
             } else {
-                delete this.onEnterFrame;
-                this.selectIndicator._y = 0;
-                this.selectIndicator._alpha = 100;
+                this.resetSelectionAnim(true);
             }
         } else {
-            delete this.onEnterFrame;
-            this.selectIndicator._visible = false;
-            this.selectIndicator._y = 0;
-            this.selectIndicator._alpha = 100;
+            this.resetSelectionAnim(false);
         }
     }
 
@@ -209,4 +210,12 @@ class skyui.components.list.TabularListEntry extends skyui.components.list.Basic
         
         return (cleanIndex == tabIndex) ? a_text : a_text.substring(0, cleanIndex);
     }
+
+    private function resetSelectionAnim(a_visible: Boolean)
+	{
+		delete this.onEnterFrame;
+		this.selectIndicator._visible = a_visible;
+		this.selectIndicator._y = 0;
+		this.selectIndicator._alpha = 100;
+	}
 }
