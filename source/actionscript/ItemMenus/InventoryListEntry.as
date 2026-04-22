@@ -1,289 +1,225 @@
 class InventoryListEntry extends skyui.components.list.TabularListEntry
 {
-   var _iconColor;
-   var _iconLabel;
-   var bestIcon;
-   var enchIcon;
-   var equipIcon;
-   var favoriteIcon;
-   var itemIcon;
-   var poisonIcon;
-   var readIcon;
-   var selectIndicator;
-   var stolenIcon;
-   static var STATES = ["None","Equipped","LeftEquip","RightEquip","LeftAndRightEquip"];
-   function InventoryListEntry()
-   {
-      super();
-   }
-   function initialize(a_index, a_state)
+  /* CONSTANTS */
+
+   private static var STATES = ["None", "Equipped", "LeftEquip", "RightEquip", "LeftAndRightEquip"];
+
+  /* PRIVATE VARIABLES */
+   
+   private var _iconLabel: String;
+   private var _iconColor: Number;
+   
+  /* STAGE ELMENTS */
+
+   public var itemIcon: MovieClip;
+   public var equipIcon: MovieClip;
+   
+   public var bestIcon: MovieClip;
+   public var favoriteIcon: MovieClip;
+   public var poisonIcon: MovieClip;
+   public var stolenIcon: MovieClip;
+   public var enchIcon: MovieClip;
+   public var readIcon: MovieClip;
+   
+   
+  /* INITIALIZATION */
+   
+   // @override TabularListEntry
+   public function initialize(a_index: Number, a_state: ListState)
    {
       super.initialize();
-      var _loc4_ = new MovieClipLoader();
-      _loc4_.addListener(this);
-      _loc4_.loadClip(a_state.iconSource,this.itemIcon);
+      
+      var iconLoader = new MovieClipLoader();
+      iconLoader.addListener(this);
+      iconLoader.loadClip(a_state.iconSource, this.itemIcon);
+      
       this.itemIcon._visible = false;
       this.equipIcon._visible = false;
-      var _loc3_ = 0;
-      while(this["textField" + _loc3_] != undefined)
-      {
-         this["textField" + _loc3_]._visible = false;
-         _loc3_ = _loc3_ + 1;
-      }
+      
+      for (var i = 0; this["textField" + i] != undefined; i++)
+         this["textField" + i]._visible = false;
    }
-   // HACK: specific workaround for tab-delimited translation text (e.g. BOOBIES Potions).
-   // TODO: replace with a cleaner generic solution if SkyUI handles this case centrally later.
-   function __rf_cleanDisplayText(a_text)
+   
+   
+  /* PUBLIC FUNCTIONS */
+   
+   // @override TabularListEntry
+   public function setSpecificEntryLayout(a_entryObject: Object, a_state: ListState)
    {
-      var _loc2_;
-      var _loc3_;
-      if(a_text == undefined)
-      {
-         return a_text;
-      }
-      _loc2_ = a_text.indexOf("\t");
-      if(_loc2_ == -1)
-      {
-         return a_text;
-      }
-      _loc3_ = _loc2_;
-      while(_loc3_ > 0 && (a_text.charCodeAt(_loc3_ - 1) == 32 || a_text.charCodeAt(_loc3_ - 1) == 160))
-      {
-         _loc3_ -= 1;
-      }
-      return a_text.substring(0,_loc3_);
+      var iconY = skyui.components.list.TabularList(a_state.list).layout.entryHeight * 0.25;
+      var iconSize = skyui.components.list.TabularList(a_state.list).layout.entryHeight * 0.5;
+         
+      this.bestIcon._height = this.bestIcon._width = iconSize;
+      this.favoriteIcon._height = this.favoriteIcon._width = iconSize;
+      this.poisonIcon._height = this.poisonIcon._width = iconSize;
+      this.stolenIcon._height = this.stolenIcon._width = iconSize;
+      this.enchIcon._height = this.enchIcon._width = iconSize;
+      this.readIcon._height = this.readIcon._width = iconSize;
+         
+      this.bestIcon._y = iconY;
+      this.favoriteIcon._y = iconY;
+      this.poisonIcon._y = iconY;
+      this.stolenIcon._y = iconY;
+      this.enchIcon._y = iconY;
+      this.readIcon._y = iconY;
    }
-   function setEntry(a_entryObject, a_state)
+
+   // @override TabularListEntry
+   public function formatEquipIcon(a_entryField: Object, a_entryObject: Object, a_state: ListState)
    {
-      var _loc4_ = skyui.components.list.TabularList(a_state.list).layout;
-      this.selectIndicator._visible = a_entryObject == a_state.list.selectedEntry;
-      var _loc5_ = _loc4_.layoutUpdateCount;
-      if(this._layoutUpdateCount != _loc5_)
-      {
-         this._layoutUpdateCount = _loc5_;
-         this.setEntryLayout(a_entryObject,a_state);
-         this.setSpecificEntryLayout(a_entryObject,a_state);
-      }
-      var _loc6_ = 0;
-      var _loc7_;
-      var _loc8_;
-      var _loc9_;
-      var _loc10_;
-      var _loc11_;
-      var _loc12_;
-      while(_loc6_ < _loc4_.columnCount)
-      {
-         _loc7_ = _loc4_.columnLayoutData[_loc6_];
-         _loc8_ = this[_loc7_.stageName];
-         _loc9_ = _loc7_.entryValue;
-         if(_loc9_ != undefined)
-         {
-            if(_loc9_.charAt(0) == "@")
-            {
-               _loc10_ = a_entryObject[_loc9_.slice(1)];
-               _loc12_ = _loc10_ == undefined ? "-" : _loc10_;
-               if(_loc7_.stageName == "textField1")
-               {
-                  _loc12_ = this.__rf_cleanDisplayText(_loc12_);
-               }
-               _loc8_.SetText(_loc12_);
-            }
-            else
-            {
-               _loc12_ = _loc9_;
-               if(_loc7_.stageName == "textField1")
-               {
-                  _loc12_ = this.__rf_cleanDisplayText(_loc12_);
-               }
-               _loc8_.SetText(_loc12_);
-            }
-         }
-         switch(_loc7_.type)
-         {
-            case skyui.components.list.ListLayout.COL_TYPE_EQUIP_ICON:
-               this.formatEquipIcon(_loc8_,a_entryObject,a_state);
-               break;
-            case skyui.components.list.ListLayout.COL_TYPE_ITEM_ICON:
-               this.formatItemIcon(_loc8_,a_entryObject,a_state);
-               break;
-            case skyui.components.list.ListLayout.COL_TYPE_NAME:
-               this.formatName(_loc8_,a_entryObject,a_state);
-               break;
-            case skyui.components.list.ListLayout.COL_TYPE_TEXT:
-            default:
-               this.formatText(_loc8_,a_entryObject,a_state);
-         }
-         if(_loc7_.colorAttribute != undefined)
-         {
-            _loc11_ = a_entryObject[_loc7_.colorAttribute];
-            if(_loc11_ != undefined)
-            {
-               _loc8_.textColor = _loc11_;
-            }
-         }
-         _loc6_ += 1;
-      }
-   }
-   function setSpecificEntryLayout(a_entryObject, a_state)
-   {
-      var _loc2_ = skyui.components.list.TabularList(a_state.list).layout.entryHeight * 0.25;
-      var _loc3_ = skyui.components.list.TabularList(a_state.list).layout.entryHeight * 0.5;
-      this.bestIcon._height = this.bestIcon._width = _loc3_;
-      this.favoriteIcon._height = this.favoriteIcon._width = _loc3_;
-      this.poisonIcon._height = this.poisonIcon._width = _loc3_;
-      this.stolenIcon._height = this.stolenIcon._width = _loc3_;
-      this.enchIcon._height = this.enchIcon._width = _loc3_;
-      this.readIcon._height = this.readIcon._width = _loc3_;
-      this.bestIcon._y = _loc2_;
-      this.favoriteIcon._y = _loc2_;
-      this.poisonIcon._y = _loc2_;
-      this.stolenIcon._y = _loc2_;
-      this.enchIcon._y = _loc2_;
-      this.readIcon._y = _loc2_;
-   }
-   function formatEquipIcon(a_entryField, a_entryObject, a_state)
-   {
-      if(a_entryObject != undefined && a_entryObject.equipState != undefined)
-      {
+      if (a_entryObject != undefined && a_entryObject.equipState != undefined) {
          a_entryField.gotoAndStop(InventoryListEntry.STATES[a_entryObject.equipState]);
-      }
-      else
-      {
+      } else {
          a_entryField.gotoAndStop("None");
       }
    }
-   function formatItemIcon(a_entryField, a_entryObject, a_state)
+
+   // @override TabularListEntry
+   public function formatItemIcon(a_entryField: Object, a_entryObject: Object, a_state: ListState)
    {
-      this._iconLabel = a_entryObject.iconLabel == undefined ? "default_misc" : a_entryObject.iconLabel;
-      this._iconColor = a_entryObject.iconColor;
+      this._iconLabel = a_entryObject["iconLabel"] != undefined ? a_entryObject["iconLabel"] : "default_misc";
+      this._iconColor = a_entryObject["iconColor"];
+
+      // Could return here if _iconLoaded is false
       a_entryField.gotoAndStop(this._iconLabel);
-      this.changeIconColor(MovieClip(a_entryField),this._iconColor);
+      this.changeIconColor(MovieClip(a_entryField), this._iconColor);
    }
-   function formatName(a_entryField, a_entryObject, a_state)
+
+   // @override TabularListEntry
+   public function formatName(a_entryField: Object, a_entryObject: Object, a_state: ListState)
    {
-      if(a_entryObject.text == undefined)
-      {
+      if (a_entryObject.text == undefined) {
          a_entryField.SetText(" ");
-         return undefined;
+         return;
       }
-      var _loc4_ = a_entryObject.text;
-      if(a_entryObject.soulLVL != undefined)
-      {
-         _loc4_ = _loc4_ + " (" + a_entryObject.soulLVL + ")";
+
+      // Text
+      var text = a_entryObject.text;
+
+      if (a_entryObject.soulLVL != undefined) {
+         text = text + " (" + a_entryObject.soulLVL + ")";
       }
-      if(a_entryObject.count > 1)
-      {
-         _loc4_ = _loc4_ + " (" + a_entryObject.count.toString() + ")";
+
+      if (a_entryObject.count > 1) {
+         text = text + " (" + a_entryObject.count.toString() + ")";
       }
-      if(_loc4_.length > a_state.maxTextLength)
-      {
-         _loc4_ = _loc4_.substr(0,a_state.maxTextLength - 3) + "...";
+
+      if (text.length > a_state.maxTextLength) {
+         text = text.substr(0, a_state.maxTextLength - 3) + "...";
       }
+
       a_entryField.autoSize = "left";
-      a_entryField.SetText(_loc4_);
-      this.formatColor(a_entryField,a_entryObject,a_state);
-      var _loc2_ = a_entryField._x + a_entryField._width + 5;
-      var _loc5_ = this.bestIcon._width * 1.25;
-      if(a_entryObject.bestInClass == true)
-      {
-         this.bestIcon._x = _loc2_;
-         _loc2_ += _loc5_;
+      a_entryField.SetText(text);
+      
+      this.formatColor(a_entryField, a_entryObject, a_state);
+
+      // BestInClass icon
+      var iconPos = a_entryField._x + a_entryField._width + 5;
+
+      // All icons have the same size
+      var iconSpace = this.bestIcon._width * 1.25;
+
+      if (a_entryObject.bestInClass == true) {
+         this.bestIcon._x = iconPos;
+         iconPos = iconPos + iconSpace;
+
          this.bestIcon.gotoAndStop("show");
-      }
-      else
-      {
+      } else {
          this.bestIcon.gotoAndStop("hide");
       }
-      if(a_entryObject.favorite == true)
-      {
-         this.favoriteIcon._x = _loc2_;
-         _loc2_ += _loc5_;
+
+      // Fav icon
+      if (a_entryObject.favorite == true) {
+         this.favoriteIcon._x = iconPos;
+         iconPos = iconPos + iconSpace;
          this.favoriteIcon.gotoAndStop("show");
-      }
-      else
-      {
+      } else {
          this.favoriteIcon.gotoAndStop("hide");
       }
-      if(a_entryObject.isPoisoned == true)
-      {
-         this.poisonIcon._x = _loc2_;
-         _loc2_ += _loc5_;
+
+      // Poisoned Icon
+      if (a_entryObject.isPoisoned == true) {
+         this.poisonIcon._x = iconPos;
+         iconPos = iconPos + iconSpace;
          this.poisonIcon.gotoAndStop("show");
-      }
-      else
-      {
+      } else {
          this.poisonIcon.gotoAndStop("hide");
       }
-      if((a_entryObject.isStolen == true || a_entryObject.isStealing == true) && a_state.showStolenIcon == true)
-      {
-         this.stolenIcon._x = _loc2_;
-         _loc2_ += _loc5_;
+
+      // Stolen Icon
+      if ((a_entryObject.isStolen == true || a_entryObject.isStealing == true) && a_state.showStolenIcon == true) {
+         this.stolenIcon._x = iconPos;
+         iconPos = iconPos + iconSpace;
          this.stolenIcon.gotoAndStop("show");
-      }
-      else
-      {
+      } else {
          this.stolenIcon.gotoAndStop("hide");
       }
-      if(a_entryObject.isEnchanted == true)
-      {
-         this.enchIcon._x = _loc2_;
-         _loc2_ += _loc5_;
+
+      // Enchanted Icon
+      if (a_entryObject.isEnchanted == true) {
+         this.enchIcon._x = iconPos;
+         iconPos = iconPos + iconSpace;
          this.enchIcon.gotoAndStop("show");
-      }
-      else
-      {
+      } else {
          this.enchIcon.gotoAndStop("hide");
       }
-      if(a_entryObject.isRead == true)
-      {
-         this.readIcon._x = _loc2_;
-         _loc2_ += _loc5_;
+
+      // Enchanted Icon
+      if (a_entryObject.isRead == true) {
+         this.readIcon._x = iconPos;
+         iconPos = iconPos + iconSpace;
          this.readIcon.gotoAndStop("show");
-      }
-      else
-      {
+      } else {
          this.readIcon.gotoAndStop("hide");
       }
    }
-   function formatText(a_entryField, a_entryObject, a_state)
+   
+   // @override TabularEntry
+   public function formatText(a_entryField: Object, a_entryObject: Object, a_state: ListState)
    {
-      this.formatColor(a_entryField,a_entryObject,a_state);
+      this.formatColor(a_entryField, a_entryObject, a_state);
       a_entryField.autoSize = a_entryField.getTextFormat().align;
    }
-   function onLoadInit(a_icon)
+   
+   
+  /* PRIVATE FUNCTIONS */
+
+   // @implements MovieClipLoader
+   private function onLoadInit(a_icon: MovieClip)
    {
       a_icon.gotoAndStop(this._iconLabel);
-      this.changeIconColor(a_icon,this._iconColor);
+      this.changeIconColor(a_icon, this._iconColor);
    }
-   function formatColor(a_entryField, a_entryObject, a_state)
+   
+   private function formatColor(a_entryField: Object, a_entryObject: Object, a_state: ListState)
    {
-      if(a_entryObject.negativeEffect == true)
-      {
-         a_entryField.textColor = a_entryObject.enabled != false ? a_state.negativeEnabledColor : a_state.negativeDisabledColor;
-      }
-      else if(a_entryObject.infoIsStolen == true || a_entryObject.isStealing == true)
-      {
-         a_entryField.textColor = a_entryObject.enabled != false ? a_state.stolenEnabledColor : a_state.stolenDisabledColor;
-      }
+      // Negative Effect
+      if (a_entryObject.negativeEffect == true)
+         a_entryField.textColor = a_entryObject.enabled == false ? a_state.negativeDisabledColor : a_state.negativeEnabledColor;
+         
+      // Stolen
+      else if (a_entryObject.infoIsStolen == true || a_entryObject.isStealing == true)
+         a_entryField.textColor = a_entryObject.enabled == false ? a_state.stolenDisabledColor : a_state.stolenEnabledColor;
+         
+      // Default
       else
-      {
-         a_entryField.textColor = a_entryObject.enabled != false ? a_state.defaultEnabledColor : a_state.defaultDisabledColor;
-      }
+         a_entryField.textColor = a_entryObject.enabled == false ? a_state.defaultDisabledColor : a_state.defaultEnabledColor;
    }
-   function changeIconColor(a_icon, a_rgb)
+   
+   private function changeIconColor(a_icon: MovieClip, a_rgb: Number)
    {
-      var _loc2_;
-      var _loc1_;
-      var _loc3_;
-      for(var _loc6_ in a_icon)
-      {
-         _loc2_ = a_icon[_loc6_];
-         if(_loc2_ instanceof MovieClip)
-         {
-            _loc1_ = new flash.geom.ColorTransform();
-            _loc3_ = new flash.geom.Transform(MovieClip(_loc2_));
-            _loc1_.rgb = a_rgb != undefined ? a_rgb : 16777215;
-            _loc3_.colorTransform = _loc1_;
+      var element: Object;
+      for (var e in a_icon) {
+         element = a_icon[e];
+         if (element instanceof MovieClip) {
+            //Note: Could check if all values of RGBA mult and .rgb are all the same then skip
+            var ct: ColorTransform = new ColorTransform();
+            var tf: Transform = new Transform(MovieClip(element));
+            // Could return here if (a_rgb == tf.colorTransform.rgb && a_rgb != undefined)
+            ct.rgb = (a_rgb == undefined)? 0xFFFFFF: a_rgb;
+            tf.colorTransform = ct;
+            // Shouldn't be necessary to recurse since we don't expect multiple clip depths for an icon
+            //this.changeIconColor(element, a_rgb);
          }
       }
    }
