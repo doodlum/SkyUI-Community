@@ -88,7 +88,7 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
         if (this.scrollbar != undefined) {
             this.scrollbar.position = 0;
             this.scrollbar.addEventListener("scroll", this, "onScroll");
-            this.scrollbar._y = this.background._x + this.topBorder;
+            this.scrollbar._y = this.background._y + this.topBorder;
             this.scrollbar.height = this._listHeight;
         }
     }
