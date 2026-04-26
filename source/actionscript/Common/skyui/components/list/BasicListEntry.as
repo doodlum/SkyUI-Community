@@ -11,6 +11,14 @@ class skyui.components.list.BasicListEntry extends MovieClip
     public var isEnabled: Boolean = true;
 
 
+  /* INITIALIZATION */
+
+    function BasicListEntry()
+    {
+        super();
+    }
+
+
   /* PUBLIC FUNCTIONS */
 
     // @override MovieClip
