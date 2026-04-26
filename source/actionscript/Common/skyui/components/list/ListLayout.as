@@ -464,7 +464,7 @@ class skyui.components.list.ListLayout
         var xPos = 0;
         c = 0;
         for (var i = 0; i < this._columnList.length; i++) {
-            var col = _columnList[i];
+            var col = this._columnList[i];
             // Skip
             if (col.hidden == true)
                 continue;
