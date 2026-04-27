@@ -11,9 +11,14 @@ macro(Add_SWF _TARGET_NAME _SWF_REL _XML_PATH)
     foreach(_token IN LISTS _RAW_SOURCES)
         if("${_token}" STREQUAL "SKIP_IN_RELEASE")
             set(_SKIP_IN_RELEASE TRUE)
+            set(_LAST_TOKEN "") # Keywords cannot be directory names
         elseif("${_token}" STREQUAL "{")
-            # If we encounter '{', then the previous token was a folder.
-            # Remove it from the file list and add it to the directory stack.
+            # Validation: Check if the preceding token is a valid folder name
+            if("${_LAST_TOKEN}" STREQUAL "" OR "${_LAST_TOKEN}" STREQUAL "{" OR "${_LAST_TOKEN}" STREQUAL "}")
+                message(FATAL_ERROR "Add_SWF(${_TARGET_NAME}): '{' must be preceded by a directory name. Found: '${_LAST_TOKEN}'")
+            endif()
+
+            # The directory name was added to _SOURCES in the 'else' branch; remove it
             list(LENGTH _SOURCES _len)
             if(_len GREATER 0)
                 math(EXPR _last_idx "${_len} - 1")
@@ -22,30 +27,42 @@ macro(Add_SWF _TARGET_NAME _SWF_REL _XML_PATH)
             
             list(APPEND _PREFIX_STACK "${_LAST_TOKEN}")
             string(REPLACE ";" "/" _CURRENT_PREFIX "${_PREFIX_STACK}")
+            set(_LAST_TOKEN "") # Reset to prevent nested push of same token
         elseif("${_token}" STREQUAL "}")
-            # If we encounter '}', we exit the current folder (remove the last element from the stack).
+            # Validation: Check for stack underflow
             list(LENGTH _PREFIX_STACK _len)
-            if(_len GREATER 0)
-                math(EXPR _last_idx "${_len} - 1")
-                list(REMOVE_AT _PREFIX_STACK ${_last_idx})
+            if(_len EQUAL 0)
+                message(FATAL_ERROR "Add_SWF(${_TARGET_NAME}): Unexpected '}' found without matching '{'.")
             endif()
+
+            # Pop from stack
+            math(EXPR _last_idx "${_len} - 1")
+            list(REMOVE_AT _PREFIX_STACK ${_last_idx})
             
             if(_PREFIX_STACK)
                 string(REPLACE ";" "/" _CURRENT_PREFIX "${_PREFIX_STACK}")
             else()
                 set(_CURRENT_PREFIX "")
             endif()
+            set(_LAST_TOKEN "") # Reset after closing a block
         else()
-            # Add the file to the list with the current prefix (if any)
+            # Regular file or a potential directory name
             if(_CURRENT_PREFIX)
                 list(APPEND _SOURCES "${_CURRENT_PREFIX}/${_token}")
             else()
                 list(APPEND _SOURCES "${_token}")
             endif()
+            set(_LAST_TOKEN "${_token}")
         endif()
-        set(_LAST_TOKEN "${_token}")
     endforeach()
 
+    # Validation: Check for unmatched open braces
+    list(LENGTH _PREFIX_STACK _len)
+    if(_len GREATER 0)
+        message(FATAL_ERROR "Add_SWF(${_TARGET_NAME}): Missing closing '}' for directories: ${_PREFIX_STACK}")
+    endif()
+
+    # --- Logic for build starts here ---
     if(NOT (_SKIP_IN_RELEASE AND CMAKE_BUILD_TYPE STREQUAL "Release"))
         set(_BASE_SWF "${CMAKE_CURRENT_BINARY_DIR}/interface/base/${_SWF_REL}")
         set(_FINAL_SWF "${CMAKE_CURRENT_BINARY_DIR}/interface/${_SWF_REL}")
