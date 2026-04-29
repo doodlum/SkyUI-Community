@@ -25,6 +25,14 @@ class skyui.components.list.ButtonListEntry extends skyui.components.list.BasicL
     public static var disabledTextColor: Number = 0x505050;
 
 
+  /* INITIALIZATION */
+
+    function ButtonListEntry()
+    {
+        super();
+    }
+
+
   /* PUBLIC FUNCTIONS */
 
     public function setEntry(a_entryObject: Object, a_state: ListState)

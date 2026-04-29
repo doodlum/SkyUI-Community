@@ -11,6 +11,14 @@ class skyui.components.list.BasicListEntry extends MovieClip
     public var isEnabled: Boolean = true;
 
 
+  /* INITIALIZATION */
+
+    function BasicListEntry()
+    {
+        super();
+    }
+
+
   /* PUBLIC FUNCTIONS */
 
     // @override MovieClip
@@ -49,12 +57,17 @@ class skyui.components.list.BasicListEntry extends MovieClip
             list.onItemPressAux(this.itemIndex, a_keyboardOrMouse, a_buttonIndex);
     }
 
-    // This is called after the object is added to the stage since the constructor does not accept any parameters.
-    public function initialize(a_index: Number, a_list: BasicList)
-    {
-        // Do nothing.
-    }
 
-    // @abstract
-    public function setEntry(a_entryObject: Object, a_state: ListState) {}
+    // # NOTE: Empty functions are intentionally commented out—they cause ColumnSelectDialog to break.
+    // JPEXS currently has issues with using empty functions.
+    // # See https://www.free-decompiler.com/flash/issues/2705
+
+    // // This is called after the object is added to the stage since the constructor does not accept any parameters.
+    // public function initialize(a_index: Number, a_list: BasicList)
+    // {
+    //     // Do nothing.
+    // }
+
+    // // @abstract
+    // public function setEntry(a_entryObject: Object, a_state: ListState) {}
 }
