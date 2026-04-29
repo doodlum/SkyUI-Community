@@ -11,6 +11,14 @@ class skyui.components.list.TabularListEntry extends skyui.components.list.Basic
     public var selectIndicator: MovieClip;
 
 
+  /* INITIALIZATION */
+
+    function TabularListEntry()
+    {
+        super();
+    }
+
+
   /* PUBLIC FUNCTIONS */
 
     // @override BasicListEntry
