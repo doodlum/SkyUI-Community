@@ -34,12 +34,17 @@ class skyui.components.list.TabularListEntry extends skyui.components.list.Basic
         // Show select area if this is the current entry
         var isSelected: Boolean = (a_entryObject == a_state.list.selectedEntry);
         var isMarquee: Boolean = (a_entryObject.isMarqueeSelected == true);
+        
+        var isMultiActive: Boolean = this._list._parent._parent._parent.isMultiSelectionActive();
 
         this.selectIndicator._visible = (isSelected || isMarquee);
         this.selectIndicator._y = 0;
-        this.selectIndicator._alpha = 100;
-        
-        var curLayoutUpdateCount = layout.layoutUpdateCount;
+
+        if (isSelected) {
+            this.selectIndicator._alpha = (isMultiActive || isMarquee) ? 70 : 100;
+        } else {
+            this.selectIndicator._alpha = 100;
+        }
         
         // Has the view update sequence number changed? Then Update the columns positions etc.
         if (this._layoutUpdateCount != curLayoutUpdateCount) {
@@ -106,11 +111,16 @@ class skyui.components.list.TabularListEntry extends skyui.components.list.Basic
         }
 
         var isActualSelected: Boolean = (this._entryObject == this._list.selectedEntry);
+        var isMultiActive: Boolean = this._list._parent._parent._parent.isMultiSelectionActive();
         
         this.selectIndicator._visible = (a_selected || isActualSelected);
-        
         this.selectIndicator._y = 0;
-        this.selectIndicator._alpha = 100;
+        
+        if (isActualSelected) {
+            this.selectIndicator._alpha = (isMultiActive || a_selected) ? 70 : 100;
+        } else {
+            this.selectIndicator._alpha = 100;
+        }
     }
 
     // Do any clip-specific tasks when the view was changed for this entry.
