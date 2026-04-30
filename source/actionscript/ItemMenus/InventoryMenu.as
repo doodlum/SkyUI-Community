@@ -283,17 +283,4 @@ class InventoryMenu extends ItemMenu
       }
       this.navPanel.updateButtons(true);
    }
-
-   function onMouseDown()
-   {
-      this._marqueeController.onMouseDown();
-   }
-   function onMouseUp()
-   {
-      this._marqueeController.onMouseUp();
-   }
-   function onMouseMove()
-   {
-      this._marqueeController.onMouseMove();
-   }
 }

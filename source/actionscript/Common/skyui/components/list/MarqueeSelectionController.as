@@ -24,6 +24,7 @@ class skyui.components.list.MarqueeSelectionController
 
     public function MarqueeSelectionController(a_menu: MovieClip, a_inventoryLists: MovieClip)
     {
+        Mouse.addListener(this);
         this._menu = a_menu;
         this._inventoryLists = a_inventoryLists;
         this._dropQueue = [];
@@ -34,7 +35,7 @@ class skyui.components.list.MarqueeSelectionController
 
     public function onMouseDown()
     {
-        if (!enabled || !this._menu.bFadedIn) return;
+        if (!this.enabled || !this._menu.bFadedIn) return;
 
         var itemList = this._inventoryLists.itemList;
         var isCtrl = Key.isDown(Key.CONTROL);
@@ -79,7 +80,7 @@ class skyui.components.list.MarqueeSelectionController
 
     public function handleInput(details: Object)
     {
-        if (!enabled) return;
+        if (!this.enabled) return;
 
         if (details.value == "keyDown") {
             var nav = details.navEquivalent;
@@ -92,7 +93,7 @@ class skyui.components.list.MarqueeSelectionController
 
     public function processItemClick(a_index: Number, a_entry: Object)
     {
-        if (enabled && Key.isDown(Key.CONTROL) && a_entry != undefined) {
+        if (this.enabled && Key.isDown(Key.CONTROL) && a_entry != undefined) {
             a_entry.isMarqueeSelected = !a_entry.isMarqueeSelected;
 
             var list = this._inventoryLists.itemList;
@@ -113,15 +114,19 @@ class skyui.components.list.MarqueeSelectionController
         this._dropQueue = [];
 
         for (var i = 0; i < list.entryList.length; i++) {
-            if (list.entryList[i].isMarqueeSelected) this._dropQueue.push(i);
+            if (list.entryList[i].isMarqueeSelected) 
+                this._dropQueue.push(i);
         }
 
-        if (this._dropQueue.length > 0) {
+        if (this._dropQueue.length > 1) {
             this._dropQueue.sort(function(a, b) { return b - a; });
             list.disableInput = true;
             this._isProcessingQueue = true;
             this._menu.onEnterFrame = mx.utils.Delegate.create(this, this.processDropQueue);
             return true;
+        }
+        if (this._dropQueue.length == 1) {
+            list.selectedIndex = this._dropQueue[0];
         }
         return false;
     }
