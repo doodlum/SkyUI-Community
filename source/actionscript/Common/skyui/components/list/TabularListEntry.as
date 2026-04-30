@@ -4,6 +4,8 @@ class skyui.components.list.TabularListEntry extends skyui.components.list.Basic
   /* PRIVATE VARIABLES */
 
     private var _layoutUpdateCount: Number = -1;
+    private var _entryObject;
+    private var _list;
 
 
   /* STAGE ELEMENTS */
@@ -24,10 +26,18 @@ class skyui.components.list.TabularListEntry extends skyui.components.list.Basic
     // @override BasicListEntry
     public function setEntry(a_entryObject: Object, a_state: ListState)
     {
+        this._entryObject = a_entryObject;
+        this._list = a_state.list;
+
         var layout: ListLayout = skyui.components.list.TabularList(a_state.list).layout;
             
         // Show select area if this is the current entry
-        this.selectIndicator._visible = (a_entryObject == a_state.list.selectedEntry);
+        var isSelected: Boolean = (a_entryObject == a_state.list.selectedEntry);
+        var isMarquee: Boolean = (a_entryObject.isMarqueeSelected == true);
+
+        this.selectIndicator._visible = (isSelected || isMarquee);
+        this.selectIndicator._y = 0;
+        this.selectIndicator._alpha = 100;
         
         var curLayoutUpdateCount = layout.layoutUpdateCount;
         
@@ -87,6 +97,20 @@ class skyui.components.list.TabularListEntry extends skyui.components.list.Basic
                     e.textColor = color;
             }
         }
+    }
+
+    public function setMultiSelected(a_selected: Boolean)
+    {
+        if (this._entryObject != undefined) {
+            this._entryObject.isMarqueeSelected = a_selected;
+        }
+
+        var isActualSelected: Boolean = (this._entryObject == this._list.selectedEntry);
+        
+        this.selectIndicator._visible = (a_selected || isActualSelected);
+        
+        this.selectIndicator._y = 0;
+        this.selectIndicator._alpha = 100;
     }
 
     // Do any clip-specific tasks when the view was changed for this entry.
