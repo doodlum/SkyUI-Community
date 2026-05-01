@@ -11,8 +11,9 @@ class skyui.components.list.MarqueeSelectionController
     private var _isSelecting: Boolean = false;
     private var _baselineSelection: Object;
 
-    private var _dropQueue: Array;
+    private var _actionQueue: Array;
     private var _isProcessingQueue: Boolean = false;
+    private var _currentActionFunc: Function;
 
 
   /* PUBLIC VARIABLES */
@@ -27,7 +28,7 @@ class skyui.components.list.MarqueeSelectionController
         Mouse.addListener(this);
         this._menu = a_menu;
         this._inventoryLists = a_inventoryLists;
-        this._dropQueue = [];
+        this._actionQueue =[];
     }
 
 
@@ -35,7 +36,8 @@ class skyui.components.list.MarqueeSelectionController
 
     public function onMouseDown()
     {
-        if (!this.enabled || !this._menu.bFadedIn) return;
+        if (!this.enabled || !this._menu.bFadedIn)
+            return;
 
         var itemList = this._inventoryLists.itemList;
         var isCtrl = Key.isDown(Key.CONTROL);
@@ -102,7 +104,7 @@ class skyui.components.list.MarqueeSelectionController
             }
 
             list.requestUpdate();
-            gfx.io.GameDelegate.call("PlaySound", ["UIMenuFocus"]);
+            gfx.io.GameDelegate.call("PlaySound",["UIMenuFocus"]);
             return true;
         }
         return false;
@@ -110,25 +112,18 @@ class skyui.components.list.MarqueeSelectionController
 
     public function startBatchDrop()
     {
-        var list = this._inventoryLists.itemList;
-        this._dropQueue = [];
+        var dropFunc = function(a_entry) {
+            gfx.io.GameDelegate.call("ItemDrop", [a_entry.count]);
+        };
+        return this.startGenericBatchAction(dropFunc, true);
+    }
 
-        for (var i = 0; i < list.entryList.length; i++) {
-            if (list.entryList[i].isMarqueeSelected) 
-                this._dropQueue.push(i);
-        }
-
-        if (this._dropQueue.length > 1) {
-            this._dropQueue.sort(function(a, b) { return b - a; });
-            list.disableInput = true;
-            this._isProcessingQueue = true;
-            this._menu.onEnterFrame = mx.utils.Delegate.create(this, this.processDropQueue);
-            return true;
-        }
-        if (this._dropQueue.length == 1) {
-            list.selectedIndex = this._dropQueue[0];
-        }
-        return false;
+    public function startBatchTransfer(a_isViewingContainer: Boolean)
+    {
+        var transferFunc = function(a_entry) {
+            gfx.io.GameDelegate.call("ItemTransfer", [a_entry.count, a_isViewingContainer]);
+        };
+        return this.startGenericBatchAction(transferFunc, false);
     }
 
     public function clearSelection()
@@ -157,6 +152,68 @@ class skyui.components.list.MarqueeSelectionController
 
 
   /* PRIVATE FUNCTIONS */
+
+    private function startGenericBatchAction(a_actionFunc: Function, a_checkSingle: Boolean)
+    {
+        var list = this._inventoryLists.itemList;
+        this._actionQueue =[];
+
+        for (var i = 0; i < list.entryList.length; i++) {
+            if (list.entryList[i].isMarqueeSelected) 
+                this._actionQueue.push(i);
+        }
+
+        var qLen = this._actionQueue.length;
+
+        if (qLen == 1 && a_checkSingle) {
+            list.doSetSelectedIndex(this._actionQueue[0], 1);
+            return false; 
+        }
+
+        if (qLen > 0) {
+            this._actionQueue.sort(function(a, b) { return b - a; });
+            this._currentActionFunc = a_actionFunc;
+            
+            list.disableInput = true;
+            this._isProcessingQueue = true;
+            
+            this._menu.onEnterFrame = mx.utils.Delegate.create(this, this.processActionQueue);
+            return true;
+        }
+
+        return false;
+    }
+
+    private function processActionQueue()
+    {
+        var list = this._inventoryLists.itemList;
+
+        if (this._actionQueue.length > 0) {
+            var targetIdx = this._actionQueue.shift();
+            var entry = list.entryList[targetIdx];
+
+            if (entry != undefined) {
+                list.doSetSelectedIndex(targetIdx, 1);
+                this._currentActionFunc(entry);
+            }
+        } 
+        
+        // Если очередь опустела — завершаем
+        if (this._actionQueue.length == 0) {
+            this.finishBatchAction();
+        }
+    }
+
+    private function finishBatchAction()
+    {
+        delete this._menu.onEnterFrame;
+        this._isProcessingQueue = false;
+        this._inventoryLists.itemList.disableInput = false;
+        this._currentActionFunc = null;
+        
+        this.clearSelection();
+        gfx.io.GameDelegate.call("RequestItemCardInfo",[], this._menu, "UpdateItemCardInfo");
+    }
 
     private function drawMarquee(a_currX: Number, a_currY: Number)
     {
@@ -187,25 +244,6 @@ class skyui.components.list.MarqueeSelectionController
                 var wasSelected = (this._baselineSelection != null && this._baselineSelection[clip.itemIndex] == true);
                 if (clip.setMultiSelected != undefined) clip.setMultiSelected(isHit != wasSelected);
             }
-        }
-    }
-
-    private function processDropQueue()
-    {
-        var list = this._inventoryLists.itemList;
-        if (this._dropQueue.length > 0) {
-            var targetIdx = this._dropQueue.shift();
-            var entry = list.entryList[targetIdx];
-            if (entry != undefined) {
-                list.doSetSelectedIndex(targetIdx, 1);
-                gfx.io.GameDelegate.call("ItemDrop", [entry.count]);
-            }
-        } else {
-            delete this._menu.onEnterFrame;
-            this._isProcessingQueue = false;
-            list.disableInput = false;
-            this.clearSelection();
-            gfx.io.GameDelegate.call("RequestItemCardInfo", [], this._menu, "UpdateItemCardInfo");
         }
     }
 }

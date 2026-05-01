@@ -28,11 +28,15 @@ class ContainerMenu extends ItemMenu
    var _bEquipMode = false;
    var bNPCMode = false;
    var bEnableTabs = true;
+
+   private var _marqueeController: MarqueeSelectionController;
+
    function ContainerMenu()
    {
       super();
       this._categoryListIconArt = ["inv_all","inv_weapons","inv_armor","inv_potions","inv_scrolls","inv_food","inv_ingredients","inv_books","inv_keys","inv_misc"];
       this._tabBarIconArt = ["take","give"];
+      this._marqueeController = new skyui.components.list.MarqueeSelectionController(this, this.inventoryLists);
    }
    function InitExtensions()
    {
@@ -47,6 +51,9 @@ class ContainerMenu extends ItemMenu
    function setConfig(a_config)
    {
       super.setConfig(a_config);
+      if (a_config.ItemList.selection.marquee.enabled != undefined) {
+         this._marqueeController.enabled = a_config.ItemList.selection.marquee.enabled;
+      }
       var _loc3_ = this.inventoryLists.itemList;
       _loc3_.addDataProcessor(new InventoryDataSetter());
       _loc3_.addDataProcessor(new InventoryIconSetter(a_config.Appearance));
@@ -66,6 +73,7 @@ class ContainerMenu extends ItemMenu
    function handleInput(details, pathToFocus)
    {
       super.handleInput(details,pathToFocus);
+      this._marqueeController.handleInput(details);
       
       if(this._platform == 0 && details.skseKeycode == this._equipModeKey)
       {
@@ -95,6 +103,9 @@ class ContainerMenu extends ItemMenu
    }
    function AttemptEquip(a_slot, a_bCheckOverList)
    {
+      if (this._marqueeController.enabled && Key.isDown(Key.CONTROL))
+         return;
+
       var _loc2_ = a_bCheckOverList != undefined ? a_bCheckOverList : true;
       if(!this.shouldProcessItemsListInput(_loc2_) || !this.confirmSelectedEntry())
       {
@@ -134,6 +145,9 @@ class ContainerMenu extends ItemMenu
    }
    function onItemSelect(event)
    {
+      if (this._marqueeController.processItemClick(event.index, event.entry))
+         return;
+
       if(event.keyboardOrMouse != 0)
       {
          if(this._platform == 0 && this._bEquipMode)
@@ -261,6 +275,11 @@ class ContainerMenu extends ItemMenu
    }
    function startItemTransfer()
    {
+      if (this._marqueeController.isMultiSelectionActive()) {
+         this._marqueeController.startBatchTransfer(this.isViewingContainer());
+         return;
+      }
+
       if(this.inventoryLists.itemList.selectedEntry.enabled)
       {
          if(this.itemCard.itemInfo.weight == 0 && this.isViewingContainer())
