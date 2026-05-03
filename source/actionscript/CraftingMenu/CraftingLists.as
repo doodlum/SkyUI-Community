@@ -321,6 +321,17 @@ class CraftingLists extends MovieClip
       {
          this._sortOrderKey = _loc2_.Input.controls.gamepad.sortOrder;
       }
+      if(_loc2_.ListLayout.smoothScroll != undefined && this.itemList != undefined)
+      {
+         if(_loc2_.ListLayout.smoothScroll.enabled != undefined)
+         {
+            this.itemList.smoothScrollEnabled = _loc2_.ListLayout.smoothScroll.enabled;
+         }
+         if(_loc2_.ListLayout.smoothScroll.durationMs != undefined)
+         {
+            this.itemList.smoothScrollDuration = _loc2_.ListLayout.smoothScroll.durationMs;
+         }
+      }
    }
    function onItemListInvalidate()
    {
@@ -444,6 +455,18 @@ class CraftingLists extends MovieClip
    function onConfigUpdate(event)
    {
       this.itemList.layout.refresh();
+      var _loc2_ = event.config;
+      if(_loc2_.ListLayout.smoothScroll != undefined && this.itemList != undefined)
+      {
+         if(_loc2_.ListLayout.smoothScroll.enabled != undefined)
+         {
+            this.itemList.smoothScrollEnabled = _loc2_.ListLayout.smoothScroll.enabled;
+         }
+         if(_loc2_.ListLayout.smoothScroll.durationMs != undefined)
+         {
+            this.itemList.smoothScrollDuration = _loc2_.ListLayout.smoothScroll.durationMs;
+         }
+      }
    }
    function onItemPress()
    {
