@@ -146,18 +146,21 @@ class skyui.components.list.TabularListEntry extends skyui.components.list.Basic
     // TODO: replace with a cleaner generic solution if SkyUI handles this case centrally later.
     private function __rf_cleanDisplayText(a_text)
     {
-        if (a_text == undefined) return a_text;
-
-        var tabIndex = a_text.indexOf("\t");
-
-        if (tabIndex == -1) return a_text;
+        if (a_text == undefined)
+            return a_text;
+            
+        var firstTabIndex = a_text.indexOf("\t");
         
-        var cleanIndex = tabIndex;
-        while (cleanIndex > 0 && (a_text.charCodeAt(cleanIndex - 1) == 32 || a_text.charCodeAt(cleanIndex - 1) == 160))
+        if (firstTabIndex == -1)
+            return a_text;
+            
+        var lastValidCharIndex = firstTabIndex;
+        
+        while (lastValidCharIndex > 0 && (a_text.charCodeAt(lastValidCharIndex - 1) == 32 || a_text.charCodeAt(lastValidCharIndex - 1) == 160))
         {
-            cleanIndex -= 1;
+            lastValidCharIndex--;
         }
         
-        return (cleanIndex == tabIndex) ? a_text : a_text.substring(0, cleanIndex);
+        return a_text.substring(0, lastValidCharIndex);
     }
 }
