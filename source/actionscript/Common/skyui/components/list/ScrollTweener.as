@@ -169,12 +169,6 @@ class skyui.components.list.ScrollTweener
         return Math.abs(this._velocity) < skyui.components.list.ScrollTweener.VELOCITY_STOP_THRESHOLD;
     }
 
-    public function settle()
-    {
-        this._velocity = 0;
-        this._active = false;
-    }
-
     public function cancel()
     {
         this._velocity = 0;

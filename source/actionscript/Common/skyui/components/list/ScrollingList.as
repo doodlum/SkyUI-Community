@@ -137,36 +137,8 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
 
         this._scrollTweener = new skyui.components.list.ScrollTweener();
 
-        // Register config callbacks BEFORE the container/mask wiring so even if the latter
-        // hits a Scaleform quirk, smoothScrollEnabled / smoothScrollDuration still come in.
-        skyui.util.ConfigManager.registerLoadCallback(this, "onConfigLoad");
-        skyui.util.ConfigManager.registerUpdateCallback(this, "onConfigUpdate");
-
-        // Items container + a programmatic mask. The mask covers `background`'s rectangle
-        // plus padding on the left so columns with a negative indent (equip icon at -28)
-        // remain visible. Header / scrollbar / etc. stay direct children of `this`, outside
-        // entriesContainer, so they aren't touched by the mask.
         this.entriesContainer = this.createEmptyMovieClip("entriesContainer", this.getNextHighestDepth());
         this.rebuildEntriesMask();
-    }
-
-    public function onConfigLoad(a_event: Object)
-    {
-        var smoothScroll = a_event.config.ListLayout.smoothScroll;
-        if (smoothScroll == undefined)
-            return;
-        // ConfigManager.parseValueString already converts "true"/"false"/numerics, so values
-        // arrive here as real booleans/numbers regardless of whether they came from config.txt
-        // or a Papyrus override.
-        if (smoothScroll.enabled != undefined)
-            this.smoothScrollEnabled = smoothScroll.enabled;
-        if (smoothScroll.durationMs != undefined)
-            this.smoothScrollDuration = smoothScroll.durationMs;
-    }
-
-    public function onConfigUpdate(a_event: Object)
-    {
-        this.onConfigLoad(a_event);
     }
 
 
@@ -180,6 +152,18 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
             this.scrollbar.addEventListener("scroll", this, "onScroll");
             this.scrollbar._y = this.background._y + this.topBorder;
             this.scrollbar.height = this._listHeight;
+        }
+    }
+
+    // @override MovieClip
+    public function onUnload()
+    {
+        if (this._scrollTweener != undefined)
+            this._scrollTweener.cancel();
+        this._isMomentumActive = false;
+        if (this._tickIntervalId != -1) {
+            clearInterval(this._tickIntervalId);
+            this._tickIntervalId = -1;
         }
     }
 
@@ -472,7 +456,7 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
         }
 
         if (this._scrollTweener.isSettled()) {
-            this._scrollTweener.settle();
+            this._scrollTweener.cancel();
             this._visualScrollPosition = Math.round(this._visualScrollPosition);
             this._scrollPosition = this._visualScrollPosition;
             this._isMomentumActive = false;
