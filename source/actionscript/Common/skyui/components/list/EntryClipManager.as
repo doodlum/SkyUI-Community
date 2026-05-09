@@ -61,8 +61,7 @@ class skyui.components.list.EntryClipManager
     private function growPool(a_size: Number)
     {
         var entryRenderer = this._list.entryRenderer;
-        // ScrollingList parents its clips under entriesContainer so they can be masked without
-        // hiding sibling stage elements. Other list classes attach directly to the list.
+        // ScrollingList parents clips under entriesContainer so the mask doesn't hide siblings.
         var clipParent: MovieClip = this._list.entriesContainer != undefined ? this._list.entriesContainer : this._list;
 
         for (var i = 0; i < a_size; i++) {

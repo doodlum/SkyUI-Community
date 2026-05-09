@@ -27,36 +27,24 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
 
     public var isPressOnMove: Boolean = false;
 
-    // Off by default; users opt in via the Smooth Scrolling toggle in the SkyUI MCM.
-    // onConfigLoad pulls the user's preference from config.txt / Papyrus override at runtime.
     public var smoothScrollEnabled: Boolean = false;
-
     public var smoothScrollDuration: Number = 150;
 
     private var _scrollPosition: Number = 0;
-
     private var _visualScrollPosition: Number = 0;
 
-    // Velocity-based momentum scroller. State + math live in ScrollTweener so the helper class
-    // can be authored into the SWF once via the FFDec GUI and reused cleanly.
     private var _scrollTweener: skyui.components.list.ScrollTweener;
     private var _isMomentumActive: Boolean = false;
 
-    // Per-frame ticker. Uses setInterval rather than MovieClip.onEnterFrame because
-    // onEnterFrame doesn't reliably fire for runtime-driven MovieClips in Scaleform/GFx.
     private var _tickIntervalId: Number = -1;
-    private static var TICK_INTERVAL_MS: Number = 16;       // ~60 fps
+    private static var TICK_INTERVAL_MS: Number = 16;
 
-    // Items live in this masked sub-clip so partial rows during a glide don't bleed past
-    // the list bounds onto the header / scrollbar. EntryClipManager.growPool detects this
-    // field and attaches entries here.
     public var entriesContainer: MovieClip;
 
-    // Mask shape -- drawn slightly wider than `background` because some columns (notably the
-    // equip-icon column with its negative `indent = -28`) render *outside* the background's
-    // left edge. Using setMask(this.background) would clip those off.
+    // Mask is drawn wider than `background` so columns with a negative indent (equip icon at -28)
+    // remain visible.
     private var _entriesMask: MovieClip;
-    private static var ENTRIES_MASK_LEFT_PAD: Number = 32;     // px slack on the left for negative-indent columns
+    private static var ENTRIES_MASK_LEFT_PAD: Number = 32;
 
     public function get scrollPosition()
     {
@@ -95,12 +83,9 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
         if (this.scrollbar != undefined)
             this.scrollbar.height = this._listHeight;
 
-        // Items area changed -- regenerate the mask shape.
         this.rebuildEntriesMask();
     }
 
-    // (Re)builds the entries mask MovieClip. Sized to `background` plus left padding so
-    // negative-indent columns (e.g. the equip icon) remain visible.
     private function rebuildEntriesMask()
     {
         if (this.entriesContainer == undefined || this.background == undefined)
@@ -256,10 +241,8 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
         for (var i = visualStart + this._listIndex; i < this.getListEnumSize(); i++)
             this.getListEnumEntry(i).clipIndex = undefined;
 
-        // Select entry under the cursor for mouse-driven navigation.
-        // Skip while momentum scrolling is active: cursor-on-clip reselection would yank
-        // scrollPosition back to the cursor and snap the visual progress. The final UpdateList
-        // call after momentum settles will re-run reselection naturally.
+        // Select entry under the cursor for mouse-driven navigation. Skipped while momentum
+        // is active to avoid the reselect snapping the visual position back to the cursor.
         if (this.isMouseDrivenNav && !this._isMomentumActive) {
             for (var j = 0; j < this._listIndex; j++) {
                 var clip = this.getClipByIndex(j);
@@ -400,11 +383,8 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
 
         this.isMouseDrivenNav = true;
 
-        // Vanilla 1-row path when smooth scrolling is off in MCM, or when ScrollTweener
-        // isn't authored into this SWF (e.g. craftingmenu.swf inherits ScrollingList from
-        // upstream's PR #182 but doesn't yet have a ScrollTweener class slot, so
-        // `new ScrollTweener()` returned undefined). Without this fallback, _scrollTweener.tick()
-        // returns undefined and poisons _visualScrollPosition with NaN.
+        // Vanilla 1-row path when smooth scrolling is off, or when ScrollTweener isn't present
+        // (defensive: prevents NaN poisoning of _visualScrollPosition).
         if (!this.smoothScrollEnabled || this._scrollTweener == undefined || this._scrollTweener.tick == undefined) {
             var simpleTarget: Number = this._scrollPosition;
             if (a_delta < 0)      simpleTarget += this.scrollDelta;
@@ -416,9 +396,6 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
             return;
         }
 
-        // Momentum path: each tick adds a *one-row* impulse. An isolated tick scrolls about
-        // a row; rapid ticks accumulate velocity for a fast glide ("the more you scroll, the
-        // quicker it scrolls"). A tick in the opposite direction halts and reverses.
         var direction: Number = a_delta < 0 ? 1 : -1;
 
         this._scrollTweener.impulse(direction, this.scrollDelta, this.smoothScrollDuration);
@@ -431,8 +408,8 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
 
     private function onScroll(event: Object)
     {
-        // Ignore the scrollbar's own scroll event while we're driving the position via momentum;
-        // accepting it would cancel velocity and snap the visual progress.
+        // Ignore scrollbar events while momentum is driving position; otherwise the scrollbar
+        // event would snap us back and cancel the tween.
         if (this._isMomentumActive)
             return;
         var newPos: Number = Math.floor(event.position + 0.5);
@@ -467,11 +444,7 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
             if (this.scrollbar != undefined)
                 this.scrollbar.position = this._scrollPosition;
         } else {
-            // Keep _scrollPosition in sync at row granularity so observers see sensible values.
             this._scrollPosition = Math.round(this._visualScrollPosition);
-            // Drive the scrollbar thumb at sub-row precision so it glides with the items.
-            // Safe because onScroll early-returns while _isMomentumActive, preventing the
-            // scrollbar's resulting scroll event from cancelling our tween.
             if (this.scrollbar != undefined)
                 this.scrollbar.position = this._visualScrollPosition;
         }

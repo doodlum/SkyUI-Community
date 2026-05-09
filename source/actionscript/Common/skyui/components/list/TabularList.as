@@ -39,9 +39,6 @@ class skyui.components.list.TabularList extends skyui.components.list.ScrollingL
         super();
 
         skyui.util.ConfigManager.registerLoadCallback(this, "onConfigLoad");
-        // Also listen for runtime config updates -- without this, MCM toggles for smooth
-        // scroll would only land on the next configLoad (i.e. on next game-load), not at
-        // the moment the user moves a slider.
         skyui.util.ConfigManager.registerUpdateCallback(this, "onConfigUpdate");
     }
 
@@ -87,17 +84,11 @@ class skyui.components.list.TabularList extends skyui.components.list.ScrollingL
         this.applySmoothScrollConfig(config);
     }
 
-    // Listens for runtime config overrides pushed by SKI_SettingsManager -- e.g. when the
-    // user toggles smooth scroll in MCM, the toggle's new value lands here on the next
-    // menu open. (configLoad is the initial load; configUpdate is everything after.)
     private function onConfigUpdate(event: Object)
     {
         this.applySmoothScrollConfig(event.config);
     }
 
-    // Applies the smoothScroll keys onto inherited fields (smoothScrollEnabled and
-    // smoothScrollDuration are on ScrollingList). InventoryLists and CraftingLists both
-    // inherit from TabularList, so they pick this up automatically.
     private function applySmoothScrollConfig(config: Object)
     {
         if (config.ListLayout.smoothScroll == undefined)

@@ -21,11 +21,8 @@ class skyui.components.list.BasicListEntry extends MovieClip
 
   /* PUBLIC FUNCTIONS */
 
-    // ScrollingList wraps its entries in a masked sub-clip (entriesContainer), so this._parent
-    // is the container, not the list itself. Walk up the display tree until we find a clip
-    // that actually exposes onItemPress -- that's the owning list. For lists that don't nest
-    // (e.g. ButtonList) the loop exits immediately on the first iteration and behavior is
-    // unchanged.
+    // Walk up the display tree to find the list -- entries may live in a sub-clip
+    // (entriesContainer), so this._parent isn't always the list itself.
     private function findOwningList()
     {
         var p = this._parent;
