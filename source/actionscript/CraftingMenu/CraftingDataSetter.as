@@ -6,21 +6,44 @@ class CraftingDataSetter implements skyui.components.list.IListProcessor
    }
    function processList(a_list)
    {
-      var _loc4_ = a_list.entryList;
-      var _loc3_ = 0;
-      var _loc2_;
-      while(_loc3_ < _loc4_.length)
-      {
-         _loc2_ = _loc4_[_loc3_];
-         if(!_loc2_.skyui_itemDataProcessed)
-         {
-            _loc2_.skyui_itemDataProcessed = true;
-            this.fixSKSEExtendedObject(_loc2_);
-            this.processEntry(_loc2_);
-         }
-         _loc3_ = _loc3_ + 1;
+      if (this._list != a_list) {
+         if (this._list)
+            this._list.removeEventListener("listUpdate", this, "onListUpdate");
+
+         this._list = a_list;
+         this._list.addEventListener("listUpdate", this, "onListUpdate");
       }
    }
+
+   function onListUpdate(event: Object)
+   {
+      var listEnum = this._list.listEnumeration;
+      if (listEnum == undefined) return;
+
+      var maxVisible = this._list.maxListIndex;
+      var batchSize = maxVisible * 2;
+      
+      var startIdx = this._list.scrollPosition;
+      var endIdx = Math.min(startIdx + maxVisible, listEnum.size());
+      
+      for (var i = startIdx; i < endIdx; i++) {
+         var entry = listEnum.at(i);
+         if (entry != undefined && !entry.skyui_itemDataProcessed && entry.filterFlag != 0) {
+            var chunkEnd = Math.min(i + batchSize, listEnum.size());
+            
+            for (var j = i; j < chunkEnd; j++) {
+               var batchEntry = listEnum.at(j);
+               if (batchEntry != undefined && !batchEntry.skyui_itemDataProcessed) {
+                  batchEntry.skyui_itemDataProcessed = true;
+                  this.fixSKSEExtendedObject(batchEntry);
+                  this.processEntry(batchEntry);
+               }
+            }
+            break;
+         }
+      }
+   }
+
    function processEntry(a_entryObject)
    {
       a_entryObject.baseId = a_entryObject.formId & 0xFFFFFF;

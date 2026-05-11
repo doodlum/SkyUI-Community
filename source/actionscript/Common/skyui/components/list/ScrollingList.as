@@ -67,6 +67,11 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
             this.scrollbar.height = this._listHeight;
     }
 
+    public function get maxListIndex()
+    {
+        return this._maxListIndex;
+    }
+
 
   /* INITIALIZATION */
 
@@ -139,6 +144,8 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
             this._bRequestUpdate = true;
             return;
         }
+
+        this.dispatchEvent({type: "listUpdate"});
         
         // Prepare clips
         this.setClipCount(this._maxListIndex);

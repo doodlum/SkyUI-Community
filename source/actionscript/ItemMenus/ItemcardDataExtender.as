@@ -3,6 +3,8 @@ class ItemcardDataExtender implements skyui.components.list.IListProcessor
    var _itemInfo;
    var _requestItemInfo;
    var _selectedIndex;
+   var _list;
+
    function ItemcardDataExtender()
    {
       this._requestItemInfo = function(a_target, a_index)
@@ -19,20 +21,47 @@ class ItemcardDataExtender implements skyui.components.list.IListProcessor
    }
    function processList(a_list)
    {
-      var _loc4_ = a_list.entryList;
-      var _loc3_ = 0;
-      var _loc2_;
-      while(_loc3_ < _loc4_.length)
+      if (this._list != a_list)
       {
-         _loc2_ = _loc4_[_loc3_];
-         if(!(_loc2_.skyui_itemDataProcessed || _loc2_.filterFlag == 0))
-         {
-            _loc2_.skyui_itemDataProcessed = true;
-            this.fixSKSEExtendedObject(_loc2_);
-            this._requestItemInfo.apply(a_list,[this,_loc3_]);
-            this.processEntry(_loc2_,this._itemInfo);
+         if (this._list)
+            this._list.removeEventListener("listUpdate", this, "onListUpdate");
+         
+         this._list = a_list;
+         this._list.addEventListener("listUpdate", this, "onListUpdate");
+      }
+   }
+
+   function onListUpdate(event: Object)
+   {
+      var listEnum = this._list.listEnumeration;
+      if (listEnum == undefined) return;
+
+      var maxVisible = this._list.maxListIndex;
+      var batchSize = maxVisible * 2;
+      
+      var startIdx = this._list.scrollPosition;
+      var endIdx = Math.min(startIdx + maxVisible, listEnum.size());
+      
+      var totalEntries = listEnum.size();
+      
+      for (var i = startIdx; i < endIdx; i++) {
+         var entry = listEnum.at(i);
+         
+         if (entry != undefined && !entry.skyui_itemDataProcessed && entry.filterFlag != 0) {
+               var chunkEnd = Math.min(i + batchSize, totalEntries);
+               
+            for (var j = i; j < chunkEnd; j++) {
+               var batchEntry = listEnum.at(j);
+               if (batchEntry != undefined && !batchEntry.skyui_itemDataProcessed) {
+                  batchEntry.skyui_itemDataProcessed = true;
+                  
+                  this.fixSKSEExtendedObject(batchEntry);
+                  this._requestItemInfo.apply(this._list, [this, batchEntry.itemIndex]);
+                  this.processEntry(batchEntry, this._itemInfo);
+               }
+            }
+            break;
          }
-         _loc3_ = _loc3_ + 1;
       }
    }
    function processEntry(a_entryObject, a_itemInfo)

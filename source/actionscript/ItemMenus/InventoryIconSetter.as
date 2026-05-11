@@ -1,20 +1,55 @@
 class InventoryIconSetter implements skyui.components.list.IListProcessor
 {
    var _noIconColors;
+   var _list;
+
    function InventoryIconSetter(a_configAppearance)
    {
       this._noIconColors = a_configAppearance.icons.item.noColor;
    }
    function processList(a_list)
    {
-      var _loc3_ = a_list.entryList;
-      var _loc2_ = 0;
-      while(_loc2_ < _loc3_.length)
+      if (this._list != a_list)
       {
-         this.processEntry(_loc3_[_loc2_]);
-         _loc2_ = _loc2_ + 1;
+         if (this._list)
+            this._list.removeEventListener("listUpdate", this, "onListUpdate");
+
+         this._list = a_list;
+         this._list.addEventListener("listUpdate", this, "onListUpdate");
       }
    }
+
+   function onListUpdate(event: Object)
+   {
+      var listEnum = this._list.listEnumeration;
+      if (listEnum == undefined) return;
+
+      var maxVisible = this._list.maxListIndex;
+      var batchSize = maxVisible * 2;
+      
+      var startIdx = this._list.scrollPosition;
+      var endIdx = Math.min(startIdx + maxVisible, listEnum.size());
+      
+      var totalEntries = listEnum.size();
+
+      for (var i = startIdx; i < endIdx; i++) {
+         var entry = listEnum.at(i);
+         
+         if (entry != undefined && !entry.skyui_iconProcessed && entry.skyui_itemDataProcessed) {
+            var chunkEnd = Math.min(i + batchSize, totalEntries);
+               
+            for (var j = i; j < chunkEnd; j++) {
+               var batchEntry = listEnum.at(j);
+               if (batchEntry != undefined && !batchEntry.skyui_iconProcessed && batchEntry.skyui_itemDataProcessed) {
+                  this.processEntry(batchEntry);
+                  batchEntry.skyui_iconProcessed = true;
+               }
+            }
+            break;
+         }
+      }
+   }
+   
    function processEntry(a_entryObject)
    {
       switch(a_entryObject.formType)
