@@ -9,14 +9,10 @@ class CraftingIconSetter implements skyui.components.list.IListProcessor
    }
    function processList(a_list)
    {
-      if (this._list != a_list)
-      {
-         if (this._list)
-            this._list.removeEventListener("listUpdate", this, "onListUpdate");
-
-         this._list = a_list;
-         this._list.addEventListener("listUpdate", this, "onListUpdate");
-      }
+      if (this._list == a_list) return;
+      if (this._list) this._list.removeEventListener("listUpdate", this, "onListUpdate");
+      this._list = a_list;
+      if (this._list) this._list.addEventListener("listUpdate", this, "onListUpdate");
    }
 
    function onListUpdate(event: Object)
@@ -24,11 +20,11 @@ class CraftingIconSetter implements skyui.components.list.IListProcessor
       var listEnum = this._list.listEnumeration;
       if (listEnum == undefined) return;
 
-      var maxVisible = this._list.maxListIndex;
-      var batchSize = maxVisible * 2;
+      var visibleCount = Math.max(1, this._list.maxListIndex + 1);
+      var batchSize = visibleCount * 2;
       
       var startIdx = this._list.scrollPosition;
-      var endIdx = Math.min(startIdx + maxVisible, listEnum.size());
+      var endIdx = Math.min(startIdx + visibleCount, listEnum.size());
       
       var totalEntries = listEnum.size();
 
