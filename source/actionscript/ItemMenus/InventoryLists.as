@@ -309,15 +309,18 @@ class InventoryLists extends MovieClip
         var flagOffset = 1;
         var bDontHideOffset = 2;
         var len = 3;
+        var index = 0;
 
         this.categoryList.clearList();
 
-        for (var i = 0, index = 0; i < arguments.length; i = i + len, index++) {
+        for (var i = 0; i < arguments.length; i = i + len) {
             var entry = {text: arguments[i + textOffset], flag: arguments[i + flagOffset], bDontHide: arguments[i + bDontHideOffset], savedItemIndex: 0, filterFlag: arguments[i + bDontHideOffset] == true ? (1) : (0)};
             this.categoryList.entryList.push(entry);
 
             if (entry.flag == 0)
                 this.categoryList.dividerIndex = index;
+            
+            index++;
         }
         
         // Initialize tabbar labels and replace text of segment heads (name -> ALL)
