@@ -4,6 +4,7 @@ class SaveLoadPanel extends MovieClip
    var BackMouseButton;
    var CharacterSelectionHint_mc;
    var List_mc;
+   var PS3Switch;
    var PlayerInfoText;
    var SaveLoadList_mc;
    var ScreenShotRect_mc;
@@ -88,9 +89,11 @@ class SaveLoadPanel extends MovieClip
    {
       return this.iPlatform;
    }
-   function set platform(aiPlatform)
+   function SetPlatform(aiPlatform, abPS3Switch)
    {
+      trace("SaveLoadPanel::SetPlatform " + aiPlatform.toString() + ", abPS3Switch = " + abPS3Switch.toString());
       this.iPlatform = aiPlatform;
+      this.PS3Switch = abPS3Switch;
       var _loc2_;
       if(this.iPlatform == SaveLoadPanel.CONTROLLER_PC)
       {
@@ -103,8 +106,8 @@ class SaveLoadPanel extends MovieClip
       }
       else
       {
-         this.BackGamepadButton.SetPlatform(this.iPlatform);
-         this.SelectGamepadButton.SetPlatform(this.iPlatform);
+         this.BackGamepadButton.SetPlatform(this.iPlatform,this.PS3Switch);
+         this.SelectGamepadButton.SetPlatform(this.iPlatform,this.PS3Switch);
       }
       this.BackMouseButton._visible = this.SelectMouseButton._visible = this.iPlatform == SaveLoadPanel.CONTROLLER_PC;
       this.BackGamepadButton._visible = this.SelectGamepadButton._visible = this.iPlatform != SaveLoadPanel.CONTROLLER_PC;
