@@ -98,6 +98,7 @@ class ItemMenu extends MovieClip
         this.itemCard.addEventListener("subMenuAction", this, "onItemCardSubMenuAction");
         
         this.positionFixedElements();
+        this.updateDynamicListHeight();
         
         this.itemCard._visible = false;
         this.navPanel.hideButtons();
@@ -112,12 +113,6 @@ class ItemMenu extends MovieClip
     public function setConfig(a_config: Object)
     {
         this._config = a_config;
-
-         var customWidth = a_config["ListLayout"].defaults.entryWidth;
-      
-        if (customWidth != undefined && customWidth > 0) {
-            this.inventoryLists.applyDynamicWidth(customWidth);
-        }
 
         this.positionFloatingElements();
         
@@ -137,26 +132,27 @@ class ItemMenu extends MovieClip
         itemListState.negativeDisabledColor = appearance.colors.negative.disabled;
         itemListState.stolenDisabledColor = appearance.colors.stolen.disabled;
 
-        this._quantityMinCount = a_config["ItemList"].quantityMenu.minCount;
+        var itemList = a_config["ItemList"];
+        this._quantityMinCount = itemList.quantityMenu.minCount;
         
+        var input = a_config["Input"];
         if (this._platform == 0) {
-            this._switchTabKey = a_config["Input"].controls.pc.switchTab;
+            this._switchTabKey = input.controls.pc.switchTab;
         } else {
-            this._switchTabKey = a_config["Input"].controls.gamepad.switchTab;
-            
-            var previousColumnKey = a_config["Input"].controls.gamepad.prevColumn;
-            var nextColumnKey = a_config["Input"].controls.gamepad.nextColumn;
-            var sortOrderKey = a_config["Input"].controls.gamepad.sortOrder;
-            this._sortColumnControls = [{keyCode: previousColumnKey},
-                                {keyCode: nextColumnKey}];
-            this._sortOrderControls = {keyCode: sortOrderKey};
+            var gamepad = input.controls.gamepad;
+            this._switchTabKey = gamepad.switchTab;
+            this._sortColumnControls = [{keyCode: gamepad.prevColumn}, {keyCode: gamepad.nextColumn}];
+            this._sortOrderControls = {keyCode: gamepad.sortOrder};
         }
         
         this._switchControls = {keyCode: this._switchTabKey};
         
-        this._searchKey = a_config["Input"].controls.pc.search;
+        this._searchKey = input.controls.pc.search;
         this._searchControls = {keyCode: this._searchKey};
         
+        var listLayout = a_config["ListLayout"];
+        this.inventoryLists.applyDynamicWidth(listLayout.defaults.entryWidth);
+
         this.updateBottomBar(false);
     }
 
@@ -469,8 +465,6 @@ class ItemMenu extends MovieClip
         MovieClip(this.exitMenuRect).Lock("TL");
         this.exitMenuRect._x -= Stage.safeRect.x;
         this.exitMenuRect._y -= Stage.safeRect.y;
-
-        this.updateDynamicListHeight();
     }
     
     private function positionFloatingElements()
