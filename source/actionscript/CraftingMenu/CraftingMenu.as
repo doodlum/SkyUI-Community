@@ -45,8 +45,6 @@ class CraftingMenu extends MovieClip
    var _lastScrollPos = -1;
    var _lastColIdx = -1;
    var _lastColState = -1;
-   var _indicesChangedTime = 0;
-   var _pendingSave = false;
 
    function CraftingMenu()
    {
@@ -567,7 +565,6 @@ class CraftingMenu extends MovieClip
       
       if (abForceSave == true)
       {
-         this._pendingSave = false;
          var _loc2_ = new Array();
          _loc2_.push(catIdx);
          _loc2_.push(itemIdx);
@@ -587,14 +584,6 @@ class CraftingMenu extends MovieClip
          this._lastScrollPos = scrollPos;
          this._lastColIdx = colIdx;
          this._lastColState = colState;
-         
-         this._indicesChangedTime = getTimer(); 
-         this._pendingSave = true;
-      }
-      
-      if (this._pendingSave && (getTimer() - this._indicesChangedTime >= 300))
-      {
-         this._pendingSave = false;
          
          var _loc3_ = new Array();
          _loc3_.push(catIdx);
