@@ -99,6 +99,9 @@ class InventoryDataSetter extends ItemcardDataExtender
                 this.processSoulGemStatus(a_entryObject);
                 this.processSoulGemBaseId(a_entryObject);
                 break;
+
+            default:
+                break;
         }
     }
 
@@ -144,7 +147,7 @@ class InventoryDataSetter extends ItemcardDataExtender
         if (a_entryObject.keywords == undefined)
             return;
 
-        if (a_entryObject.keywords["ArmorMaterialDaedric"] != undefined || a_entryObject.keywords["WeapMaterialDaedric"] != undefined  || a_entryObject.keywords["DLC1WeapMaterialDragonbone"] != undefined || a_entryObject.keywords["ccBGSSSE025_ArmorMaterialDark"] != undefined || a_entryObject.keywords["ccBGSSSE025_WeapMaterialDark"] != undefined || a_entryObject.keywords["ccBGSSSE025_ArmorMaterialGolden"] != undefined || a_entryObject.keywords["ccBGSSSE025_WeapMaterialGolden"] != undefined) {
+        if (a_entryObject.keywords["ArmorMaterialDaedric"] != undefined || a_entryObject.keywords["WeapMaterialDaedric"] != undefined || a_entryObject.keywords["ccBGSSSE025_ArmorMaterialDark"] != undefined || a_entryObject.keywords["ccBGSSSE025_WeapMaterialDark"] != undefined || a_entryObject.keywords["ccBGSSSE025_ArmorMaterialGolden"] != undefined || a_entryObject.keywords["ccBGSSSE025_WeapMaterialGolden"] != undefined) {
             a_entryObject.material = skyui.defines.Material.DAEDRIC;
             a_entryObject.materialDisplay = skyui.util.Translator.translate("$Daedric");
         
@@ -156,8 +159,7 @@ class InventoryDataSetter extends ItemcardDataExtender
             a_entryObject.material = skyui.defines.Material.DWARVEN;
             a_entryObject.materialDisplay = skyui.util.Translator.translate("$Dwarven");
         
-        } else if (a_entryObject.keywords["ArmorMaterialEbony"] != undefined ||
-                a_entryObject.keywords["WeapMaterialEbony"] != undefined) {
+        } else if (a_entryObject.keywords["ArmorMaterialEbony"] != undefined || a_entryObject.keywords["WeapMaterialEbony"] != undefined) {
             a_entryObject.material = skyui.defines.Material.EBONY;
             a_entryObject.materialDisplay = skyui.util.Translator.translate("$Ebony");
         
@@ -165,8 +167,7 @@ class InventoryDataSetter extends ItemcardDataExtender
             a_entryObject.material = skyui.defines.Material.ELVEN;
             a_entryObject.materialDisplay = skyui.util.Translator.translate("$Elven");
         
-        } else if (a_entryObject.keywords["ArmorMaterialGlass"] != undefined ||
-                a_entryObject.keywords["WeapMaterialGlass"] != undefined) {
+        } else if (a_entryObject.keywords["ArmorMaterialGlass"] != undefined || a_entryObject.keywords["WeapMaterialGlass"] != undefined) {
             a_entryObject.material = skyui.defines.Material.GLASS;
             a_entryObject.materialDisplay = skyui.util.Translator.translate("$Glass");
         
@@ -199,7 +200,7 @@ class InventoryDataSetter extends ItemcardDataExtender
             a_entryObject.material = skyui.defines.Material.STEEL;
             a_entryObject.materialDisplay = skyui.util.Translator.translate("$Steel");
         
-        } else if (a_entryObject.keywords["WeapMaterialSilver"] != undefined || a_entryObject.keywords["WeapMaterialSteel"] != undefined) {
+        } else if (a_entryObject.keywords["WeapMaterialSilver"] != undefined) {
             a_entryObject.material = skyui.defines.Material.SILVER;
             a_entryObject.materialDisplay = skyui.util.Translator.translate("$Silver");
         
@@ -227,15 +228,15 @@ class InventoryDataSetter extends ItemcardDataExtender
             a_entryObject.material = skyui.defines.Material.FALMER;
             a_entryObject.materialDisplay = skyui.util.Translator.translate("$Falmer");
         
-        } else if(a_entryObject.keywords.ccASVSSE001_ArmorOrdinator != undefined || a_entryObject.keywords["ccASVSSE001_ArmorOrdinatorIndoril"] != undefined) {
+        } else if(a_entryObject.keywords["ccASVSSE001_ArmorOrdinator"] != undefined || a_entryObject.keywords["ccASVSSE001_ArmorOrdinatorIndoril"] != undefined) {
             a_entryObject.material = skyui.defines.Material.ORDINATOR;
             a_entryObject.materialDisplay = skyui.util.Translator.translate("$Ordinator");
         
-        } else if(a_entryObject.keywords.ccBGSSSE025_ArmorMaterialAmber != undefined || a_entryObject.keywords["ccBGSSSE025_WeapMaterialAmber"] != undefined) {
+        } else if(a_entryObject.keywords["ccBGSSSE025_ArmorMaterialAmber"] != undefined || a_entryObject.keywords["ccBGSSSE025_WeapMaterialAmber"] != undefined) {
             a_entryObject.material = skyui.defines.Material.AMBER;
             a_entryObject.materialDisplay = skyui.util.Translator.translate("$Amber");
         
-        } else if(a_entryObject.keywords.ccBGSSSE025_ArmorMaterialMadness != undefined || a_entryObject.keywords["ccBGSSSE025_WeapMaterialMadness"] != undefined) {
+        } else if(a_entryObject.keywords["ccBGSSSE025_ArmorMaterialMadness"] != undefined || a_entryObject.keywords["ccBGSSSE025_WeapMaterialMadness"] != undefined) {
             a_entryObject.material = skyui.defines.Material.MADNESS;
             a_entryObject.materialDisplay = skyui.util.Translator.translate("$Madness");
         
@@ -321,6 +322,9 @@ class InventoryDataSetter extends ItemcardDataExtender
                 a_entryObject.subType = skyui.defines.Weapon.TYPE_CROSSBOW;
                 a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Crossbow");
                 break;
+            
+            default:
+                break;
         }
     }
 
@@ -351,6 +355,9 @@ class InventoryDataSetter extends ItemcardDataExtender
                     case skyui.defines.Form.FORMID_FORSWORNSTAFF:
                     case skyui.defines.Form.FORMID_FORSWORNSWORD:
                         break;
+
+                    default:
+                        break;
                 }
                 break;
 
@@ -364,7 +371,13 @@ class InventoryDataSetter extends ItemcardDataExtender
                         a_entryObject.material = skyui.defines.Material.STEEL;
                         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Steel");
                         break;
+
+                    default:
+                        break;
                 }
+                break;
+
+            default:
                 break;
         }
     }
@@ -501,6 +514,9 @@ class InventoryDataSetter extends ItemcardDataExtender
                 a_entryObject.weightClass = skyui.defines.Armor.WEIGHT_JEWELRY;
                 a_entryObject.weightClassDisplay = skyui.util.Translator.translate("$Jewelry");
                 break;
+
+            default:
+                break;
         }
     }
 
@@ -550,6 +566,7 @@ class InventoryDataSetter extends ItemcardDataExtender
         if (a_entryObject.keywords["VendorItemRecipe"] != undefined) {
             a_entryObject.subType = skyui.defines.Item.BOOK_RECIPE;
             a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Recipe");
+
         } else if (a_entryObject.keywords["VendorItemSpellTome"] != undefined) {
             a_entryObject.subType = skyui.defines.Item.BOOK_SPELLTOME;
             a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Spell Tome");
@@ -561,6 +578,7 @@ class InventoryDataSetter extends ItemcardDataExtender
         if ((a_entryObject.flags & skyui.defines.Weapon.AMMOFLAG_NONBOLT) != 0) {
             a_entryObject.subType = skyui.defines.Weapon.AMMO_ARROW;
             a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Arrow");
+
         } else {
             a_entryObject.subType = skyui.defines.Weapon.AMMO_BOLT;
             a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Bolt");
@@ -576,18 +594,22 @@ class InventoryDataSetter extends ItemcardDataExtender
                         a_entryObject.material = skyui.defines.Material.DAEDRIC;
                         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Daedric");
                         break;
+
                     case skyui.defines.Form.FORMID_EBONYARROW:
                         a_entryObject.material = skyui.defines.Material.EBONY;
                         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Ebony");
                         break;
+
                     case skyui.defines.Form.FORMID_GLASSARROW:
                         a_entryObject.material = skyui.defines.Material.GLASS;
                         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Glass");
                         break;
+
                     case skyui.defines.Form.FORMID_ELVENARROW:
                         a_entryObject.material = skyui.defines.Material.ELVEN;
                         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Elven");
                         break;
+
                     case skyui.defines.Form.FORMID_DWARVENARROW:
                     case skyui.defines.Form.FORMID_DWARVENSPHEREARROW:
                     case skyui.defines.Form.FORMID_DWARVENSPHEREBOLT01:
@@ -595,18 +617,22 @@ class InventoryDataSetter extends ItemcardDataExtender
                         a_entryObject.material = skyui.defines.Material.DWARVEN;
                         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Dwarven");
                         break;
+
                     case skyui.defines.Form.FORMID_ORCISHARROW:
                         a_entryObject.material = skyui.defines.Material.ORCISH;
                         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Orcish");
                         break;
+
                     case skyui.defines.Form.FORMID_NORDHEROARROW:
                         a_entryObject.material = skyui.defines.Material.NORDIC;
                         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Nordic");
                         break;
+
                     case skyui.defines.Form.FORMID_FALMERARROW:
                         a_entryObject.material = skyui.defines.Material.FALMER;
                         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Falmer");
                         break;
+
                     case skyui.defines.Form.FORMID_STEELARROW:
                     case skyui.defines.Form.FORMID_MQ101STEELARROW:
                     case skyui.defines.Form.FORMID_DRAUGRARROW:
@@ -614,6 +640,7 @@ class InventoryDataSetter extends ItemcardDataExtender
                         a_entryObject.material = skyui.defines.Material.STEEL;
                         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Steel");
                         break;
+
                     case skyui.defines.Form.FORMID_IRONARROW:
                     case skyui.defines.Form.FORMID_CWARROW:
                     case skyui.defines.Form.FORMID_CWARROWSHORT:
@@ -622,6 +649,9 @@ class InventoryDataSetter extends ItemcardDataExtender
                     case skyui.defines.Form.FORMID_FOLLOWERIRONARROW:
                         a_entryObject.material = skyui.defines.Material.IRON;
                         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Iron");
+                        break;
+
+                    default:
                         break;
                 }
                 break;
@@ -633,9 +663,13 @@ class InventoryDataSetter extends ItemcardDataExtender
                         a_entryObject.material = skyui.defines.Material.ELVEN;
                         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Elven");
                         break;
+
                     case skyui.defines.Form.FORMID_TESTDLC1BOLT:
                         a_entryObject.material = skyui.defines.Material.IRON;
                         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Iron");
+
+                    default:
+                        break;
 
                 }
                 break;
@@ -646,20 +680,24 @@ class InventoryDataSetter extends ItemcardDataExtender
                         a_entryObject.material = skyui.defines.Material.DWARVEN;
                         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Dwarven");
                         break;
+
                     case skyui.defines.Form.FORMID_DLC2RIEKLINGSPEARTHROWN:
                         a_entryObject.material = skyui.defines.Material.WOOD;
                         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Wood");
                         break;
+                    
+                    default:
+                        break;
                 }
+
+            default:
+                break;
         }
     }
 
     private function processKeyType(a_entryObject: Object)
     {
         a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Key");
-
-        if (a_entryObject.infoValue <= 0)
-            a_entryObject.infoValue = null;
 
         if (a_entryObject.infoValue <= 0)
             a_entryObject.infoValue = null;
@@ -683,16 +721,19 @@ class InventoryDataSetter extends ItemcardDataExtender
         } else if ((a_entryObject.flags & skyui.defines.Item.ALCHFLAG_POISON) != 0) {
             a_entryObject.subType = skyui.defines.Item.POTION_POISON;
             a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Poison");
+
         } else {
             switch (a_entryObject.actorValue) {
                 case skyui.defines.Actor.AV_HEALTH:
                     a_entryObject.subType = skyui.defines.Item.POTION_HEALTH;
                     a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Health");
                     break;
+
                 case skyui.defines.Actor.AV_MAGICKA:
                     a_entryObject.subType = skyui.defines.Item.POTION_MAGICKA;
                     a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Magicka");
                     break;
+
                 case skyui.defines.Actor.AV_STAMINA:
                     a_entryObject.subType = skyui.defines.Item.POTION_STAMINA;
                     a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Stamina");
@@ -702,10 +743,12 @@ class InventoryDataSetter extends ItemcardDataExtender
                     a_entryObject.subType = skyui.defines.Item.POTION_HEALRATE;
                     a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Health");
                     break;
+
                 case skyui.defines.Actor.AV_MAGICKARATE:
                     a_entryObject.subType = skyui.defines.Item.POTION_MAGICKARATE;
                     a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Magicka");
                     break;
+
                 case skyui.defines.Actor.AV_STAMINARATE:
                     a_entryObject.subType = skyui.defines.Item.POTION_STAMINARATE;
                     a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Stamina");
@@ -715,10 +758,12 @@ class InventoryDataSetter extends ItemcardDataExtender
                     a_entryObject.subType = skyui.defines.Item.POTION_HEALRATEMULT;
                     a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Health");
                     break;
+
                 case skyui.defines.Actor.AV_MAGICKARATEMULT:
                     a_entryObject.subType = skyui.defines.Item.POTION_MAGICKARATEMULT;
                     a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Magicka");
                     break;
+
                 case skyui.defines.Actor.AV_STAMINARATEMULT:
                     a_entryObject.subType = skyui.defines.Item.POTION_STAMINARATEMULT;
                     a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Stamina");
@@ -734,6 +779,9 @@ class InventoryDataSetter extends ItemcardDataExtender
 
                 case skyui.defines.Actor.AV_FROSTRESIST:
                     a_entryObject.subType = skyui.defines.Item.POTION_FROSTRESIST;
+                    break;
+
+                default:
                     break;
             }
         }
@@ -772,6 +820,9 @@ class InventoryDataSetter extends ItemcardDataExtender
                 a_entryObject.subType = skyui.defines.Item.SOULGEM_SOULTOMATO;
                 a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$SoulTomato");
                 break;
+
+            default:
+                break;
         }
     }
 
@@ -791,11 +842,9 @@ class InventoryDataSetter extends ItemcardDataExtender
             a_entryObject.subType = skyui.defines.Item.MISC_TOY;
             a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Toy");
 
-        
         } else if (a_entryObject.keywords["BYOHHouseCraftingCategoryWeaponRacks"] != undefined || a_entryObject.keywords["BYOHHouseCraftingCategoryShelf"] != undefined ||  a_entryObject.keywords["BYOHHouseCraftingCategoryFurniture"] != undefined || a_entryObject.keywords["BYOHHouseCraftingCategoryExterior"] != undefined ||  a_entryObject.keywords["BYOHHouseCraftingCategoryContainers"] != undefined || a_entryObject.keywords["BYOHHouseCraftingCategoryBuilding"] != undefined ||  a_entryObject.keywords["BYOHHouseCraftingCategorySmithing"] != undefined) {
             a_entryObject.subType = skyui.defines.Item.MISC_HOUSEPART;
             a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$House Part");
-        
 
         } else if (a_entryObject.keywords["VendorItemDaedricArtifact"] != undefined) {
             a_entryObject.subType = skyui.defines.Item.MISC_ARTIFACT;
@@ -821,7 +870,7 @@ class InventoryDataSetter extends ItemcardDataExtender
             a_entryObject.subType = skyui.defines.Item.MISC_INGOT;
             a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Ingot");
 
-        } else if (a_entryObject.keywords["VendorItemFirewood"] != undefined) {
+        } else if (a_entryObject.keywords["VendorItemFireword"] != undefined) {
             a_entryObject.subType = skyui.defines.Item.MISC_FIREWOOD;
             a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Firewood");
 
@@ -1032,6 +1081,9 @@ class InventoryDataSetter extends ItemcardDataExtender
                         a_entryObject.subType = skyui.defines.Item.MISC_ORE;
                         a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Ore");
                         break
+
+                    default:
+                        break;
                 }
                 break;
 
@@ -1041,6 +1093,9 @@ class InventoryDataSetter extends ItemcardDataExtender
                     case skyui.defines.Form.FORMID_UPDATEHORSETACK2:
                         a_entryObject.subType = skyui.defines.Item.MISC_HORSETACK;
                         a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$HorseTack");
+                        break;
+
+                    default:
                         break;
                 }
                 break;
@@ -1071,6 +1126,9 @@ class InventoryDataSetter extends ItemcardDataExtender
                         a_entryObject.subType = skyui.defines.Item.MISC_NETCHLEATHER;
                         a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$NetchLeather");
                         break
+
+                    default:
+                        break;
                 }
                 break;
 
@@ -1088,6 +1146,9 @@ class InventoryDataSetter extends ItemcardDataExtender
                     case skyui.defines.Form.FORMID_HFHOUSEPART10:
                         a_entryObject.subType = skyui.defines.Item.MISC_HOUSEPART;
                         a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$BuildingMaterial");
+                        break;
+                    
+                    default:
                         break;
                 }
                 break;
@@ -1142,6 +1203,9 @@ class InventoryDataSetter extends ItemcardDataExtender
                         a_entryObject.subType = skyui.defines.Item.MISC_ORE;
                         a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Ore");
                         break;
+
+                    default:
+                        break;
                 }
                 break;
 
@@ -1162,6 +1226,9 @@ class InventoryDataSetter extends ItemcardDataExtender
                     case skyui.defines.Form.ESLID_CCVSV002PETAMULET:
                         a_entryObject.subType = skyui.defines.Item.MISC_PETGEAR;
                         a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$PetGear");
+                        break;
+
+                    default:
                         break;
                 }
                 break;
@@ -1230,6 +1297,9 @@ class InventoryDataSetter extends ItemcardDataExtender
                         a_entryObject.subType = skyui.defines.Item.MISC_ORE;
                         a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$Ore");
                         break;
+
+                    default:
+                        break;
                 }
                 break;
         }
@@ -1260,6 +1330,9 @@ class InventoryDataSetter extends ItemcardDataExtender
                         a_entryObject.subType = skyui.defines.Item.BOOK_ELDERSCROLL;
                         a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$ElderScroll");
                         break;
+
+                    default:
+                        break;
                 }
                 break;
                 
@@ -1270,6 +1343,9 @@ class InventoryDataSetter extends ItemcardDataExtender
                     case skyui.defines.Form.FORMID_DLC1ELDERSCROLL3:
                         a_entryObject.subType = skyui.defines.Item.BOOK_ELDERSCROLL;
                         a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$ElderScroll");
+                        break;
+
+                    default:
                         break;
                 }
                 break;
@@ -1332,6 +1408,9 @@ class InventoryDataSetter extends ItemcardDataExtender
                 a_entryObject.subType = skyui.defines.Item.SCROLL_SPIDER;
                 a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$ScrollSpider");
                 break;
+
+            default:
+                break;
         }
     }
     function processPotionBaseId(a_entryObject)
@@ -1342,6 +1421,9 @@ class InventoryDataSetter extends ItemcardDataExtender
             case skyui.defines.Form.BASEID_HEARTLANDAYLEIDCRYSTALPOTION2:
                 a_entryObject.subType = skyui.defines.Item.POTION_AYLEIDCRYSTAL;
                 a_entryObject.subTypeDisplay = skyui.util.Translator.translate("$AyleidCrystal");
+                break;
+
+            default:
                 break;
         }
     }
