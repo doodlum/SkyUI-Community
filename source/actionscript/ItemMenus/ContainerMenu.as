@@ -205,8 +205,8 @@ class ContainerMenu extends ItemMenu
 
     private function onQuantityMenuSelect(event: Object)
     {
-        if (_equipHand != undefined) {
-            gfx.io.GameDelegate.call("EquipItem",[_equipHand, event.amount]);
+        if (this._equipHand != undefined) {
+            gfx.io.GameDelegate.call("EquipItem",[this._equipHand, event.amount]);
 
             if (!this.checkBook(this.inventoryLists.itemList.selectedEntry))
                 this.checkPoison(this.inventoryLists.itemList.selectedEntry);
@@ -243,7 +243,7 @@ class ContainerMenu extends ItemMenu
                     this.navPanel.addButton({text: "$Take All", controls: skyui.defines.Input.XButton});
             } else {
                 if (this._platform != 0) {
-                    this.navPanel.addButton({text: bNPCMode ? "$Give" : "$Store", controls: skyui.defines.Input.Activate});
+                    this.navPanel.addButton({text: this.bNPCMode ? "$Give" : "$Store", controls: skyui.defines.Input.Activate});
                     this.navPanel.addButton(this.getEquipButtonData(this.itemCard.itemInfo.type, true));
                 } else {
                     if (this._bEquipMode)
