@@ -272,7 +272,7 @@ class InventoryLists extends MovieClip
 
     public function getContentBounds()
     {
-        var lb = panelContainer.ListBackground;
+        var lb = this.panelContainer.ListBackground;
         return [lb._x, lb._y, lb._width, lb._height];
     }
     
@@ -380,7 +380,7 @@ class InventoryLists extends MovieClip
         var config = event.config;
         this._searchKey = config["Input"].controls.pc.search;
         
-        if (_platform == 0)
+        if (this._platform == 0)
             this._switchTabKey = config["Input"].controls.pc.switchTab;
         else {
             this._switchTabKey = config["Input"].controls.gamepad.switchTab;
