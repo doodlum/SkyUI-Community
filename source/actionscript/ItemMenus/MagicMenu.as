@@ -88,7 +88,7 @@ class MagicMenu extends ItemMenu
     public function DragonSoulSpent()
     {
         this.itemCard.itemInfo.soulSpent = true;
-        this.updateBottomBar();
+        this.updateBottomBar(true);
     }
     
     // @API
