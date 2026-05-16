@@ -19,7 +19,7 @@ class MagicDataSetter extends ItemcardDataExtender
   /* PUBLIC FUNCTIONS */
     
     // @override ItemcardDataExtender
-    public function processEntry(a_entryObject: Object, a_itemInfo: Object): Void
+    public function processEntry(a_entryObject: Object, a_itemInfo: Object)
     {
         a_entryObject.baseId = a_entryObject.formId & 0x00FFFFFF;
         a_entryObject.type = a_itemInfo.type;
