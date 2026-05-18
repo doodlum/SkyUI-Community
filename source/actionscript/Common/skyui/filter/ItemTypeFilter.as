@@ -65,7 +65,7 @@ class skyui.filter.ItemTypeFilter implements skyui.filter.IFilter
         }
     }
     
-    public function isMatch(a_entry: Object, a_flag)
+    public function isMatch(a_entry: Object, a_flag: Boolean)
     {
         return this._matcherFunc(a_entry, a_flag);
     }
