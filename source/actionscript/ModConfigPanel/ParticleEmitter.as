@@ -41,7 +41,7 @@ class ParticleEmitter extends MovieClip
     public function get height() { return this._height; }
     
     public function set visible(a_val: Boolean) { this._particleHolder._visible = a_val; }
-    public function get visible(): Boolean { return this._particleHolder._visible; }
+    public function get visible() { return this._particleHolder._visible; }
     
     public function set alpha(a_val: Number) { this._particleHolder._alpha = a_val; }
     public function get alpha() { return this._particleHolder._alpha; }
