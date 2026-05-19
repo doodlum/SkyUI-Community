@@ -698,11 +698,7 @@ Add_SWF(skyui_inventorylists
     Common/skyui/components/list {
         BasicListEntry.as
         TabularListEntry.as
-        TabularList.as
         ScrollingList.as
-        FilteredEnumeration.as
-        EntryClipManager.as
-        ListLayout.as
     }
     ItemMenus {
         CategoryList.as
