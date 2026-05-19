@@ -1,86 +1,87 @@
+// Combine multiple properties into one property (used for flexible sorting)
 class skyui.props.CompoundProperty
-{
-    var defaultValues;
-    var itemFilter;
-    var numPadding;
-    var overwrite;
-    var padString;
-    var propertyList;
-    var propertyToSet;
-    function CompoundProperty(configObject)
+{	
+    var propertyToSet: String;
+    var itemFilter: ItemFilter;
+    var defaultValues: Array;
+    var padString: String;
+    var numPadding: Number;
+    var overwrite: Boolean;
+
+    var propertyList:Array;
+    
+    function CompoundProperty(configObject:Object)
     {
         this.propertyToSet = configObject.propertyToSet;
         this.itemFilter = new skyui.props.ItemFilter(configObject.filter);
         this.defaultValues = configObject.defaultValues;
+
         this.padString = configObject.padString;
-        if(this.padString == undefined)
-        {
+        if (this.padString == undefined)
             this.padString = "0";
-        }
+
         this.numPadding = configObject.numPadding;
-        if(this.numPadding == undefined)
-        {
+        if (this.numPadding == undefined)
             this.numPadding = 3;
-        }
+
         this.overwrite = configObject.overwrite;
-        if(this.overwrite == undefined)
-        {
+        if (this.overwrite == undefined)
             this.overwrite = false;
-        }
+
         this.propertyList = configObject.concatenateList;
     }
-    function _padString(_str, _n, _pStr)
+
+    private function _padString(_str: String, _n: Number, _pStr: String)
     {
-        var _loc6_ = _str;
-        if(_pStr == undefined || _pStr == null || _pStr.length < 1)
+        var _rtn: String = _str;
+        if ((_pStr == undefined) || (_pStr == null) || (_pStr.length < 1))
         {
             _pStr = " ";
         }
-        var _loc4_;
-        var _loc1_;
-        if(_str.length < _n)
+        
+        if (_str.length < _n)
         {
-            _loc4_ = "";
-            _loc1_ = 0;
-            while(_loc1_ < _n - _str.length)
+            var _s: String = "";
+            for (var i: Number = 0 ; i < (_n - _str.length) ; i++)
             {
-                _loc4_ += _pStr;
-                _loc1_ = _loc1_ + 1;
+                _s += _pStr;
             }
-            _loc6_ = _loc4_ + _str;
+            _rtn = _s + _str;
         }
-        return _loc6_;
+        
+        return _rtn;
     }
-    function processCompoundProperty(obj)
+    
+    
+    function processCompoundProperty(obj:Object)
     {
-        if(!this.itemFilter.passesFilter(obj))
-        {
+        if(!this.itemFilter.passesFilter(obj)) {
             return false;
         }
-        if(!this.overwrite && obj[this.propertyToSet] != undefined && obj[this.propertyToSet] != this.defaultValues[this.propertyToSet])
-        {
+
+        // Unless this.overwrite is true
+        // return if this object already has the property set to a known value
+        if ((!this.overwrite && obj[this.propertyToSet] != undefined
+             && obj[this.propertyToSet] != this.defaultValues[this.propertyToSet])) {
             return false;
         }
-        var _loc6_ = "";
-        var _loc3_ = 0;
-        var _loc2_;
-        var _loc5_;
-        while(_loc3_ < this.propertyList.length)
+        
+        var compoundValue: String = "";
+        for(var i: Number = 0; i < this.propertyList.length; i++)
         {
-            _loc2_ = this.propertyList[_loc3_];
-            _loc5_ = String(this.defaultValues[_loc2_]);
-            if(obj.hasOwnProperty(_loc2_) && obj[_loc2_] != undefined && obj[_loc2_] != "")
-            {
-                _loc5_ = String(obj[_loc2_]);
+            var currProp: String = propertyList[i];
+            var currVal: String = String(this.defaultValues[currProp]);
+            if (obj.hasOwnProperty(currProp) && obj[currProp] != undefined && obj[currProp] != "") {
+                currVal = String(obj[currProp]);
             }
-            _loc6_ += this._padString(_loc5_,this.numPadding,this.padString);
-            _loc3_ = _loc3_ + 1;
+            compoundValue += this._padString(currVal, this.numPadding, this.padString);
         }
-        if(_loc6_ == "" && this.defaultValues[this.propertyToSet])
-        {
-            _loc6_ = this.defaultValues[this.propertyToSet];
+        
+        if (compoundValue == "" && this.defaultValues[this.propertyToSet]) {
+            compoundValue = this.defaultValues[this.propertyToSet];
         }
-        obj[this.propertyToSet] = _loc6_;
+        
+        obj[this.propertyToSet] = compoundValue;
         return true;
     }
 }

@@ -1,48 +1,47 @@
+// For now this is a just a simple associative array of required values
 class skyui.props.ItemFilter
-{
-    var reqs;
-    function ItemFilter(requirementsObj)
+{	
+    var reqs: Object;
+    
+    function ItemFilter(requirementsObj: Object)
     {
         this.setFromObject(requirementsObj);
     }
-    function addRequirement(requiredProperty, requiredVal)
+    
+    function addRequirement(requiredProperty: String, requiredVal)
     {
         this.reqs[requiredProperty] = requiredVal;
     }
-    function setFromArray(a)
+    
+    function setFromArray(a: Array)
     {
         this.reqs = new Object();
-        var _loc2_ = 0;
-        while(_loc2_ + 1 < a.length)
-        {
-            this.reqs[a[_loc2_]] = a[_loc2_ + 1];
-            _loc2_ += 2;
+        // Unzip ("a", "b", "c", "d") to {a:"b", c:"d"}
+        for (var i: Number = 0; i + 1 < a.length; i = i + 2) {
+            this.reqs[a[i]] = a[i + 1];
         }
     }
-    function setFromObject(requirements)
+
+    function setFromObject(requirements: Object)
     {
-        if(requirements instanceof Array)
-        {
+        if (requirements instanceof Array) {
             this.setFromArray(Array(requirements));
         }
-        else if(requirements instanceof Object)
-        {
+        else if (requirements instanceof Object) {
             this.reqs = requirements;
         }
-        else
-        {
+        else {
             this.reqs = new Object();
         }
     }
-    function passesFilter(objectToCheck)
+
+    function passesFilter(objectToCheck: Object)
     {
-        for(var _loc3_ in this.reqs)
-        {
-            if(objectToCheck[_loc3_] != this.reqs[_loc3_])
-            {
+        // Check if this object passes all the filter criteria
+        for (var filterProperty in this.reqs)
+            if (objectToCheck[filterProperty] != this.reqs[filterProperty])
                 return false;
-            }
-        }
+        
         return true;
     }
 }

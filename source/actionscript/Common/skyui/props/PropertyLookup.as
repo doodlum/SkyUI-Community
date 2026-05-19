@@ -1,172 +1,190 @@
 class skyui.props.PropertyLookup
 {
-    var dataMembers;
+    private static var dataMemberLimit = 200;
+    private static var _delimiter = ";;";
+    
+    var propertiesToSet: Array;
+    var itemFilter: ItemFilter;
     var defaultValues;
-    var itemFilter;
-    var keywords;
-    var propertiesToSet;
-    static var dataMemberLimit = 200;
-    static var _delimiter = ";;";
-    var lastValue = -1;
-    function PropertyLookup(a_configObject)
+
+    private var lastValue: Number = -1;
+    private var keywords: Object;
+    private var dataMembers: Object;
+
+    // Expects an object set by reading the config file with the following information provided
+    // propertiesToSet the property names that may be set
+    // itemFilter will determine which objects should try to match against this list
+    // defaultValues: if defined then if no data match this value will be set on the propertyToSet
+    // keywords: keyword to match against and the values to set if matched.
+    // dataMember#: Filter to specify what to match and set object for properties to set when matched
+    function PropertyLookup(a_configObject: Object)
     {
-        this.propertiesToSet = a_configObject.propertiesToSet;
+        this.propertiesToSet = a_configObject.propertiesToSet; //TODO: eventually determine this automatically?
         this.itemFilter = new skyui.props.ItemFilter(a_configObject.filter);
         this.defaultValues = a_configObject.defaultValues;
         this.keywords = a_configObject.keywords;
         this._parseDataMemberList(a_configObject);
+        
         this.lastValue = -1;
     }
-    function _getPropertyValFromFilter(a_filter)
-    {
-        var _loc3_ = 0;
-        var _loc2_ = new Array();
-        for(var _loc6_ in a_filter)
-        {
-            _loc2_.push(_loc6_);
-            _loc3_ = _loc3_ + 1;
+    
+    private function _getPropertyValFromFilter(a_filter: Object)
+    {		
+        var numDataMembers: Number = 0;
+        var dataMembers: Array = new Array();
+        for (var dataMember in a_filter) {
+            dataMembers.push(dataMember);
+            numDataMembers++;
         }
-        if(_loc3_ <= 0)
-        {
-            return new Array("extended","true");
+        
+        if (numDataMembers <= 0) {
+            return new Array("extended", "true");
+        } else if (numDataMembers == 1) {
+            return new Array(dataMembers[0], a_filter[dataMembers[0]]);
         }
-        if(_loc3_ == 1)
-        {
-            return new Array(_loc2_[0],a_filter[_loc2_[0]]);
+
+        // else numDataMembers > 1
+        dataMembers.sort();
+        var dataMember: String = dataMembers.join(skyui.props.PropertyLookup._delimiter);
+        var valueArray: Array = new Array();
+        for (var i: Number = 0; i < numDataMembers; i++) {
+            valueArray.push(a_filter[dataMembers[i]]);
         }
-        _loc2_.sort();
-        var _loc6_ = _loc2_.join(skyui.props.PropertyLookup._delimiter);
-        var _loc5_ = new Array();
-        var _loc1_ = 0;
-        while(_loc1_ < _loc3_)
-        {
-            _loc5_.push(a_filter[_loc2_[_loc1_]]);
-            _loc1_ = _loc1_ + 1;
-        }
-        var _loc7_ = _loc5_.join(skyui.props.PropertyLookup._delimiter);
-        return new Array(_loc6_,_loc7_);
+        var matchVal: String = valueArray.join(skyui.props.PropertyLookup._delimiter);
+        
+        return new Array(dataMember, matchVal);
+        
     }
-    function _parseDataMemberList(a_configObject)
+    
+    private function _parseDataMemberList(a_configObject: Object)
     {
         this.dataMembers = new Object();
-        var _loc6_;
-        var _loc3_ = 1;
-        var _loc4_;
-        var _loc7_;
-        var _loc5_;
-        var _loc2_;
-        var _loc8_;
-        while(_loc3_ < skyui.props.PropertyLookup.dataMemberLimit)
-        {
-            _loc4_ = "dataMember" + _loc3_;
-            if(a_configObject[_loc4_] == undefined)
-            {
+        
+        var dataMemberGroupObj: Object;
+        for (var i: Number = 1; i < skyui.props.PropertyLookup.dataMemberLimit; i++) {
+            var dataMemberGroup: String = "dataMember" + i;
+            
+            if (a_configObject[dataMemberGroup] == undefined) {
+                // No more dataMember# to go through (they must be sequential)
                 break;
             }
-            _loc6_ = a_configObject[_loc4_];
-            _loc7_ = _loc6_.filter;
-            _loc5_ = this._getPropertyValFromFilter(_loc7_);
-            _loc2_ = _loc5_[0];
-            _loc8_ = _loc5_[1];
-            if(this.dataMembers[_loc2_] == undefined)
-            {
-                this.dataMembers[_loc2_] = new Object();
+
+            dataMemberGroupObj = a_configObject[dataMemberGroup];  //dataMember1 etc
+            
+            var filter: Object = dataMemberGroupObj["filter"];
+            
+            // get keyValue for formId, subType etc in dataMember#
+            var keyValue: Array = this._getPropertyValFromFilter(filter);
+            
+            var dataMember: String = keyValue[0];
+            var matchVal = keyValue[1];
+            
+            // create object for this dataMember (formId etc) if it does not exist.
+            if (this.dataMembers[dataMember] == undefined) {
+                this.dataMembers[dataMember] = new Object();
             }
-            this.dataMembers[_loc2_][_loc8_] = _loc6_["set"];
-            _loc3_ = _loc3_ + 1;
+            
+            this.dataMembers[dataMember][matchVal] = dataMemberGroupObj["set"];
         }
     }
-    function getKeywordValues(a_keyword)
+
+    function getKeywordValues(a_keyword: String)
     {
         return this.keywords[a_keyword];
     }
-    function getDataMemberValues(a_dataMember, a_sourceValue)
+
+    function getDataMemberValues(a_dataMember: String, a_sourceValue)
     {
         return this.dataMembers[a_dataMember][a_sourceValue];
     }
-    function keywordMatches(a_keyword)
+    
+    function keywordMatches(a_keyword: String)
     {
-        return this.keywords[a_keyword] != undefined;
+        return (this.keywords[a_keyword] != undefined);
     }
-    function dataMemberMatches(keyword, sourceValue)
+    
+    function dataMemberMatches(keyword: String, sourceValue)
     {
-        return this.dataMembers[keyword][sourceValue] != undefined;
+        return (this.dataMembers[keyword][sourceValue] != undefined);
     }
-    function _getMultSourceVal(a_object, a_dataMember)
+    
+    private function _getMultSourceVal(a_object: Object, a_dataMember: String)
     {
-        var _loc2_ = a_dataMember.split(skyui.props.PropertyLookup._delimiter);
-        if(_loc2_.length <= 0)
-        {
-            return undefined;
+        var dataMembers: Array = a_dataMember.split(skyui.props.PropertyLookup._delimiter);
+        if (dataMembers.length <= 0) {
+            // Shouldn't occur, just return undefined
+            return;
         }
-        if(_loc2_.length == 1)
-        {
-            return a_object[a_dataMember];
+        else if (dataMembers.length == 1) {
+            // only a single dataMember, simply try to get the value of it on a_object
+            return a_object[a_dataMember] ;
         }
-        var _loc4_ = new Array();
-        var _loc1_ = 0;
-        while(_loc1_ < _loc2_.length)
-        {
-            if(!a_object.hasOwnProperty(_loc2_[_loc1_]))
-            {
-                return undefined;
+        
+        // else dataMembers.length > 1
+        var valueArray: Array = new Array();
+        for (var i: Number = 0; i < dataMembers.length; i++) {
+            if (a_object.hasOwnProperty(dataMembers[i])) {
+                valueArray.push(a_object[dataMembers[i]]);
             }
-            _loc4_.push(a_object[_loc2_[_loc1_]]);
-            _loc1_ = _loc1_ + 1;
-        }
-        return _loc4_.join(skyui.props.PropertyLookup._delimiter);
-    }
-    function processProperty(a_obj)
-    {
-        if(!this.itemFilter.passesFilter(a_obj))
-        {
-            return undefined;
-        }
-        for(var _loc8_ in this.defaultValues)
-        {
-            if(this.defaultValues[_loc8_] != undefined)
-            {
-                a_obj[_loc8_] = this.defaultValues[_loc8_];
+            else {
+                // Missing a dataMember, return undefined
+                return;
             }
         }
-        var _loc2_;
-        var _loc4_;
-        for(var _loc9_ in a_obj.keywords)
-        {
-            _loc4_ = this.getKeywordValues(_loc9_);
-            if(_loc4_ != undefined)
-            {
-                for(var _loc7_ in _loc4_)
-                {
-                _loc2_ = _loc4_[_loc7_];
-                if(_loc2_ != undefined && _loc2_ != this.defaultValues[_loc7_])
-                {
-                    a_obj[_loc7_] = _loc2_;
-                }
-                }
-                break;
+        return valueArray.join(skyui.props.PropertyLookup._delimiter);
+        
+    }
+    
+    function processProperty(a_obj: Object)
+    {
+        // Check if this object passes the filter for this keyword search
+        if (!this.itemFilter.passesFilter(a_obj))
+            return;
+
+        // Set defaults
+        for (var propertyToDefault in this.defaultValues) {
+            if (this.defaultValues[propertyToDefault] != undefined) {
+                a_obj[propertyToDefault] = this.defaultValues[propertyToDefault];
             }
         }
-        var _loc6_;
-        var _loc5_;
-        for(var _loc10_ in this.dataMembers)
-        {
-            _loc6_ = this._getMultSourceVal(a_obj,_loc10_);
-            if(_loc6_ != undefined)
-            {
-                _loc5_ = this.getDataMemberValues(_loc10_,_loc6_);
-                if(_loc5_ != undefined)
-                {
-                for(_loc7_ in _loc5_)
-                {
-                    _loc2_ = _loc5_[_loc7_];
-                    if(_loc2_ != undefined && _loc2_ != this.defaultValues[_loc7_])
-                    {
-                        a_obj[_loc7_] = _loc2_;
+
+        var valToSet;
+
+        // Check for keywords
+        for(var keyword in a_obj.keywords) {
+            var keywordValues: Object = this.getKeywordValues(keyword);
+            if (keywordValues != undefined) {
+                // keyword match found
+                for (var propertyToSet in keywordValues) {
+                    valToSet = keywordValues[propertyToSet];
+                    // Don't bother setting if default value is already set
+                    if (valToSet != undefined && valToSet != this.defaultValues[propertyToSet]) {
+                        a_obj[propertyToSet] = valToSet;
                     }
                 }
                 break;
+            }
+        }
+
+        // Check data members last, they take precedence (for example, matching baseID)
+        for(var dataMember in this.dataMembers) {
+            //var sourceValue = a_obj[dataMember];
+            var sourceValue = this._getMultSourceVal(a_obj, dataMember);
+            if (sourceValue == undefined)
+                continue;
+            
+            var setValues: Object = this.getDataMemberValues(dataMember, sourceValue);
+            if (setValues != undefined) {
+                // we have a match
+                for (var propertyToSet in setValues){
+                    var valToSet = setValues[propertyToSet];
+                    if (valToSet != undefined && valToSet != this.defaultValues[propertyToSet]) {
+                        a_obj[propertyToSet] = valToSet;
+                    }
+        
                 }
+
+                break;
             }
         }
     }

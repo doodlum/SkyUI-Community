@@ -1,113 +1,109 @@
 class skyui.props.PropertyDataExtender implements skyui.components.list.IListProcessor
 {
-    var _compoundPropertyList;
-    var _iconList;
-    var _noIconColors;
-    var _propertyList;
-    var compoundPropVar;
-    var iconsVar;
-    var propertiesVar;
-    function PropertyDataExtender(a_configAppearance, a_dataSource, a_propertiesVar, a_iconsVar, a_compoundPropVar)
+  /* PRIVATE VARIABLES */
+    
+    private var _propertyList;
+    private var _iconList;
+    private var _compoundPropertyList;
+
+    private var _noIconColors: Boolean;
+    
+    
+  /* PROPERTIES */
+
+    public var propertiesVar: String;
+    public var iconsVar: String;
+    public var compoundPropVar: String;
+    
+  /* CONSTRUCTORS */
+    
+    public function PropertyDataExtender(a_configAppearance: Object, a_dataSource: Object, a_propertiesVar: String, a_iconsVar: String, a_compoundPropVar: String)
     {
         this.propertiesVar = a_propertiesVar;
         this.iconsVar = a_iconsVar;
         this.compoundPropVar = a_compoundPropVar;
+        
         this._propertyList = new Array();
         this._iconList = new Array();
         this._compoundPropertyList = new Array();
+
         this._noIconColors = a_configAppearance.icons.item.noColor;
-        var _loc11_ = "props";
-        var _loc12_ = "compoundProps";
-        var _loc10_;
-        var _loc2_;
-        var _loc7_;
-        var _loc6_;
-        var _loc5_;
-        if(this.propertiesVar)
-        {
-            _loc10_ = a_dataSource[this.propertiesVar];
-            if(_loc10_ instanceof Array)
-            {
-                _loc2_ = 0;
-                while(_loc2_ < _loc10_.length)
-                {
-                _loc7_ = _loc10_[_loc2_];
-                _loc6_ = a_dataSource[_loc11_][_loc7_];
-                _loc5_ = new skyui.props.PropertyLookup(_loc6_);
-                this._propertyList.push(_loc5_);
-                _loc2_ = _loc2_ + 1;
+        
+        var propertyLevel = "props";
+        var compoundLevel = "compoundProps";
+        
+        // Set up our arrays with information from the config for use in ProcessConfigVars()
+        if (this.propertiesVar) {
+            var configProperties = a_dataSource[this.propertiesVar];
+            if (configProperties instanceof Array) {
+                for (var i = 0; i < configProperties.length; i++) {
+                    var propName = configProperties[i];
+                    var propertyData = a_dataSource[propertyLevel][propName];
+                    var propLookup = new skyui.props.PropertyLookup(propertyData);
+                    this._propertyList.push(propLookup);
                 }
             }
         }
-        var _loc9_;
-        if(this.iconsVar)
-        {
-            _loc9_ = a_dataSource[this.iconsVar];
-            if(_loc9_ instanceof Array)
-            {
-                _loc2_ = 0;
-                while(_loc2_ < _loc9_.length)
-                {
-                _loc7_ = _loc9_[_loc2_];
-                _loc6_ = a_dataSource[_loc11_][_loc7_];
-                _loc5_ = new skyui.props.PropertyLookup(_loc6_);
-                this._iconList.push(_loc5_);
-                _loc2_ = _loc2_ + 1;
+        
+        if (this.iconsVar) {
+            var configIcons = a_dataSource[this.iconsVar];
+            if (configIcons instanceof Array) {
+                for (var i = 0; i < configIcons.length; i++) {
+                    var propName = configIcons[i];
+                    var propertyData = a_dataSource[propertyLevel][propName];
+                    var propLookup = new skyui.props.PropertyLookup(propertyData);
+                    this._iconList.push(propLookup);
                 }
             }
         }
-        var _loc8_;
-        var _loc4_;
-        if(this.compoundPropVar)
-        {
-            _loc8_ = a_dataSource[this.compoundPropVar];
-            if(_loc8_ instanceof Array)
-            {
-                _loc2_ = 0;
-                while(_loc2_ < _loc8_.length)
-                {
-                _loc7_ = _loc8_[_loc2_];
-                _loc6_ = a_dataSource[_loc12_][_loc7_];
-                _loc4_ = new skyui.props.CompoundProperty(_loc6_);
-                this._compoundPropertyList.push(_loc4_);
-                _loc2_ = _loc2_ + 1;
+
+        if (this.compoundPropVar) {
+            var configCompoundList = a_dataSource[this.compoundPropVar];
+            if (configCompoundList instanceof Array) {
+                for (var i = 0; i < configCompoundList.length; i++) {
+                    var propName = configCompoundList[i];
+                    var propertyData = a_dataSource[compoundLevel][propName];
+                    var compoundProperty = new skyui.props.CompoundProperty(propertyData);
+                    this._compoundPropertyList.push(compoundProperty);
                 }
             }
         }
     }
-    function processList(a_list)
+    
+    
+  /* PUBLIC FUNCTIONS */
+    
+    // @override IListProcessor
+    public function processList(a_list: BasicList)
     {
-        var _loc3_ = a_list.entryList;
-        var _loc2_ = 0;
-        while(_loc2_ < _loc3_.length)
-        {
-            this.processEntry(_loc3_[_loc2_]);
-            _loc2_ = _loc2_ + 1;
-        }
+        var entryList = a_list.entryList;
+        
+        for (var i = 0; i < entryList.length; i++)
+            this.processEntry(entryList[i]);
     }
-    function processEntry(a_entryObject)
+    
+    
+  /* PRIVATE FUNCTIONS */
+    
+    private function processEntry(a_entryObject: Object)
     {
-        var _loc2_ = 0;
-        while(_loc2_ < this._propertyList.length)
-        {
-            this._propertyList[_loc2_].processProperty(a_entryObject);
-            _loc2_ = _loc2_ + 1;
-        }
-        _loc2_ = 0;
-        while(_loc2_ < this._iconList.length)
-        {
-            this._iconList[_loc2_].processProperty(a_entryObject);
-            _loc2_ = _loc2_ + 1;
-        }
-        _loc2_ = 0;
-        while(_loc2_ < this._compoundPropertyList.length)
-        {
-            this._compoundPropertyList[_loc2_].processCompoundProperty(a_entryObject);
-            _loc2_ = _loc2_ + 1;
-        }
-        if(this._noIconColors && a_entryObject.iconColor != undefined)
-        {
-            delete a_entryObject.iconColor;
-        }
+        // Use the information from the arrays from the config to fill in additional info
+        
+        // Set properties based on other dataMembers and keywords
+        // as defined in the config
+        for (var i = 0; i < this._propertyList.length; i++)
+            this._propertyList[i].processProperty(a_entryObject);
+
+        // Set iconLabel, iconColor etc (run this even if skse not used)
+        for (var i = 0; i < this._iconList.length; i++)
+            this._iconList[i].processProperty(a_entryObject);
+            
+        // Process compound properties 
+        // (concatenate several properties together, used for sorting)
+        for (var i = 0; i < this._compoundPropertyList.length; i++)
+            this._compoundPropertyList[i].processCompoundProperty(a_entryObject);	
+
+        if (this._noIconColors && a_entryObject.iconColor != undefined)
+            delete(a_entryObject.iconColor)
     }
 }
