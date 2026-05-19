@@ -1,251 +1,306 @@
 class skyui.util.ColorFunctions
-{
-    static var RAD_TO_DEG = 57.295779513082;
-    static var DEG_TO_RAD = 0.017453292519943;
-    static var TWO_PI = 6.2831853071796;
-    static var SQRT_3_OVER_2 = 0.86602540378444;
-    function ColorFunctions()
+{	
+  /* CONSTANTS */
+
+    private static var RAD_TO_DEG: Number		= 57.295779513082;
+    private static var DEG_TO_RAD: Number		= 0.017453292519943;									 
+    private static var TWO_PI: Number			= 6.2831853071796;
+    private static var SQRT_3_OVER_2: Number	= 0.86602540378444;
+
+
+  /* PUBLIC FUNCTIONS */
+
+    // Hex
+    public static function hexToRgb(a_RRGGBB: Number)
     {
+        var RRGGBB: Number = skyui.util.ColorFunctions.validHex(a_RRGGBB);
+
+        return [RRGGBB >> 0x10 & 0xFF, RRGGBB >> 0x08 & 0xFF, RRGGBB & 0xFF];
     }
-    static function hexToRgb(a_RRGGBB)
-    {
-        var _loc1_ = skyui.util.ColorFunctions.validHex(a_RRGGBB);
-        return [_loc1_ >> 16 & 0xFF,_loc1_ >> 8 & 0xFF,_loc1_ & 0xFF];
-    }
-    static function hexToHsv(a_RRGGBB)
+
+    public static function hexToHsv(a_RRGGBB: Number)
     {
         return skyui.util.ColorFunctions.rgbToHsv(skyui.util.ColorFunctions.hexToRgb(a_RRGGBB));
     }
-    static function hexToHsl(a_RRGGBB)
+
+    public static function hexToHsl(a_RRGGBB: Number)
     {
         return skyui.util.ColorFunctions.rgbToHsl(skyui.util.ColorFunctions.hexToRgb(a_RRGGBB));
     }
-    static function hexToStr(a_RRGGBB, a_prefix)
+
+    public static function hexToStr(a_RRGGBB: Number, a_prefix: Boolean)
     {
-        var _loc2_ = a_RRGGBB.toString(16).toUpperCase();
-        var _loc3_ = "";
-        var _loc1_ = _loc2_.length;
-        while(_loc1_ < 6)
-        {
-            _loc3_ += "0";
-            _loc1_ = _loc1_ + 1;
+        var str: String = a_RRGGBB.toString(16).toUpperCase();
+
+        var padding: String = '';
+        for (var i: Number = str.length; i < 6; i++) {
+            padding += '0';
         }
-        _loc2_ = (!a_prefix ? "" : "0x") + _loc3_ + _loc2_;
-        return _loc2_;
+
+        str = ((a_prefix)? "0x": "") + padding + str;
+
+        return str;
+
     }
-    static function validHex(a_RRGGBB)
+
+    public static function validHex(a_RRGGBB: Number)
     {
-        return skyui.util.ColorFunctions.clampValue(a_RRGGBB,0,16777215);
+        return skyui.util.ColorFunctions.clampValue(a_RRGGBB, 0x000000, 0xFFFFFF);
     }
-    static function rgbToHex(a_RGB)
+
+    // RGB
+    public static function rgbToHex(a_RGB: Array)
     {
-        var _loc1_ = a_RGB;
-        return _loc1_[0] << 16 ^ _loc1_[1] << 8 ^ _loc1_[2];
+        var RGB: Array = a_RGB;
+        return (RGB[0] << 0x10 ^ RGB[1] << 0x08 ^ RGB[2]);
     }
-    static function rgbToHsv(a_RGB)
+
+    public static function rgbToHsv(a_RGB: Array)
     {
-        var _loc6_ = skyui.util.ColorFunctions.clampValue(a_RGB[0],0,255) / 255;
-        var _loc5_ = skyui.util.ColorFunctions.clampValue(a_RGB[1],0,255) / 255;
-        var _loc3_ = skyui.util.ColorFunctions.clampValue(a_RGB[2],0,255) / 255;
-        var _loc1_;
-        var _loc4_;
-        var _loc2_;
-        var _loc8_ = Math.max(_loc6_,Math.max(_loc5_,_loc3_));
-        var _loc10_ = Math.min(_loc6_,Math.min(_loc5_,_loc3_));
-        var _loc7_ = _loc8_ - _loc10_;
-        var _loc12_ = (2 * _loc6_ - _loc5_ - _loc3_) / 2;
-        var _loc11_ = (_loc5_ - _loc3_) * skyui.util.ColorFunctions.SQRT_3_OVER_2;
-        _loc1_ = Math.atan2(_loc11_,_loc12_);
-        _loc2_ = _loc8_;
-        _loc4_ = _loc7_ != 0 ? _loc7_ / _loc2_ : 0;
-        if(_loc1_ < 0)
-        {
-            _loc1_ += skyui.util.ColorFunctions.TWO_PI;
-        }
-        _loc1_ *= skyui.util.ColorFunctions.RAD_TO_DEG;
-        _loc4_ *= 100;
-        _loc2_ *= 100;
-        _loc1_ = Math.round(_loc1_);
-        _loc4_ = Math.round(_loc4_);
-        _loc2_ = Math.round(_loc2_);
-        return [_loc1_,_loc4_,_loc2_];
+        // in: [R [0-255], G [0-255], B [0-255]]
+        // out: [H [0-360), S [0, 100], V [0, 100]]
+        var R: Number = skyui.util.ColorFunctions.clampValue(a_RGB[0], 0, 255)/255;
+        var G: Number = skyui.util.ColorFunctions.clampValue(a_RGB[1], 0, 255)/255;
+        var B: Number = skyui.util.ColorFunctions.clampValue(a_RGB[2], 0, 255)/255;
+
+        var H, S, V: Number;
+
+        var M: Number = Math.max(R, Math.max(G, B));
+        var m: Number = Math.min(R, Math.min(G, B));
+        var C: Number = M - m;
+        //H = piecewise..
+
+        var alpha: Number = (2*R - G - B)/2;
+        var beta: Number = (G - B) * skyui.util.ColorFunctions.SQRT_3_OVER_2;
+        H = Math.atan2(beta, alpha);
+        V = M;
+        S = ((C == 0)? 0: C/V);
+
+        if (H < 0)
+            H += skyui.util.ColorFunctions.TWO_PI;
+        
+        H *= skyui.util.ColorFunctions.RAD_TO_DEG;
+        S *= 100;
+        V *= 100;
+
+        H = Math.round(H);
+        S = Math.round(S);
+        V = Math.round(V);
+
+        return [H, S, V];
     }
-    static function rgbToHsb(a_RGB)
+
+    public static function rgbToHsb(a_RGB: Array) { return skyui.util.ColorFunctions.rgbToHsv(a_RGB); }
+
+    public static function rgbToHsl(a_RGB: Array)
     {
-        return skyui.util.ColorFunctions.rgbToHsv(a_RGB);
+        // in: [R [0-255], G [0-255], B [0-255]]
+        // out: [H [0-360), S [0, 100], L [0, 100]]
+        var R: Number = skyui.util.ColorFunctions.clampValue(a_RGB[0], 0, 255)/255;
+        var G: Number = skyui.util.ColorFunctions.clampValue(a_RGB[1], 0, 255)/255;
+        var B: Number = skyui.util.ColorFunctions.clampValue(a_RGB[2], 0, 255)/255;
+
+        var H, S, L: Number;
+
+        var M: Number = Math.max(R, Math.max(G, B));
+        var m: Number = Math.min(R, Math.min(G, B));
+        var C: Number = M - m;
+        //H = piecewise..
+
+        var alpha: Number = (2*R - G - B)/2;
+        var beta: Number = (G - B) * skyui.util.ColorFunctions.SQRT_3_OVER_2;
+        H = Math.atan2(beta, alpha);
+        L = (M + m)/2;
+        S = ((C == 0)? 0: C/(1 - Math.abs(2*L - 1)));
+
+        if (H < 0)
+            H += skyui.util.ColorFunctions.TWO_PI;
+        
+        H *= skyui.util.ColorFunctions.RAD_TO_DEG;
+        S *= 100;
+        L *= 100;
+
+        H = Math.round(H);
+        S = Math.round(S);
+        L = Math.round(L);
+
+        return [H, S, L];
     }
-    static function rgbToHsl(a_RGB)
+
+    
+    // HSV
+    public static function hsvToRgb(a_HSV: Array)
     {
-        var _loc6_ = skyui.util.ColorFunctions.clampValue(a_RGB[0],0,255) / 255;
-        var _loc5_ = skyui.util.ColorFunctions.clampValue(a_RGB[1],0,255) / 255;
-        var _loc3_ = skyui.util.ColorFunctions.clampValue(a_RGB[2],0,255) / 255;
-        var _loc1_;
-        var _loc4_;
-        var _loc2_;
-        var _loc8_ = Math.max(_loc6_,Math.max(_loc5_,_loc3_));
-        var _loc9_ = Math.min(_loc6_,Math.min(_loc5_,_loc3_));
-        var _loc7_ = _loc8_ - _loc9_;
-        var _loc12_ = (2 * _loc6_ - _loc5_ - _loc3_) / 2;
-        var _loc11_ = (_loc5_ - _loc3_) * skyui.util.ColorFunctions.SQRT_3_OVER_2;
-        _loc1_ = Math.atan2(_loc11_,_loc12_);
-        _loc2_ = (_loc8_ + _loc9_) / 2;
-        _loc4_ = _loc7_ != 0 ? _loc7_ / (1 - Math.abs(2 * _loc2_ - 1)) : 0;
-        if(_loc1_ < 0)
-        {
-            _loc1_ += skyui.util.ColorFunctions.TWO_PI;
-        }
-        _loc1_ *= skyui.util.ColorFunctions.RAD_TO_DEG;
-        _loc4_ *= 100;
-        _loc2_ *= 100;
-        _loc1_ = Math.round(_loc1_);
-        _loc4_ = Math.round(_loc4_);
-        _loc2_ = Math.round(_loc2_);
-        return [_loc1_,_loc4_,_loc2_];
-    }
-    static function hsvToRgb(a_HSV)
-    {
-        var _loc11_ = skyui.util.ColorFunctions.loopValue(a_HSV[0],360);
-        var _loc9_ = skyui.util.ColorFunctions.clampValue(a_HSV[1],0,100) / 100;
-        var _loc7_ = skyui.util.ColorFunctions.clampValue(a_HSV[2],0,100) / 100;
-        var _loc2_;
-        var _loc3_;
-        var _loc1_;
-        var _loc4_ = _loc7_ * _loc9_;
-        var _loc8_ = _loc11_ / 60;
-        var _loc10_ = Math.floor(_loc8_);
-        var _loc5_ = _loc4_ * (1 - Math.abs(_loc8_ % 2 - 1));
-        switch(_loc10_)
-        {
+        // in: [H [0-360), S [0, 100], V [0, 100]]
+        // out: [R [0-255], G [0-255], B [0-255]]
+        var H: Number = skyui.util.ColorFunctions.loopValue(a_HSV[0], 360);
+        var S: Number = skyui.util.ColorFunctions.clampValue(a_HSV[1], 0, 100)/100;
+        var V: Number = skyui.util.ColorFunctions.clampValue(a_HSV[2], 0, 100)/100;
+
+        var R, G, B: Number;
+
+        var C = V * S;
+
+        var Hdash: Number = H / 60;
+        var sextant: Number = Math.floor(Hdash);
+
+        var X: Number = C*(1 - Math.abs(Hdash % 2 - 1));
+
+        switch(sextant) {
             case 0:
-                _loc2_ = _loc4_;
-                _loc3_ = _loc5_;
-                _loc1_ = 0;
+                R = C;
+                G = X;
+                B = 0;
                 break;
             case 1:
-                _loc2_ = _loc5_;
-                _loc3_ = _loc4_;
-                _loc1_ = 0;
+                R = X;
+                G = C;
+                B = 0;
                 break;
             case 2:
-                _loc2_ = 0;
-                _loc3_ = _loc4_;
-                _loc1_ = _loc5_;
+                R = 0;
+                G = C;
+                B = X;
                 break;
             case 3:
-                _loc2_ = 0;
-                _loc3_ = _loc5_;
-                _loc1_ = _loc4_;
+                R = 0;
+                G = X;
+                B = C;
                 break;
             case 4:
-                _loc2_ = _loc5_;
-                _loc3_ = 0;
-                _loc1_ = _loc4_;
+                R = X;
+                G = 0;
+                B = C;
                 break;
             case 5:
-                _loc2_ = _loc4_;
-                _loc3_ = 0;
-                _loc1_ = _loc5_;
+                R = C;
+                G = 0;
+                B = X;
                 break;
             default:
-                _loc2_ = 0;
-                _loc3_ = 0;
-                _loc1_ = 0;
+                R = 0;
+                G = 0;
+                B = 0;
+                break;
         }
-        var _loc6_ = _loc7_ - _loc4_;
-        _loc2_ += _loc6_;
-        _loc3_ += _loc6_;
-        _loc1_ += _loc6_;
-        _loc2_ *= 255;
-        _loc3_ *= 255;
-        _loc1_ *= 255;
-        _loc2_ = Math.round(_loc2_);
-        _loc3_ = Math.round(_loc3_);
-        _loc1_ = Math.round(_loc1_);
-        return [_loc2_,_loc3_,_loc1_];
+
+        var m: Number = V - C;
+
+        R += m;
+        G += m;
+        B += m;
+
+        R *= 255;
+        G *= 255;
+        B *= 255;
+
+        R = Math.round(R);
+        G = Math.round(G);
+        B = Math.round(B);
+
+        return [R, G, B];
     }
-    static function hsvToHex(a_HSV)
+    public static function hsvToHex(a_HSV) { return skyui.util.ColorFunctions.rgbToHex(skyui.util.ColorFunctions.hsvToRgb(a_HSV)); }
+
+    // HSB (alias for HSV)
+    public static function hsbToRgb(a_HSB: Array) { return skyui.util.ColorFunctions.hsvToRgb(a_HSB); }
+    public static function hsbToHex(a_HSB) { return skyui.util.ColorFunctions.hsvToHex(a_HSB); }
+
+    // HSL
+    public static function hslToRgb(a_HSL: Array)
     {
-        return skyui.util.ColorFunctions.rgbToHex(skyui.util.ColorFunctions.hsvToRgb(a_HSV));
-    }
-    static function hsbToRgb(a_HSB)
-    {
-        return skyui.util.ColorFunctions.hsvToRgb(a_HSB);
-    }
-    static function hsbToHex(a_HSB)
-    {
-        return skyui.util.ColorFunctions.hsvToHex(a_HSB);
-    }
-    static function hslToRgb(a_HSL)
-    {
-        var _loc12_ = skyui.util.ColorFunctions.loopValue(a_HSL[0],360);
-        var _loc9_ = skyui.util.ColorFunctions.clampValue(a_HSL[1],0,100) / 100;
-        var _loc7_ = skyui.util.ColorFunctions.clampValue(a_HSL[2],0,100) / 100;
-        var _loc2_;
-        var _loc3_;
-        var _loc1_;
-        var _loc4_ = (1 - Math.abs(2 * _loc7_ - 1)) * _loc9_;
-        var _loc8_ = _loc12_ / 60;
-        var _loc10_ = Math.floor(_loc8_);
-        var _loc5_ = _loc4_ * (1 - Math.abs(_loc8_ % 2 - 1));
-        switch(_loc10_)
-        {
+        // in: [H [0-360), S [0, 100], L [0, 100]]
+        // out: [R [0-255], G [0-255], B [0-255]]
+        var H: Number = skyui.util.ColorFunctions.loopValue(a_HSL[0], 360);
+        var S: Number = skyui.util.ColorFunctions.clampValue(a_HSL[1], 0, 100)/100;
+        var L: Number = skyui.util.ColorFunctions.clampValue(a_HSL[2], 0, 100)/100;
+
+        var R, G, B: Number;
+
+        var C = (1 - Math.abs(2*L - 1)) * S;
+
+        var Hdash: Number = H / 60;
+        var sextant: Number = Math.floor(Hdash);
+
+        var X: Number = C*(1 - Math.abs(Hdash % 2 - 1));
+
+        switch(sextant) {
             case 0:
-                _loc2_ = _loc4_;
-                _loc3_ = _loc5_;
-                _loc1_ = 0;
+                R = C;
+                G = X;
+                B = 0;
                 break;
             case 1:
-                _loc2_ = _loc5_;
-                _loc3_ = _loc4_;
-                _loc1_ = 0;
+                R = X;
+                G = C;
+                B = 0;
                 break;
             case 2:
-                _loc2_ = 0;
-                _loc3_ = _loc4_;
-                _loc1_ = _loc5_;
+                R = 0;
+                G = C;
+                B = X;
                 break;
             case 3:
-                _loc2_ = 0;
-                _loc3_ = _loc5_;
-                _loc1_ = _loc4_;
+                R = 0;
+                G = X;
+                B = C;
                 break;
             case 4:
-                _loc2_ = _loc5_;
-                _loc3_ = 0;
-                _loc1_ = _loc4_;
+                R = X;
+                G = 0;
+                B = C;
                 break;
             case 5:
-                _loc2_ = _loc4_;
-                _loc3_ = 0;
-                _loc1_ = _loc5_;
+                R = C;
+                G = 0;
+                B = X;
                 break;
             default:
-                _loc2_ = 0;
-                _loc3_ = 0;
-                _loc1_ = 0;
+                R = 0;
+                G = 0;
+                B = 0;
+                break;
         }
-        var _loc6_ = _loc7_ - _loc4_ / 2;
-        _loc2_ += _loc6_;
-        _loc3_ += _loc6_;
-        _loc1_ += _loc6_;
-        _loc2_ *= 255;
-        _loc3_ *= 255;
-        _loc1_ *= 255;
-        _loc2_ = Math.round(_loc2_);
-        _loc3_ = Math.round(_loc3_);
-        _loc1_ = Math.round(_loc1_);
-        return [_loc2_,_loc3_,_loc1_];
+
+        var m: Number = L - C/2;
+
+        R += m;
+        G += m;
+        B += m;
+
+        R *= 255;
+        G *= 255;
+        B *= 255;
+
+        R = Math.round(R);
+        G = Math.round(G);
+        B = Math.round(B);
+
+        return [R, G, B];
     }
-    static function hslToHex(a_HSL)
+
+    public static function hslToHex(a_HSL) { return skyui.util.ColorFunctions.rgbToHex(skyui.util.ColorFunctions.hslToRgb(a_HSL)); }
+
+
+  /* PRIVATE FUNCTIONS */
+
+    private static function clampValue(a_val: Number, a_min: Number, a_max: Number)
     {
-        return skyui.util.ColorFunctions.rgbToHex(skyui.util.ColorFunctions.hslToRgb(a_HSL));
+        // $ trace(clampValue(1000, 0, 100))
+        // > 100
+        // $ trace(clampValue(-1000, -50, 100))
+        // > -50
+        return Math.min(a_max, Math.max(a_min, a_val));
     }
-    static function clampValue(a_val, a_min, a_max)
+
+    private static function loopValue(a_val: Number, a_max: Number)
     {
-        return Math.min(a_max,Math.max(a_min,a_val));
-    }
-    static function loopValue(a_val, a_max)
-    {
-        return a_val % a_max;
+        // $ trace(loopValue(360.1012, 360))
+        // > 0.10120000000001
+        // $ trace(loopValue(360, 360))
+        // > 0
+        // $ trace(loopValue(-1, 360))
+        // > 359
+        return (a_val % a_max);
     }
 }

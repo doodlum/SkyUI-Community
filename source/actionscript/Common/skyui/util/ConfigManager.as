@@ -1,386 +1,422 @@
 class skyui.util.ConfigManager
 {
-    static var _config;
-    static var _eventDummy;
-    static var _timeoutID;
-    static var CONFIG_PATH = "skyui/config.txt";
-    static var TIMEOUT = 3000;
-    static var LOAD_NONE = 0;
-    static var LOAD_FILE = 1;
-    static var LOAD_PAPYRUS = 2;
-    static var _constantTable = {ASCENDING:0,DESCENDING:Array.DESCENDING,CASEINSENSITIVE:Array.CASEINSENSITIVE,NUMERIC:Array.NUMERIC};
-    static var _extConstantTableNames = [];
-    static var _extConstantTables = {};
-    static var _loadPhase = skyui.util.ConfigManager.LOAD_NONE;
-    static var _initialized = skyui.util.ConfigManager.initialize();
-    static var out_overrides = {};
-    static var in_overrideKeys = [];
-    function ConfigManager()
-    {
-    }
-    static function initialize()
+  /* CONSTANTS */
+
+    private static var CONFIG_PATH = "skyui/config.txt";
+    private static var TIMEOUT = 3000;
+    
+    private static var LOAD_NONE = 0;
+    private static var LOAD_FILE = 1;
+    private static var LOAD_PAPYRUS = 2;
+    
+    
+  /* PRIVATE VARIABLES */
+
+    private static var _constantTable: Object = {
+        
+        ASCENDING: 0,
+        DESCENDING: Array.DESCENDING,
+        CASEINSENSITIVE: Array.CASEINSENSITIVE,
+        NUMERIC: Array.NUMERIC
+    };
+    
+    // Contains names of classes
+    private static var _extConstantTableNames: Array = [];
+    // Contains the actual classes.
+    private static var _extConstantTables: Object = {};
+    
+    private static var _eventDummy: Object;
+    
+    // 0: Waiting for file, 1: Waiting for override 2: Loaded
+    private static var _loadPhase: Number = skyui.util.ConfigManager.LOAD_NONE;
+    
+    private static var _config: Object;
+    
+    private static var _timeoutID: Number;
+    
+    
+  /* INITIALIATZION */
+
+    private static var _initialized:Boolean = skyui.util.ConfigManager.initialize();
+
+    private static function initialize()
     {
         skyui.util.GlobalFunctions.addArrayFunctions();
+        
         skyui.util.ConfigManager._eventDummy = {};
         gfx.events.EventDispatcher.initialize(skyui.util.ConfigManager._eventDummy);
-        var _loc1_ = new LoadVars();
-        _loc1_.onData = skyui.util.ConfigManager.parseData;
-        _loc1_.load(skyui.util.ConfigManager.CONFIG_PATH);
+        
+        var lv = new LoadVars();
+        lv.onData = skyui.util.ConfigManager.parseData;
+        lv.load(skyui.util.ConfigManager.CONFIG_PATH);
+        
         return true;
     }
-    static function setExternalOverrideKeys()
+    
+    
+  /* PAPYRUS INTERFACE */
+
+    // Key/value pairs "Section$k$e$y$" / "value"
+    public static var out_overrides = {};
+    public static var in_overrideKeys = [];
+    
+    public static function setExternalOverrideKeys()
     {
         skyui.util.ConfigManager.in_overrideKeys.splice(0);
-        var _loc2_ = 0;
-        while(_loc2_ < arguments.length)
-        {
-            skyui.util.ConfigManager.in_overrideKeys[_loc2_] = arguments[_loc2_];
-            _loc2_ = _loc2_ + 1;
-        }
+        
+        for (var i = 0; i < arguments.length; i++)
+            skyui.util.ConfigManager.in_overrideKeys[i] = arguments[i];
     }
-    static function setExternalOverrideValues()
+    
+    public static function setExternalOverrideValues()
     {
-        if(skyui.util.ConfigManager._loadPhase == skyui.util.ConfigManager.LOAD_NONE)
-        {
-            return undefined;
+        // Received overrides before file? This can't be right.
+        if (skyui.util.ConfigManager._loadPhase == skyui.util.ConfigManager.LOAD_NONE)
+            return;
+        
+        // Update happens in 2 phases.
+        // First the keys are sent and stored, then the values are sent and immediately processed.
+        for (var i = 0; i < arguments.length; i++) {
+            var t = skyui.util.ConfigManager.in_overrideKeys[i];
+            if (t && t != "")
+                skyui.util.ConfigManager.parseExternalOverride(t, arguments[i]);
         }
-        var _loc2_ = 0;
-        var _loc3_;
-        while(_loc2_ < arguments.length)
-        {
-            _loc3_ = skyui.util.ConfigManager.in_overrideKeys[_loc2_];
-            if(_loc3_ && _loc3_ != "")
-            {
-                skyui.util.ConfigManager.parseExternalOverride(_loc3_,arguments[_loc2_]);
-            }
-            _loc2_ = _loc2_ + 1;
-        }
-        if(skyui.util.ConfigManager._loadPhase != skyui.util.ConfigManager.LOAD_PAPYRUS)
-        {
-            clearInterval(skyui.util.ConfigManager._timeoutID);
+        
+        if (skyui.util.ConfigManager._loadPhase != skyui.util.ConfigManager.LOAD_PAPYRUS) {
+            clearInterval(_timeoutID);
             delete skyui.util.ConfigManager._timeoutID;
+            
             skyui.util.ConfigManager._loadPhase = skyui.util.ConfigManager.LOAD_PAPYRUS;
-            skyui.util.ConfigManager._eventDummy.dispatchEvent({type:"configLoad",config:skyui.util.ConfigManager._config});
-        }
-        else
-        {
-            skyui.util.ConfigManager._eventDummy.dispatchEvent({type:"configUpdate",config:skyui.util.ConfigManager._config});
+            skyui.util.ConfigManager._eventDummy.dispatchEvent({type: "configLoad", config: skyui.util.ConfigManager._config});			
+        } else {
+            // Timeout
+            skyui.util.ConfigManager._eventDummy.dispatchEvent({type: "configUpdate", config: _config});
         }
     }
-    static function registerLoadCallback(a_scope, a_callBack)
+    
+    
+  /* PUBLIC FUNCTIONS */
+
+    public static function registerLoadCallback(a_scope: Object, a_callBack: String)
     {
-        skyui.util.ConfigManager._eventDummy.addEventListener("configLoad",a_scope,a_callBack);
+        skyui.util.ConfigManager._eventDummy.addEventListener("configLoad", a_scope, a_callBack);
     }
-    static function registerUpdateCallback(a_scope, a_callBack)
+    
+    public static function registerUpdateCallback(a_scope: Object, a_callBack: String)
     {
-        skyui.util.ConfigManager._eventDummy.addEventListener("configUpdate",a_scope,a_callBack);
+        skyui.util.ConfigManager._eventDummy.addEventListener("configUpdate", a_scope, a_callBack);
     }
-    static function setConstant(a_name, a_value)
+    
+    public static function setConstant(a_name: String, a_value)
     {
-        var _loc1_ = typeof a_value;
-        if(_loc1_ != "number" && _loc1_ != "boolean" && _loc1_ != "string")
-        {
-            return undefined;
-        }
+        var type = typeof(a_value);
+        if (type != "number" && type != "boolean" && type != "string")
+            return;
+        
         skyui.util.ConfigManager._constantTable[a_name] = a_value;
     }
-    static function addConstantTable(a_name, a_class)
+    
+    
+    public static function addConstantTable(a_name: String, a_class: Function)
     {
         skyui.util.ConfigManager._extConstantTableNames.push(a_name);
     }
-    static function getConstant(a_name)
+    
+    public static function getConstant(a_name: String)
     {
-        if(skyui.util.ConfigManager._constantTable[a_name] != undefined)
-        {
+        if (skyui.util.ConfigManager._constantTable[a_name] != undefined)
             return skyui.util.ConfigManager._constantTable[a_name];
-        }
-        var _loc1_ = a_name.split(".");
-        if(_loc1_.length < 2)
-        {
+        
+        var a: Array = a_name.split(".");
+
+        if (a.length < 2)
             return undefined;
-        }
-        var _loc3_ = _loc1_[_loc1_.length - 2];
-        var _loc2_ = _loc1_[_loc1_.length - 1];
-        if(skyui.util.ConfigManager._extConstantTables[_loc3_][_loc2_] != undefined)
-        {
-            return skyui.util.ConfigManager._extConstantTables[_loc3_][_loc2_];
-        }
+
+        var className: String = a[a.length - 2];
+        var constName: String = a[a.length - 1];
+
+        if (skyui.util.ConfigManager._extConstantTables[className][constName] != undefined)
+            return skyui.util.ConfigManager._extConstantTables[className][constName];
+
         return undefined;
     }
-    static function setOverride(a_section, a_key, a_value, a_valueStr)
+    
+    public static function setOverride(a_section: String, a_key: String, a_value, a_valueStr: String)
     {
-        if(skyui.util.ConfigManager._config[a_section] == undefined)
-        {
+        // Allow to add new sections
+        if (skyui.util.ConfigManager._config[a_section] == undefined)
             skyui.util.ConfigManager._config[a_section] = {};
+        
+        var a = a_key.split(".");
+
+        // Prepare key subsections
+        var loc = skyui.util.ConfigManager._config[a_section];
+
+        var varContainer = null;
+        if (a[0] == "vars")
+            varContainer = loc.vars[a[1]];
+        
+        for (var j = 0; j < a.length-1; j++) {
+            if (loc[a[j]] == undefined)
+                loc[a[j]] = {};
+            loc = loc[a[j]];
         }
-        var _loc3_ = a_key.split(".");
-        var _loc4_ = skyui.util.ConfigManager._config[a_section];
-        var _loc5_ = null;
-        if(_loc3_[0] == "vars")
-        {
-            _loc5_ = _loc4_.vars[_loc3_[1]];
-        }
-        var _loc1_ = 0;
-        while(_loc1_ < _loc3_.length - 1)
-        {
-            if(_loc4_[_loc3_[_loc1_]] == undefined)
-            {
-                _loc4_[_loc3_[_loc1_]] = {};
-            }
-            _loc4_ = _loc4_[_loc3_[_loc1_]];
-            _loc1_ = _loc1_ + 1;
-        }
-        _loc4_[_loc3_[_loc3_.length - 1]] = a_value;
+
+        // Store value in config
+        loc[a[a.length-1]] = a_value;
+        
+        // UI functions would try to look up keys.a.b.c, instead of keys["a.b.c"].
+        // . -> $
         a_key = a_key.split(".").join("$");
-        var _loc9_ = a_section + "$" + a_key;
-        skyui.util.ConfigManager.out_overrides[_loc9_] = a_valueStr;
-        skse.SendModEvent("SKICO_setConfigOverride",_loc9_);
-        var _loc2_;
-        var _loc6_;
-        var _loc7_;
-        if(_loc5_)
-        {
-            _loc2_ = 0;
-            while(_loc2_ < _loc5_._refLocs.length)
-            {
-                _loc6_ = _loc5_._refLocs[_loc2_];
-                _loc7_ = _loc5_._refKeys[_loc2_];
-                _loc6_[_loc7_] = a_value;
-                _loc2_ = _loc2_ + 1;
+        
+        var ovrKey = a_section + "$" + a_key;
+        skyui.util.ConfigManager.out_overrides[ovrKey] = a_valueStr;
+        skse.SendModEvent("SKICO_setConfigOverride", ovrKey);
+        
+        // If we changed the value of a var, update all recorded references.
+        if (varContainer) {
+            for (var i = 0; i < varContainer._refLocs.length; i++) {
+                var varLoc = varContainer._refLocs[i];
+                var varKey = varContainer._refKeys[i];
+                varLoc[varKey] = a_value;
             }
         }
-        skyui.util.ConfigManager._eventDummy.dispatchEvent({type:"configUpdate",config:skyui.util.ConfigManager._config});
+        
+        skyui.util.ConfigManager._eventDummy.dispatchEvent({type: "configUpdate", config: _config});
     }
-    static function parseExternalOverride(a_key, a_valueStr)
+    
+    // (Unsafe) Provide static accessor to the config to retrieve trivial values
+    /*
+    public static function getValue(a_section: String, a_key: String)
     {
-        var _loc9_ = a_key.indexOf("$");
-        var _loc12_ = skyui.util.GlobalFunctions.clean(a_key.slice(0,_loc9_));
-        var _loc10_ = skyui.util.GlobalFunctions.clean(a_key.slice(_loc9_ + 1));
-        var _loc8_ = skyui.util.ConfigManager.parseValueString(skyui.util.GlobalFunctions.clean(a_valueStr),null);
-        var _loc3_ = _loc10_.split("$");
-        var _loc4_ = skyui.util.ConfigManager._config[_loc12_];
-        var _loc5_ = null;
-        if(_loc3_[0] == "vars")
-        {
-            _loc5_ = _loc4_.vars[_loc3_[1]];
+        if (skyui.util.ConfigManager._loadPhase < skyui.util.ConfigManager.LOAD_PAPYRUS)
+            return null;
+        
+        var a = a_key.split(".");
+        var loc = skyui.util.ConfigManager._config[a_section];
+        for (var j = 0; j < a.length; j++) {
+            if (loc[a[j]] == undefined)
+                return null;
+            loc = loc[a[j]];
         }
-        var _loc1_ = 0;
-        while(_loc1_ < _loc3_.length - 1)
-        {
-            if(_loc4_[_loc3_[_loc1_]] == undefined)
-            {
-                _loc4_[_loc3_[_loc1_]] = {};
-            }
-            _loc4_ = _loc4_[_loc3_[_loc1_]];
-            _loc1_ = _loc1_ + 1;
+        
+        return loc;
+    }*/
+
+
+  /* PRIVATE FUNCTIONS */
+
+    private static function parseExternalOverride(a_key: String, a_valueStr: String)
+    {
+        var index =  a_key.indexOf("$");
+        
+        // raw key: section$k$e$y
+        var section = skyui.util.GlobalFunctions.clean(a_key.slice(0, index));
+        var key = skyui.util.GlobalFunctions.clean(a_key.slice(index + 1));
+        var val = skyui.util.ConfigManager.parseValueString(skyui.util.GlobalFunctions.clean(a_valueStr), null);
+
+        // Prepare key subsections - external keys use $ as separator
+        var a = key.split("$");
+        var loc = skyui.util.ConfigManager._config[section];
+        
+        var varContainer = null;
+        if (a[0] == "vars")
+            varContainer = loc.vars[a[1]];
+        
+        for (var j = 0; j < a.length - 1; j++) {
+            if (loc[a[j]] == undefined)
+                loc[a[j]] = {};
+            loc = loc[a[j]];
         }
-        _loc4_[_loc3_[_loc3_.length - 1]] = _loc8_;
-        var _loc2_;
-        var _loc6_;
-        var _loc7_;
-        if(_loc5_)
-        {
-            _loc2_ = 0;
-            while(_loc2_ < _loc5_._refLocs.length)
-            {
-                _loc6_ = _loc5_._refLocs[_loc2_];
-                _loc7_ = _loc5_._refKeys[_loc2_];
-                _loc6_[_loc7_] = _loc8_;
-                _loc2_ = _loc2_ + 1;
+        
+        loc[a[a.length - 1]] = val;
+        
+        // If we changed the value of a var, update all recorded references.
+        if (varContainer) {
+            for (var i = 0; i < varContainer._refLocs.length; i++) {
+                var varLoc = varContainer._refLocs[i];
+                var varKey = varContainer._refKeys[i];
+                varLoc[varKey] = val;
             }
         }
     }
-    static function parseData(a_data)
+
+    private static function parseData(a_data: Array)
     {
         skyui.util.ConfigManager._config = {};
-        var _loc4_ = 0;
-        var _loc2_;
-        var _loc11_;
-        var _loc7_;
-        var _loc3_;
-        while(_loc4_ < skyui.util.ConfigManager._extConstantTableNames.length)
-        {
-            _loc2_ = skyui.util.ConfigManager._extConstantTableNames[_loc4_].split(".");
-            _loc11_ = _loc2_[_loc2_.length - 1];
-            _loc7_ = _global[_loc2_[0]];
-            _loc3_ = 1;
-            while(_loc3_ < _loc2_.length)
-            {
-                _loc7_ = _loc7_[_loc2_[_loc3_]];
-                _loc3_ = _loc3_ + 1;
+        
+        // Resolve constant tables
+        for (var i = 0; i < skyui.util.ConfigManager._extConstantTableNames.length; i++) {
+            var a = skyui.util.ConfigManager._extConstantTableNames[i].split(".");
+            var className: String = a[a.length - 1];
+            var tbl = _global[a[0]];
+            for (var j = 1; j < a.length; j++)
+                tbl = tbl[a[j]];
+            skyui.util.ConfigManager._extConstantTables[className] = tbl;
+        }
+        
+        var lines = a_data.split("\r\n");
+        if (lines.length == 1)
+            lines = a_data.split("\n");
+
+        var section = undefined;
+
+        for (var i = 0; i < lines.length; i++) {
+
+            // Comment
+            if (lines[i].charAt(0) == ";")
+                continue;
+
+            // Section start
+            if (lines[i].charAt(0) == "[") {
+                section = lines[i].slice(1, lines[i].lastIndexOf("]"));
+                
+                if (skyui.util.ConfigManager._config[section] == undefined)
+                    skyui.util.ConfigManager._config[section] = {};
+                    
+                continue;
             }
-            skyui.util.ConfigManager._extConstantTables[_loc11_] = _loc7_;
-            _loc4_ = _loc4_ + 1;
-        }
-        var _loc6_ = a_data.split("\r\n");
-        if(_loc6_.length == 1)
-        {
-            _loc6_ = a_data.split("\n");
-        }
-        var _loc8_;
-        _loc4_ = 0;
-        var _loc10_;
-        var _loc5_;
-        var _loc9_;
-        while(_loc4_ < _loc6_.length)
-        {
-            if(_loc6_[_loc4_].charAt(0) != ";")
-            {
-                if(_loc6_[_loc4_].charAt(0) == "[")
-                {
-                _loc8_ = _loc6_[_loc4_].slice(1,_loc6_[_loc4_].lastIndexOf("]"));
-                if(skyui.util.ConfigManager._config[_loc8_] == undefined)
-                {
-                    skyui.util.ConfigManager._config[_loc8_] = {};
-                }
-                }
-                else if(!(_loc6_[_loc4_].length < 3 || _loc8_ == undefined))
-                {
-                _loc10_ = skyui.util.GlobalFunctions.clean(_loc6_[_loc4_].slice(0,_loc6_[_loc4_].indexOf("=")));
-                if(_loc10_ != undefined)
-                {
-                    _loc2_ = _loc10_.split(".");
-                    _loc5_ = skyui.util.ConfigManager._config[_loc8_];
-                    _loc3_ = 0;
-                    while(_loc3_ < _loc2_.length - 1)
-                    {
-                        if(_loc5_[_loc2_[_loc3_]] == undefined)
-                        {
-                            _loc5_[_loc2_[_loc3_]] = {};
-                        }
-                        _loc5_ = _loc5_[_loc2_[_loc3_]];
-                        _loc3_ = _loc3_ + 1;
-                    }
-                    _loc9_ = skyui.util.ConfigManager.parseValueString(skyui.util.GlobalFunctions.clean(_loc6_[_loc4_].slice(_loc6_[_loc4_].indexOf("=") + 1)),skyui.util.ConfigManager._config[_loc8_],_loc5_,_loc2_[_loc2_.length - 1]);
-                    if(_loc9_ != undefined)
-                    {
-                        _loc5_[_loc2_[_loc2_.length - 1]] = _loc9_;
-                    }
-                }
-                }
+
+            if (lines[i].length < 3 || section == undefined)
+                continue;
+            
+            // Get raw key string
+            var key = skyui.util.GlobalFunctions.clean(lines[i].slice(0, lines[i].indexOf("=")));
+            if (key == undefined)
+                continue;
+                
+            // Prepare key subsections
+            var a = key.split(".");
+            var loc = skyui.util.ConfigManager._config[section];
+            for (var j = 0; j < a.length - 1; j++) {
+                if (loc[a[j]] == undefined)
+                    loc[a[j]] = {};
+                loc = loc[a[j]];
             }
-            _loc4_ = _loc4_ + 1;
+
+            // Detect value type & extract
+            var val = skyui.util.ConfigManager.parseValueString(skyui.util.GlobalFunctions.clean(lines[i].slice(lines[i].indexOf("=") + 1)), skyui.util.ConfigManager._config[section], loc, a[a.length - 1]);
+            
+            if (val == undefined)
+                continue;
+
+            // Store val at config.section.a.b.c.d
+            loc[a[a.length-1]] = val;
         }
+        
         skyui.util.ConfigManager._loadPhase = skyui.util.ConfigManager.LOAD_FILE;
-        skyui.util.ConfigManager._timeoutID = setInterval(skyui.util.ConfigManager.onTimeout,skyui.util.ConfigManager.TIMEOUT);
+        skyui.util.ConfigManager._timeoutID = setInterval(skyui.util.ConfigManager.onTimeout, skyui.util.ConfigManager.TIMEOUT);
+        
+//		_eventDummy.dispatchEvent({type: "configLoad", config: _config});
     }
-    static function onTimeout()
+    
+    private static function onTimeout()
     {
         clearInterval(skyui.util.ConfigManager._timeoutID);
         delete skyui.util.ConfigManager._timeoutID;
-        if(skyui.util.ConfigManager._loadPhase != skyui.util.ConfigManager.LOAD_PAPYRUS)
-        {
+
+        if (skyui.util.ConfigManager._loadPhase != skyui.util.ConfigManager.LOAD_PAPYRUS) {
             skyui.util.ConfigManager._loadPhase = skyui.util.ConfigManager.LOAD_PAPYRUS;
-            skyui.util.ConfigManager._eventDummy.dispatchEvent({type:"configLoad",config:skyui.util.ConfigManager._config});
+            skyui.util.ConfigManager._eventDummy.dispatchEvent({type: "configLoad", config: skyui.util.ConfigManager._config});
         }
     }
-    static function parseValueString(a_str, a_root, a_loc, a_key)
+    
+    private static function parseValueString(a_str: String, a_root: Object, a_loc: Object, a_key: String)
     {
-        if(a_str == undefined)
-        {
+        if (a_str == undefined)
             return undefined;
-        }
-        var _loc6_;
-        if(!isNaN(a_str))
-        {
+            
+        var t = undefined;
+
+        // Number?
+        if (!isNaN(a_str)) {
             return Number(a_str);
-        }
-        if(a_str.toLowerCase() == "true")
-        {
+            
+        // Bool true?
+        } else if (a_str.toLowerCase() == "true") {
             return true;
-        }
-        if(a_str.toLowerCase() == "false")
-        {
+            
+        // Bool false?
+        } else if (a_str.toLowerCase() == "false") {
             return false;
-        }
-        if(a_str.toLowerCase() == "undefined")
-        {
+
+        // Undefined?
+        } else if (a_str.toLowerCase() == "undefined") {
             return undefined;
-        }
-        if(a_str.charAt(0) == "\'")
-        {
-            return skyui.util.GlobalFunctions.extract(a_str,"\'","\'");
-        }
-        if(a_str.charAt(0) == "@")
-        {
+            
+        // Explicit String?
+        } else if (a_str.charAt(0) == "'") {
+            return skyui.util.GlobalFunctions.extract(a_str, "'", "'");
+            
+        // Entry property? - substituted later
+        } else if (a_str.charAt(0) == "@") {
             return a_str;
-        }
-        var _loc8_;
-        var _loc11_;
-        var _loc3_;
-        var _loc2_;
-        var _loc5_;
-        var _loc7_;
-        if(a_str.charAt(0) == "<" && a_str.indexOf(":") != -1)
-        {
-            _loc8_ = new Object();
-            _loc11_ = skyui.util.GlobalFunctions.extract(a_str,"<",">").split(",");
-            _loc3_ = 0;
-            while(_loc3_ < _loc11_.length)
-            {
-                _loc2_ = _loc11_[_loc3_].split(":");
-                if(_loc2_.length == 2)
-                {
-                _loc5_ = skyui.util.ConfigManager.parseValueString(skyui.util.GlobalFunctions.clean(_loc2_[0]),a_root,null,null);
-                _loc7_ = skyui.util.ConfigManager.parseValueString(skyui.util.GlobalFunctions.clean(_loc2_[1]),a_root,_loc8_,_loc5_);
-                _loc8_[_loc5_] = _loc7_;
+
+        // Associative array?
+        //TODO: This should properly check if [:,] is within a string
+        //      As should the List parsing below
+        } else if (a_str.charAt(0) == "<" && a_str.indexOf(":") != -1) {
+            var assocArray = new Object();
+            var pairs =  skyui.util.GlobalFunctions.extract(a_str, "<", ">").split(",");
+            for (var i = 0; i < pairs.length; i++) {
+                var keyValue = pairs[i].split(":");
+                if (keyValue.length != 2) {
+                    // If we don't have a pair we just ignore it
+                    continue;
                 }
-                _loc3_ = _loc3_ + 1;
+                var key = skyui.util.ConfigManager.parseValueString(skyui.util.GlobalFunctions.clean(keyValue[0]), a_root, null, null);
+                var val = skyui.util.ConfigManager.parseValueString(skyui.util.GlobalFunctions.clean(keyValue[1]), a_root, assocArray, key);
+                assocArray[key] = val;
             }
-            return _loc8_;
-        }
-        var _loc10_;
-        if(a_str.charAt(0) == "<")
-        {
-            if(a_str.charAt(1) == ">")
-            {
+            return assocArray;
+
+        // List?
+        } else if (a_str.charAt(0) == "<") {
+            if (a_str.charAt(1) == ">")
                 return new Array();
+            var values = skyui.util.GlobalFunctions.extract(a_str, "<", ">").split(",");
+            for (var i = 0; i < values.length; i++)
+                values[i] = skyui.util.ConfigManager.parseValueString(skyui.util.GlobalFunctions.clean(values[i]), a_root, values, i);
+                
+            return values;
+            
+        // Flags?
+        } else if (a_str.charAt(0) == "{") {
+            var values = skyui.util.GlobalFunctions.extract(a_str, "{", "}").split("|");
+            var flags = 0;
+            for (var i = 0; i < values.length; i++) {
+                t = skyui.util.ConfigManager.parseValueString(skyui.util.GlobalFunctions.clean(values[i]), a_root, a_loc, a_key);
+                if (isNaN(t))
+                    return undefined;
+                    
+                flags = flags | t;
             }
-            _loc10_ = skyui.util.GlobalFunctions.extract(a_str,"<",">").split(",");
-            _loc3_ = 0;
-            while(_loc3_ < _loc10_.length)
-            {
-                _loc10_[_loc3_] = skyui.util.ConfigManager.parseValueString(skyui.util.GlobalFunctions.clean(_loc10_[_loc3_]),a_root,_loc10_,_loc3_);
-                _loc3_ = _loc3_ + 1;
-            }
-            return _loc10_;
-        }
-        var _loc9_;
-        if(a_str.charAt(0) == "{")
-        {
-            _loc10_ = skyui.util.GlobalFunctions.extract(a_str,"{","}").split("|");
-            _loc9_ = 0;
-            _loc3_ = 0;
-            while(_loc3_ < _loc10_.length)
-            {
-                _loc6_ = skyui.util.ConfigManager.parseValueString(skyui.util.GlobalFunctions.clean(_loc10_[_loc3_]),a_root,a_loc,a_key);
-                if(isNaN(_loc6_))
-                {
-                return undefined;
+            return flags;
+        
+        // Constant?
+        } else if ((t = skyui.util.ConfigManager.getConstant(a_str)) != undefined) {
+            return t;
+            
+        // Var?
+        } else if (a_root.vars[a_str] != undefined) {
+            // A variable might be updated later via overrides, in which case we'd have to re-evaluate previous
+            // expressions that used it. To make that efficient, each variable stores it's references.
+            // Because we can't store pointers, this has to be the object/key pair (aka loc/name).
+            if (a_loc && a_key) {
+                if (a_root.vars[a_str]._refLocs == undefined) {
+                    a_root.vars[a_str]._refLocs = [];
+                    a_root.vars[a_str]._refKeys = [];
                 }
-                _loc9_ |= _loc6_;
-                _loc3_ = _loc3_ + 1;
-            }
-            return _loc9_;
-        }
-        if((_loc6_ = skyui.util.ConfigManager.getConstant(a_str)) != undefined)
-        {
-            return _loc6_;
-        }
-        if(a_root.vars[a_str] != undefined)
-        {
-            if(a_loc && a_key)
-            {
-                if(a_root.vars[a_str]._refLocs == undefined)
-                {
-                a_root.vars[a_str]._refLocs = [];
-                a_root.vars[a_str]._refKeys = [];
-                }
+                
+                // Can be either object+string or array+index
                 a_root.vars[a_str]._refLocs.push(a_loc);
                 a_root.vars[a_str]._refKeys.push(a_key);
             }
+            
             return a_root.vars[a_str].value;
         }
+        
+        // Default String
         return a_str;
     }
 }
