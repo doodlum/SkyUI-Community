@@ -31,8 +31,12 @@ option(ENABLE_FPS_PATCH "Enable FPS patching" OFF)
 # SkyrimSE_PATH: absolute path to the game directory. 
 # Defaults to the standard Steam library location if not provided.
 if(NOT DEFINED SkyrimSE_PATH OR SkyrimSE_PATH STREQUAL "")
-    set(SkyrimSE_PATH "C:/Program Files (x86)/Steam/steamapps/common/Skyrim Special Edition"
-        CACHE PATH "Path to Skyrim Special Edition installation")
+    if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
+        set(_SKYRIMSE_DEFAULT "$ENV{HOME}/.local/share/Steam/steamapps/common/Skyrim Special Edition")
+    else()
+        set(_SKYRIMSE_DEFAULT "C:/Program Files (x86)/Steam/steamapps/common/Skyrim Special Edition")
+    endif()
+    set(SkyrimSE_PATH "${_SKYRIMSE_DEFAULT}" CACHE PATH "Path to Skyrim Special Edition installation")
 endif()
 
 # Build type setup
@@ -65,6 +69,10 @@ list(APPEND CMAKE_MODULE_PATH
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake"
     "${CMAKE_CURRENT_SOURCE_DIR}/external/BethesdaCMakeModules/Modules"
 )
+
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
+    include(LinuxTools)
+endif()
 
 include(Papyrus)
 include(BSArchive)
@@ -101,9 +109,18 @@ file(GLOB PAPYRUS_SOURCES
 )
 
 if(PAPYRUS_SOURCES)
+    # Papyrus.cmake writes a stamp file to _Papyrus/ but never creates the
+    # directory — ensure it exists before the custom commands run.
+    file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/_Papyrus")
+
+    # Set by LinuxTools.cmake on Linux; falls back to the game dir on other platforms.
+    if(NOT DEFINED _PAPYRUS_GAME_DIR OR _PAPYRUS_GAME_DIR STREQUAL "")
+        set(_PAPYRUS_GAME_DIR "${SkyrimSE_PATH}")
+    endif()
+
     Papyrus_Add(
         "Papyrus"
-        GAME "${SkyrimSE_PATH}"
+        GAME "${_PAPYRUS_GAME_DIR}"
         MODE SkyrimSE
         IMPORTS
             "${CMAKE_CURRENT_SOURCE_DIR}/source/scripts"
@@ -156,17 +173,25 @@ if(IS_DEBUG_BUILD)
     list(JOIN Papyrus_OUTPUT        "\n" _PEX_CONTENT)
     list(JOIN SWF_COMPILED_OUTPUTS  "\n" _SWF_COMPILED_CONTENT)
 
-    file(WRITE "${_DEPLOY_LISTS_DIR}/pex_files.txt"       "${_PEX_CONTENT}")
-    file(WRITE "${_DEPLOY_LISTS_DIR}/swf_compiled.txt"    "${_SWF_COMPILED_CONTENT}")
-    file(WRITE "${_DEPLOY_LISTS_DIR}/swf_passthrough.txt" "") # Obsolete
-    file(WRITE "${_DEPLOY_LISTS_DIR}/esp_file.txt"        "${_ESP_FILE}")
+    file(WRITE "${_DEPLOY_LISTS_DIR}/pex_files.txt"    "${_PEX_CONTENT}")
+    file(WRITE "${_DEPLOY_LISTS_DIR}/swf_compiled.txt" "${_SWF_COMPILED_CONTENT}")
+    file(WRITE "${_DEPLOY_LISTS_DIR}/esp_file.txt"     "${_ESP_FILE}")
+
+    # CONFIGURE_DEPENDS: adding a translation or config file triggers re-configure.
+    file(GLOB_RECURSE _DEBUG_DATA_FILES
+        CONFIGURE_DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/data/interface/*"
+    )
+    list(FILTER _DEBUG_DATA_FILES EXCLUDE REGEX "\\.swf$")
+    list(JOIN _DEBUG_DATA_FILES "\n" _DATA_FILES_CONTENT)
+    file(WRITE "${_DEPLOY_LISTS_DIR}/data_files.txt" "${_DATA_FILES_CONTENT}")
 
     add_custom_target("deploy_debug" ALL
         COMMAND "${CMAKE_COMMAND}"
             "-DOUTPUT_DIR=${MOD_DEBUG_PATH}"
             "-DDEPLOY_LISTS_DIR=${_DEPLOY_LISTS_DIR}"
             "-DSWF_COMPILED_BASE=${CMAKE_BINARY_DIR}/interface"
-            "-DSWF_PASSTHROUGH_BASE=${CMAKE_CURRENT_SOURCE_DIR}/data/interface"
+            "-DDATA_BASE_DIR=${CMAKE_CURRENT_SOURCE_DIR}/data/interface"
             -P "${_DEPLOY_SCRIPT}"
         DEPENDS
             ${Papyrus_OUTPUT}

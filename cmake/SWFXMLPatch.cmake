@@ -76,8 +76,10 @@ function(Add_XML_Base)
     endif()
 
     # Step 2: Rebuild SWF from (possibly patched) XML
+    cmake_path(GET ARG_OUTPUT_SWF PARENT_PATH _OUTPUT_SWF_DIR)
     add_custom_command(
         OUTPUT "${ARG_OUTPUT_SWF}"
+        COMMAND "${CMAKE_COMMAND}" -E make_directory "${_OUTPUT_SWF_DIR}"
         COMMAND "${CMAKE_COMMAND}" -E echo "[Build] ffdec -xml2swf ${ARG_XML_PATH}"
         COMMAND "${FFDEC_CLI}" -xml2swf "${_XML_PATCHED}" "${ARG_OUTPUT_SWF}"
         DEPENDS "${_XML_PATCHED}"

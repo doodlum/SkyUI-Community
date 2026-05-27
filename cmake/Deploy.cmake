@@ -9,12 +9,12 @@ Variables expected:
   OUTPUT_DIR             - destination root (MOD_DEBUG_PATH)
   DEPLOY_LISTS_DIR       - directory containing the list files below
   SWF_COMPILED_BASE      - base dir for relative path calculation (build tree)
-  SWF_PASSTHROUGH_BASE   - base dir for relative path calculation (source tree)
+  DATA_BASE_DIR          - base dir for data files relative path calculation
 
 List files (in DEPLOY_LISTS_DIR):
   pex_files.txt          - absolute paths to .pex files
   swf_compiled.txt       - absolute paths to built .swf files
-  swf_passthrough.txt    - absolute paths to original .swf files
+  data_files.txt         - absolute paths to non-SWF interface data files
   esp_file.txt           - absolute path to the .esp
 
 #]=======================================================================]
@@ -23,7 +23,7 @@ List files (in DEPLOY_LISTS_DIR):
 # Validation
 # ---------------------------------------------------------------------------
 
-foreach(REQUIRED_VAR OUTPUT_DIR DEPLOY_LISTS_DIR SWF_COMPILED_BASE SWF_PASSTHROUGH_BASE)
+foreach(REQUIRED_VAR OUTPUT_DIR DEPLOY_LISTS_DIR SWF_COMPILED_BASE DATA_BASE_DIR)
     if(NOT DEFINED ${REQUIRED_VAR} OR "${${REQUIRED_VAR}}" STREQUAL "")
         message(FATAL_ERROR "Deploy.cmake: ${REQUIRED_VAR} is not set.")
     endif()
@@ -85,13 +85,13 @@ copy_files_from_list(
 )
 message(STATUS "  Deployed compiled SWFs")
 
-# 3. Passthrough SWFs (structured copy)
+# 3. Non-SWF interface data files (config.txt, translations, .dds, etc.)
 copy_files_from_list(
-    "${DEPLOY_LISTS_DIR}/swf_passthrough.txt"
+    "${DEPLOY_LISTS_DIR}/data_files.txt"
     "${OUTPUT_DIR}/interface"
-    "${SWF_PASSTHROUGH_BASE}"
+    "${DATA_BASE_DIR}"
 )
-message(STATUS "  Deployed passthrough SWFs")
+message(STATUS "  Deployed interface data files")
 
 # 4. ESP files (flat copy, debug only)
 set(_ESP_LIST_FILE "${DEPLOY_LISTS_DIR}/esp_file.txt")

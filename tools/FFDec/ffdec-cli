@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Linux launcher for the JPEXS Free Flash Decompiler CLI.
+# The ffdec-cli.jar manifest resolves lib/ and ffdec.jar relative to the JAR
+# location, so we only need to pass the full path to the JAR.
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+exec java -jar "$SCRIPT_DIR/ffdec-cli.jar" "$@"
