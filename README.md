@@ -61,19 +61,19 @@ The easiest way to build is to run `./build.sh`. It will automatically detect yo
 
 You can also set the `SkyrimSE_PATH` environment variable beforehand to skip the prompt:
 
-```
+```bash
 export SkyrimSE_PATH="$HOME/.local/share/Steam/steamapps/common/Skyrim Special Edition"
 ```
 
 For convenient debugging, use `MOD_DEBUG_PATH`:
 
-```
+```bash
 export MOD_DEBUG_PATH="$HOME/.local/share/ModOrganizer/Skyrim Special Edition/mods/SkyUI-dev"
 ```
 
 Alternatively, from the command line (ensure `SkyrimSE_PATH` is exported first):
 
-```
+```bash
 cmake --preset debug
 cmake --build --preset debug
 ```

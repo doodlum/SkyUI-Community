@@ -98,12 +98,12 @@ if [[ "${MODE,,}" == "debug" && -z "${MOD_DEBUG_PATH:-}" ]]; then
     echo "This is the mod folder where compiled files will be deployed."
     echo "Example: /home/you/.local/share/ModOrganizer/Skyrim Special Edition/mods/SkyUI-dev"
     echo
-    echo "Press Enter to use the default output folder: build/debug/data"
+    echo "Press Enter to use the default output folder: dist"
     echo
     read -rp "Enter mod folder path (or Enter for default): " DEBUG_PATH_INPUT
 
     if [[ -z "$DEBUG_PATH_INPUT" ]]; then
-        echo "Using default: build/debug/data"
+        echo "Using default: dist"
     elif [[ ! -d "$DEBUG_PATH_INPUT" ]]; then
         echo
         echo "ERROR: Folder does not exist:"
@@ -141,7 +141,7 @@ if [[ "${MODE,,}" == "debug" ]]; then
         echo "Deployed to:"
         echo "  ${MOD_DEBUG_PATH}"
     else
-        echo "Deployed to: build/debug/data"
+        echo "Deployed to: dist"
     fi
 elif [[ "${MODE,,}" == "release" ]]; then
     echo "Release artefacts in: build/release/"
