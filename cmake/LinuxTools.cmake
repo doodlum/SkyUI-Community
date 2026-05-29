@@ -10,7 +10,7 @@ compiler (PapyrusCompiler.exe), PEX anonymizer (AFKPexAnon), and BSA packer
 
 Variables consumed (all optional — auto-detected if absent):
   PROTON_WINE       Path to the Proton wine binary.
-                    Default: searches CachyOS/Steam Proton install locations.
+                    Default: searches system and Steam Proton install locations.
   STEAM_APP_ID      Steam App ID whose compatdata prefix is used as WINEPREFIX.
                     Default: 489830 (Skyrim Special Edition)
 
@@ -33,7 +33,7 @@ message(STATUS "[Linux] Configuring Proton tool wrappers")
 # ---------------------------------------------------------------------------
 
 if(NOT DEFINED PROTON_WINE OR PROTON_WINE STREQUAL "")
-    # Search order: CachyOS system Proton → Steam-installed Proton builds
+    # Search order: system Proton (e.g. CachyOS) → Steam-installed Proton builds
     find_program(PROTON_WINE wine
         PATHS
             "/usr/share/steam/compatibilitytools.d/proton-cachyos-slr/files/bin"
@@ -88,8 +88,8 @@ endif()
 #
 # The wrapper handles three cases that arise from BethesdaCMakeModules:
 #
-# 1. Plain Linux absolute paths (e.g. /home/lee/build/foo.swf)
-#    → Z:\home\lee\build\foo.swf
+# 1. Plain Linux absolute paths (e.g. /home/user/build/foo.swf)
+#    → Z:\home\user\build\foo.swf
 #
 # 2. key=value args whose value contains Linux paths, including
 #    semicolon-separated path lists (e.g. --import=path1;path2;path3)
