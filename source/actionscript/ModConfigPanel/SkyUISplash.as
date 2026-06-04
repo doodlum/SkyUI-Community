@@ -1,13 +1,18 @@
 class SkyUISplash extends MovieClip
 {
-   var versionText;
-   function SkyUISplash()
-   {
-      super();
-   }
-   function onLoad()
-   {
-      super.onLoad();
-      this.versionText.text = "v" + SkyUISplash.SKYUI_VERSION_STRING;
-   }
+  /* STAGE ELEMENTS */
+
+    public var versionText: TextField;
+
+    public function SkyUISplash()
+    {
+    }
+
+    // @override MovieClip
+    private function onLoad()
+    {
+        super.onLoad();
+
+        this.versionText.text = ("v" + SkyUISplash.SKYUI_VERSION_STRING);
+    }
 }
