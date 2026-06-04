@@ -1,29 +1,26 @@
 class skyui.defines.Material
 {
-   static var AMBER      = 0;
-   static var BONEMOLD   = 1;
-   static var CHITIN     = 2;
-   static var DAEDRIC    = 3;
-   static var DRAGON     = 4;
-   static var DWARVEN    = 5;
-   static var EBONY      = 6;
-   static var ELVEN      = 7;
-   static var FALMER     = 8;
-   static var GLASS      = 9;
-   static var HIDE       = 10;
-   static var IMPERIAL   = 11;
-   static var IRON       = 12;
-   static var LEATHER    = 13;
-   static var MADNESS    = 14;
-   static var NORDIC     = 15;
-   static var ORCISH     = 16;
-   static var ORDINATOR  = 17;
-   static var SILVER     = 18;
-   static var STALHRIM   = 19;
-   static var STEEL      = 20;
-   static var STORMCLOAK = 21;
-   static var WOOD       = 22;
-   function Material()
-   {
-   }
+    public static var AMBER: Number      = 0;
+    public static var BONEMOLD: Number   = 1;
+    public static var CHITIN: Number     = 2;
+    public static var DAEDRIC: Number    = 3;
+    public static var DRAGON: Number     = 4;
+    public static var DWARVEN: Number    = 5;
+    public static var EBONY: Number      = 6;
+    public static var ELVEN: Number      = 7;
+    public static var FALMER: Number     = 8;
+    public static var GLASS: Number      = 9;
+    public static var HIDE: Number       = 10;
+    public static var IMPERIAL: Number   = 11;
+    public static var IRON: Number       = 12;
+    public static var LEATHER: Number    = 13;
+    public static var MADNESS: Number    = 14;
+    public static var NORDIC: Number     = 15;
+    public static var ORCISH: Number     = 16;
+    public static var ORDINATOR: Number  = 17;
+    public static var SILVER: Number     = 18;
+    public static var STALHRIM: Number   = 19;
+    public static var STEEL: Number      = 20;
+    public static var STORMCLOAK: Number = 21;
+    public static var WOOD: Number       = 22;
 }
