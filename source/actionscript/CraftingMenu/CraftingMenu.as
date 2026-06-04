@@ -38,6 +38,14 @@ class CraftingMenu extends MovieClip
    var _platform = 0;
    var currentMenuType = "";
    var dbgIntvl = 0;
+
+   // Save Indices vars
+   var _lastCatIdx = -1;
+   var _lastItemIdx = -1;
+   var _lastScrollPos = -1;
+   var _lastColIdx = -1;
+   var _lastColState = -1;
+
    function CraftingMenu()
    {
       super();
@@ -113,6 +121,7 @@ class CraftingMenu extends MovieClip
       };
       this.bCanCraft = false;
       this.positionFixedElements();
+      this.RestoreIndices();
    }
    function SetPartitionedFilterMode(a_bPartitioned)
    {
@@ -541,5 +550,93 @@ class CraftingMenu extends MovieClip
       {
          this.onItemsListInputCatcherClick();
       }
+   }
+
+   function saveIndices(abForceSave)
+   {
+      if (this._subtypeName == undefined || this.CategoryList == undefined || this.ItemList == undefined || this.ItemList.layout == undefined)
+         return;
+
+      var catIdx = this.CategoryList.CategoriesList.selectedIndex;
+      var itemIdx = this.ItemList.selectedIndex;
+      var scrollPos = this.ItemList.scrollPosition;
+      var colIdx = this.ItemList.layout.activeColumnIndex;
+      var colState = this.ItemList.layout.activeColumnState;
+      
+      if (abForceSave == true)
+      {
+         var _loc2_ = new Array();
+         _loc2_.push(catIdx);
+         _loc2_.push(itemIdx);
+         _loc2_.push(scrollPos);
+         _loc2_.push(colIdx);
+         _loc2_.push(colState);
+         skse.StoreIndices(this._subtypeName, _loc2_);
+         return;
+      }
+      
+      if (this._lastCatIdx != catIdx || this._lastItemIdx != itemIdx || 
+          this._lastScrollPos != scrollPos || this._lastColIdx != colIdx || 
+          this._lastColState != colState)
+      {
+         this._lastCatIdx = catIdx;
+         this._lastItemIdx = itemIdx;
+         this._lastScrollPos = scrollPos;
+         this._lastColIdx = colIdx;
+         this._lastColState = colState;
+         
+         var _loc3_ = new Array();
+         _loc3_.push(catIdx);
+         _loc3_.push(itemIdx);
+         _loc3_.push(scrollPos);
+         _loc3_.push(colIdx);
+         _loc3_.push(colState);
+         skse.StoreIndices(this._subtypeName, _loc3_);
+      }
+   }
+
+   function RestoreIndices()
+   {
+      var _loc2_ = new Array();
+      skse.LoadIndices(this._subtypeName,_loc2_);
+      var _loc4_ = this.CategoryList.CategoriesList;
+      var _loc3_ = this.ItemList;
+      if(_loc2_.length == 5 && _loc2_[0] != -1)
+      {
+         _loc4_.listState.restoredItem = _loc2_[0];
+         _loc4_.onUnsuspend = function()
+         {
+            this.onItemPress(this.listState.restoredItem,0);
+            delete this.onUnsuspend;
+         };
+         _loc3_.listState.restoredScrollPosition = _loc2_[2];
+         _loc3_.listState.restoredSelectedIndex = _loc2_[1];
+         _loc3_.listState.restoredActiveColumnIndex = _loc2_[3];
+         _loc3_.listState.restoredActiveColumnState = _loc2_[4];
+         _loc3_.onUnsuspend = function()
+         {
+            this.onInvalidate = function()
+            {
+               this.scrollPosition = this.listState.restoredScrollPosition;
+               this.selectedIndex = this.listState.restoredSelectedIndex;
+               delete this.onInvalidate;
+            };
+            this.layout.restoreColumnState(this.listState.restoredActiveColumnIndex,this.listState.restoredActiveColumnState);
+            delete this.onUnsuspend;
+         };
+      }
+      else
+      {
+         _loc4_.onUnsuspend = function()
+         {
+            this.onItemPress(0,0);
+            delete this.onUnsuspend;
+         };
+      }
+   }
+
+   function onEnterFrame()
+   {
+      this.saveIndices(false);
    }
 }
