@@ -61,9 +61,11 @@ class skyui.components.list.EntryClipManager
     private function growPool(a_size: Number)
     {
         var entryRenderer = this._list.entryRenderer;
-        
+        // ScrollingList parents clips under entriesContainer so the mask doesn't hide siblings.
+        var clipParent: MovieClip = this._list.entriesContainer != undefined ? this._list.entriesContainer : this._list;
+
         for (var i = 0; i < a_size; i++) {
-            var entryClip = this._list.attachMovie(entryRenderer, entryRenderer + this._nextIndex, this._list.getNextHighestDepth());
+            var entryClip = clipParent.attachMovie(entryRenderer, entryRenderer + this._nextIndex, clipParent.getNextHighestDepth());
             entryClip.initialize(this._nextIndex, this._list.listState);
 
             this._clipPool[this._nextIndex] = entryClip;

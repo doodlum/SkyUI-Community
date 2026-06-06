@@ -37,8 +37,9 @@ class skyui.components.list.TabularList extends skyui.components.list.ScrollingL
     public function TabularList()
     {
         super();
-        
+
         skyui.util.ConfigManager.registerLoadCallback(this, "onConfigLoad");
+        skyui.util.ConfigManager.registerUpdateCallback(this, "onConfigUpdate");
     }
 
 
@@ -73,12 +74,30 @@ class skyui.components.list.TabularList extends skyui.components.list.ScrollingL
     private function onConfigLoad(event: Object)
     {
         var config = event.config;
-        
+
         if (this._platform != 0) {
             this._previousColumnKey = config["Input"].controls.gamepad.prevColumn;
             this._nextColumnKey = config["Input"].controls.gamepad.nextColumn;
             this._sortOrderKey = config["Input"].controls.gamepad.sortOrder;
         }
+
+        this.applySmoothScrollConfig(config);
+    }
+
+    private function onConfigUpdate(event: Object)
+    {
+        this.applySmoothScrollConfig(event.config);
+    }
+
+    private function applySmoothScrollConfig(config: Object)
+    {
+        if (config.ListLayout.smoothScroll == undefined)
+            return;
+
+        if (config.ListLayout.smoothScroll.enabled != undefined)
+            this.smoothScrollEnabled = config.ListLayout.smoothScroll.enabled;
+        if (config.ListLayout.smoothScroll.durationMs != undefined)
+            this.smoothScrollDuration = config.ListLayout.smoothScroll.durationMs;
     }
 
     private function onLayoutChange(event: Object)
