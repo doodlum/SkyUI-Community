@@ -205,6 +205,7 @@ Add_SWF(craftingmenu
     }
     Common/skyui/components/list {
         BasicListEntry.as
+        ListLayout.as
         TabularListEntry.as
         ScrollingList.as
     }
@@ -661,6 +662,7 @@ Add_SWF(skyui_inventorylists
     }
     Common/skyui/components/list {
         BasicListEntry.as
+        ListLayout.as
         TabularListEntry.as
         ScrollingList.as
     }

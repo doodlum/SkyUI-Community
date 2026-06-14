@@ -133,6 +133,18 @@ class skyui.components.list.ListLayout
         return this._sortAttributes;
     }
 
+    private var _columnMargin: Number;
+
+    public function get columnMargin()
+    {
+        return this._columnMargin;
+    }
+
+    public function set columnMargin(a_margin: Number)
+    {
+        this._columnMargin = a_margin;
+    }
+
 
 
   /* INITIALIZATION */
@@ -157,6 +169,9 @@ class skyui.components.list.ListLayout
 
         if (this._entryWidth == undefined)
             this._entryWidth = this._defaultsData.entryWidth;
+
+        if (this._columnMargin == undefined)
+            this._columnMargin = this._defaultsData.columnMargin;
         
         this.updateViewList();
         this.updateColumnList();
@@ -460,6 +475,8 @@ class skyui.components.list.ListLayout
             }
         }
         
+        var visibleColumnCount = this._columnLayoutData.length;
+
         // Set x positions based on calculated widths, and set label data
         var xPos = 0;
         c = 0;
@@ -469,22 +486,29 @@ class skyui.components.list.ListLayout
             if (col.hidden == true)
                 continue;
                 
+            var currentVisibleIdx = c;
             var columnLayoutData = this._columnLayoutData[c++];
             
             if (col.indent != undefined)
                 xPos += col.indent;
 
-            columnLayoutData.labelX = xPos;
+            var offset = 0;
+            if (columnLayoutData.type == skyui.components.list.ListLayout.COL_TYPE_TEXT) {
+                var multiplier = (visibleColumnCount - 1) - currentVisibleIdx;
+                offset = this.columnMargin * multiplier;
+            }
+
+            columnLayoutData.labelX = xPos - offset;
 
             if (col.border != undefined) {
                 columnLayoutData.labelWidth = columnLayoutData.width + col.border[skyui.components.list.ListLayout.LEFT] + col.border[skyui.components.list.ListLayout.RIGHT];
-                columnLayoutData.x = xPos;
+                columnLayoutData.x = xPos - offset;
                 xPos += col.border[skyui.components.list.ListLayout.LEFT];
-                columnLayoutData.x = xPos;
+                columnLayoutData.x = xPos - offset;
                 xPos += col.border[skyui.components.list.ListLayout.RIGHT] + columnLayoutData.width;
             } else {
                 columnLayoutData.labelWidth = columnLayoutData.width;
-                columnLayoutData.x = xPos;
+                columnLayoutData.x = xPos - offset;
                 xPos += columnLayoutData.width;
             }
         }
