@@ -24,6 +24,9 @@ class InventoryMenu extends ItemMenu
    var _bMenuClosing = false;
    var _bSwitchMenus = false;
    var bPCControlsReady = true;
+
+   var _marqueeController: MarqueeSelectionController;
+
    function InventoryMenu()
    {
       super();
@@ -32,6 +35,8 @@ class InventoryMenu extends ItemMenu
       gfx.io.GameDelegate.addCallBack("DropItem",this,"DropItem");
       gfx.io.GameDelegate.addCallBack("AttemptChargeItem",this,"AttemptChargeItem");
       gfx.io.GameDelegate.addCallBack("ItemRotating",this,"ItemRotating");
+
+      this._marqueeController = new skyui.components.list.MarqueeSelectionController(this, this.inventoryLists);
    }
    function InitExtensions()
    {
@@ -45,6 +50,9 @@ class InventoryMenu extends ItemMenu
    function setConfig(a_config)
    {
       super.setConfig(a_config);
+      if (a_config.ItemList.selection.marquee.enabled != undefined) {
+         this._marqueeController.enabled = a_config.ItemList.selection.marquee.enabled;
+      }
       var _loc3_ = this.inventoryLists.itemList;
       _loc3_.addDataProcessor(new InventoryDataSetter());
       _loc3_.addDataProcessor(new InventoryIconSetter(a_config.Appearance));
@@ -62,6 +70,7 @@ class InventoryMenu extends ItemMenu
       {
          return true;
       }
+      this._marqueeController.handleInput(details);
       var _loc3_ = pathToFocus.shift();
       if(_loc3_.handleInput(details,pathToFocus))
       {
@@ -86,6 +95,9 @@ class InventoryMenu extends ItemMenu
    }
    function AttemptEquip(a_slot, a_bCheckOverList)
    {
+      if (this._marqueeController.enabled && Key.isDown(Key.CONTROL))
+         return;
+
       var _loc2_ = a_bCheckOverList == undefined ? true : a_bCheckOverList;
       if(this.shouldProcessItemsListInput(_loc2_) && this.confirmSelectedEntry())
       {
@@ -95,6 +107,9 @@ class InventoryMenu extends ItemMenu
    }
    function DropItem()
    {
+      if (this._marqueeController.startBatchDrop())
+         return;
+
       if(this.shouldProcessItemsListInput(false) && this.inventoryLists.itemList.selectedEntry != undefined)
       {
          if(this._quantityMinCount < 1 || this.inventoryLists.itemList.selectedEntry.count < this._quantityMinCount)
@@ -171,6 +186,9 @@ class InventoryMenu extends ItemMenu
    }
    function onItemSelect(event)
    {
+      if (this._marqueeController.processItemClick(event.index, event.entry))
+         return;
+
       if(event.entry.enabled && event.keyboardOrMouse != 0)
       {
          gfx.io.GameDelegate.call("ItemSelect",[]);

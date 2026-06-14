@@ -152,6 +152,9 @@ Add_SWF(console
 Add_SWF(containermenu
     containermenu.swf
     containermenu.xml
+    Common/skyui/components/list {
+        MarqueeSelectionController.as
+    }
     Common/skyui/defines {
         Actor.as
         Armor.as
@@ -391,6 +394,9 @@ Add_SWF(hudmenu
 Add_SWF(inventorymenu
     inventorymenu.swf
     inventorymenu.xml
+    Common/skyui/components/list {
+        MarqueeSelectionController.as
+    }
     Common/skyui/defines {
         Actor.as
         Armor.as

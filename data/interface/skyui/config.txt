@@ -30,7 +30,7 @@ itemcard.yOffset = 0
 [ItemList] 
 ; =====================================================================================================================
 quantityMenu.minCount = 6 ; Number of items required to trigger quantity dialog. 0 is disabled
-
+selection.marquee.enabled = true ; Toggle multi-selection frame on/off (Ctrl + Drag)
 
 ; =====================================================================================================================
 [Appearance] 

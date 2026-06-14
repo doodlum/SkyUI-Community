@@ -4,6 +4,8 @@ class skyui.components.list.TabularListEntry extends skyui.components.list.Basic
   /* PRIVATE VARIABLES */
 
     private var _layoutUpdateCount: Number = -1;
+    private var _entryObject;
+    private var _list;
 
 
   /* STAGE ELEMENTS */
@@ -24,12 +26,25 @@ class skyui.components.list.TabularListEntry extends skyui.components.list.Basic
     // @override BasicListEntry
     public function setEntry(a_entryObject: Object, a_state: ListState)
     {
+        this._entryObject = a_entryObject;
+        this._list = a_state.list;
+
         var layout: ListLayout = skyui.components.list.TabularList(a_state.list).layout;
             
         // Show select area if this is the current entry
-        this.selectIndicator._visible = (a_entryObject == a_state.list.selectedEntry);
+        var isSelected: Boolean = (a_entryObject == a_state.list.selectedEntry);
+        var isMarquee: Boolean = (a_entryObject.isMarqueeSelected == true);
         
-        var curLayoutUpdateCount = layout.layoutUpdateCount;
+        var isMultiActive: Boolean = this._list._parent._parent._parent.isMultiSelectionActive();
+
+        this.selectIndicator._visible = (isSelected || isMarquee);
+        this.selectIndicator._y = 0;
+
+        if (isSelected) {
+            this.selectIndicator._alpha = (isMultiActive || isMarquee) ? 70 : 100;
+        } else {
+            this.selectIndicator._alpha = 100;
+        }
         
         // Has the view update sequence number changed? Then Update the columns positions etc.
         if (this._layoutUpdateCount != curLayoutUpdateCount) {
@@ -86,6 +101,25 @@ class skyui.components.list.TabularListEntry extends skyui.components.list.Basic
                 if (color != undefined)
                     e.textColor = color;
             }
+        }
+    }
+
+    public function setMultiSelected(a_selected: Boolean)
+    {
+        if (this._entryObject != undefined) {
+            this._entryObject.isMarqueeSelected = a_selected;
+        }
+
+        var isActualSelected: Boolean = (this._entryObject == this._list.selectedEntry);
+        var isMultiActive: Boolean = this._list._parent._parent._parent.isMultiSelectionActive();
+        
+        this.selectIndicator._visible = (a_selected || isActualSelected);
+        this.selectIndicator._y = 0;
+        
+        if (isActualSelected) {
+            this.selectIndicator._alpha = (isMultiActive || a_selected) ? 70 : 100;
+        } else {
+            this.selectIndicator._alpha = 100;
         }
     }
 
