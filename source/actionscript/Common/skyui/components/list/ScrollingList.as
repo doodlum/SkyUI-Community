@@ -10,6 +10,10 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
     // The maximum allowed size. Actual size might be smaller if the list is not filled completely.
     private var _maxListIndex: Number;
 
+    // Flag that allows list Entry to disable their animation
+    public var bDisableAnim: Boolean = false;
+    public var lastSelectionAnimY: Number = -1;
+    public var enableAnimation: Boolean = false; 
 
   /* STAGE ELEMENTS */
 
@@ -39,10 +43,13 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
         if (a_newPosition == this._scrollPosition || a_newPosition < 0 || a_newPosition > this._maxScrollPosition)
             return;
             
-        if (this.scrollbar != undefined)
+        if (this.scrollbar != undefined) {
             this.scrollbar.position = a_newPosition;
-        else
+        } else {
+            this.bDisableAnim = true;
             this.updateScrollPosition(a_newPosition);
+            this.bDisableAnim = false;
+        }
     }
 
     private var _maxScrollPosition: Number = 0;
@@ -218,6 +225,8 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
             this._selectedIndex = -1;
         
         this.calculateMaxScrollPosition();		
+        
+        this.bDisableAnim = true;
         this.UpdateList();
         
         // Restore selection
@@ -228,6 +237,8 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
             var entryClip = this.getClipByIndex(this._curClipIndex);
             this.doSetSelectedIndex(entryClip.itemIndex, skyui.components.list.BasicList.SELECT_MOUSE);
         }
+        
+        this.bDisableAnim = false;
         
         if (this.onInvalidate)
             this.onInvalidate();
@@ -322,12 +333,21 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
 
     private function onScroll(event: Object)
     {
-        this.updateScrollPosition(Math.floor(event.position + 0.5));
+        this.bDisableAnim = true;
+        try {
+            this.updateScrollPosition(Math.floor(event.position + 0.5));
+        } finally {
+            this.bDisableAnim = false;
+        }
     }
 
     // @override BasicList
     private function doSetSelectedIndex(a_newIndex: Number, a_keyboardOrMouse: Number)
     {
+        if (this._selectedIndex == -1 && a_newIndex != -1) {
+            this.lastSelectionAnimY = -1;
+        }
+        
         if (this.disableSelection || a_newIndex == this._selectedIndex)
             return;
             

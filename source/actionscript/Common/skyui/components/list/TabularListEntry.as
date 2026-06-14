@@ -1,6 +1,13 @@
 // @abstract
 class skyui.components.list.TabularListEntry extends skyui.components.list.BasicListEntry
 {
+  /* CONSTANTS */
+	
+	private static var ANIM_FADE_STEP: Number = 10;
+	private static var ANIM_MAX_JUMP_Y: Number = 600;
+	private static var ANIM_Y_DECAY: Number = 0.6;
+	private static var ANIM_Y_EPSILON: Number = 0.5;
+
   /* PRIVATE VARIABLES */
 
     private var _layoutUpdateCount: Number = -1;
@@ -22,12 +29,22 @@ class skyui.components.list.TabularListEntry extends skyui.components.list.Basic
   /* PUBLIC FUNCTIONS */
 
     // @override BasicListEntry
+    public function initialize(a_index: Number, a_list: BasicList)
+    {
+        // It is necessary that when navigating via the keyboard, when the cursor is on a list,
+        // the keyboard does not get stuck on the item that the mouse cursor is hovering over when moving down the list.
+        this.hitArea = this.background;
+    }
+
+    // @override BasicListEntry
     public function setEntry(a_entryObject: Object, a_state: ListState)
     {
         var layout: ListLayout = skyui.components.list.TabularList(a_state.list).layout;
             
         // Show select area if this is the current entry
-        this.selectIndicator._visible = (a_entryObject == a_state.list.selectedEntry);
+        var isSelected: Boolean = (a_entryObject == a_state.list.selectedEntry);
+        
+        this.updateSelectionAnimation(isSelected, a_state.list);
         
         var curLayoutUpdateCount = layout.layoutUpdateCount;
         
@@ -86,6 +103,59 @@ class skyui.components.list.TabularListEntry extends skyui.components.list.Basic
                 if (color != undefined)
                     e.textColor = color;
             }
+        }
+    }
+
+    public function updateSelectionAnimation(isSelected: Boolean, a_list: ScrollingList)
+    {
+        if (isSelected) {
+            this.selectIndicator._visible = true;
+            
+            if (a_list.bDisableAnim || a_list.enableAnimation === false) {
+                this.resetSelectionAnim(true);
+                a_list.lastSelectionAnimY = this._y;
+                return;
+            }
+
+            if (a_list.lastSelectionAnimY == undefined || a_list.lastSelectionAnimY == -1) {
+                this.selectIndicator._y = 0;
+                this.selectIndicator._alpha = 0;
+                a_list.lastSelectionAnimY = this._y;
+
+                this.onEnterFrame = function() {
+                    this.selectIndicator._alpha += skyui.components.list.TabularListEntry.ANIM_FADE_STEP; 
+                    if (this.selectIndicator._alpha >= 100) {
+                        this.selectIndicator._alpha = 100;
+                        delete this.onEnterFrame;
+                    }
+                };
+                return;
+            }
+
+            var prevY: Number = a_list.lastSelectionAnimY;
+            var diffY: Number = prevY - this._y;
+            if (diffY == 0) {
+                this.resetSelectionAnim(true);
+                return;
+            }
+            a_list.lastSelectionAnimY = this._y;
+            
+            if (Math.abs(diffY) < skyui.components.list.TabularListEntry.ANIM_MAX_JUMP_Y) {
+                this.selectIndicator._y = diffY;
+                this.selectIndicator._alpha = 100;
+
+                this.onEnterFrame = function() {
+                    this.selectIndicator._y *= skyui.components.list.TabularListEntry.ANIM_Y_DECAY; 
+                    if (Math.abs(this.selectIndicator._y) < skyui.components.list.TabularListEntry.ANIM_Y_EPSILON) {
+                        this.selectIndicator._y = 0;
+                        delete this.onEnterFrame;
+                    }
+                };
+            } else {
+                this.resetSelectionAnim(true);
+            }
+        } else {
+            this.resetSelectionAnim(false);
         }
     }
 
@@ -163,4 +233,12 @@ class skyui.components.list.TabularListEntry extends skyui.components.list.Basic
         
         return a_text.substring(0, lastValidCharIndex);
     }
+
+    private function resetSelectionAnim(a_visible: Boolean)
+	{
+		delete this.onEnterFrame;
+		this.selectIndicator._visible = a_visible;
+		this.selectIndicator._y = 0;
+		this.selectIndicator._alpha = 100;
+	}
 }

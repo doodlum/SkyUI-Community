@@ -74,6 +74,9 @@ class skyui.components.list.TabularList extends skyui.components.list.ScrollingL
     {
         var config = event.config;
         
+        if (config.ScrollingList.selection.animation != undefined)
+            this.enableAnimation = config.ScrollingList.selection.animation;
+        
         if (this._platform != 0) {
             this._previousColumnKey = config["Input"].controls.gamepad.prevColumn;
             this._nextColumnKey = config["Input"].controls.gamepad.nextColumn;

@@ -27,24 +27,24 @@ class CraftingListEntry extends skyui.components.list.TabularListEntry
 
     
   /* INITIALIZATION */
-
-    // @override TabularListEntry
-    public function initialize(a_index: Number, a_state: ListState)
-    {
-        super.initialize();
-        
-        var iconLoader = new MovieClipLoader();
-        iconLoader.addListener(this);
-        iconLoader.loadClip(a_state.iconSource, this.itemIcon);
-        
-        this.itemIcon._visible = false;
-        this.equipIcon._visible = false;
-        
-        for (var i = 0; this["textField" + i] != undefined; i++)
-            this["textField" + i]._visible = false;
-    }
-
-
+   
+   // @override TabularListEntry
+   public function initialize(a_index: Number, a_state: ListState)
+   {
+      super.initialize(a_index);
+      
+      var iconLoader = new MovieClipLoader();
+      iconLoader.addListener(this);
+      iconLoader.loadClip(a_state.iconSource, this.itemIcon);
+      
+      this.itemIcon._visible = false;
+      this.equipIcon._visible = false;
+      
+      for (var i = 0; this["textField" + i] != undefined; i++)
+         this["textField" + i]._visible = false;
+   }
+   
+   
   /* PUBLIC FUNCTIONS */
 
     // @override TabularListEntry
