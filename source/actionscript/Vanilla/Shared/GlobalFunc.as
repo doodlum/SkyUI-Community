@@ -362,4 +362,151 @@ class Shared.GlobalFunc
       tf.htmlText = best;
       tf.setTextFormat(fmt);
    }
+
+    /**
+     * Injects the Anchor method into the MovieClip prototype.
+     * This allows any MovieClip to be aligned relative to another clip.
+     */
+    static function AddAnchorFunction() {
+        if (MovieClip.prototype.Anchor != undefined) return;
+        if (Shared.GlobalFunc._deferCounter == undefined) Shared.GlobalFunc._deferCounter = 0;
+
+        /**
+         * Aligns the current MovieClip relative to a source MovieClip.
+         * 
+         * @param source            The reference MovieClip to align against.
+         * @param targetAnchorType  Point on THIS clip (TL, TC, TR, CL, C, CR, BL, BC, BR).
+         * @param sourceAnchorType  Point on SOURCE clip. If undefined, targetAnchorType is used for source, and target is mirrored.
+         * @param offsetX           Additional horizontal offset.
+         * @param offsetY           Additional vertical offset.
+         * @param waitNextFrame     If true, delays calculation by one frame (useful for newly created UI).
+         * @return                  Returns 'this' for method chaining.
+         */
+        MovieClip.prototype.Anchor = function(source:MovieClip, targetAnchorType:String, sourceAnchorType:String, offsetX:Number, offsetY:Number, waitNextFrame:Boolean) {
+            if (!source) return this;
+            
+            if (sourceAnchorType == undefined) {
+                sourceAnchorType = targetAnchorType;
+                targetAnchorType = undefined;
+            }
+            
+            var sAnchor:Number = Shared.GlobalFunc._parseAnchorString(sourceAnchorType);
+            var tAnchor:Number = (targetAnchorType != undefined) 
+                ? Shared.GlobalFunc._parseAnchorString(targetAnchorType) 
+                : Shared.GlobalFunc._parseOppositeAnchor(sAnchor);
+            
+            // Defer execution by one frame to allow Scaleform components (like DialogManager) 
+            // to finalize their internal layout and calculate accurate dimensions.
+            if (waitNextFrame === true) {
+                var target = this;
+                var helperName = "__anchorHelper_" + (++Shared.GlobalFunc._deferCounter);
+                var helper = target.createEmptyMovieClip(helperName, target.getNextHighestDepth());
+                
+                helper.onEnterFrame = function() {
+                    delete this.onEnterFrame;
+                    this.removeMovieClip();
+                    Shared.GlobalFunc.Anchor(target, source, tAnchor, sAnchor, offsetX, offsetY);
+                };
+            } else {
+                Shared.GlobalFunc.Anchor(this, source, tAnchor, sAnchor, offsetX, offsetY);
+            }
+            
+            return this;
+        };
+    }
+
+    /**
+     * Core static logic for calculating and applying coordinates.
+     * 
+     * @param target        The MovieClip to be moved.
+     * @param source        The reference MovieClip.
+     * @param targetAnchor  Numeric ID (1-9) of the anchor point on the target.
+     * @param sourceAnchor  Numeric ID (1-9) of the anchor point on the source.
+     * @param offsetX       Horizontal translation.
+     * @param offsetY       Vertical translation.
+     */
+    public static function Anchor(target:MovieClip, source:MovieClip, targetAnchor:Number, sourceAnchor:Number, offsetX:Number, offsetY:Number) {
+        if (!target || !source) return;
+        
+        var destPt = Shared.GlobalFunc._getAnchorPointGlobal(source, sourceAnchor);
+        if (!destPt || isNaN(destPt.x) || isNaN(destPt.y)) return;
+        
+        destPt.x += (offsetX != undefined ? offsetX : 0);
+        destPt.y += (offsetY != undefined ? offsetY : 0);
+        
+        var targetPt = Shared.GlobalFunc._getAnchorPointLocal(target, targetAnchor);
+        target.localToGlobal(targetPt);
+        if (!targetPt || isNaN(targetPt.x) || isNaN(targetPt.y)) return;
+        
+        var parent = target._parent;
+        if (parent) {
+            parent.globalToLocal(destPt);
+            parent.globalToLocal(targetPt);
+        }
+        
+        target._x += (destPt.x - targetPt.x);
+        target._y += (destPt.y - targetPt.y);
+    }
+
+    /**
+     * Converts a string anchor code to a numeric Numpad-style ID (1-9).
+     * 
+     * @param anchorType    String code (e.g., "TL", "TC", "BR").
+     * @return              Numeric ID (1=TL, 2=TC, 3=TR, 4=CL, 5=C, 6=CR, 7=BL, 8=BC, 9=BR).
+     */
+    private static function _parseAnchorString(anchorType:String) {
+        var map = {TL:1, T:2, TC:2, TR:3, L:4, CL:4, C:5, CR:6, R:6, BL:7, B:8, BC:8, BR:9};
+        var key = (anchorType && typeof anchorType == "string") ? anchorType.toUpperCase() : "C";
+        return map[key] || 5;
+    }
+
+    /**
+     * Calculates the vertically mirrored anchor point.
+     * 
+     * @param anchor    Original anchor numeric ID.
+     * @return          Opposite anchor ID (e.g., Top becomes Bottom).
+     */
+    private static function _parseOppositeAnchor(anchor:Number) {
+        var flip = [5, 7, 8, 9, 4, 5, 6, 1, 2, 3];
+        return flip[anchor] || 5;
+    }
+
+    /**
+     * Retrieves global stage coordinates for a specific anchor point on a clip.
+     * 
+     * @param clip      The MovieClip to inspect.
+     * @param anchor    Anchor point numeric ID.
+     * @return          Object with global {x, y}.
+     */
+    private static function _getAnchorPointGlobal(clip:MovieClip, anchor:Number) {
+        var pt = Shared.GlobalFunc._getAnchorPointLocal(clip, anchor);
+        clip.localToGlobal(pt); 
+        return pt;
+    }
+
+    /**
+     * Calculates local coordinates of an anchor point relative to the clip's visual bounds.
+     * 
+     * @param clip      The MovieClip to inspect.
+     * @param anchor    Anchor point numeric ID (1-9).
+     * @return          Object with local {x, y}.
+     */
+    private static function _getAnchorPointLocal(clip:MovieClip, anchor:Number) {
+        var b = clip.getBounds(clip);
+        var xMin:Number = b.xMin != undefined ? b.xMin : 0;
+        var xMax:Number = b.xMax != undefined ? b.xMax : 0;
+        var yMin:Number = b.yMin != undefined ? b.yMin : 0;
+        var yMax:Number = b.yMax != undefined ? b.yMax : 0;
+        
+        // Protection against crooked anchors (return to center)
+        anchor = (anchor > 0 && anchor < 10) ? anchor : 5; 
+        
+        var col = (anchor - 1) % 3;             // 0: Left, 1: Center, 2: Right
+        var row = Math.floor((anchor - 1) / 3); // 0: Up,   1: Middle, 2: Down
+        
+        var x = (col == 0) ? xMin : (col == 2 ? xMax : (xMin + xMax) / 2);
+        var y = (row == 0) ? yMin : (row == 2 ? yMax : (yMin + yMax) / 2);
+        
+        return {x: x, y: y};
+    }
 }
