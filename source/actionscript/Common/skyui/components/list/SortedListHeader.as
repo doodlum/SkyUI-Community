@@ -3,6 +3,8 @@ class skyui.components.list.SortedListHeader extends MovieClip
   /* PRIVATE VARIABLES */
 
     private var _columns: Array;
+    private var _itemCount: Number = -1;
+    private var _countColumn: MovieClip;
 
 
   /* STAGE ELEMENTS */
@@ -44,6 +46,21 @@ class skyui.components.list.SortedListHeader extends MovieClip
     public function columnPress(a_columnIndex: Number)
     {
         this._layout.selectColumn(a_columnIndex);
+    }
+    
+    public function updateItemCount(a_count: Number)
+    {
+        this._itemCount = a_count;
+        
+        if (a_count < 0) {
+            if (this._countColumn != undefined)
+                this._countColumn._visible = false;
+            if (this._layout != undefined)
+                this.positionButtons();
+            return;
+        }
+        
+        this.positionButtons();
     }
 
 
@@ -141,6 +158,30 @@ class skyui.components.list.SortedListHeader extends MovieClip
                 this.sortIcon._y = -e._height + ((e._height - this.sortIcon._height) / 2) - 1;
                 
                 this.iconColumnIndicator._visible = this._layout.columnLayoutData[i].type != skyui.components.list.ListLayout.COL_TYPE_ITEM_ICON;
+            }
+
+            if (this._layout.columnLayoutData[i].type == skyui.components.list.ListLayout.COL_TYPE_NAME  && this._itemCount >= 0) {
+                
+                if (this._countColumn == undefined) {
+                    this._countColumn = this.attachMovie("HeaderColumn", "CountColumn", this.getNextHighestDepth());
+                    this._countColumn.buttonArea._visible = false;
+                    this._countColumn.label.autoSize = "left";
+                }
+                
+                var fmt: TextFormat = this._layout.columnLayoutData[i].labelTextFormat;
+                this._countColumn.label.setTextFormat(fmt);
+                this._countColumn.label.SetText("(" + this._itemCount + ")");
+                
+                if (activeIndex == i)
+                    this._countColumn._x = this.sortIcon._x + this.sortIcon._width + 4;
+                else
+                    this._countColumn._x = e._x + e.buttonArea._x + e.buttonArea._width + 4;
+                
+                this._countColumn._y = e._y;
+                this._countColumn.label._y = e.label._y;
+                this._countColumn._visible = true;
+                
+                e.buttonArea._width = (this._countColumn._x + this._countColumn.label._width) - (e._x + e.buttonArea._x);
             }
         }
     }
