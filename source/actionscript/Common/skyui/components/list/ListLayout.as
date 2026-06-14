@@ -45,6 +45,8 @@ class skyui.components.list.ListLayout
 
     private var _lastFilterFlag: Number = -1;
 
+    private var _forceReverse: Boolean = false;
+
 
   /* PROPERTIES */
 
@@ -230,7 +232,7 @@ class skyui.components.list.ListLayout
         this.updateLayout();
     }
 
-    public function selectColumn(a_index: Number)
+    public function selectColumn(a_index: Number, a_bShift: Boolean)
     {
         var listIndex = this.toColumnListIndex(a_index);
         var col = this._columnList[listIndex];
@@ -238,17 +240,54 @@ class skyui.components.list.ListLayout
         // Invalid column
         if (col == null || col.passive)
             return;
-            
-        if (this._activeColumnIndex != a_index) {
+
+        if (this._activeColumnIndex == a_index) {
+            if (a_bShift) {
+                this._forceReverse = !this._forceReverse;
+            } else {
+                this._forceReverse = false;
+                if (this._activeColumnState < col.states)
+                    this._activeColumnState++;
+                else
+                    this._activeColumnState = 1;
+            }
+        } else {
             this._activeColumnIndex = a_index;
             this._activeColumnState = 1;
-        } else {
-            if (this._activeColumnState < col.states)
-                this._activeColumnState++;
-            else
-                this._activeColumnState = 1;
+            this._forceReverse = (a_bShift == true);
         }
         
+        // Save as preferred state
+        this._prefData.column = col;
+        this._prefData.stateIndex = this._activeColumnState;
+            
+        this.updateLayout();
+    }
+
+    public function selectColumnPrev(a_index: Number, a_bShift: Boolean)
+    {
+        var listIndex = this.toColumnListIndex(a_index);
+        var col = this._columnList[listIndex];
+        
+        // Invalid column
+        if (col == null || col.passive)
+            return;
+
+        if (this._activeColumnIndex == a_index) {
+            if (a_bShift) {
+                this._forceReverse = !this._forceReverse;
+            } else {
+                this._forceReverse = false;
+                if (this._activeColumnState > 1)
+                    this._activeColumnState--;
+                else
+                    this._activeColumnState = col.states;
+            }
+        } else {
+            this._activeColumnIndex = a_index;
+            this._activeColumnState = col.states;
+            this._forceReverse = (a_bShift == true);
+        }
         // Save as preferred state
         this._prefData.column = col;
         this._prefData.stateIndex = this._activeColumnState;
@@ -275,6 +314,19 @@ class skyui.components.list.ListLayout
         this._prefData.column = col;
         this._prefData.stateIndex = this._activeColumnState;
 
+        this.updateLayout();
+    }
+
+    public function clearSorting()
+    {
+        this._forceReverse = false;
+        this._activeColumnIndex = this.currentView.columns.indexOf(this.currentView.primaryColumn);
+        if (this._activeColumnIndex == undefined || this._activeColumnIndex < 0)
+            this._activeColumnIndex = 0;
+            
+        this._activeColumnState = 1;
+        this._prefData.column = this._columnList[this.toColumnListIndex(this._activeColumnIndex)];
+        this._prefData.stateIndex = 1;
         this.updateLayout();
     }
 
@@ -311,12 +363,19 @@ class skyui.components.list.ListLayout
             if (c == this._activeColumnIndex) {
                 stateData = col["state" + this._activeColumnState];
                 this.updateSortParams(stateData);
+                
+                var defaultArrow: Boolean = stateData.label.arrowDown ? true : false;
+                if (col.type == skyui.components.list.ListLayout.COL_TYPE_NAME && this._forceReverse)
+                    columnLayoutData.labelArrowDown = !defaultArrow;
+                else
+                    columnLayoutData.labelArrowDown = defaultArrow;
             } else {
                 stateData = col["state1"];
+                columnLayoutData.labelArrowDown = stateData.label.arrowDown ? true : false;
             }
                 
             columnLayoutData.type = col.type;
-            columnLayoutData.labelArrowDown = stateData.label.arrowDown ? true : false;
+
             columnLayoutData.labelValue = stateData.label.text;
             columnLayoutData.entryValue = stateData.entry.text;
             columnLayoutData.colorAttribute = stateData.colorAttribute;
@@ -510,32 +569,29 @@ class skyui.components.list.ListLayout
         var sortAttributes = stateData.sortAttributes;
         var sortOptions = stateData.sortOptions;
         
-        if (!sortOptions) {
-            this._sortOptions = null;
-            this._sortAttributes = null;
-            return;
-        }
-        
         // No attribute(s) set? Try to use entry value
-        if (!sortAttributes)
-            if (stateData.entry.text.charAt(0) == "@")
-                sortAttributes = [ stateData.entry.text.slice(1) ];
-        
-        if (!sortAttributes) {
+        if (!sortAttributes && stateData.entry.text.charAt(0) == "@")
+            sortAttributes = [ stateData.entry.text.slice(1) ];
+
+        if (!sortOptions || !sortAttributes) {
             this._sortOptions = null;
             this._sortAttributes = null;
             return;
         }
         
         // Wrap single attribute in array
-        if (!(sortAttributes instanceof Array))
-            sortAttributes = [sortAttributes];
-            
-        if (!(sortOptions instanceof Array))
-            sortOptions = [sortOptions];
-            
-        this._sortOptions = sortOptions;
-        this._sortAttributes = sortAttributes;
+        this._sortAttributes = (sortAttributes instanceof Array) ? sortAttributes : [sortAttributes];
+        var optionsCopy = (sortOptions instanceof Array) ? sortOptions.concat() : [sortOptions];
+
+        var col = this._columnList[this.toColumnListIndex(this._activeColumnIndex)];
+        if (col.type == skyui.components.list.ListLayout.COL_TYPE_NAME && this._forceReverse) {
+            var DESCENDING = 2;
+            for (var i = 0; i < optionsCopy.length; i++) {
+                optionsCopy[i] = optionsCopy[i] ^ DESCENDING; 
+            }
+        }
+        
+        this._sortOptions = optionsCopy;
     }
 
     private function restorePrefState()
