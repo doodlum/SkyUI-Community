@@ -1,0 +1,1 @@
+fix: 1371 list entries, InvalidateData median 17.1 ms/rebuild (rounds: 17.1, 17.2, 17.0, 17.1, 17.2)
