@@ -1,0 +1,8 @@
+tempered right-hand sword: item id -47449809 -> -1330998650
+favourited 'Iron Sword (Legendary)'
+favourited 'Iron Shield'
+added 'Iron Sword (Legendary)' (itemId -1330998650.0) to group 1
+added 'Iron Shield (2)' (itemId -468392994.0) to group 1
+spells in both hands: left=Flames right=Flames rightItemId=0 swordCount=2
+group use #1: left=Iron Shield right=Iron Sword rightItemId=-1330998650 swordCount=2 -> OK: tempered sword in right hand
+inventory rows: Iron Sword x2 equipped=True
