@@ -410,9 +410,13 @@ class CraftingMenu extends MovieClip
       {
          _loc5_ = skyui.components.list.ListLayoutManager.createLayout(a_config.ListLayout,"AlchemyListLayout");
          _loc5_.entryWidth -= CraftingLists.SHORT_LIST_OFFSET;
-         // The alchemy list is shifted right by SHORT_LIST_OFFSET (leftBorder), so the header separator
-         // must shrink by the same amount or it runs past the list background.
-         this.ItemList.header.seperator._width -= CraftingLists.SHORT_LIST_OFFSET;
+         // The alchemy list is shifted right by SHORT_LIST_OFFSET (leftBorder, see CraftingLists), so the
+         // header separator must shrink by the same amount or it runs past the list background.
+         // Other subtypes reaching this branch keep their list unshifted, so leave their separator alone.
+         if(this._subtypeName == "Alchemy")
+         {
+            this.ItemList.header.seperator._width -= CraftingLists.SHORT_LIST_OFFSET;
+         }
       }
       this.ItemList.layout = _loc5_;
       var _loc7_ = a_config.Input.controls.gamepad.prevColumn;
