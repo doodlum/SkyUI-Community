@@ -807,13 +807,13 @@ bool function ProcessItem(Form a_item, int a_itemType, bool a_allowDeferring = t
 				if (a_item == PlayerREF.GetEquippedObject(1) && a_itemId != PlayerREF.GetEquippedItemId(1))
 					UnequipHand(1) ; avoid damage-related bug when swapping for enhanced item
 				endIf
-				PlayerREF.EquipItemById(itemWeapon, a_itemId, 1, equipSound = _silenceEquipSounds)
+				EquipWeaponById(itemWeapon, a_itemId, 1, 1)
 				_usedRightHand = true
 			elseIf (!_usedLeftHand)
 				if (a_item == PlayerREF.GetEquippedObject(0) && a_itemId != PlayerREF.GetEquippedItemId(0))
 					UnequipHand(0)
 				endIf
-				PlayerREF.EquipItemById(itemWeapon, a_itemId, 2, equipSound = _silenceEquipSounds)
+				EquipWeaponById(itemWeapon, a_itemId, 2, 0)
 				_usedLeftHand = true
 			endIf
 
@@ -825,7 +825,7 @@ bool function ProcessItem(Form a_item, int a_itemType, bool a_allowDeferring = t
 			if (a_item == PlayerREF.GetEquippedObject(0) && a_itemId != PlayerREF.GetEquippedItemId(1))
 				UnequipHand(0)
 			endIf
-			PlayerREF.EquipItemById(itemWeapon, a_itemId, equipSlot = 0, equipSound = _silenceEquipSounds)
+			EquipWeaponById(itemWeapon, a_itemId, 0, 1)
 
 			_usedRightHand = true
 			_usedLeftHand = true
@@ -840,7 +840,7 @@ bool function ProcessItem(Form a_item, int a_itemType, bool a_allowDeferring = t
 		; It's a shield... 
 		if (slotMask == 512)
 			if (!_usedLeftHand)
-				PlayerREF.EquipItemById(a_item, a_itemId, equipSlot = 0, equipSound = _silenceEquipSounds)
+				EquipArmorById(a_item, a_itemId, slotMask)
 				_usedLeftHand = true
 				_usedOutfitMask += slotMask
 			endIf
@@ -850,7 +850,7 @@ bool function ProcessItem(Form a_item, int a_itemType, bool a_allowDeferring = t
 				PlayerREF.UnequipItemEx(a_item)
 			endIf
 			
-			PlayerREF.EquipItemById(a_item, a_itemId, equipSlot = 0, equipSound = _silenceEquipSounds)
+			EquipArmorById(a_item, a_itemId, slotMask)
 			_usedOutfitMask += slotMask
 		endIf
 
@@ -975,6 +975,60 @@ bool function ProcessItem(Form a_item, int a_itemType, bool a_allowDeferring = t
 	endIf
 
 	return true
+endFunction
+
+; An item's id is derived from its extra data, so it changes when the item is tempered, enchanted or
+; renamed after it was added to a group. EquipItemById then finds nothing and the slot is left as it was
+; (e.g. a spell stays in the hand, #214). Detect that, equip the item by form instead, and re-key the
+; group data to the item's current id so later uses equip it directly again.
+function EquipWeaponById(Weapon a_weapon, int a_itemId, int a_equipSlot, int a_hand)
+	PlayerREF.EquipItemById(a_weapon, a_itemId, a_equipSlot, equipSound = _silenceEquipSounds)
+	if (PlayerREF.GetEquippedObject(a_hand) == a_weapon)
+		return
+	endIf
+	PlayerREF.EquipItemEx(a_weapon, a_equipSlot, equipSound = _silenceEquipSounds)
+	ReplaceItemId(a_itemId, PlayerREF.GetEquippedItemId(a_hand))
+endFunction
+
+function EquipArmorById(Form a_armor, int a_itemId, int a_slotMask)
+	PlayerREF.EquipItemById(a_armor, a_itemId, equipSlot = 0, equipSound = _silenceEquipSounds)
+	if (PlayerREF.GetWornForm(a_slotMask) == a_armor)
+		return
+	endIf
+	PlayerREF.EquipItemEx(a_armor, equipSlot = 0, equipSound = _silenceEquipSounds)
+	ReplaceItemId(a_itemId, PlayerREF.GetWornItemId(a_slotMask))
+endFunction
+
+function ReplaceItemId(int a_oldId, int a_newId)
+	if (a_oldId == 0 || a_newId == 0 || a_oldId == a_newId)
+		return
+	endIf
+
+	int index = _itemIds1.Find(a_oldId)
+	while (index != -1)
+		_itemIds1[index] = a_newId
+		index = _itemIds1.Find(a_oldId, index + 1)
+	endWhile
+
+	index = _itemIds2.Find(a_oldId)
+	while (index != -1)
+		_itemIds2[index] = a_newId
+		index = _itemIds2.Find(a_oldId, index + 1)
+	endWhile
+
+	int i = 0
+	while (i < 8)
+		if (_groupMainHandItemIds[i] == a_oldId)
+			_groupMainHandItemIds[i] = a_newId
+		endIf
+		if (_groupOffHandItemIds[i] == a_oldId)
+			_groupOffHandItemIds[i] = a_newId
+		endIf
+		if (_groupIconItemIds[i] == a_oldId)
+			_groupIconItemIds[i] = a_newId
+		endIf
+		i += 1
+	endWhile
 endFunction
 
 function InvalidateItem(int a_itemId, bool redrawIcon = false)

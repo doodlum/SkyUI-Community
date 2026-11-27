@@ -30,16 +30,21 @@ class skyui.filter.ItemTypeFilter implements skyui.filter.IFilter
    }
    function applyFilter(a_filteredList)
    {
-      var _loc2_ = 0;
-      while(_loc2_ < a_filteredList.length)
+      // Compact in place (keeps order). Removing non-matching entries one splice() at a time shifted the rest of
+      // the array on every removal - O(n^2) for categories that hide most of a large list.
+      var matcher = this._matcherFunc;
+      var flag = this._itemFilter;
+      var len = a_filteredList.length;
+      var writeIndex = 0;
+      for(var i = 0; i < len; i++)
       {
-         if(!this._matcherFunc(a_filteredList[_loc2_],this._itemFilter))
+         var e = a_filteredList[i];
+         if(matcher(e,flag))
          {
-            a_filteredList.splice(_loc2_,1);
-            _loc2_ = _loc2_ - 1;
+            a_filteredList[writeIndex++] = e;
          }
-         _loc2_ = _loc2_ + 1;
       }
+      a_filteredList.length = writeIndex;
    }
    function isMatch(a_entry, a_flag)
    {
