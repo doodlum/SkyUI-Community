@@ -11,6 +11,7 @@ Usage
   Add_XML_Base(
       OUTPUT_SWF <absolute/path/to/base.swf>
       XML_PATH   <relative/path/to/source.xml>
+      [FPS_STUB  <bool>]   # add the empty FpsScale class the FPS patch needs
   )
 
   Add_FPS_Patch(
@@ -32,7 +33,7 @@ are converted is decided in tools/fps_patch_plan.json), and FFDec rebuilds it.
 # Add_XML_Base
 # ---------------------------------------------------------------------------
 function(Add_XML_Base)
-    cmake_parse_arguments(ARG "" "OUTPUT_SWF;XML_PATH" "" ${ARGN})
+    cmake_parse_arguments(ARG "" "OUTPUT_SWF;XML_PATH;FPS_STUB" "" ${ARGN})
 
     if(NOT ARG_OUTPUT_SWF)
         message(FATAL_ERROR "Add_XML_Base: OUTPUT_SWF is required.")
@@ -51,7 +52,7 @@ function(Add_XML_Base)
     endif()
 
     cmake_path(GET ARG_OUTPUT_SWF PARENT_PATH _OUTPUT_SWF_DIR)
-    if(ENABLE_FPS_PATCH)
+    if(ARG_FPS_STUB)
         # Declare an empty skyui.util.FpsScale class so the script import compiles FpsScale.as into it
         # (FFDec only replaces classes that already exist).
         set(_XML_STUBBED "${CMAKE_CURRENT_BINARY_DIR}/staging/xml/${ARG_XML_PATH}")

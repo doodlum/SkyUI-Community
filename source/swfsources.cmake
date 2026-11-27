@@ -67,13 +67,25 @@ macro(Add_SWF _TARGET_NAME _SWF_REL _XML_PATH)
         set(_BASE_SWF "${CMAKE_CURRENT_BINARY_DIR}/interface/base/${_SWF_REL}")
         set(_FINAL_SWF "${CMAKE_CURRENT_BINARY_DIR}/interface/${_SWF_REL}")
 
+        # SWFs marked "exclude" in tools/fps_patch_plan.json are built exactly as with the FPS patch off
+        set(_FPS_THIS ${ENABLE_FPS_PATCH})
+        if(ENABLE_FPS_PATCH)
+            string(TOLOWER "${_SWF_REL}" _FPS_KEY)
+            string(JSON _FPS_EXCLUDE ERROR_VARIABLE _FPS_ERR GET "${FPS_PATCH_PLAN_JSON}" swfs "${_FPS_KEY}" exclude)
+            if(NOT _FPS_ERR AND _FPS_EXCLUDE)
+                set(_FPS_THIS OFF)
+                message(STATUS "[Build] FPS patch   : ${_SWF_REL} excluded by the plan, built unpatched")
+            endif()
+        endif()
+
         # Rebuild base from XML
         Add_XML_Base(
             OUTPUT_SWF "${_BASE_SWF}"
             XML_PATH   "${_XML_PATH}"
+            FPS_STUB   ${_FPS_THIS}
         )
 
-        if(ENABLE_FPS_PATCH)
+        if(_FPS_THIS)
             # The patched bytecode calls skyui.util.FpsScale (see tools/xml_fps_patcher.py)
             list(APPEND _SOURCES "Common/skyui/util/FpsScale.as")
             set(_AS_SWF "${CMAKE_CURRENT_BINARY_DIR}/fps_unpatched/${_SWF_REL}")
@@ -90,7 +102,7 @@ macro(Add_SWF _TARGET_NAME _SWF_REL _XML_PATH)
             SOURCES      ${_SOURCES}
         )
 
-        if(ENABLE_FPS_PATCH)
+        if(_FPS_THIS)
             Add_FPS_Patch(
                 TARGET_NAME FPS_${_TARGET_NAME}
                 SWF_REL     "${_SWF_REL}"

@@ -38,6 +38,9 @@ if(ENABLE_FPS_PATCH)
     # run at once so a parallel build does not exhaust memory (Ninja only).
     set(FPS_PATCH_JOBS "3" CACHE STRING "Maximum number of FPS patch steps running in parallel")
     set_property(GLOBAL APPEND PROPERTY JOB_POOLS "fps_patch=${FPS_PATCH_JOBS}")
+    # Read at configure time: SWFs with "exclude": true are built without any FPS patch step
+    file(READ "${CMAKE_CURRENT_SOURCE_DIR}/tools/fps_patch_plan.json" FPS_PATCH_PLAN_JSON)
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/tools/fps_patch_plan.json")
     message(STATUS "[Build] FPS patch   : ON -- SWFs listed in tools/fps_patch_plan.json are rebuilt at ${FPS_PATCH_TARGET} fps")
 else()
     message(STATUS "[Build] FPS patch   : OFF -- SWFs keep their original frame rates (-DENABLE_FPS_PATCH=ON to enable)")

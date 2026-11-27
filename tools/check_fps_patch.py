@@ -424,11 +424,46 @@ def main():
     for s in unknown:
         print("FAIL %s: built but not listed in fps_patch_plan.json" % s)
         failures += 1
+    wanted = [x.replace("\\", "/").lower() for x in (args.swf or [])]
+    excluded = [s for s, e in plan["swfs"].items() if e.get("exclude") and (not wanted or s in wanted)]
     for s in plan["swfs"]:
-        if s not in built:
+        if s not in built and s not in excluded:
             print("note: %s is in the plan but was not built (e.g. SKIP_IN_RELEASE)" % s)
 
-    todo = [s for s in built if s in plan["swfs"] and (not args.swf or s in [x.replace("\\", "/").lower() for x in args.swf])]
+    # excluded SWFs must be byte-for-byte what a patch-off build produces: original rate, no trace of the patch
+    for s in excluded:
+        final = os.path.join(final_dir, s)
+        if not os.path.exists(final):
+            print("note: %s is excluded in the plan but was not built" % s)
+            continue
+        src = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "source", "swf", s[:-4] + ".xml")
+        after_xml = os.path.join(work, s[:-4] + ".after.xml")
+        errors = []
+        try:
+            export(args.ffdec, final, after_xml)
+            ta = sx.load(after_xml)
+            fa = float(ta.getroot().get("frameRate"))
+            fs = float(sx.load(src).getroot().get("frameRate")) if os.path.exists(src) else None
+            if fs is not None and abs(fa - fs) > 1e-6:
+                errors.append("frame rate %g, source XML has %g" % (fa, fs))
+            if HELPER_EXPORT in sx.export_names(ta).values():
+                errors.append("contains skyui.util.FpsScale")
+            if any(el.get("name") == MARKER for el in ta.getroot().iter("item")):
+                errors.append("contains a %s marker" % MARKER)
+            needle = b"FpsScale".hex()
+            if any(needle in (el.get("actionBytes") or "") for el in ta.getroot().iter("item")):
+                errors.append("bytecode references FpsScale")
+        except Fail as e:
+            errors.append(str(e))
+        if errors:
+            failures += 1
+            print("FAIL %s (excluded)" % s)
+            for e in errors:
+                print("     - %s" % e)
+        else:
+            print("OK   %-42s excluded: built without the FPS patch, %g fps (%s)" % (s, fa, plan["swfs"][s].get("reason", "")[:90]))
+
+    todo = [s for s in built if s in plan["swfs"] and s not in excluded and (not wanted or s in wanted)]
     notes = []
     for s in todo:
         entry = plan["swfs"][s]
@@ -464,7 +499,7 @@ def main():
         print("\nNotes (throttled per-frame handlers run once per original frame):")
         for n in sorted(set(notes)):
             print("  " + n)
-    print("\n%d SWF(s) checked, %d failure(s)" % (len(todo), failures))
+    print("\n%d SWF(s) checked, %d failure(s)" % (len(todo) + len(excluded), failures))
     return 1 if failures else 0
 
 

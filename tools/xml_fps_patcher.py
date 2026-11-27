@@ -483,6 +483,9 @@ def kept_closure(tree, ids):
 
 def patch(tree, swf_key, entry, plan, target_fps):
     swf = tree.getroot()
+    if entry.get("exclude"):
+        raise PatchError("%s is excluded in the plan; the build must not run the patcher on it "
+                         "(reconfigure CMake after editing fps_patch_plan.json)" % swf_key)
     orig_fps = float(swf.get("frameRate"))
     convert = bool(entry.get("convert"))
     k = 1
