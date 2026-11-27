@@ -286,6 +286,26 @@ def check_swf(key, entry, plan, before_xml, after_xml, notes):
                         or places[0].get("characterId") != marker_id:
                     err("main timeline frame 1: %s marker definition/placement not found" % MARKER)
                 tags_a = [e for e in tags_a if not any(e is m for m in defs + places)]
+                # FpsScale must be defined before any other code runs: class definitions call
+                # FpsScale.throttle() while they are built, which returns undefined if it is not there yet
+                def is_helper(e):
+                    t = sx.tag_type(e)
+                    if t in ("DefineSpriteTag", "DoInitActionTag") and e.get("spriteId") in helper_ids:
+                        return True
+                    if t == "ExportAssetsTag":
+                        ids = [x.text for x in (e.find("tags") if e.find("tags") is not None else [])]
+                        return bool(ids) and all(i in helper_ids for i in ids)
+                    return False
+                code_idx = [i for i, e in enumerate(tags_a) if sx.tag_type(e) in ("DoActionTag", "DoInitActionTag")]
+                helper_idx = [i for i in code_idx if tags_a[i].get("spriteId") in helper_ids]
+                if not helper_idx or helper_idx[0] != code_idx[0]:
+                    err("main timeline frame 1: skyui.util.FpsScale is not the first code to run "
+                        "(classes defined before it lose their onEnterFrame handlers)")
+                if sorted(ET.tostring(e, encoding="unicode") for e in tags_b if is_helper(e)) != \
+                        sorted(ET.tostring(e, encoding="unicode") for e in tags_a if is_helper(e)):
+                    err("main timeline frame 1: FpsScale definition changed")
+                tags_b = [e for e in tags_b if not is_helper(e)]
+                tags_a = [e for e in tags_a if not is_helper(e)]
             elif tid in kept and f == 0:
                 places = [e for e in tags_a if sx.tag_type(e).startswith("PlaceObject") and e.get("name") == MARKER]
                 if len(places) != 1 or places[0].get("characterId") != one_id:

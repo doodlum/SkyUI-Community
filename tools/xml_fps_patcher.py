@@ -555,7 +555,39 @@ def patch(tree, swf_key, entry, plan, target_fps):
         swf.set("frameRate", "%.1f" % (orig_fps * k))
 
     add_markers(tree, k, kept if k > 1 else set())
+    move_helper_first(tree, helper_ids)
     return k, stats
+
+
+def move_helper_first(tree, helper_ids):
+    """Class definitions run in tag order, and rewritten class code calls FpsScale while it is being defined
+    (prototype.onEnterFrame = FpsScale.throttle(fn)). If FpsScale were defined later that call would return
+    undefined and silently delete the handler (that killed HUDMenu.onEnterFrame and with it every HUD
+    notification), so FpsScale's sprite, export and DoInitAction go before all other tags of frame 1."""
+    tags = tree.getroot().find("tags")
+    children = list(tags)
+    head = 0
+    for i, el in enumerate(children):
+        if sx.tag_type(el) in ("FileAttributesTag", "MetadataTag", "SetBackgroundColorTag", "ScriptLimitsTag",
+                               "EnableDebuggerTag", "EnableDebugger2Tag", "ProductInfoTag"):
+            head = i + 1
+        else:
+            break
+    move = []
+    for el in children:
+        t = sx.tag_type(el)
+        if t == "DefineSpriteTag" and el.get("spriteId") in helper_ids:
+            move.append(el)
+        elif t == "ExportAssetsTag":
+            ids = [x.text for x in (el.find("tags") if el.find("tags") is not None else [])]
+            if ids and all(i in helper_ids for i in ids):
+                move.append(el)
+        elif t == "DoInitActionTag" and el.get("spriteId") in helper_ids:
+            move.append(el)
+    for el in move:
+        tags.remove(el)
+    for j, el in enumerate(move):
+        tags.insert(head + j, el)
 
 
 def main():
