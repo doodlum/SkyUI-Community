@@ -271,23 +271,24 @@ class InventoryLists extends MovieClip
          _loc3_ = _loc3_ + 1;
       }
       this.itemList.InvalidateData();
-      _loc3_ = 0;
-      var _loc2_;
-      while(_loc3_ < this.itemList.entryList.length)
+      // Enable every category that at least one item belongs to. OR-ing all item flags first and testing each
+      // category against the union is equivalent to testing every item against every category, but O(n + c)
+      // instead of O(n * c) - with thousands of items (large containers) the nested loop alone took ~125 ms.
+      var itemEntries = this.itemList.entryList;
+      var catEntries = this.categoryList.entryList;
+      var itemFlags = 0;
+      var itemCount = itemEntries.length;
+      for(var i = 0; i < itemCount; i++)
       {
-         _loc2_ = 0;
-         while(_loc2_ < this.categoryList.entryList.length)
+         itemFlags |= itemEntries[i].filterFlag;
+      }
+      var catCount = catEntries.length;
+      for(var c = 0; c < catCount; c++)
+      {
+         if(catEntries[c].filterFlag == 0 && (itemFlags & catEntries[c].flag))
          {
-            if(this.categoryList.entryList[_loc2_].filterFlag == 0)
-            {
-               if(this.itemList.entryList[_loc3_].filterFlag & this.categoryList.entryList[_loc2_].flag)
-               {
-                  this.categoryList.entryList[_loc2_].filterFlag = 1;
-               }
-            }
-            _loc2_ = _loc2_ + 1;
+            catEntries[c].filterFlag = 1;
          }
-         _loc3_ = _loc3_ + 1;
       }
       this.categoryList.UpdateList();
       if(_loc4_ != this.categoryList.selectedEntry.flag)
