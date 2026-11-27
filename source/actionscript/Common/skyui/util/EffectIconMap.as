@@ -253,8 +253,6 @@ class skyui.util.EffectIconMap
             
         // Replace base icon for damage health with resistType icon
         if (actorValue == skyui.defines.Actor.AV_HEALTH) {
-            var resistType = a_effectData.resistType;
-            
             switch (a_effectData.resistType) {
                 case skyui.defines.Actor.AV_FIRERESIST:
                     baseLabel = "magic_fire";

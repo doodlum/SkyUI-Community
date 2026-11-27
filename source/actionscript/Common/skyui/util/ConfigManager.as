@@ -241,7 +241,7 @@ class skyui.util.ConfigManager
         }
     }
 
-    private static function parseData(a_data: Array)
+    private static function parseData(a_data: String)
     {
         skyui.util.ConfigManager._config = {};
         

@@ -56,7 +56,7 @@ class skyui.util.Translator
 
 		do {
 			var startIndex = a_str.indexOf("{", offset);
-			var endIndex = a_str.indexOf("}", offset);
+			var endIndex = (startIndex != -1) ? a_str.indexOf("}", startIndex + 1) : -1;
 
 			if (startIndex != -1 && endIndex != -1 && startIndex < endIndex) {
 				var s = a_str.slice(startIndex + 1, endIndex);
