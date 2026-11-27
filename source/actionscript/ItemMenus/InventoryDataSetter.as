@@ -150,7 +150,7 @@ class InventoryDataSetter extends ItemcardDataExtender
             t[a_keyword] = {o: a_order, m: a_material, l: a_label};
     }
 
-    private static function buildMaterialTable(): Object
+    private static function buildMaterialTable()
     {
         var t: Object = {};
         InventoryDataSetter.putMaterial(t, "ArmorMaterialDaedric", 2, skyui.defines.Material.DAEDRIC, "$Daedric");

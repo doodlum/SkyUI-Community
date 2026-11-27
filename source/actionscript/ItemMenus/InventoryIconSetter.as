@@ -287,7 +287,7 @@ class InventoryIconSetter implements skyui.components.list.IListProcessor
             a_map[a_key] = a_value;
     }
 
-    private static function buildTables(): Object
+    private static function buildTables()
     {
         var Form = skyui.defines.Form;
         var Armor = skyui.defines.Armor;
@@ -414,7 +414,7 @@ class InventoryIconSetter implements skyui.components.list.IListProcessor
     }
 
     // Slot -> icon suffix shared by the light armor, heavy armor and clothing icon sets.
-    private static function armorTable(a_prefix: String): Object
+    private static function armorTable(a_prefix: String)
     {
         var Armor = skyui.defines.Armor;
         var put: Function = InventoryIconSetter.put;
