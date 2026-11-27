@@ -12,7 +12,9 @@ XML with FFDec, and fails loudly unless:
              order and otherwise unchanged, on stretched frame (f-1)*k+1, so every frame label and frame script
              fires at the same time in seconds; the frames in between only hold PlaceObject2 moves of objects
              already on stage (tween interpolation);
-           - the only new timeline is the "__fpsScale" marker (k frames) on the main timeline's first frame;
+           - the only new timeline is the "__fpsScale" marker (k frames) on the main timeline's first frame,
+             plus a 1-frame marker placed in each timeline listed under keep_timelines (engine-driven sprites
+             left unstretched, reported as such);
   code     - undoing the documented substitutions (FpsScale.prop/go/throttle calls, GotoFrame index * k,
              onClipEvent(enterFrame) tick guard) gives back the original bytecode byte for byte, i.e. nothing
              else was changed;
@@ -216,15 +218,28 @@ def check_swf(key, entry, plan, before_xml, after_xml, notes):
     missing = [tid for tid in tls_b if tid not in tls_a]
     if missing:
         err("timelines missing after patch: %s" % missing)
-    marker_id = None
-    if len(extra) != 1:
-        err("expected exactly one new timeline (the %s marker), found %s" % (MARKER, extra))
-    else:
-        marker_id = extra[0]
-        if tls_a[marker_id].frame_count != k:
-            err("marker sprite has %d frames, expected k=%d" % (tls_a[marker_id].frame_count, k))
+    # timelines the plan leaves unstretched (engine-driven), with everything nested in them
+    listed = list(plan.get("keep_timelines", {}).get(key, {}).keys()) if k > 1 else []
+    kept = keep_closure(tls_b, listed)
+    for i in listed:
+        if i not in tls_b:
+            err("keep_timelines lists unknown sprite %s" % i)
 
-    stats = {"timelines": 0, "animated": 0, "labels": 0, "scripts": 0, "interp_moves": 0,
+    marker_id = one_id = None
+    for tid in extra:
+        n = tls_a[tid].frame_count
+        if n == k and marker_id is None:
+            marker_id = tid
+        elif n == 1 and kept and one_id is None:
+            one_id = tid
+        else:
+            err("unexpected new timeline %s (%d frames)" % (tid, n))
+    if marker_id is None:
+        err("the %s marker (a %d-frame sprite) is missing" % (MARKER, k))
+    if kept and one_id is None:
+        err("the 1-frame %s marker for unstretched timelines is missing" % MARKER)
+
+    stats = {"timelines": 0, "animated": 0, "labels": 0, "scripts": 0, "interp_moves": 0, "kept": len(kept),
              "dur_min": None, "dur_max": None, "prop": 0, "go": 0, "throttle": 0, "gotoframe": 0, "guard": 0}
     exports_b = sx.export_names(tb)
 
@@ -233,38 +248,48 @@ def check_swf(key, entry, plan, before_xml, after_xml, notes):
             continue
         tl_a = tls_a[tid]
         name = "main timeline" if tid == sx.ROOT else "sprite %s%s" % (tid, " (%s)" % exports_b[tid] if tid in exports_b else "")
+        kt = 1 if tid in kept else k
         nb, na = tl_b.frame_count, tl_a.frame_count
         stats["timelines"] += 1
-        if na != nb * k:
-            err("%s: %d frames -> %d, expected %d (duration %.4fs -> %.4fs)" % (name, nb, na, nb * k, nb / fb, na / fa))
+        if na != nb * kt:
+            err("%s: %d frames -> %d, expected %d (duration %.4fs -> %.4fs)" % (name, nb, na, nb * kt, nb / fb, na / fa))
         dur_b, dur_a = nb / fb, na / fa
-        if abs(dur_b - dur_a) > 1e-9:
+        if tid in kept:
+            if nb > 1:
+                notes.append("%s: %s left unstretched (%d frames, engine-driven): plays %dx faster if played" % (key, name, nb, k))
+        elif abs(dur_b - dur_a) > 1e-9:
             err("%s: duration %.6fs -> %.6fs" % (name, dur_b, dur_a))
-        if nb > 1:
+        if nb > 1 and tid not in kept:
             stats["animated"] += 1
             stats["dur_min"] = dur_b if stats["dur_min"] is None else min(stats["dur_min"], dur_b)
             stats["dur_max"] = dur_b if stats["dur_max"] is None else max(stats["dur_max"], dur_b)
 
         frames_b, trail_b, show_b = frames_of(tl_b)
         frames_a, trail_a, show_a = frames_of(tl_a)
-        if show_a != show_b * k:
-            err("%s: %d ShowFrame tags -> %d, expected %d" % (name, show_b, show_a, show_b * k))
+        if show_a != show_b * kt:
+            err("%s: %d ShowFrame tags -> %d, expected %d" % (name, show_b, show_a, show_b * kt))
             continue
         if [canonical(e) for e in trail_b] != [canonical(e) for e in trail_a]:
             err("%s: trailing tags changed" % name)
         live_depths = set()
         for f, tags_b in enumerate(frames_b):
-            tags_a = list(frames_a[f * k])
-            if tid == sx.ROOT and f == 0 and marker_id is not None:
-                mk = [e for e in tags_a if (sx.tag_type(e) == "DefineSpriteTag" and e.get("spriteId") == marker_id)
-                      or (sx.tag_type(e).startswith("PlaceObject") and e.get("name") == MARKER)]
-                if len(mk) != 2 or mk[1].get("characterId") != marker_id:
+            tags_a = list(frames_a[f * kt])
+            if tid == sx.ROOT and f == 0:
+                defs = [e for e in tags_a if sx.tag_type(e) == "DefineSpriteTag" and e.get("spriteId") in (marker_id, one_id)]
+                places = [e for e in tags_a if sx.tag_type(e).startswith("PlaceObject") and e.get("name") == MARKER]
+                if len(defs) != len([x for x in (marker_id, one_id) if x]) or len(places) != 1 \
+                        or places[0].get("characterId") != marker_id:
                     err("main timeline frame 1: %s marker definition/placement not found" % MARKER)
-                tags_a = [e for e in tags_a if not any(e is m for m in mk)]
+                tags_a = [e for e in tags_a if not any(e is m for m in defs + places)]
+            elif tid in kept and f == 0:
+                places = [e for e in tags_a if sx.tag_type(e).startswith("PlaceObject") and e.get("name") == MARKER]
+                if len(places) != 1 or places[0].get("characterId") != one_id:
+                    err("%s: 1-frame %s marker not placed on frame 1" % (name, MARKER))
+                tags_a = [e for e in tags_a if not any(e is m for m in places)]
             cb = [canonical(e) for e in tags_b]
             ca = [canonical(e) for e in tags_a]
             if cb != ca:
-                err("%s: original frame %d differs from stretched frame %d (tags %d vs %d)" % (name, f + 1, f * k + 1, len(cb), len(ca)))
+                err("%s: original frame %d differs from stretched frame %d (tags %d vs %d)" % (name, f + 1, f * kt + 1, len(cb), len(ca)))
                 continue
             for e in tags_b:
                 t = sx.tag_type(e)
@@ -274,13 +299,13 @@ def check_swf(key, entry, plan, before_xml, after_xml, notes):
                     live_depths.add(e.get("depth"))
                 elif t.startswith("RemoveObject"):
                     live_depths.discard(e.get("depth"))
-            for j in range(1, k):
-                for e in frames_a[f * k + j]:
+            for j in range(1, kt):
+                for e in frames_a[f * kt + j]:
                     ok = (sx.tag_type(e) == "PlaceObject2Tag" and e.get("placeFlagMove") == "true"
                           and e.get("placeFlagHasCharacter") == "false" and e.get("placeFlagHasClipActions") == "false"
                           and e.get("placeFlagHasName") == "false" and e.get("depth") in live_depths)
                     if not ok:
-                        err("%s: stretched frame %d holds %s, only moves of objects on stage are allowed" % (name, f * k + j + 1, sx.tag_type(e)))
+                        err("%s: stretched frame %d holds %s, only moves of objects on stage are allowed" % (name, f * kt + j + 1, sx.tag_type(e)))
                     stats["interp_moves"] += 1
 
             # --- code in this frame -------------------------------------------
@@ -299,7 +324,7 @@ def check_swf(key, entry, plan, before_xml, after_xml, notes):
                         err("%s: FpsScale itself was rewritten" % where)
                     continue
                 try:
-                    orig, st = unrewrite(ba, k, where)
+                    orig, st = unrewrite(ba, kt, where)
                 except (Fail, ValueError) as e:
                     err(str(e))
                     continue
@@ -317,7 +342,7 @@ def check_swf(key, entry, plan, before_xml, after_xml, notes):
                         need["prop"] += 1
                     elif r.kind == "call_method":
                         need["go"] += 1
-                    elif r.kind == "gotoframe" and k > 1:
+                    elif r.kind == "gotoframe" and kt > 1:
                         need["gotoframe"] += 1
                     elif r.kind == "enterframe_assign" and where_key(where) not in free_running:
                         need["throttle"] += 1
@@ -344,6 +369,19 @@ def check_swf(key, entry, plan, before_xml, after_xml, notes):
                     if r.kind in RAW_KINDS:
                         err("%s: raw frame reference left after patch: %s" % (where, r))
     return errors, stats
+
+
+def keep_closure(tls, ids):
+    todo, seen = list(ids), set()
+    while todo:
+        i = todo.pop()
+        if i in seen or i not in tls or i == sx.ROOT:
+            continue
+        seen.add(i)
+        for el in tls[i].container:
+            if sx.tag_type(el).startswith("PlaceObject") and el.get("characterId") in tls:
+                todo.append(el.get("characterId"))
+    return seen
 
 
 def where_key(where):
@@ -418,12 +456,12 @@ def main():
         k = st and int(round(float(plan["target_fps"]) / fb)) if entry.get("convert") else 1
         dur = ("%.2fs..%.2fs" % (st["dur_min"], st["dur_max"])) if st.get("dur_min") is not None else "-"
         mode = "%g -> %g fps (x%d)" % (fb, fb * k, k) if entry.get("convert") else "kept at %g fps (%s)" % (fb, entry.get("reason", ""))
-        print("OK   %-42s %s; %d timelines (%d animated, %s, all durations equal), %d labels, %d scripts; "
+        print("OK   %-42s %s; %d timelines (%d animated, %s, all durations equal; %d unstretched), %d labels, %d scripts; "
               "rescaled: %d prop, %d goto, %d GotoFrame, %d+%d onEnterFrame throttled; %d interpolated moves"
-              % (s, mode, st["timelines"], st["animated"], dur, st["labels"], st["scripts"], st["prop"], st["go"],
+              % (s, mode, st["timelines"], st["animated"], dur, st["kept"], st["labels"], st["scripts"], st["prop"], st["go"],
                  st["gotoframe"], st["throttle"], st["guard"], st["interp_moves"]))
     if notes:
-        print("\nThrottled per-frame handlers (run once per original frame):")
+        print("\nNotes (throttled per-frame handlers run once per original frame):")
         for n in sorted(set(notes)):
             print("  " + n)
     print("\n%d SWF(s) checked, %d failure(s)" % (len(todo), failures))

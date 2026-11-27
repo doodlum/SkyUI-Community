@@ -60,6 +60,13 @@
         "skyui/icons_item_psychosteve.swf":     {"convert": false, "reason": "static icon library (gotoAndStop by label); nothing plays"},
         "exported/skyui/icons_effect_psychosteve.swf": {"convert": false, "reason": "static icon library (gotoAndStop by label); nothing plays"}
     },
+    "keep_timelines": {
+        "_doc": "Sprites (and everything nested in them) left unstretched inside a converted SWF because the game engine drives them by frame number from native code, which the patcher cannot rewrite. Each gets its own 1-frame __fpsScale marker so ActionScript sees k = 1 for them.",
+        "hudmenu.swf": {
+            "714": "StealthMeterInstance.SneakAnimInstance (120 frames): handed to the engine by RegisterHUDComponents, which sets the stealth eye by frame number",
+            "820": "EnemyHealth_mc.BracketsInstance (100 frames): handed to the engine by RegisterHUDComponents, which sizes the enemy-name brackets by frame number"
+        }
+    },
     "enterframe_free_running": {
         "init __Packages.mx.transitions.Tween": "time-based when constructed with useSeconds=true; check_fps_patch.py requires every 'new Tween(...)' to pass a literal true",
         "init __Packages.com.greensock.TweenNano": "time-based (getTimer) unless useFrames is set; check_fps_patch.py rejects useFrames outside TweenNano itself"

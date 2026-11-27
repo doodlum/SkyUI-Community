@@ -408,57 +408,74 @@ def free_character_id(tree):
     return i
 
 
-def add_marker(tree, k):
-    swf = tree.getroot()
-    tags = swf.find("tags")
-    root_depths = [int(el.get("depth")) for el in tags if sx.tag_type(el).startswith("PlaceObject")]
-    sprite_id = free_character_id(tree)
-    depth = max(root_depths + [0]) + 1
+def _marker_sprite(sprite_id, frames):
+    sprite = ET.Element("item", {"type": "DefineSpriteTag", "forceWriteAsLong": "true", "frameCount": str(frames),
+                                 "hasEndTag": "true", "spriteId": str(sprite_id)})
+    sub = ET.SubElement(sprite, "subTags")
+    for _ in range(frames):
+        ET.SubElement(sub, "item", {"type": "ShowFrameTag", "forceWriteAsLong": "false"})
+    return sprite
+
+
+def _marker_place(sprite_id, depth):
     if depth >= 16384:
         raise PatchError("no free timeline depth for the FPS marker")
+    return ET.Element("item", {
+        "type": "PlaceObject2Tag", "characterId": str(sprite_id), "clipDepth": "0", "depth": str(depth),
+        "forceWriteAsLong": "true", "name": MARKER_NAME, "placeFlagHasCharacter": "true",
+        "placeFlagHasClipActions": "false", "placeFlagHasClipDepth": "false", "placeFlagHasColorTransform": "false",
+        "placeFlagHasMatrix": "false", "placeFlagHasName": "true", "placeFlagHasRatio": "false",
+        "placeFlagMove": "false", "ratio": "0"})
 
-    sprite = ET.Element("item")
-    sprite.set("type", "DefineSpriteTag")
-    sprite.set("forceWriteAsLong", "true")
-    sprite.set("frameCount", str(k))
-    sprite.set("hasEndTag", "true")
-    sprite.set("spriteId", str(sprite_id))
-    sub = ET.SubElement(sprite, "subTags")
-    for _ in range(k):
-        sf = ET.SubElement(sub, "item")
-        sf.set("type", "ShowFrameTag")
-        sf.set("forceWriteAsLong", "false")
 
-    place = ET.Element("item")
-    place.set("type", "PlaceObject2Tag")
-    place.set("characterId", str(sprite_id))
-    place.set("clipDepth", "0")
-    place.set("depth", str(depth))
-    place.set("forceWriteAsLong", "true")
-    place.set("name", MARKER_NAME)
-    place.set("placeFlagHasCharacter", "true")
-    place.set("placeFlagHasClipActions", "false")
-    place.set("placeFlagHasClipDepth", "false")
-    place.set("placeFlagHasColorTransform", "false")
-    place.set("placeFlagHasMatrix", "false")
-    place.set("placeFlagHasName", "true")
-    place.set("placeFlagHasRatio", "false")
-    place.set("placeFlagMove", "false")
-    place.set("ratio", "0")
-
-    children = list(tags)
-    pos = None
-    for i, el in enumerate(children):
+def _first_frame_pos(container):
+    """Index of the first PlaceObject/ShowFrame tag (where frame 1's display list starts)."""
+    for i, el in enumerate(list(container)):
         t = sx.tag_type(el)
         if t.startswith("PlaceObject") or t == "ShowFrameTag":
-            pos = i
-            break
-    if pos is None:
-        pos = len(children)
-    tags.insert(pos, place)
-    tags.insert(pos, sprite)
-    return sprite_id, depth
+            return i
+    return len(list(container))
 
+
+def add_markers(tree, k, kept):
+    """Main timeline: child "__fpsScale" with k frames.  Every timeline in `kept` (left unstretched inside a
+    converted SWF) gets its own 1-frame "__fpsScale" child, so FpsScale.factor() returns 1 for it and for
+    everything nested in it."""
+    swf = tree.getroot()
+    tags = swf.find("tags")
+    head = 0
+    for i, el in enumerate(list(tags)):
+        if sx.tag_type(el) in ("FileAttributesTag", "MetadataTag", "SetBackgroundColorTag", "ScriptLimitsTag",
+                               "EnableDebuggerTag", "EnableDebugger2Tag", "ProductInfoTag"):
+            head = i + 1
+        else:
+            break
+    root_id = free_character_id(tree)
+    tags.insert(head, _marker_sprite(root_id, k))
+    depth = max([int(el.get("depth")) for el in tags if sx.tag_type(el).startswith("PlaceObject")] + [0]) + 1
+    tags.insert(_first_frame_pos(tags), _marker_place(root_id, depth))
+    if kept:
+        one_id = free_character_id(tree)
+        tags.insert(head, _marker_sprite(one_id, 1))
+        for tl in sx.timelines(tree):
+            if tl.id in kept:
+                d = max([int(el.get("depth")) for el in tl.container if sx.tag_type(el).startswith("PlaceObject")] + [0]) + 1
+                tl.container.insert(_first_frame_pos(tl.container), _marker_place(one_id, d))
+
+
+def kept_closure(tree, ids):
+    """`ids` plus every sprite placed (directly or indirectly) inside them."""
+    tls = {tl.id: tl for tl in sx.timelines(tree)}
+    todo, seen = [i for i in ids], set()
+    while todo:
+        i = todo.pop()
+        if i in seen or i not in tls or i == sx.ROOT:
+            continue
+        seen.add(i)
+        for el in tls[i].container:
+            if sx.tag_type(el).startswith("PlaceObject") and el.get("characterId") in tls:
+                todo.append(el.get("characterId"))
+    return seen
 
 # ---------------------------------------------------------------------------
 # Main
@@ -475,7 +492,12 @@ def patch(tree, swf_key, entry, plan, target_fps):
         if abs(ratio - k) > 1e-6 or k < 1:
             raise PatchError("%s: %g fps is not an integer multiple of %g fps" % (swf_key, target_fps, orig_fps))
     stats = {"prop": 0, "go": 0, "gotoframe": 0, "throttle": 0, "enterframe_free": 0, "clip_guard": 0,
-             "timelines": 0, "interp_tags": 0}
+             "timelines": 0, "kept_timelines": 0, "interp_tags": 0}
+    listed = list(plan.get("keep_timelines", {}).get(swf_key, {}).keys())
+    kept = kept_closure(tree, listed)
+    missing = [i for i in listed if i not in kept]
+    if missing:
+        raise PatchError("%s: keep_timelines lists unknown sprite(s) %s" % (swf_key, missing))
 
     if convert and k > 1:
         for el in swf.iter("item"):
@@ -501,7 +523,9 @@ def patch(tree, swf_key, entry, plan, target_fps):
         if blob.kind == "DoInitAction" and blob.el.get("spriteId") in helper_ids:
             continue
         guard_n += 1
-        rewrite_blob(blob, k, free_running, override_ok, stats, "__fpsTickCE%d" % guard_n)
+        # GotoFrame acts on the timeline the script sits on; unstretched timelines keep their numbers
+        k_own = 1 if blob.timeline in kept else k
+        rewrite_blob(blob, k_own, free_running, override_ok, stats, "__fpsTickCE%d" % guard_n)
 
     if convert and k > 1:
         show_proto = None
@@ -510,10 +534,13 @@ def patch(tree, swf_key, entry, plan, target_fps):
                 show_proto = copy.copy(el)
                 break
         for tl in sx.timelines(tree):
+            if tl.id in kept:
+                stats["kept_timelines"] += 1
+                continue
             stretch_timeline(tl, k, show_proto, stats)
         swf.set("frameRate", "%.1f" % (orig_fps * k))
 
-    add_marker(tree, k)
+    add_markers(tree, k, kept if k > 1 else set())
     return k, stats
 
 
@@ -525,7 +552,6 @@ def main():
     ap.add_argument("--plan", default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "fps_patch_plan.json"))
     ap.add_argument("--fps", type=float, default=None, help="target frame rate (default: plan target_fps)")
     args = ap.parse_args()
-
 
     plan = load_plan(args.plan)
     fps = args.fps if args.fps is not None else float(plan["target_fps"])
