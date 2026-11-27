@@ -346,15 +346,22 @@ class InventoryLists extends MovieClip
 
         this.itemList.InvalidateData();
 
-        // Set filter flag = 1 for non-empty categories with bDontHideOffset=false
-        for (var i = 0; i < this.itemList.entryList.length; i++) {
-            for (var j = 0; j < this.categoryList.entryList.length; ++j) {
-                if (this.categoryList.entryList[j].filterFlag != 0)
-                    continue;
+        // Set filter flag = 1 for non-empty categories with bDontHideOffset=false.
+        // OR-ing all item flags first and testing each category against the union is equivalent to testing
+        // every item against every category, but O(n + c) instead of O(n * c) - with thousands of items
+        // (large containers) the nested loop alone took ~125 ms.
+        var itemEntries: Array = this.itemList.entryList;
+        var categoryEntries: Array = this.categoryList.entryList;
 
-                if (this.itemList.entryList[i].filterFlag & this.categoryList.entryList[j].flag)
-                    this.categoryList.entryList[j].filterFlag = 1;
-            }
+        var itemFlags: Number = 0;
+        var itemCount: Number = itemEntries.length;
+        for (var i = 0; i < itemCount; i++)
+            itemFlags |= itemEntries[i].filterFlag;
+
+        var categoryCount: Number = categoryEntries.length;
+        for (var j = 0; j < categoryCount; j++) {
+            if (categoryEntries[j].filterFlag == 0 && (itemFlags & categoryEntries[j].flag))
+                categoryEntries[j].filterFlag = 1;
         }
 
         this.categoryList.UpdateList();
