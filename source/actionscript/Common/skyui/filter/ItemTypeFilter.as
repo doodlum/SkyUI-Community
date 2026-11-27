@@ -57,12 +57,18 @@ class skyui.filter.ItemTypeFilter implements skyui.filter.IFilter
     // @override skyui.IFilter
     public function applyFilter(a_filteredList: Array)
     {
-        for (var i = 0; i < a_filteredList.length; i++) {
-            if (!this._matcherFunc(a_filteredList[i], this._itemFilter)) {
-                a_filteredList.splice(i,1);
-                i--;
-            }
+        // Compact in place (keeps order). Removing non-matching entries one splice() at a time shifted the rest of
+        // the array on every removal - O(n^2) for categories that hide most of a large list.
+        var matcher: Function = this._matcherFunc;
+        var flag: Number = this._itemFilter;
+        var len: Number = a_filteredList.length;
+        var writeIndex: Number = 0;
+        for (var i = 0; i < len; i++) {
+            var e = a_filteredList[i];
+            if (matcher(e, flag))
+                a_filteredList[writeIndex++] = e;
         }
+        a_filteredList.length = writeIndex;
     }
     
     public function isMatch(a_entry: Object, a_flag: Boolean)
