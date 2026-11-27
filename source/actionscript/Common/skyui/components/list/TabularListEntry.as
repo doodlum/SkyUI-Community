@@ -4,8 +4,10 @@ class skyui.components.list.TabularListEntry extends skyui.components.list.Basic
   /* PRIVATE VARIABLES */
 
     private var _layoutUpdateCount: Number = -1;
-    private var _entryObject;
-    private var _list;
+    // Authored alpha of selectIndicator, captured on first setEntry.
+    private var _indicatorAlpha: Number;
+
+    private static var DIMMED_INDICATOR_FACTOR: Number = 0.5;
 
     // Entry value of the Type column (columns.subTypeColumn in config.txt), the column that
     // __rf_cleanDisplayText is meant for.
@@ -30,26 +32,24 @@ class skyui.components.list.TabularListEntry extends skyui.components.list.Basic
     // @override BasicListEntry
     public function setEntry(a_entryObject: Object, a_state: ListState)
     {
-        this._entryObject = a_entryObject;
-        this._list = a_state.list;
-
         var layout: ListLayout = skyui.components.list.TabularList(a_state.list).layout;
-            
-        // Show select area if this is the current entry
-        var isSelected: Boolean = (a_entryObject == a_state.list.selectedEntry);
+
+        // Show select area if this is the current entry or part of a marquee multi-selection
+        // (MarqueeSelectionController). While a multi-selection exists, the plain cursor highlight of an
+        // unselected entry is dimmed so it can be told apart from the selection.
+        var isCurrent: Boolean = (a_entryObject == a_state.list.selectedEntry);
         var isMarquee: Boolean = (a_entryObject.isMarqueeSelected == true);
-        
-        var isMultiActive: Boolean = this._list._parent._parent._parent.isMultiSelectionActive();
 
-        this.selectIndicator._visible = (isSelected || isMarquee);
-        this.selectIndicator._y = 0;
+        if (this._indicatorAlpha == undefined)
+            this._indicatorAlpha = this.selectIndicator._alpha;
 
-        if (isSelected) {
-            this.selectIndicator._alpha = (isMultiActive || isMarquee) ? 70 : 100;
-        } else {
-            this.selectIndicator._alpha = 100;
-        }
-        
+        this.selectIndicator._visible = (isCurrent || isMarquee);
+        this.selectIndicator._alpha = (isCurrent && !isMarquee && a_state.marqueeActive == true)
+            ? this._indicatorAlpha * skyui.components.list.TabularListEntry.DIMMED_INDICATOR_FACTOR
+            : this._indicatorAlpha;
+
+        var curLayoutUpdateCount = layout.layoutUpdateCount;
+
         // Has the view update sequence number changed? Then Update the columns positions etc.
         if (this._layoutUpdateCount != curLayoutUpdateCount) {
             this._layoutUpdateCount = curLayoutUpdateCount;
@@ -106,25 +106,6 @@ class skyui.components.list.TabularListEntry extends skyui.components.list.Basic
                 if (color != undefined)
                     e.textColor = color;
             }
-        }
-    }
-
-    public function setMultiSelected(a_selected: Boolean)
-    {
-        if (this._entryObject != undefined) {
-            this._entryObject.isMarqueeSelected = a_selected;
-        }
-
-        var isActualSelected: Boolean = (this._entryObject == this._list.selectedEntry);
-        var isMultiActive: Boolean = this._list._parent._parent._parent.isMultiSelectionActive();
-        
-        this.selectIndicator._visible = (a_selected || isActualSelected);
-        this.selectIndicator._y = 0;
-        
-        if (isActualSelected) {
-            this.selectIndicator._alpha = (isMultiActive || a_selected) ? 70 : 100;
-        } else {
-            this.selectIndicator._alpha = 100;
         }
     }
 

@@ -29,7 +29,9 @@ class ContainerMenu extends ItemMenu
    var bNPCMode = false;
    var bEnableTabs = true;
 
-   private var _marqueeController: MarqueeSelectionController;
+   // Marquee multi-selection (Ctrl+drag / Ctrl+click in the item list, the transfer key moves the selection).
+   var _marqueeController;
+   var _bBatchViewingContainer = false;
 
    function ContainerMenu()
    {
@@ -47,13 +49,13 @@ class ContainerMenu extends ItemMenu
       gfx.io.GameDelegate.addCallBack("AttemptEquip",this,"AttemptEquip");
       gfx.io.GameDelegate.addCallBack("XButtonPress",this,"onXButtonPress");
       this.itemCardFadeHolder.StealTextInstance._visible = false;
+      this._marqueeController.init();
    }
    function setConfig(a_config)
    {
       super.setConfig(a_config);
-      if (a_config.ItemList.selection.marquee.enabled != undefined) {
-         this._marqueeController.enabled = a_config.ItemList.selection.marquee.enabled;
-      }
+      // Missing key (or any missing parent node) reads as undefined in AS2 -> disabled.
+      this._marqueeController.enabled = a_config.ItemList.selection.marquee.enabled == true;
       var _loc3_ = this.inventoryLists.itemList;
       _loc3_.addDataProcessor(new InventoryDataSetter());
       _loc3_.addDataProcessor(new InventoryIconSetter(a_config.Appearance));
@@ -103,7 +105,7 @@ class ContainerMenu extends ItemMenu
    }
    function AttemptEquip(a_slot, a_bCheckOverList)
    {
-      if (this._marqueeController.enabled && Key.isDown(Key.CONTROL))
+      if (this._marqueeController.shouldSuppressAction())
          return;
 
       var _loc2_ = a_bCheckOverList != undefined ? a_bCheckOverList : true;
@@ -145,7 +147,7 @@ class ContainerMenu extends ItemMenu
    }
    function onItemSelect(event)
    {
-      if (this._marqueeController.processItemClick(event.index, event.entry))
+      if (this._marqueeController.processItemClick(event))
          return;
 
       if(event.keyboardOrMouse != 0)
@@ -156,7 +158,9 @@ class ContainerMenu extends ItemMenu
          }
          else
          {
-            this.startItemTransfer();
+            // Transfer key (keyboard/gamepad): moves the marquee selection if there is one. Mouse clicks
+            // arrive through AttemptEquip and always act on the clicked item only.
+            this.startItemTransfer(true);
          }
       }
    }
@@ -273,11 +277,35 @@ class ContainerMenu extends ItemMenu
       }
       this.navPanel.updateButtons(true);
    }
-   function startItemTransfer()
+   function startItemTransfer(a_bAllowBatch)
    {
-      if (this._marqueeController.isMultiSelectionActive()) {
-         this._marqueeController.startBatchTransfer(this.isViewingContainer());
-         return;
+      if (this._marqueeController.isProcessing)
+         return undefined;
+
+      // Not for the equip path (startItemEquip sets _equipHand and transfers the one item it equips).
+      if (a_bAllowBatch == true && this._equipHand == undefined)
+      {
+         var selected = this._marqueeController.getSelectedEntries();
+         if (selected.length > 0)
+         {
+            if (!this.shouldProcessItemsListInput(false))
+               return undefined;
+
+            if (selected.length > 1)
+            {
+               // Whole stacks, one per frame. Disabled entries are skipped, and so are equipped and
+               // favorited items when giving/storing.
+               this._bBatchViewingContainer = this.isViewingContainer();
+               this._marqueeController.startBatch(mx.utils.Delegate.create(this, this.batchTransferEntry), mx.utils.Delegate.create(this, this.canBatchTransferEntry));
+               return undefined;
+            }
+
+            // A single selected entry: transfer it through the regular path below (quantity menu etc.).
+            var bSelected = this._marqueeController.selectEntry(selected[0]);
+            this._marqueeController.clearSelection();
+            if (!bSelected)
+               return undefined;
+         }
       }
 
       if(this.inventoryLists.itemList.selectedEntry.enabled)
@@ -296,6 +324,18 @@ class ContainerMenu extends ItemMenu
             this.itemCard.ShowQuantityMenu(this.inventoryLists.itemList.selectedEntry.count);
          }
       }
+   }
+   function batchTransferEntry(a_entry)
+   {
+      gfx.io.GameDelegate.call("ItemTransfer",[a_entry.count,this._bBatchViewingContainer]);
+   }
+   function canBatchTransferEntry(a_entry)
+   {
+      if(a_entry.enabled == false)
+      {
+         return false;
+      }
+      return this._bBatchViewingContainer || !skyui.components.list.MarqueeSelectionController.isEquippedOrFavorite(a_entry);
    }
    function startItemEquip(a_equipHand)
    {

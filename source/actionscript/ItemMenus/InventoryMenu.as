@@ -25,7 +25,8 @@ class InventoryMenu extends ItemMenu
    var _bSwitchMenus = false;
    var bPCControlsReady = true;
 
-   var _marqueeController: MarqueeSelectionController;
+   // Marquee multi-selection (Ctrl+drag / Ctrl+click in the item list, R drops the selection).
+   var _marqueeController;
 
    function InventoryMenu()
    {
@@ -46,13 +47,13 @@ class InventoryMenu extends ItemMenu
       var _loc3_ = this.inventoryLists.categoryList;
       _loc3_.iconArt = this._categoryListIconArt;
       this.itemCard.addEventListener("itemPress",this,"onItemCardListPress");
+      this._marqueeController.init();
    }
    function setConfig(a_config)
    {
       super.setConfig(a_config);
-      if (a_config.ItemList.selection.marquee.enabled != undefined) {
-         this._marqueeController.enabled = a_config.ItemList.selection.marquee.enabled;
-      }
+      // Missing key (or any missing parent node) reads as undefined in AS2 -> disabled.
+      this._marqueeController.enabled = a_config.ItemList.selection.marquee.enabled == true;
       var _loc3_ = this.inventoryLists.itemList;
       _loc3_.addDataProcessor(new InventoryDataSetter());
       _loc3_.addDataProcessor(new InventoryIconSetter(a_config.Appearance));
@@ -95,7 +96,7 @@ class InventoryMenu extends ItemMenu
    }
    function AttemptEquip(a_slot, a_bCheckOverList)
    {
-      if (this._marqueeController.enabled && Key.isDown(Key.CONTROL))
+      if (this._marqueeController.shouldSuppressAction())
          return;
 
       var _loc2_ = a_bCheckOverList == undefined ? true : a_bCheckOverList;
@@ -107,8 +108,29 @@ class InventoryMenu extends ItemMenu
    }
    function DropItem()
    {
-      if (this._marqueeController.startBatchDrop())
+      if (this._marqueeController.isProcessing)
          return;
+
+      var selected = this._marqueeController.getSelectedEntries();
+      if (selected.length > 0)
+      {
+         if (!this.shouldProcessItemsListInput(false))
+            return;
+
+         if (selected.length > 1)
+         {
+            // Whole stacks, one per frame. Equipped, favorited and gold stacks are skipped; the engine
+            // refuses quest items on its own.
+            this._marqueeController.startBatch(mx.utils.Delegate.create(this, this.batchDropEntry), mx.utils.Delegate.create(this, this.canBatchDropEntry));
+            return;
+         }
+
+         // A single selected entry: drop it through the regular path below (quantity menu etc.).
+         var bSelected = this._marqueeController.selectEntry(selected[0]);
+         this._marqueeController.clearSelection();
+         if (!bSelected)
+            return;
+      }
 
       if(this.shouldProcessItemsListInput(false) && this.inventoryLists.itemList.selectedEntry != undefined)
       {
@@ -121,6 +143,14 @@ class InventoryMenu extends ItemMenu
             this.itemCard.ShowQuantityMenu(this.inventoryLists.itemList.selectedEntry.count);
          }
       }
+   }
+   function batchDropEntry(a_entry)
+   {
+      gfx.io.GameDelegate.call("ItemDrop",[a_entry.count]);
+   }
+   function canBatchDropEntry(a_entry)
+   {
+      return a_entry.enabled != false && !skyui.components.list.MarqueeSelectionController.isEquippedOrFavorite(a_entry) && !skyui.components.list.MarqueeSelectionController.isGold(a_entry);
    }
    function AttemptChargeItem()
    {
@@ -186,7 +216,7 @@ class InventoryMenu extends ItemMenu
    }
    function onItemSelect(event)
    {
-      if (this._marqueeController.processItemClick(event.index, event.entry))
+      if (this._marqueeController.processItemClick(event))
          return;
 
       if(event.entry.enabled && event.keyboardOrMouse != 0)
@@ -245,6 +275,7 @@ class InventoryMenu extends ItemMenu
    }
    function startMenuFade()
    {
+      this._marqueeController.cancel();
       this.inventoryLists.hidePanel();
       this.ToggleMenuFade();
       this.saveIndices();
