@@ -69,7 +69,7 @@ class skyui.props.CompoundProperty
         var compoundValue: String = "";
         for(var i: Number = 0; i < this.propertyList.length; i++)
         {
-            var currProp: String = propertyList[i];
+            var currProp: String = this.propertyList[i];
             var currVal: String = String(this.defaultValues[currProp]);
             if (obj.hasOwnProperty(currProp) && obj[currProp] != undefined && obj[currProp] != "") {
                 currVal = String(obj[currProp]);
