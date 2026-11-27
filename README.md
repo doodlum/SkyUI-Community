@@ -79,11 +79,11 @@ cmake --preset debug
 cmake --build --preset debug
 ```
 
-### FPS patch (120 fps menus)
+### FPS patch (240 fps menus)
 
-By default the build converts the SWFs to 120 fps for smoother menus on high-refresh displays
+By default the build converts the SWFs to 240 fps for smoother menus on high-refresh displays
 (`ENABLE_FPS_PATCH=ON`, target set by `FPS_PATCH_TARGET`). Every timeline with more than one frame is stretched by the same factor
-(x2 for 60 fps menus, x4 for 30, x5 for 24) so animations keep their real-time length, tweens are interpolated,
+(x4 for 60 fps menus, x8 for 30, x10 for 24) so animations keep their real-time length, tweens are interpolated,
 and the compiled ActionScript is rewritten to keep using original frame numbers (`tools/xml_fps_patcher.py`,
 runtime side in `source/actionscript/Common/skyui/util/FpsScale.as`). Which SWFs are converted is listed in
 `tools/fps_patch_plan.json`.
@@ -92,7 +92,7 @@ runtime side in `source/actionscript/Common/skyui/util/FpsScale.as`). Which SWFs
   by hand keeps whatever value is in its `CMakeCache.txt`, so pass `-DENABLE_FPS_PATCH=ON` (or `OFF`) when
   reusing one. With the patch OFF the SWFs keep their original frame rates.
 - Verify a patched build with `cmake --build --preset debug --target check_fps_patch` (or
-  `python tools/check_fps_patch.py --build build/debug --ffdec <path to ffdec-cli>`). It proves for every SWF
+  `python tools/check_fps_patch.py --build build/debug --ffdec <path to ffdec-cli> --fps 240`). It proves for every SWF
   that each timeline keeps its duration in seconds and that every frame-number reference in the bytecode was
   rescaled, and fails otherwise.
 

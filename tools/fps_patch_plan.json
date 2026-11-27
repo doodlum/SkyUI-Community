@@ -13,7 +13,7 @@
         "method_override_allowed: classes that define nextFrame/prevFrame/gotoAndStop/gotoAndPlay themselves but",
         "  are not MovieClips (FpsScale.go passes calls on non-MovieClip objects through unchanged)."
     ],
-    "target_fps": 120,
+    "target_fps": 240,
     "swfs": {
         "bartermenu.swf":          {"convert": true},
         "console.swf":             {"convert": true},

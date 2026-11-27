@@ -31,7 +31,7 @@ endif()
 # existing build folder keeps the value it was configured with, so pass -DENABLE_FPS_PATCH=ON/OFF explicitly
 # when switching. The configure log and the build log ("[Build] FPS patch ...") show which state you got.
 option(ENABLE_FPS_PATCH "Rebuild SWFs at a higher frame rate (FPS_PATCH_TARGET) with timelines stretched to match" ON)
-set(FPS_PATCH_TARGET "120" CACHE STRING "Frame rate the FPS patch converts SWFs to (an integer multiple of 24, 30 and 60)")
+set(FPS_PATCH_TARGET "240" CACHE STRING "Frame rate the FPS patch converts SWFs to (an integer multiple of 24, 30 and 60)")
 if(ENABLE_FPS_PATCH)
     find_package(Python3 REQUIRED COMPONENTS Interpreter)
     # Each patch step runs two FFDec JVMs and a Python pass over the SWF's XML (hudmenu: ~2 GB); cap how many
@@ -177,7 +177,7 @@ if(ENABLE_FPS_PATCH)
     # Proves the FPS patch kept every timeline's duration and rescaled every frame reference (not part of ALL).
     add_custom_target("check_fps_patch"
         COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tools/check_fps_patch.py"
-                --build "${CMAKE_BINARY_DIR}" --ffdec "${FFDEC_CLI}"
+                --build "${CMAKE_BINARY_DIR}" --ffdec "${FFDEC_CLI}" --fps "${FPS_PATCH_TARGET}"
         USES_TERMINAL
         VERBATIM
     )

@@ -430,10 +430,13 @@ def main():
     ap.add_argument("--plan", default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "fps_patch_plan.json"))
     ap.add_argument("--swf", action="append", help="only check these SWFs (relative to interface/)")
     ap.add_argument("--work", help="folder for the XML exports (default: <build>/staging/fps_check)")
+    ap.add_argument("--fps", type=float, default=None, help="frame rate the build was patched to (default: plan target_fps)")
     args = ap.parse_args()
 
     with open(args.plan, "r", encoding="utf-8") as f:
         plan = json.load(f)
+    if args.fps is not None:
+        plan["target_fps"] = args.fps
     build = os.path.abspath(args.build)
     unpatched_dir = os.path.join(build, "fps_unpatched")
     final_dir = os.path.join(build, "interface")
