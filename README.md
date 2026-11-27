@@ -5,8 +5,9 @@
 ### Prerequisites
 
 - [CMake 4.2+](https://cmake.org/download/)
-- [Visual Studio 2026](https://visualstudio.microsoft.com/) (or another CMake-supported generator)
+- [Visual Studio 2026](https://visualstudio.microsoft.com/) (or another CMake-supported generator; on Linux, the default make generator is used)
 - [Java](https://www.java.com/en/download/) (required by the bundled ffdec-cli)
+- [Proton](https://github.com/ValveSoftware/Proton) *(Linux only)* — auto-detected from your Steam installation. Skyrim SE must have been launched via Steam at least once to create the Proton prefix.
 - A clean Skyrim Special Edition installation with:
   - The [Creation Kit](https://store.steampowered.com/app/1946180/Skyrim_Special_Edition_Creation_Kit/) installed and **run at least once** to unpack the base game script sources
   - The latest [SKSE64](https://skse.silverlock.org/) installed, including its script source files, overwriting the scripts included with the Creation Kit
@@ -50,6 +51,29 @@ set MOD_DEBUG_PATH="C:\Users\user\AppData\Local\ModOrganizer\Skyrim Special Edit
 Alternatively, from the command line:
 
 ```
+cmake --preset debug
+cmake --build --preset debug
+```
+
+### Building on Linux
+
+The easiest way to build is to run `./build.sh`. It will automatically detect your Skyrim SE installation from your Steam library. If auto-detection fails, it will prompt you to enter the path manually.
+
+You can also set the `SkyrimSE_PATH` environment variable beforehand to skip the prompt:
+
+```bash
+export SkyrimSE_PATH="$HOME/.local/share/Steam/steamapps/common/Skyrim Special Edition"
+```
+
+For convenient debugging, use `MOD_DEBUG_PATH`:
+
+```bash
+export MOD_DEBUG_PATH="$HOME/.local/share/ModOrganizer/Skyrim Special Edition/mods/SkyUI-dev"
+```
+
+Alternatively, from the command line (ensure `SkyrimSE_PATH` is exported first):
+
+```bash
 cmake --preset debug
 cmake --build --preset debug
 ```
