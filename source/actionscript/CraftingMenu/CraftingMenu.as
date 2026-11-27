@@ -99,6 +99,9 @@ class CraftingMenu extends MovieClip
       this.MenuNameHolder._visible = false;
       this.MenuDescription = this.MenuDescriptionHolder.MenuDescription;
       this.MenuDescription.autoSize = "center";
+      // Positioned in positionFloatingElements(), which runs on config load (after the first frames are
+      // drawn); keep it hidden until then so it doesn't appear at its default spot and jump.
+      this.MenuDescriptionHolder._visible = false;
       this.CategoryList.InitExtensions(this._subtypeName);
       gfx.managers.FocusHandler.instance.setFocus(this.CategoryList,0);
       this.CategoryList.addEventListener("itemHighlightChange",this,"onItemHighlightChange");
@@ -360,6 +363,7 @@ class CraftingMenu extends MovieClip
       
       this.MenuDescriptionHolder.Lock("TR");
       this.MenuDescriptionHolder._x = _loc2_._x + _loc2_._width - 17;
+      this.MenuDescriptionHolder._visible = true;
 
       MovieClip(this.MouseRotationRect).Lock("T");
       this.MouseRotationRect._x = this.ItemInfo._parent._x;
@@ -410,6 +414,13 @@ class CraftingMenu extends MovieClip
       {
          _loc5_ = skyui.components.list.ListLayoutManager.createLayout(a_config.ListLayout,"AlchemyListLayout");
          _loc5_.entryWidth -= CraftingLists.SHORT_LIST_OFFSET;
+         // The alchemy list is shifted right by SHORT_LIST_OFFSET (leftBorder, see CraftingLists), so the
+         // header separator must shrink by the same amount or it runs past the list background.
+         // Other subtypes reaching this branch keep their list unshifted, so leave their separator alone.
+         if(this._subtypeName == "Alchemy")
+         {
+            this.ItemList.header.seperator._width -= CraftingLists.SHORT_LIST_OFFSET;
+         }
       }
       this.ItemList.layout = _loc5_;
       var _loc7_ = a_config.Input.controls.gamepad.prevColumn;

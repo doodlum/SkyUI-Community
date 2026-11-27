@@ -103,6 +103,9 @@ Add_SWF(bartermenu
         Material.as
         Weapon.as
     }
+    Common/skyui/util {
+        Translator.as
+    }
     Common/skyui/filter {
         ItemTypeFilter.as
         NameFilter.as
@@ -163,6 +166,9 @@ Add_SWF(containermenu
         Material.as
         Weapon.as
     }
+    Common/skyui/util {
+        Translator.as
+    }
     Common/skyui/filter {
         ItemTypeFilter.as
         NameFilter.as
@@ -197,6 +203,9 @@ Add_SWF(craftingmenu
         Magic.as
         Material.as
         Weapon.as
+    }
+    Common/skyui/util {
+        Translator.as
     }
     Common/skyui/filter {
         ItemTypeFilter.as
@@ -340,6 +349,9 @@ Add_SWF(giftmenu
         Material.as
         Weapon.as
     }
+    Common/skyui/util {
+        Translator.as
+    }
     Common/skyui/filter {
         ItemTypeFilter.as
         NameFilter.as
@@ -403,6 +415,9 @@ Add_SWF(inventorymenu
         Magic.as
         Material.as
         Weapon.as
+    }
+    Common/skyui/util {
+        Translator.as
     }
     Common/skyui/filter {
         ItemTypeFilter.as
@@ -476,6 +491,9 @@ Add_SWF(magicmenu
         Magic.as
         Material.as
         Weapon.as
+    }
+    Common/skyui/util {
+        Translator.as
     }
     Common/skyui/filter {
         ItemTypeFilter.as
