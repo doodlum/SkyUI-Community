@@ -244,6 +244,10 @@ def check_swf(key, entry, plan, before_xml, after_xml, notes):
         return t.frame_count <= 1 or sum(1 for e in t.container if sx.tag_type(e) == "ShowFrameTag") <= 1
     k_marked = {t for t in keep_closure(tls_b, list(shallow)) - shallow - kept if not _single(tls_b[t])}
     kept = kept | shallow
+    # every exported symbol carries its own marker (it may be imported into a SWF with another k)
+    exp_b = sx.export_names(tb)
+    k_marked |= {cid for cid, n in exp_b.items()
+                 if cid in tls_b and tls_b[cid].frame_count >= 1 and not n.startswith("__Packages.")} - kept
 
     marker_id = one_id = None
     for tid in extra:

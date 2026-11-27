@@ -544,6 +544,12 @@ def patch(tree, swf_key, entry, plan, target_fps):
         raise PatchError("%s: keep_shallow lists unknown sprite(s) %s" % (swf_key, sorted(shallow - ids)))
     k_marked = (kept_closure(tree, list(shallow)) - shallow - single - kept) if k > 1 else set()
     kept = kept | shallow
+    # Exported symbols can end up inside another SWF (ImportAssets, attachMovie from a library) where the
+    # nearest marker above them would be the host's: give each its own marker so FpsScale uses this SWF's k
+    # for them (1 for unconverted art libraries such as buttonart.swf, whose icons are picked by frame number).
+    exports = sx.export_names(tree)
+    frames = {tl.id: tl.frame_count for tl in sx.timelines(tree)}
+    k_marked |= {cid for cid, n in exports.items() if frames.get(cid, 0) >= 1 and not n.startswith("__Packages.")} - kept
 
     if convert and k > 1:
         for el in swf.iter("item"):
