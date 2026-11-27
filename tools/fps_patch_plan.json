@@ -1,9 +1,9 @@
 {
     "_doc": [
         "Which SWFs the FPS patch converts (tools/xml_fps_patcher.py, verified by tools/check_fps_patch.py).",
-        "convert=true: frame rate -> target_fps, every timeline stretched by k = target_fps / original fps,",
+        "convert=true: every timeline stretched by k, the largest whole factor with original fps * k <= target_fps (a cap),",
         "  all frame-number references in the SWF's bytecode rescaled at run time by skyui.util.FpsScale.",
-        "played_at: for libraries other SWFs import (ImportAssets): their symbols play at the importer's frame rate, so they are stretched by target_fps / played_at; check_fps_patch.py verifies it against every importer.",
+        "played_at: for libraries other SWFs import (ImportAssets): their symbols play at the importer's frame rate, so their k is computed from played_at instead of their own rate; check_fps_patch.py verifies it against every importer.",
         "keep_shallow: sprite ids whose own timeline stays unstretched (1-frame marker) while every timeline nested in it is stretched and gets its own k marker.",
         "convert=false: frame rate and timelines unchanged (code is still rewritten, with k = 1, because it may",
         "  drive clips of converted SWFs loaded into it).",
@@ -15,7 +15,7 @@
         "method_override_allowed: classes that define nextFrame/prevFrame/gotoAndStop/gotoAndPlay themselves but",
         "  are not MovieClips (FpsScale.go passes calls on non-MovieClip objects through unchanged)."
     ],
-    "target_fps": 240,
+    "target_fps": 90,
     "swfs": {
         "bartermenu.swf":          {"convert": true},
         "console.swf":             {"convert": true},

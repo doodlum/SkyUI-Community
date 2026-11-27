@@ -516,12 +516,11 @@ def patch(tree, swf_key, entry, plan, target_fps):
     # Libraries imported by other SWFs (ImportAssets) play at the importing SWF's frame rate, not their own:
     # "played_at" is that rate, and the library is stretched by the same factor as its importers.
     played_at = float(entry.get("played_at", orig_fps))
+    # target_fps is a cap: each SWF gets the largest whole stretch factor that keeps it at or below the cap
+    # (24 fps -> 72 and 30 -> 90 at a cap of 90; 60 fps stays 60). k = 1 leaves the timelines as they are.
     k = 1
     if convert:
-        ratio = target_fps / played_at
-        k = int(round(ratio))
-        if abs(ratio - k) > 1e-6 or k < 1:
-            raise PatchError("%s: %g fps is not an integer multiple of %g fps" % (swf_key, target_fps, played_at))
+        k = max(1, int(target_fps / played_at + 1e-9))
     stats = {"prop": 0, "go": 0, "gotoframe": 0, "throttle": 0, "enterframe_free": 0, "clip_guard": 0,
              "timelines": 0, "kept_timelines": 0, "interp_tags": 0}
     # Timelines with one frame (or none) have no duration to keep and are never stretched: Flash plays a
@@ -538,7 +537,7 @@ def patch(tree, swf_key, entry, plan, target_fps):
         raise PatchError("%s: keep_timelines lists unknown sprite(s) %s" % (swf_key, missing))
     # "keep_shallow": sprites whose own timeline stays unstretched (other mods read their raw frame numbers)
     # while everything nested in them is stretched as usual and carries its own k marker.
-    shallow = set(str(i) for i in entry.get("keep_shallow", []))
+    shallow = set(str(i) for i in entry.get("keep_shallow", [])) if k > 1 else set()
     ids = {tl.id for tl in sx.timelines(tree)}
     if shallow - ids:
         raise PatchError("%s: keep_shallow lists unknown sprite(s) %s" % (swf_key, sorted(shallow - ids)))
@@ -593,9 +592,9 @@ def patch(tree, swf_key, entry, plan, target_fps):
                 stats["single_frame"] += 1
                 continue
             stretch_timeline(tl, k, show_proto, stats)
-        # = orig_fps * k, except for imported libraries (played_at), whose own header rate is never used and
-        # could exceed what the SWF header can hold (8.8 fixed point, < 256)
-        swf.set("frameRate", "%.1f" % target_fps)
+        # = orig_fps * k; for imported libraries played_at * k, the rate their symbols actually play at (their
+        # own header rate is never used, and orig_fps * k could exceed what the header holds, < 256)
+        swf.set("frameRate", "%.1f" % (played_at * k))
 
     add_markers(tree, k, kept if k > 1 else set(), k_marked)
     move_helper_first(tree, helper_ids)

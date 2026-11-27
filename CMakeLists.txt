@@ -31,7 +31,7 @@ endif()
 # existing build folder keeps the value it was configured with, so pass -DENABLE_FPS_PATCH=ON/OFF explicitly
 # when switching. The configure log and the build log ("[Build] FPS patch ...") show which state you got.
 option(ENABLE_FPS_PATCH "Rebuild SWFs at a higher frame rate (FPS_PATCH_TARGET) with timelines stretched to match" ON)
-set(FPS_PATCH_TARGET "240" CACHE STRING "Frame rate the FPS patch converts SWFs to (an integer multiple of 24, 30 and 60)")
+set(FPS_PATCH_TARGET "90" CACHE STRING "Highest frame rate the FPS patch gives a SWF; each is stretched by the largest whole factor that stays at or below it. Timing stays correct while the game renders at least a third of it (90: 30 fps)")
 # Compatibility profiles (tools/fps_patch_plan.json "compat") keep the SWFs other mods read frame numbers from
 # unconverted. Comma separated; set to "" to convert everything.
 set(FPS_PATCH_COMPAT "morehud_inventory" CACHE STRING "FPS patch compatibility profiles for other mods (comma separated, empty for none)")
@@ -45,7 +45,7 @@ if(ENABLE_FPS_PATCH)
     # Read at configure time: SWFs with "exclude": true are built without any FPS patch step
     file(READ "${CMAKE_CURRENT_SOURCE_DIR}/tools/fps_patch_plan.json" FPS_PATCH_PLAN_JSON)
     set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/tools/fps_patch_plan.json")
-    message(STATUS "[Build] FPS patch   : ON -- SWFs listed in tools/fps_patch_plan.json are rebuilt at ${FPS_PATCH_TARGET} fps (compat: ${FPS_PATCH_COMPAT_ARG})")
+    message(STATUS "[Build] FPS patch   : ON -- SWFs listed in tools/fps_patch_plan.json are rebuilt at up to ${FPS_PATCH_TARGET} fps (compat: ${FPS_PATCH_COMPAT_ARG})")
 else()
     message(STATUS "[Build] FPS patch   : OFF -- SWFs keep their original frame rates (-DENABLE_FPS_PATCH=ON to enable)")
 endif()

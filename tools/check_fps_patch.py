@@ -4,7 +4,7 @@ For every SWF in tools/fps_patch_plan.json it compares the unpatched SWF (build/
 script-injected SWF the patcher started from) with the shipped one (build/interface/<swf>), both exported to
 XML with FFDec, and fails loudly unless:
 
-  timing   - the frame rate is target_fps for converted SWFs (an integer multiple k of the original) and
+  timing   - converted SWFs run at k x their rate, k the largest whole factor that stays <= target_fps (a cap), and
              unchanged otherwise;
            - every timeline (main timeline and every DefineSprite) with more than one frame has exactly k times
              as many frames (one-frame timelines must stay unchanged: stretched they would loop), so its
@@ -202,12 +202,11 @@ def check_swf(key, entry, plan, before_xml, after_xml, notes):
     # set to the target too but never used. eff_b / eff_a: the rate the timelines actually play at.
     played_at = float(entry.get("played_at", fb))
     if convert:
-        if abs(fa - target) > 1e-6:
-            err("frame rate %g, expected %g" % (fa, target))
-        k = int(round(target / played_at))
-        if abs(target / played_at - k) > 1e-9 or k < 1:
-            err("target %g fps is not an integer multiple of %g" % (target, played_at))
-            return errors, {}
+        # target is a cap: the largest whole factor that keeps the SWF at or below it
+        k = max(1, int(target / played_at + 1e-9))
+        want = fb if k == 1 else played_at * k
+        if abs(fa - want) > 1e-6:
+            err("frame rate %g, expected %g" % (fa, want))
     else:
         if abs(fa - fb) > 1e-6:
             err("frame rate changed %g -> %g although the plan keeps it" % (fb, fa))
@@ -549,7 +548,7 @@ def main():
             continue
         tb = sx.load(before_xml)
         fb = float(tb.getroot().get("frameRate"))
-        k = st and int(round(float(plan["target_fps"]) / float(entry.get("played_at", fb)))) if entry.get("convert") else 1
+        k = st and max(1, int(float(plan["target_fps"]) / float(entry.get("played_at", fb)) + 1e-9)) if entry.get("convert") else 1
         dur = ("%.2fs..%.2fs" % (st["dur_min"], st["dur_max"])) if st.get("dur_min") is not None else "-"
         mode = ("%g -> %g fps (x%d)" % (fb, fb * k, k) if "played_at" not in entry else "%g fps library played at %g by its importers -> x%d" % (fb, float(entry["played_at"]), k)) if entry.get("convert") else "kept at %g fps (%s)" % (fb, entry.get("reason", ""))
         print("OK   %-42s %s; %d timelines (%d animated, %s, all durations equal; %d engine-driven + %d single-frame unstretched), %d labels, %d scripts; "
