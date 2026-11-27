@@ -1,0 +1,2 @@
+[perf] chest 0x000C2CE4 (2138 items): E -> menu open 3533, 3530 ms
+[perf] chest 0x000C2CEF (1773 items): E -> menu open 2484, 2479 ms

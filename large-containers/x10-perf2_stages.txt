@@ -1,0 +1,7 @@
+Right #1 [WEAPONS]: p0x1=0 p1x10=93 p2x10=32 enumx10=78 drawx10=78 | 
+Right #2 [$ALL]: p0x1=0 p1x10=93 p2x10=16 enumx10=78 drawx10=78 | 
+Right #3 [WEAPONS]: p0x1=0 p1x10=94 p2x10=31 enumx10=78 drawx10=78 | 
+Right #4 [$ALL]: p0x1=0 p1x10=78 p2x10=31 enumx10=78 drawx10=78 | 
+Right #5 [WEAPONS]: p0x1=0 p1x10=94 p2x10=16 enumx10=78 drawx10=94 | 
+Alt #1 [WEAPONS]: p0x1=16 p1x10=78 p2x10=31 enumx10=31 drawx10=0 | 
+Alt #2 [WEAPONS]: p0x1=0 p1x10=94 p2x10=31 enumx10=79 drawx10=78 | 

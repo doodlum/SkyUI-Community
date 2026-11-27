@@ -1,0 +1,2 @@
+[vanilla] chest 0x000C2CE4 (2138 items): E -> menu open 3551, 3531 ms
+[vanilla] chest 0x000C2CEF (1773 items): E -> menu open 2502, 2754 ms

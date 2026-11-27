@@ -1,0 +1,2 @@
+open #1 E->menu 3549 ms : ILD n=2171 invalidate=0 catloop=0 ; first rebuild: p0=125 p1=0 p2=15 enum=0 draw=16 total=156
+open #2 E->menu 3548 ms : ILD n=2171 invalidate=0 catloop=0 ; first rebuild: p0=125 p1=16 p2=0 enum=15 draw=0 total=156

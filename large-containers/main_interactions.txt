@@ -1,0 +1,6 @@
+[main] 2026-11-26T23:59:02 chest 0x000C2CE4, 2171 list entries
+[main] category Right x8: 188, 167, 167, 167, 167, 184, 167, 167 ms
+[main] category Left  x8: 183, 167, 184, 167, 184, 167, 167, 184 ms
+[main] switch side x4: 152, 167, 167, 183 ms
+[main] take 1 item x4 (until list re-sent): -1, -1, -1, -1 ms
+[main] search 'iron' 1972 ms (incl. 300ms debounce + key settles), clear 1709 ms

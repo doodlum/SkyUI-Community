@@ -1,0 +1,2 @@
+open #1 E->menu 3825 ms : n=2171 invalidate=0 [undefined] catloop=125
+open #2 E->menu 3540 ms : n=2171 invalidate=0 [undefined] catloop=125
