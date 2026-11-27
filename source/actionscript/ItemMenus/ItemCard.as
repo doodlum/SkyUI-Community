@@ -62,7 +62,6 @@ class ItemCard extends MovieClip
         Shared.GlobalFunc.MaintainTextFormat();
         Shared.GlobalFunc.AddReverseFunctions();
         gfx.events.EventDispatcher.initialize(this);
-        this.QuantitySlider_mc = this.QuantitySlider_mc;
         this.ButtonRect_mc = this.ButtonRect;
         this.ItemList = this.CardList_mc.List_mc;
         this.SetupItemName();
