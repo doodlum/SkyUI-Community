@@ -25,7 +25,7 @@
         "fadermenu.swf":           {"convert": true},
         "favoritesmenu.swf":       {"convert": true},
         "giftmenu.swf":            {"convert": true},
-        "hudmenu.swf":             {"convert": true},
+        "hudmenu.swf":             {"convert": true, "keep_shallow": ["387"], "reason": "sprite 387 (Compass Marker, 152 frames) is an icon atlas addressed by frame number; Map Marker Framework, DbSkseFunctions, ShowUnlooted and SkyBuild read and extend its raw frame layout from native code, so its own timeline stays unstretched"},
         "inventorymenu.swf":       {"convert": true},
         "levelupmenu.swf":         {"convert": true},
         "loadingmenu.swf":         {"convert": true},

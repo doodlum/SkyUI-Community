@@ -112,7 +112,11 @@ class skyui.util.FpsScale
       {
          // Going to the original frame the clip is already on keeps the exact stretched position, so idioms like
          // mc.gotoAndPlay(mc._currentframe) called every frame still let the clip advance.
-         args[0] = a_frame == cur ? a_mc._currentframe : skyui.util.FpsScale.toStretched(a_frame,k);
+         // Code outside the patched SWFs (SKSE plugins, other mods' SWFs) reads the raw stretched frame and resumes
+         // from it, e.g. Health.PlayForward(Health._currentframe) -> gotoAndPlay(raw): that raw number is the clip's
+         // own current frame, so it is kept as is rather than scaled a second time.
+         var raw = a_mc._currentframe;
+         args[0] = a_frame == cur || (lname == "gotoandplay" && a_frame == raw) ? raw : skyui.util.FpsScale.toStretched(a_frame,k);
       }
       return a_mc[a_name].apply(a_mc,args);
    }

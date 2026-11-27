@@ -105,6 +105,11 @@ Which SWFs are converted is listed in `tools/fps_patch_plan.json`.
   unstretched; `FPS_PATCH_COMPAT` (default `morehud_inventory`) selects profiles from the plan's `"compat"`
   section. `morehud_inventory` keeps the item card's own 221-frame timeline for moreHUD Inventory Edition (only
   relevant when the cap stretches the item menus, i.e. 120 or more). Set `-DFPS_PATCH_COMPAT=` for none.
+- Always kept for native HUD mods: the HUD's "Compass Marker" icon atlas keeps its original frame layout (Map
+  Marker Framework, DbSkseFunctions, ShowUnlooted and SkyBuild read and extend it from SKSE), and
+  `gotoAndPlay(n)` with the clip's raw current frame resumes from that frame (SKSE code such as Blood Magic's
+  `Health.PlayForward(Health._currentFrame)`). Known limitation: SkyUI-Navbar's stats-menu intro skip checks
+  `_totalframes == 31` and switches itself off on a patched statsmenu.swf.
 - Verify a patched build with `cmake --build --preset debug --target check_fps_patch` (or
   `python tools/check_fps_patch.py --build build/debug --ffdec <path to ffdec-cli> --fps 90 --compat morehud_inventory`,
   matching the build's options). It proves for every SWF that each timeline keeps its duration in seconds and
