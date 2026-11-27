@@ -30,7 +30,7 @@
         "loadwaitspinner.swf":     {"convert": true},
         "lockpickingmenu.swf":     {"convert": true},
         "magicmenu.swf":           {"convert": true},
-        "map.swf":                 {"convert": false, "exclude": true, "reason": "patched map.swf crashed the game to desktop whenever the Map opened (in-game test, 3/3); the unpatched build works. The engine drives the world/local map natively and the trigger is not isolated yet, so map.swf is built exactly as with the patch off (no stretch, no rewrite, no marker)"},
+        "map.swf":                 {"convert": true},
         "messagebox.swf":          {"convert": true},
         "quest_journal.swf":       {"convert": true},
         "racesex_menu.swf":        {"convert": true},

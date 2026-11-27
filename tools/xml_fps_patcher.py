@@ -1,7 +1,8 @@
 """FPS patch for SkyUI SWFs (FFDec XML export of the FINAL, script-injected SWF).
 
 For every SWF listed as "convert" in tools/fps_patch_plan.json the frame rate is raised to --fps (an integer
-multiple k of the original rate) and EVERY timeline - the main timeline and every DefineSprite - is stretched
+multiple k of the original rate) and every timeline with more than one frame - the main timeline and every
+DefineSprite (one-frame timelines are left alone: stretched they would loop) - is stretched
 by k, so animations keep their length in seconds:
 
   * original frame f becomes frames (f-1)*k+1 .. f*k; its tags (frame scripts, labels, placements, ...) stay
@@ -496,6 +497,13 @@ def patch(tree, swf_key, entry, plan, target_fps):
             raise PatchError("%s: %g fps is not an integer multiple of %g fps" % (swf_key, target_fps, orig_fps))
     stats = {"prop": 0, "go": 0, "gotoframe": 0, "throttle": 0, "enterframe_free": 0, "clip_guard": 0,
              "timelines": 0, "kept_timelines": 0, "interp_tags": 0}
+    # Timelines with one frame (or none) have no duration to keep and are never stretched: Flash plays a
+    # one-frame timeline once and stops, while k frames without stop() would loop and re-run frame 1's
+    # scripts every k frames (that re-initialised the Map and Journal menus and crashed the game).
+    # FpsScale needs no marker for them: frame 1 of 1 maps to itself for any k.
+    single = {tl.id for tl in sx.timelines(tree) if tl.frame_count <= 1 or
+              sum(1 for el in tl.container if sx.tag_type(el) == "ShowFrameTag") <= 1}
+    stats["single_frame"] = 0
     listed = list(plan.get("keep_timelines", {}).get(swf_key, {}).keys())
     kept = kept_closure(tree, listed)
     missing = [i for i in listed if i not in kept]
@@ -527,7 +535,7 @@ def patch(tree, swf_key, entry, plan, target_fps):
             continue
         guard_n += 1
         # GotoFrame acts on the timeline the script sits on; unstretched timelines keep their numbers
-        k_own = 1 if blob.timeline in kept else k
+        k_own = 1 if (blob.timeline in kept or blob.timeline in single) else k
         rewrite_blob(blob, k_own, free_running, override_ok, stats, "__fpsTickCE%d" % guard_n)
 
     if convert and k > 1:
@@ -539,6 +547,9 @@ def patch(tree, swf_key, entry, plan, target_fps):
         for tl in sx.timelines(tree):
             if tl.id in kept:
                 stats["kept_timelines"] += 1
+                continue
+            if tl.id in single:
+                stats["single_frame"] += 1
                 continue
             stretch_timeline(tl, k, show_proto, stats)
         swf.set("frameRate", "%.1f" % (orig_fps * k))

@@ -6,7 +6,8 @@ XML with FFDec, and fails loudly unless:
 
   timing   - the frame rate is target_fps for converted SWFs (an integer multiple k of the original) and
              unchanged otherwise;
-           - every timeline (main timeline and every DefineSprite) has exactly k times as many frames, so its
+           - every timeline (main timeline and every DefineSprite) with more than one frame has exactly k times
+             as many frames (one-frame timelines must stay unchanged: stretched they would loop), so its
              duration in seconds (frames / fps) is unchanged;
            - original frame f's tags (placements, labels, scripts, sounds, definitions) all sit, in the same
              order and otherwise unchanged, on stretched frame (f-1)*k+1, so every frame label and frame script
@@ -239,7 +240,7 @@ def check_swf(key, entry, plan, before_xml, after_xml, notes):
     if kept and one_id is None:
         err("the 1-frame %s marker for unstretched timelines is missing" % MARKER)
 
-    stats = {"timelines": 0, "animated": 0, "labels": 0, "scripts": 0, "interp_moves": 0, "kept": len(kept),
+    stats = {"timelines": 0, "animated": 0, "labels": 0, "scripts": 0, "interp_moves": 0, "kept": len(kept), "single": 0,
              "dur_min": None, "dur_max": None, "prop": 0, "go": 0, "throttle": 0, "gotoframe": 0, "guard": 0}
     exports_b = sx.export_names(tb)
 
@@ -248,7 +249,11 @@ def check_swf(key, entry, plan, before_xml, after_xml, notes):
             continue
         tl_a = tls_a[tid]
         name = "main timeline" if tid == sx.ROOT else "sprite %s%s" % (tid, " (%s)" % exports_b[tid] if tid in exports_b else "")
-        kt = 1 if tid in kept else k
+        # one-frame timelines must stay one frame: stretched they would loop and re-run frame 1's scripts
+        single = tl_b.frame_count <= 1 or sum(1 for e in tl_b.container if sx.tag_type(e) == "ShowFrameTag") <= 1
+        if single:
+            stats["single"] += 1
+        kt = 1 if (tid in kept or single) else k
         nb, na = tl_b.frame_count, tl_a.frame_count
         stats["timelines"] += 1
         if na != nb * kt:
@@ -257,7 +262,7 @@ def check_swf(key, entry, plan, before_xml, after_xml, notes):
         if tid in kept:
             if nb > 1:
                 notes.append("%s: %s left unstretched (%d frames, engine-driven): plays %dx faster if played" % (key, name, nb, k))
-        elif abs(dur_b - dur_a) > 1e-9:
+        elif not single and abs(dur_b - dur_a) > 1e-9:
             err("%s: duration %.6fs -> %.6fs" % (name, dur_b, dur_a))
         if nb > 1 and tid not in kept:
             stats["animated"] += 1
@@ -491,9 +496,9 @@ def main():
         k = st and int(round(float(plan["target_fps"]) / fb)) if entry.get("convert") else 1
         dur = ("%.2fs..%.2fs" % (st["dur_min"], st["dur_max"])) if st.get("dur_min") is not None else "-"
         mode = "%g -> %g fps (x%d)" % (fb, fb * k, k) if entry.get("convert") else "kept at %g fps (%s)" % (fb, entry.get("reason", ""))
-        print("OK   %-42s %s; %d timelines (%d animated, %s, all durations equal; %d unstretched), %d labels, %d scripts; "
+        print("OK   %-42s %s; %d timelines (%d animated, %s, all durations equal; %d engine-driven + %d single-frame unstretched), %d labels, %d scripts; "
               "rescaled: %d prop, %d goto, %d GotoFrame, %d+%d onEnterFrame throttled; %d interpolated moves"
-              % (s, mode, st["timelines"], st["animated"], dur, st["kept"], st["labels"], st["scripts"], st["prop"], st["go"],
+              % (s, mode, st["timelines"], st["animated"], dur, st["kept"], st["single"], st["labels"], st["scripts"], st["prop"], st["go"],
                  st["gotoframe"], st["throttle"], st["guard"], st["interp_moves"]))
     if notes:
         print("\nNotes (throttled per-frame handlers run once per original frame):")
