@@ -64,50 +64,21 @@ class Shared.CenteredList extends MovieClip
    }
    function onMouseWheel(delta)
    {
-      var _loc2_ = Mouse.getTopMostEntity();
-      while(_loc2_ && _loc2_ != undefined && gfx.managers.FocusHandler.instance.getFocus(0) == this)
+      if (this.hitTest(_root._xmouse, _root._ymouse, true))
       {
-         if(_loc2_ == this)
-         {
-            if(delta < 0)
-            {
-               this.moveListUp();
-            }
-            else if(delta > 0)
-            {
-               this.moveListDown();
-            }
-         }
-         _loc2_ = _loc2_._parent;
+         if (delta < 0)      this.moveListUp();
+         else if (delta > 0) this.moveListDown();
       }
    }
    function onPress(aiMouseIndex, aiKeyboardOrMouse)
    {
-      var _loc2_ = Mouse.getTopMostEntity();
-      while(_loc2_ && _loc2_ != undefined)
-      {
-         if(_loc2_ == this.SelectedEntry)
-         {
-            this.dispatchEvent({type:"itemPress",index:this.iSelectedIndex,entry:this.EntriesA[this.iSelectedIndex],keyboardOrMouse:aiKeyboardOrMouse});
-         }
-         _loc2_ = _loc2_._parent;
-      }
+      if (this.SelectedEntry.hitTest(_root._xmouse, _root._ymouse, true))
+         this.dispatchEvent({type:"itemPress", index:this.iSelectedIndex, entry:this.EntriesA[this.iSelectedIndex], keyboardOrMouse:aiKeyboardOrMouse});
    }
    function onPressAux(aiMouseIndex, aiKeyboardOrMouse, aiButtonIndex)
    {
-      var _loc2_;
-      if(aiButtonIndex == 1)
-      {
-         _loc2_ = Mouse.getTopMostEntity();
-         while(_loc2_ && _loc2_ != undefined)
-         {
-            if(_loc2_ == this.SelectedEntry)
-            {
-               this.dispatchEvent({type:"itemPressAux",index:this.iSelectedIndex,entry:this.EntriesA[this.iSelectedIndex],keyboardOrMouse:aiKeyboardOrMouse});
-            }
-            _loc2_ = _loc2_._parent;
-         }
-      }
+      if (this.SelectedEntry.hitTest(_root._xmouse, _root._ymouse, true) && aiButtonIndex == 1)
+         this.dispatchEvent({type:"itemPressAux", index:this.iSelectedIndex, entry:this.EntriesA[this.iSelectedIndex], keyboardOrMouse:aiKeyboardOrMouse});
    }
    function get selectedTextString()
    {

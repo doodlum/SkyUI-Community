@@ -1,7 +1,7 @@
 class ObjectiveScrollingList extends Shared.BSScrollingList
 {
    var SetEntryText;
-   var __get__selectedEntry;
+   var selectedEntry;
    function ObjectiveScrollingList()
    {
       super();
@@ -9,11 +9,7 @@ class ObjectiveScrollingList extends Shared.BSScrollingList
    function SetEntry(aEntryClip, aEntryObject)
    {
       var _loc2_;
-      if(aEntryObject.text == undefined)
-      {
-         aEntryClip.gotoAndStop("None");
-      }
-      else
+      if(aEntryObject.text != undefined)
       {
          _loc2_ = "";
          if(aEntryObject.active)
@@ -37,6 +33,10 @@ class ObjectiveScrollingList extends Shared.BSScrollingList
             _loc2_ += "Selected";
          }
          aEntryClip.gotoAndStop(_loc2_);
+      }
+      else
+      {
+         aEntryClip.gotoAndStop("None");
       }
       this.SetEntryText(aEntryClip,aEntryObject);
    }

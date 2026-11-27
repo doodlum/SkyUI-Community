@@ -2,7 +2,7 @@ class Map.MapMarker extends gfx.controls.Button
 {
    var HitArea;
    var IconClip;
-   var __set__disableFocus;
+   var disableFocus;
    var _markerSize;
    var _parent;
    var _visible;

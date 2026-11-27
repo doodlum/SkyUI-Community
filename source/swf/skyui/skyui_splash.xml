@@ -1322,7 +1322,7 @@ Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMi
         <item type="ShowFrameTag" forceWriteAsLong="false"/>
       </subTags>
     </item>
-    <item type="ImportAssets2Tag" downloadNow="1" forceWriteAsLong="true" hasDigest="0" url="gfxfontlib.swf">
+    <item type="ImportAssets2Tag" downloadNow="1" forceWriteAsLong="true" hasDigest="0" url="../gfxfontlib.swf">
       <tags>
         <item>21</item>
       </tags>

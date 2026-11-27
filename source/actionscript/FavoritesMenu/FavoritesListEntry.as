@@ -27,10 +27,12 @@ class FavoritesListEntry extends skyui.components.list.BasicListEntry
    }
    function fixIconPos()
    {
-      var _loc1_ = this.itemIcon.transform;
-      var _loc2_ = _loc1_.matrix;
-      _loc2_.translate(-64 * _loc2_.a,-64 * _loc2_.d);
-      _loc1_.matrix = _loc2_;
+      if (skse.plugins.InventoryInjector == undefined){
+         var _loc1_ = this.itemIcon.transform;
+         var _loc2_ = _loc1_.matrix;
+         _loc2_.translate(-64 * _loc2_.a,-64 * _loc2_.d);
+         _loc1_.matrix = _loc2_;
+      }
    }
    function setEntry(a_entryObject, a_state)
    {

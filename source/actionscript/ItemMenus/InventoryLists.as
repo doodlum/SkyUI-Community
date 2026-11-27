@@ -1,6 +1,7 @@
 class InventoryLists extends MovieClip
 {
    var _columnSelectDialog;
+   var _columnSelectDialogX;
    var _columnSelectInterval;
    var _currCategoryIndex;
    var _currentState;
@@ -19,10 +20,6 @@ class InventoryLists extends MovieClip
    var panelContainer;
    var searchWidget;
    var tabBar;
-   static var SKYUI_RELEASE_IDX = 2018;
-   static var SKYUI_VERSION_MAJOR = 5;
-   static var SKYUI_VERSION_MINOR = 2;
-   static var SKYUI_VERSION_STRING = InventoryLists.SKYUI_VERSION_MAJOR + "." + InventoryLists.SKYUI_VERSION_MINOR + " SE";
    static var HIDE_PANEL = 0;
    static var SHOW_PANEL = 1;
    static var TRANSITIONING_TO_HIDE_PANEL = 2;
@@ -261,23 +258,24 @@ class InventoryLists extends MovieClip
          _loc3_ = _loc3_ + 1;
       }
       this.itemList.InvalidateData();
-      _loc3_ = 0;
-      var _loc2_;
-      while(_loc3_ < this.itemList.entryList.length)
+      // Enable every category that at least one item belongs to. OR-ing all item flags first and testing each
+      // category against the union is equivalent to testing every item against every category, but O(n + c)
+      // instead of O(n * c) - with thousands of items (large containers) the nested loop alone took ~125 ms.
+      var itemEntries = this.itemList.entryList;
+      var catEntries = this.categoryList.entryList;
+      var itemFlags = 0;
+      var itemCount = itemEntries.length;
+      for(var i = 0; i < itemCount; i++)
       {
-         _loc2_ = 0;
-         while(_loc2_ < this.categoryList.entryList.length)
+         itemFlags |= itemEntries[i].filterFlag;
+      }
+      var catCount = catEntries.length;
+      for(var c = 0; c < catCount; c++)
+      {
+         if(catEntries[c].filterFlag == 0 && (itemFlags & catEntries[c].flag))
          {
-            if(this.categoryList.entryList[_loc2_].filterFlag == 0)
-            {
-               if(this.itemList.entryList[_loc3_].filterFlag & this.categoryList.entryList[_loc2_].flag)
-               {
-                  this.categoryList.entryList[_loc2_].filterFlag = 1;
-               }
-            }
-            _loc2_ = _loc2_ + 1;
+            catEntries[c].filterFlag = 1;
          }
-         _loc3_ = _loc3_ + 1;
       }
       this.categoryList.UpdateList();
       if(_loc4_ != this.categoryList.selectedEntry.flag)
@@ -341,7 +339,7 @@ class InventoryLists extends MovieClip
       this.categoryList.disableSelection = this.categoryList.disableInput = true;
       this.itemList.disableSelection = this.itemList.disableInput = true;
       this.searchWidget.isDisabled = true;
-      this._columnSelectDialog = skyui.util.DialogManager.open(this.panelContainer,"ColumnSelectDialog",{_x:554,_y:35,layout:this.itemList.layout});
+      this._columnSelectDialog = skyui.util.DialogManager.open(this.panelContainer,"ColumnSelectDialog",{_x:this._columnSelectDialogX != undefined ? this._columnSelectDialogX : 554,_y:35,layout:this.itemList.layout});
       this._columnSelectDialog.addEventListener("dialogClosed",this,"onColumnSelectDialogClosed");
    }
    function onColumnSelectDialogClosed(event)
@@ -413,5 +411,31 @@ class InventoryLists extends MovieClip
       this.categoryList.disableSelection = this.categoryList.disableInput = false;
       this.itemList.disableSelection = this.itemList.disableInput = false;
       this._nameFilter.filterText = event.data;
+   }
+
+
+   function applyDynamicWidth(a_newWidth: Number)
+   {
+      var defaultWidth = 530;
+      var delta = a_newWidth - defaultWidth;
+
+      this.panelContainer.ListBackground._width += delta;
+      this.itemList.header.seperator._width += delta;
+      this.categoryList.background._width += delta;
+
+      var tab = this.panelContainer.tabBar;
+      var halfDelta = delta / 2;
+
+      tab.image._width += delta;
+      tab.rightIcon._x += delta;
+      tab.rightLabel._x += delta;
+      tab.leftButton._width += halfDelta;
+      tab.rightButton._x += halfDelta;
+      tab.rightButton._width += halfDelta;
+
+      this.itemList.scrollbar._x += delta;
+      this.searchWidget._x += delta;
+      this.columnSelectButton._x += delta;
+      this._columnSelectDialogX = 554 + delta;
    }
 }

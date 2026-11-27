@@ -13,8 +13,10 @@ class StatsList extends Shared.BSScrollingList
       if(aEntryObject.text != undefined)
       {
          aEntryClip.valueText.SetText(aEntryObject.value.toString());
-         return undefined;
       }
-      aEntryClip.valueText.SetText(" ");
+      else
+      {
+         aEntryClip.valueText.SetText(" ");
+      }
    }
 }

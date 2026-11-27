@@ -115,7 +115,7 @@ class CraftingIconSetter implements skyui.components.list.IListProcessor
    }
    function processLightArmorIcon(a_entryObject)
    {
-      a_entryObject.iconColor = 7692288;
+      a_entryObject.iconColor = 0x6B4D16;
       switch(a_entryObject.subType)
       {
          case skyui.defines.Armor.EQUIP_HEAD:

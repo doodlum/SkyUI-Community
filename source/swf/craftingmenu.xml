@@ -3407,15 +3407,26 @@ Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMi
     </item>
     <item type="DefineSpriteTag" forceWriteAsLong="true" frameCount="1" hasEndTag="true" spriteId="104">
       <subTags>
-        <item type="PlaceObject3Tag" bitmapCache="0" blendMode="0" characterId="101" clipDepth="0" depth="1" forceWriteAsLong="true" name="sortIcon" placeFlagHasBlendMode="false" placeFlagHasCacheAsBitmap="false" placeFlagHasCharacter="true" placeFlagHasClassName="false" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="false" placeFlagHasFilterList="true" placeFlagHasImage="false" placeFlagHasMatrix="true" placeFlagHasName="true" placeFlagHasRatio="false" placeFlagHasVisible="false" placeFlagMove="false" placeFlagOpaqueBackground="false" ratio="0" reserved="false" visible="0">
+        <item type="PlaceObject3Tag" bitmapCache="0" blendMode="0" characterId="116" className="" clipDepth="0" depth="1" forceWriteAsLong="true" name="seperator" placeFlagHasBlendMode="false" placeFlagHasCacheAsBitmap="false" placeFlagHasCharacter="true" placeFlagHasClassName="false" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="true" placeFlagHasFilterList="true" placeFlagHasImage="false" placeFlagHasMatrix="true" placeFlagHasName="true" placeFlagHasRatio="false" placeFlagHasVisible="false" placeFlagMove="false" placeFlagOpaqueBackground="false" ratio="0" reserved="false" visible="0">
+          <matrix type="MATRIX" hasRotate="false" hasScale="true" nRotateBits="0" nScaleBits="18" nTranslateBits="8" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.6875" scaleY="1.0" translateX="-80" translateY="0"/>
+          <colorTransform type="CXFORMWITHALPHA" alphaAddTerm="0" alphaMultTerm="77" blueAddTerm="0" blueMultTerm="256" greenAddTerm="0" greenMultTerm="256" hasAddTerms="false" hasMultTerms="true" nbits="10" redAddTerm="0" redMultTerm="256"/>
+          <surfaceFilterList>
+            <item type="DROPSHADOWFILTER" angle="0.7853851318359375" blurX="2.0" blurY="2.0" compositeSource="true" distance="2.0" id="0" innerShadow="false" knockout="false" passes="1" strength="1.0">
+              <dropShadowColor type="RGBA" alpha="255" blue="0" green="0" red="0"/>
+            </item>
+          </surfaceFilterList>
+          <backgroundColor type="RGBA" alpha="0" blue="0" green="0" red="0"/>
+        </item>
+        <item type="PlaceObject3Tag" bitmapCache="0" blendMode="0" characterId="101" className="" clipDepth="0" depth="3" forceWriteAsLong="true" name="sortIcon" placeFlagHasBlendMode="false" placeFlagHasCacheAsBitmap="false" placeFlagHasCharacter="true" placeFlagHasClassName="false" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="false" placeFlagHasFilterList="true" placeFlagHasImage="false" placeFlagHasMatrix="true" placeFlagHasName="true" placeFlagHasRatio="false" placeFlagHasVisible="false" placeFlagMove="false" placeFlagOpaqueBackground="false" ratio="0" reserved="false" visible="0">
           <matrix type="MATRIX" hasRotate="false" hasScale="false" nRotateBits="0" nScaleBits="0" nTranslateBits="12" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.0" scaleY="0.0" translateX="1197" translateY="-128"/>
           <surfaceFilterList>
             <item type="DROPSHADOWFILTER" angle="0.7853851318359375" blurX="1.0" blurY="1.0" compositeSource="true" distance="2.0" id="0" innerShadow="false" knockout="false" passes="1" strength="1.0">
               <dropShadowColor type="RGBA" alpha="255" blue="0" green="0" red="0"/>
             </item>
           </surfaceFilterList>
+          <backgroundColor type="RGBA" alpha="0" blue="0" green="0" red="0"/>
         </item>
-        <item type="PlaceObject2Tag" characterId="103" clipDepth="0" depth="3" forceWriteAsLong="true" name="iconColumnIndicator" placeFlagHasCharacter="true" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="false" placeFlagHasMatrix="true" placeFlagHasName="true" placeFlagHasRatio="false" placeFlagMove="false" ratio="0">
+        <item type="PlaceObject2Tag" characterId="103" clipDepth="0" depth="5" forceWriteAsLong="true" name="iconColumnIndicator" placeFlagHasCharacter="true" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="false" placeFlagHasMatrix="true" placeFlagHasName="true" placeFlagHasRatio="false" placeFlagMove="false" ratio="0">
           <matrix type="MATRIX" hasRotate="false" hasScale="true" nRotateBits="0" nScaleBits="18" nTranslateBits="10" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="1.199997" scaleY="1.199997" translateX="140" translateY="-300"/>
         </item>
         <item type="ShowFrameTag" forceWriteAsLong="false"/>
@@ -3894,7 +3905,7 @@ Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMi
     </item>
     <item type="DefineSpriteTag" forceWriteAsLong="true" frameCount="1" hasEndTag="true" spriteId="116">
       <subTags>
-        <item type="PlaceObject2Tag" characterId="115" clipDepth="0" depth="1" forceWriteAsLong="false" placeFlagHasCharacter="true" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="false" placeFlagHasMatrix="true" placeFlagHasName="false" placeFlagHasRatio="false" placeFlagMove="false" ratio="0">
+        <item type="PlaceObject2Tag" characterId="115" clipDepth="0" depth="1" forceWriteAsLong="false" name="seperator" placeFlagHasCharacter="true" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="false" placeFlagHasMatrix="true" placeFlagHasName="false" placeFlagHasRatio="false" placeFlagMove="false" ratio="0">
           <matrix type="MATRIX" hasRotate="false" hasScale="false" nRotateBits="0" nScaleBits="0" nTranslateBits="0" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.0" scaleY="0.0" translateX="0" translateY="0"/>
         </item>
         <item type="ShowFrameTag" forceWriteAsLong="false"/>
@@ -3951,15 +3962,6 @@ Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMi
         </item>
         <item type="PlaceObject2Tag" characterId="104" clipDepth="0" depth="11" forceWriteAsLong="true" name="header" placeFlagHasCharacter="true" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="false" placeFlagHasMatrix="true" placeFlagHasName="true" placeFlagHasRatio="false" placeFlagMove="false" ratio="0">
           <matrix type="MATRIX" hasRotate="false" hasScale="false" nRotateBits="0" nScaleBits="0" nTranslateBits="0" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.0" scaleY="0.0" translateX="0" translateY="0"/>
-        </item>
-        <item type="PlaceObject3Tag" bitmapCache="0" blendMode="0" characterId="116" clipDepth="0" depth="15" forceWriteAsLong="true" name="background" placeFlagHasBlendMode="false" placeFlagHasCacheAsBitmap="false" placeFlagHasCharacter="true" placeFlagHasClassName="false" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="true" placeFlagHasFilterList="true" placeFlagHasImage="false" placeFlagHasMatrix="true" placeFlagHasName="true" placeFlagHasRatio="false" placeFlagHasVisible="false" placeFlagMove="false" placeFlagOpaqueBackground="false" ratio="0" reserved="false" visible="0">
-          <matrix type="MATRIX" hasRotate="false" hasScale="true" nRotateBits="0" nScaleBits="18" nTranslateBits="8" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.6875" scaleY="1.0" translateX="-80" translateY="0"/>
-          <colorTransform type="CXFORMWITHALPHA" alphaAddTerm="0" alphaMultTerm="77" blueAddTerm="0" blueMultTerm="256" greenAddTerm="0" greenMultTerm="256" hasAddTerms="false" hasMultTerms="true" nbits="10" redAddTerm="0" redMultTerm="256"/>
-          <surfaceFilterList>
-            <item type="DROPSHADOWFILTER" angle="0.7853851318359375" blurX="2.0" blurY="2.0" compositeSource="true" distance="2.0" id="0" innerShadow="false" knockout="false" passes="1" strength="1.0">
-              <dropShadowColor type="RGBA" alpha="255" blue="0" green="0" red="0"/>
-            </item>
-          </surfaceFilterList>
         </item>
         <item type="PlaceObject2Tag" characterId="98" clipDepth="0" depth="19" forceWriteAsLong="true" name="anchorEntriesBegin" placeFlagHasCharacter="true" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="false" placeFlagHasMatrix="true" placeFlagHasName="true" placeFlagHasRatio="false" placeFlagMove="false" ratio="0">
           <matrix type="MATRIX" hasRotate="false" hasScale="false" nRotateBits="0" nScaleBits="0" nTranslateBits="0" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.0" scaleY="0.0" translateX="0" translateY="0"/>

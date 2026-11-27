@@ -6,7 +6,7 @@ class FilteredList extends Shared.CenteredList
    var RepositionEntries;
    var SelectedEntry;
    var TopHalf;
-   var __get__selectedIndex;
+   var selectedIndex;
    var bMultilineList;
    var bToFitList;
    var dispatchEvent;

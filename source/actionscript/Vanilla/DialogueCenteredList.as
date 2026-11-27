@@ -92,26 +92,22 @@ class DialogueCenteredList extends Shared.CenteredScrollingList
 
       if(!this.bPointerHighlight && !this.bRecenterSelection)
       {
-         var _loc3_ = Mouse.getTopMostEntity();
-         while(_loc3_ != undefined)
-         {
-            if(_loc3_._parent == this && _loc3_._visible && _loc3_.itemIndex != undefined)
-            {
-               if (_loc3_.itemIndex != this.iSelectedIndex) {
-                  this.doSetSelectedIndex(_loc3_.itemIndex, 0);
-               }
+         for (var i = 0; i < this.iMaxItemsShown; i++) {
+            var clip = this.GetClipByIndex(i);
+            if (clip && clip._visible && clip.itemIndex != undefined && clip.hitTest(_root._xmouse, _root._ymouse, true) && clip.itemIndex != this.iSelectedIndex) {
+               this.doSetSelectedIndex(clip.itemIndex, 0);
                break;
             }
-            _loc3_ = _loc3_._parent;
          }
       }
-
+      
       this.bRecenterSelection = false;
       this.RepositionEntries();
 
       var _locIndicatorLimit = 3;
       this._parent.ScrollIndicators.Up._visible = this.scrollPosition > this.iNumTopHalfEntries;
       this._parent.ScrollIndicators.Down._visible = this.EntriesA.length - this.scrollPosition - 1 > _locIndicatorLimit || _loc6_ > this.fListHeight;
+
    }
 
    function RepositionEntries()

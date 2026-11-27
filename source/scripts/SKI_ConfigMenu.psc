@@ -34,7 +34,9 @@ int			_equipModeKey				= 42
 
 ; Internal
 float		_itemXBase
+float		_itemYBase
 float		_itemXBaseW
+float		_itemYBaseW
 
 
 ; -- Version 2 --
@@ -444,16 +446,6 @@ event OnPageReset(string a_page)
 		AddSliderOptionST("ITEMCARD_YOFFSET", "$Vertical Offset", _itemcardYOffset)
 
 		AddEmptyOption()
-
-		AddHeaderOption("$SWF Version Checking")
-		AddToggleOptionST("CHECK_MAP_MENU", "Map Menu", SKI_MainInstance.MapMenuCheckEnabled)
-		AddToggleOptionST("CHECK_FAVORITES_MENU", "Favorites Menu", SKI_MainInstance.FavoritesMenuCheckEnabled)
-		AddToggleOptionST("CHECK_INVENTORY_MENU", "Inventory Menu", SKI_MainInstance.InventoryMenuCheckEnabled)
-		AddToggleOptionST("CHECK_MAGIC_MENU", "Magic Menu", SKI_MainInstance.MagicMenuCheckEnabled)
-		AddToggleOptionST("CHECK_BARTER_MENU", "Barter Menu", SKI_MainInstance.BarterMenuCheckEnabled)
-		AddToggleOptionST("CHECK_CONTAINER_MENU", "Container Menu", SKI_MainInstance.ContainerMenuCheckEnabled)
-		AddToggleOptionST("CHECK_CRAFTING_MENU", "Crafting Menu", SKI_MainInstance.CraftingMenuCheckEnabled)
-		AddToggleOptionST("CHECK_GIFT_MENU", "Gift Menu", SKI_MainInstance.GiftMenuCheckEnabled)
 
 	endIf
 endEvent
@@ -1530,159 +1522,6 @@ endState
 
 ; -------------------------------------------------------
 
-state CHECK_INVENTORY_MENU ; TOGGLE
-
-	event OnSelectST()
-		bool newVal = !SKI_MainInstance.InventoryMenuCheckEnabled
-		SKI_MainInstance.InventoryMenuCheckEnabled = newVal
-		SetToggleOptionValueST(newVal)
-	endEvent
-
-	event OnDefaultST()
-		SKI_MainInstance.InventoryMenuCheckEnabled = true
-		SetToggleOptionValueST(true)
-	endEvent
-
-	event OnHighlightST()
-		SetInfoText("$SKI_INFO3{$On}")
-	endEvent
-
-endState
-
-state CHECK_MAGIC_MENU ; TOGGLE
-
-	event OnSelectST()
-		bool newVal = !SKI_MainInstance.MagicMenuCheckEnabled
-		SKI_MainInstance.MagicMenuCheckEnabled = newVal
-		SetToggleOptionValueST(newVal)
-	endEvent
-
-	event OnDefaultST()
-		SKI_MainInstance.MagicMenuCheckEnabled = true
-		SetToggleOptionValueST(true)
-	endEvent
-
-	event OnHighlightST()
-		SetInfoText("$SKI_INFO3{$On}")
-	endEvent
-
-endState
-
-state CHECK_BARTER_MENU ; TOGGLE
-
-	event OnSelectST()
-		bool newVal = !SKI_MainInstance.BarterMenuCheckEnabled
-		SKI_MainInstance.BarterMenuCheckEnabled = newVal
-		SetToggleOptionValueST(newVal)
-	endEvent
-
-	event OnDefaultST()
-		SKI_MainInstance.BarterMenuCheckEnabled = true
-		SetToggleOptionValueST(true)
-	endEvent
-
-	event OnHighlightST()
-		SetInfoText("$SKI_INFO3{$On}")
-	endEvent
-
-endState
-
-state CHECK_CONTAINER_MENU ; TOGGLE
-
-	event OnSelectST()
-		bool newVal = !SKI_MainInstance.ContainerMenuCheckEnabled
-		SKI_MainInstance.ContainerMenuCheckEnabled = newVal
-		SetToggleOptionValueST(newVal)
-	endEvent
-
-	event OnDefaultST()
-		SKI_MainInstance.ContainerMenuCheckEnabled = true
-		SetToggleOptionValueST(true)
-	endEvent
-
-	event OnHighlightST()
-		SetInfoText("$SKI_INFO3{$On}")
-	endEvent
-
-endState
-
-state CHECK_GIFT_MENU ; TOGGLE
-
-	event OnSelectST()
-		bool newVal = !SKI_MainInstance.GiftMenuCheckEnabled
-		SKI_MainInstance.GiftMenuCheckEnabled = newVal
-		SetToggleOptionValueST(newVal)
-	endEvent
-
-	event OnDefaultST()
-		SKI_MainInstance.GiftMenuCheckEnabled = true
-		SetToggleOptionValueST(true)
-	endEvent
-
-	event OnHighlightST()
-		SetInfoText("$SKI_INFO3{$On}")
-	endEvent
-
-endState
-
-state CHECK_MAP_MENU ; TOGGLE
-
-	event OnSelectST()
-		bool newVal = !SKI_MainInstance.MapMenuCheckEnabled
-		SKI_MainInstance.MapMenuCheckEnabled = newVal
-		SetToggleOptionValueST(newVal)
-	endEvent
-
-	event OnDefaultST()
-		SKI_MainInstance.MapMenuCheckEnabled = true
-		SetToggleOptionValueST(true)
-	endEvent
-
-	event OnHighlightST()
-		SetInfoText("$SKI_INFO3{$On}")
-	endEvent
-
-endState
-
-state CHECK_FAVORITES_MENU ; TOGGLE
-
-	event OnSelectST()
-		bool newVal = !SKI_MainInstance.FavoritesMenuCheckEnabled
-		SKI_MainInstance.FavoritesMenuCheckEnabled = newVal
-		SetToggleOptionValueST(newVal)
-	endEvent
-
-	event OnDefaultST()
-		SKI_MainInstance.FavoritesMenuCheckEnabled = true
-		SetToggleOptionValueST(true)
-	endEvent
-
-	event OnHighlightST()
-		SetInfoText("$SKI_INFO3{$On}")
-	endEvent
-
-endState
-
-state CHECK_CRAFTING_MENU ; TOGGLE
-
-	event OnSelectST()
-		bool newVal = !SKI_MainInstance.CraftingMenuCheckEnabled
-		SKI_MainInstance.CraftingMenuCheckEnabled = newVal
-		SetToggleOptionValueST(newVal)
-	endEvent
-
-	event OnDefaultST()
-		SKI_MainInstance.CraftingMenuCheckEnabled = true
-		SetToggleOptionValueST(true)
-	endEvent
-
-	event OnHighlightST()
-		SetInfoText("$SKI_INFO3{$On}")
-	endEvent
-
-endState
-
-
 ; FUNCTIONS ---------------------------------------------------------------------------------------
 
 ; @interface
@@ -1715,9 +1554,11 @@ function ApplySettings()
 	_fInventory3DItemPosScale		= Utility.GetINIFloat("fInventory3DItemPosScale:Interface")
 	_fMagic3DItemPosScale			= Utility.GetINIFloat("fMagic3DItemPosScale:Interface")
 
-	float fStageCenter       = 640.0 ; Stage Center (1280 / 2)
-	float fStageUnitsPerUnit = 8.0   ; 1 unit 3DItemPosX = 8px in 1280x720
-	float fTargetX 					 ; ItemCard Center
+	float fStageCenterX      = 640.0 ; Stage Center X (1280 / 2)
+	float fStageCenterY      = 360.0 ; Stage Center Y (720 / 2)
+	float fStageUnitsPerUnit = 8.0   ; 1 unit 3DItemPos = 8px in 1280x720
+	float fTargetX 					 ; ItemCard Center X
+	float fTargetY 					 ; ItemCard Center Y
 
 	float fWidth  = Utility.GetINIInt("iSize W:Display") as float
 	float fHeight = Utility.GetINIInt("iSize H:Display") as float
@@ -1726,14 +1567,20 @@ function ApplySettings()
 
 	if (fAspect > 3.0)     ; 32:9 (Super Ultrawide)
     	fTargetX = 785.5
+		fTargetY = 300.0
 	elseif (fAspect > 2.0) ; 21:9 (Ultrawide)
 		fTargetX = 858.0
+		fTargetY = 275.0
 	else                   ; 16:9 / 16:10 / 4:3 (Standard)
 		fTargetX = 931.225
+		fTargetY = 250.0
 	endif
 
-	_itemXBaseW = -(fTargetX - fStageCenter) / fStageUnitsPerUnit
+	_itemXBaseW = -(fTargetX - fStageCenterX) / fStageUnitsPerUnit
 	_itemXBase  = _itemXBaseW
+
+	_itemYBaseW = -(fTargetY - fStageCenterY) / fStageUnitsPerUnit
+	_itemYBase  = _itemYBaseW
 
 	Apply3DItemXOffset()
 	Apply3DItemYOffset()
@@ -1794,10 +1641,10 @@ function Apply3DItemYOffset()
 		Utility.SetINIFloat("fMagic3DItemPosZWide:Interface", _fMagic3DItemPosZWide)
 		Utility.SetINIFloat("fMagic3DItemPosZ:Interface", _fMagic3DItemPosZ)
 	else
-		Utility.SetINIFloat("fInventory3DItemPosZWide:Interface", (12 + _3DItemYOffset))
-		Utility.SetINIFloat("fInventory3DItemPosZ:Interface", (16 + _3DItemYOffset))
-		Utility.SetINIFloat("fMagic3DItemPosZWide:Interface", (12 + _3DItemYOffset))
-		Utility.SetINIFloat("fMagic3DItemPosZ:Interface", (16 + _3DItemYOffset))
+		Utility.SetINIFloat("fInventory3DItemPosZWide:Interface", (_itemYBaseW + _3DItemYOffset))
+		Utility.SetINIFloat("fInventory3DItemPosZ:Interface", (_itemYBase + _3DItemYOffset))
+		Utility.SetINIFloat("fMagic3DItemPosZWide:Interface", (_itemYBaseW + _3DItemYOffset))
+		Utility.SetINIFloat("fMagic3DItemPosZ:Interface", (_itemYBase + _3DItemYOffset))
 	endIf
 endFunction
 

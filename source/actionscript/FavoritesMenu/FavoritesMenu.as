@@ -26,10 +26,6 @@ class FavoritesMenu extends MovieClip
    var onInvalidate;
    var rightHandItemId;
    var scrollPosition;
-   static var SKYUI_RELEASE_IDX = 2018;
-   static var SKYUI_VERSION_MAJOR = 5;
-   static var SKYUI_VERSION_MINOR = 2;
-   static var SKYUI_VERSION_STRING = FavoritesMenu.SKYUI_VERSION_MAJOR + "." + FavoritesMenu.SKYUI_VERSION_MINOR + " SE";
    static var ITEM_SELECT = 0;
    static var GROUP_ASSIGN = 1;
    static var GROUP_ASSIGN_SYNC = 2;
@@ -702,22 +698,20 @@ class FavoritesMenu extends MovieClip
    }
    function confirmSelectedEntry()
    {
-      if(this._state != FavoritesMenu.ITEM_SELECT)
-      {
-         return false;
-      }
-      if(this._platform != 0 || !this._useMouseNavigation)
-      {
-         return true;
-      }
-      var _loc2_ = Mouse.getTopMostEntity();
-      while(_loc2_ != undefined)
-      {
-         if(_loc2_.itemIndex == this.itemList.selectedIndex)
-         {
-            return true;
+      if (this._state != FavoritesMenu.ITEM_SELECT) return false;
+      if (this._platform != 0 || !this._useMouseNavigation) return true;
+
+      var list = this.itemList;
+      var selectedIdx = list.selectedIndex;
+
+      if (selectedIdx != -1) {
+         var entry = list.getListEnumEntry(list.getSelectedListEnumIndex());
+         if (entry != undefined && entry.clipIndex != undefined) {
+            var clip = list.getClipByIndex(entry.clipIndex);
+
+            if (clip != undefined && clip._visible && clip.hitTest(_root._xmouse, _root._ymouse, true))
+               return true;
          }
-         _loc2_ = _loc2_._parent;
       }
       return false;
    }

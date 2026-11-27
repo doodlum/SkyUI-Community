@@ -7,11 +7,20 @@ cmake_minimum_required(VERSION 4.2)
 # Reference: https://cmake.org/cmake/help/latest/policy/CMP0175.html
 cmake_policy(SET CMP0175 OLD)
 
+include("${CMAKE_CURRENT_SOURCE_DIR}/Version.cmake")
+
 project(
     SkyUI
-    VERSION 6.0
+    VERSION ${VER_MAJOR}.${VER_MINOR}
     LANGUAGES NONE
 )
+
+set(PROJECT_RELEASE_IDX ${VER_RELEASE_IDX})
+if(VER_SUFFIX)
+    set(PROJECT_VERSION_STRING "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR} ${VER_SUFFIX}")
+else()
+    set(PROJECT_VERSION_STRING "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
+endif()
 
 # ---------------------------------------------------------------------------
 # Options & Core Paths
@@ -22,8 +31,12 @@ option(ENABLE_FPS_PATCH "Enable FPS patching" ON)
 # SkyrimSE_PATH: absolute path to the game directory. 
 # Defaults to the standard Steam library location if not provided.
 if(NOT DEFINED SkyrimSE_PATH OR SkyrimSE_PATH STREQUAL "")
-    set(SkyrimSE_PATH "C:/Program Files (x86)/Steam/steamapps/common/Skyrim Special Edition"
-        CACHE PATH "Path to Skyrim Special Edition installation")
+    if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
+        set(_SKYRIMSE_DEFAULT "$ENV{HOME}/.local/share/Steam/steamapps/common/Skyrim Special Edition")
+    else()
+        set(_SKYRIMSE_DEFAULT "C:/Program Files (x86)/Steam/steamapps/common/Skyrim Special Edition")
+    endif()
+    set(SkyrimSE_PATH "${_SKYRIMSE_DEFAULT}" CACHE PATH "Path to Skyrim Special Edition installation")
 endif()
 
 # Build type setup
@@ -56,6 +69,10 @@ list(APPEND CMAKE_MODULE_PATH
     "${CMAKE_CURRENT_SOURCE_DIR}/cmake"
     "${CMAKE_CURRENT_SOURCE_DIR}/external/BethesdaCMakeModules/Modules"
 )
+
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
+    include(LinuxTools)
+endif()
 
 include(Papyrus)
 include(BSArchive)
@@ -92,9 +109,18 @@ file(GLOB PAPYRUS_SOURCES
 )
 
 if(PAPYRUS_SOURCES)
+    # Papyrus.cmake writes a stamp file to _Papyrus/ but never creates the
+    # directory — ensure it exists before the custom commands run.
+    file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/_Papyrus")
+
+    # Set by LinuxTools.cmake on Linux; falls back to the game dir on other platforms.
+    if(NOT DEFINED _PAPYRUS_GAME_DIR OR _PAPYRUS_GAME_DIR STREQUAL "")
+        set(_PAPYRUS_GAME_DIR "${SkyrimSE_PATH}")
+    endif()
+
     Papyrus_Add(
         "Papyrus"
-        GAME "${SkyrimSE_PATH}"
+        GAME "${_PAPYRUS_GAME_DIR}"
         MODE SkyrimSE
         IMPORTS
             "${CMAKE_CURRENT_SOURCE_DIR}/source/scripts"
@@ -136,7 +162,6 @@ add_custom_target("ActionScript" DEPENDS ${AS_TARGETS})
 if(IS_DEBUG_BUILD)
 
     set(_DEPLOY_SCRIPT    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Deploy.cmake")
-    set(_DEPLOY_STAMP     "${CMAKE_BINARY_DIR}/_deploy.stamp")
     set(_DEPLOY_LISTS_DIR "${CMAKE_BINARY_DIR}/_deploy_lists")
 
     file(MAKE_DIRECTORY "${_DEPLOY_LISTS_DIR}")
@@ -148,30 +173,32 @@ if(IS_DEBUG_BUILD)
     list(JOIN Papyrus_OUTPUT        "\n" _PEX_CONTENT)
     list(JOIN SWF_COMPILED_OUTPUTS  "\n" _SWF_COMPILED_CONTENT)
 
-    file(WRITE "${_DEPLOY_LISTS_DIR}/pex_files.txt"       "${_PEX_CONTENT}")
-    file(WRITE "${_DEPLOY_LISTS_DIR}/swf_compiled.txt"    "${_SWF_COMPILED_CONTENT}")
-    file(WRITE "${_DEPLOY_LISTS_DIR}/swf_passthrough.txt" "") # Obsolete
-    file(WRITE "${_DEPLOY_LISTS_DIR}/esp_file.txt"        "${_ESP_FILE}")
+    file(WRITE "${_DEPLOY_LISTS_DIR}/pex_files.txt"    "${_PEX_CONTENT}")
+    file(WRITE "${_DEPLOY_LISTS_DIR}/swf_compiled.txt" "${_SWF_COMPILED_CONTENT}")
+    file(WRITE "${_DEPLOY_LISTS_DIR}/esp_file.txt"     "${_ESP_FILE}")
 
-    add_custom_command(
-        OUTPUT "${_DEPLOY_STAMP}"
+    # CONFIGURE_DEPENDS: adding a translation or config file triggers re-configure.
+    file(GLOB_RECURSE _DEBUG_DATA_FILES
+        CONFIGURE_DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/data/interface/*"
+    )
+    list(FILTER _DEBUG_DATA_FILES EXCLUDE REGEX "\\.swf$")
+    list(JOIN _DEBUG_DATA_FILES "\n" _DATA_FILES_CONTENT)
+    file(WRITE "${_DEPLOY_LISTS_DIR}/data_files.txt" "${_DATA_FILES_CONTENT}")
+
+    add_custom_target("deploy_debug" ALL
         COMMAND "${CMAKE_COMMAND}"
             "-DOUTPUT_DIR=${MOD_DEBUG_PATH}"
             "-DDEPLOY_LISTS_DIR=${_DEPLOY_LISTS_DIR}"
             "-DSWF_COMPILED_BASE=${CMAKE_BINARY_DIR}/interface"
-            "-DSWF_PASSTHROUGH_BASE=${CMAKE_CURRENT_SOURCE_DIR}/data/interface"
+            "-DDATA_BASE_DIR=${CMAKE_CURRENT_SOURCE_DIR}/data/interface"
             -P "${_DEPLOY_SCRIPT}"
-        COMMAND "${CMAKE_COMMAND}" -E touch "${_DEPLOY_STAMP}"
         DEPENDS
             ${Papyrus_OUTPUT}
             ${SWF_COMPILED_OUTPUTS}
             "${_ESP_FILE}"
         COMMENT "Deploying to ${MOD_DEBUG_PATH}"
         VERBATIM
-    )
-
-    add_custom_target("deploy_debug" ALL
-        DEPENDS "${_DEPLOY_STAMP}"
     )
     add_dependencies("deploy_debug" "Papyrus" "ActionScript")
 

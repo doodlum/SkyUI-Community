@@ -1,6 +1,6 @@
 class CategoryList extends skyui.components.list.BasicList
 {
-   var __get__selectedEntry;
+   var selectedEntry;
    var _activeSegment;
    var _bFastSwitch;
    var _bRequestInvalidate;

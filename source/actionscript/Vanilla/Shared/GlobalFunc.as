@@ -43,31 +43,43 @@ class Shared.GlobalFunc
    {
       TextField.prototype.SetText = function(aText, abHTMLText)
       {
-         if(aText == undefined || aText == "")
+         if (aText == undefined || aText == "")
          {
             aText = " ";
          }
-         var _loc4_;
-         var _loc3_;
-         var _loc5_;
-         if(abHTMLText)
+         var fmt;
+         var letterSpacing;
+         var kerning;
+         if (abHTMLText)
          {
-            _loc4_ = this.getTextFormat();
-            _loc3_ = _loc4_.letterSpacing;
-            _loc5_ = _loc4_.kerning;
+            fmt = this.getTextFormat();
+            letterSpacing = fmt.letterSpacing;
+            kerning = fmt.kerning;
             this.htmlText = aText;
-            _loc4_ = this.getTextFormat();
-            _loc4_.letterSpacing = _loc3_;
-            _loc4_.kerning = _loc5_;
-            this.setTextFormat(_loc4_);
+            fmt = this.getTextFormat();
+            fmt.letterSpacing = letterSpacing;
+            fmt.kerning = kerning;
+            this.setTextFormat(fmt);
          }
          else
          {
-            _loc4_ = this.getTextFormat();
+            fmt = this.getTextFormat();
             this.text = aText;
-            this.setTextFormat(_loc4_);
+            this.setTextFormat(fmt);
+         }
+
+         /* ─── SkyUI Extension: Text overflow handling ─── */
+         if (this.enableShrinkToFit || this.overflowMode == "ellipsis") {
+            Shared.GlobalFunc.ApplyTextOverflow(this);
          }
       };
+      /* ─── SkyUI Extension: Initialize custom properties ─── */
+      if (TextField.prototype.enableShrinkToFit == undefined) {
+         TextField.prototype.enableShrinkToFit = false;
+         TextField.prototype.overflowMode = "none";
+         TextField.prototype.maxHeightExpand = 0;
+         TextField.prototype.minFontSize = 10;
+      }
    }
    static function SetLockFunction()
    {
@@ -264,5 +276,90 @@ class Shared.GlobalFunc
       }
       _loc3_ = _loc3_.substring(0,_loc1_ + 1);
       return _loc3_;
+   }
+
+
+
+   /* ─── SkyUI Extensions ─── */
+   static function ApplyTextOverflow(tf:TextField) {
+      if (tf.text == "" || tf.text == undefined) return;
+
+      if (tf.origHeight == undefined) tf.origHeight = tf._height;
+      tf._height = tf.origHeight;
+      tf.textAutoSize = "none";
+      tf.multiline = true;
+      tf.wordWrap = true;
+
+      if (tf.enableShrinkToFit) {
+         var availableHeight:Number = tf.origHeight + tf.maxHeightExpand;
+         tf._height = availableHeight;
+
+         var fmt:TextFormat = tf.getTextFormat();
+         var metrics:Object = fmt.getTextExtent(tf.text, tf._width);
+
+         if (metrics.textFieldHeight > tf._height) {
+            Shared.GlobalFunc._shrinkFontToFit(tf);
+         }
+
+         metrics = tf.getTextFormat().getTextExtent(tf.text, tf._width);
+         var expansion:Number = Math.min(Math.max(metrics.textFieldHeight - tf.origHeight, 0), tf.maxHeightExpand);
+         tf._height = tf.origHeight + expansion;
+      }
+
+      if (tf.overflowMode == "ellipsis" && tf.maxscroll > 1) {
+         Shared.GlobalFunc._applyEllipsis(tf);
+      }
+   }
+   
+   private static function _shrinkFontToFit(tf:TextField) {
+      if (tf.numLines == 0) return;
+      var fmt:TextFormat = tf.getTextFormat();
+      var minSize:Number = tf.minFontSize;
+      var maxSize:Number = fmt.size;
+      var bestSize:Number = minSize;
+
+      while (minSize <= maxSize) {
+         var mid:Number = Math.floor((minSize + maxSize) / 2);
+         fmt.size = mid;
+         tf.setTextFormat(fmt);
+
+         // +4 (2 pixel gutter) = textFieldHeight
+         if ((tf.textHeight + 4) < tf._height) {
+            bestSize = mid;
+            minSize = mid + 1;
+         } else {
+            maxSize = mid - 1;
+         }
+      }
+      fmt.size = bestSize;
+      tf.setTextFormat(fmt);
+   }
+
+   private static function _applyEllipsis(tf:TextField) {
+      var original:String = tf.htmlText;
+      var ellipsis:String = "...";
+      var fmt:TextFormat = tf.getTextFormat();
+
+      var left:Number = 0;
+      var right:Number = original.length;
+      var best:String = original;
+
+      while (left <= right) {
+         var mid:Number = Math.floor((left + right) / 2);
+         var test:String = original.substr(0, mid) + ellipsis;
+
+         tf.htmlText = test;
+         tf.setTextFormat(fmt);
+
+         if (tf.maxscroll == 1) {
+            best = test;
+            left = mid + 1;
+         } else {
+            right = mid - 1;
+         }
+      }
+
+      tf.htmlText = best;
+      tf.setTextFormat(fmt);
    }
 }

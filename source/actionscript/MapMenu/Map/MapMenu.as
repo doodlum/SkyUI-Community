@@ -24,10 +24,6 @@ class Map.MapMenu
    var _selectedMarker;
    var _setDestControls;
    var _zoomControls;
-   static var SKYUI_RELEASE_IDX = 2018;
-   static var SKYUI_VERSION_MAJOR = 5;
-   static var SKYUI_VERSION_MINOR = 2;
-   static var SKYUI_VERSION_STRING = Map.MapMenu.SKYUI_VERSION_MAJOR + "." + Map.MapMenu.SKYUI_VERSION_MINOR + " SE";
    static var REFRESH_SHOW = 0;
    static var REFRESH_X = 1;
    static var REFRESH_Y = 2;

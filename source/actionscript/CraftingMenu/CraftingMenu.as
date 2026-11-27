@@ -26,10 +26,6 @@ class CraftingMenu extends MovieClip
    var bCanExpandPanel;
    var bHideAdditionalDescription;
    var navPanel;
-   static var SKYUI_RELEASE_IDX = 2018;
-   static var SKYUI_VERSION_MAJOR = 5;
-   static var SKYUI_VERSION_MINOR = 2;
-   static var SKYUI_VERSION_STRING = CraftingMenu.SKYUI_VERSION_MAJOR + "." + CraftingMenu.SKYUI_VERSION_MINOR + " SE";
    static var LIST_OFFSET = 20;
    static var SELECT_BUTTON = 0;
    static var EXIT_BUTTON = 1;
@@ -103,6 +99,9 @@ class CraftingMenu extends MovieClip
       this.MenuNameHolder._visible = false;
       this.MenuDescription = this.MenuDescriptionHolder.MenuDescription;
       this.MenuDescription.autoSize = "center";
+      // Positioned in positionFloatingElements(), which runs on config load (after the first frames are
+      // drawn); keep it hidden until then so it doesn't appear at its default spot and jump.
+      this.MenuDescriptionHolder._visible = false;
       this.CategoryList.InitExtensions(this._subtypeName);
       gfx.managers.FocusHandler.instance.setFocus(this.CategoryList,0);
       this.CategoryList.addEventListener("itemHighlightChange",this,"onItemHighlightChange");
@@ -308,12 +307,9 @@ class CraftingMenu extends MovieClip
       this.CategoryList._y -= Stage.safeRect.y;
       this.MenuNameHolder.Lock("L");
       this.MenuNameHolder._x -= CraftingMenu.LIST_OFFSET;
-      this.MenuDescriptionHolder.Lock("TR");
+
       var leftOffset = Stage.visibleRect.x + Stage.safeRect.x;
       var rightOffset = Stage.visibleRect.x + Stage.visibleRect.width - Stage.safeRect.x;
-      var _loc3_ = this.CategoryList.getContentBounds();
-      var _loc4_ = this.CategoryList._x + _loc3_[0] + _loc3_[2] + 25;
-      this.MenuDescriptionHolder._x = 10 + _loc4_ + (_loc2_ - _loc4_) / 2 + this.MenuDescriptionHolder._width / 2;
 
       var marginBottomBarInfo = 17;
       
@@ -364,6 +360,11 @@ class CraftingMenu extends MovieClip
          _loc2_._x = _loc6_ + _loc3_.xOffset + (Stage.visibleRect.x + Stage.visibleRect.width - _loc6_ - _loc5_) / 2;
       }
       _loc2_._y += _loc3_.yOffset;
+      
+      this.MenuDescriptionHolder.Lock("TR");
+      this.MenuDescriptionHolder._x = _loc2_._x + _loc2_._width - 17;
+      this.MenuDescriptionHolder._visible = true;
+
       MovieClip(this.MouseRotationRect).Lock("T");
       this.MouseRotationRect._x = this.ItemInfo._parent._x;
       this.MouseRotationRect._width = this.ItemInfo._parent._width;
@@ -377,6 +378,12 @@ class CraftingMenu extends MovieClip
    function setConfig(a_config)
    {
       this._config = a_config;
+      
+      var customWidth = a_config.ListLayout.defaults.entryWidth;
+      
+      if (customWidth != undefined && customWidth > 0) {
+         this.InventoryLists.applyDynamicWidth(customWidth);
+      }
       this.ItemList.addDataProcessor(new CraftingDataSetter());
       this.ItemList.addDataProcessor(new CraftingIconSetter(a_config.Appearance));
       this.positionFloatingElements();
@@ -407,6 +414,13 @@ class CraftingMenu extends MovieClip
       {
          _loc5_ = skyui.components.list.ListLayoutManager.createLayout(a_config.ListLayout,"AlchemyListLayout");
          _loc5_.entryWidth -= CraftingLists.SHORT_LIST_OFFSET;
+         // The alchemy list is shifted right by SHORT_LIST_OFFSET (leftBorder, see CraftingLists), so the
+         // header separator must shrink by the same amount or it runs past the list background.
+         // Other subtypes reaching this branch keep their list unshifted, so leave their separator alone.
+         if(this._subtypeName == "Alchemy")
+         {
+            this.ItemList.header.seperator._width -= CraftingLists.SHORT_LIST_OFFSET;
+         }
       }
       this.ItemList.layout = _loc5_;
       var _loc7_ = a_config.Input.controls.gamepad.prevColumn;

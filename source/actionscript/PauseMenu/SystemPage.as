@@ -5,6 +5,12 @@ class SystemPage extends MovieClip
    var CategoryList_mc;
    var ConfirmPanel;
    var ConfirmTextField;
+   var CreationListPanel;
+   var CreationTextPanel;
+   var CreationsButtonHolder;
+   var CreationsList;
+   var CreationsText;
+   var CreationsTitleText;
    var ErrorText;
    var HelpButtonHolder;
    var HelpList;
@@ -17,39 +23,26 @@ class SystemPage extends MovieClip
    var OptionsListsPanel;
    var PCQuitList;
    var PCQuitPanel;
+   var PS3Switch;
    var PanelRect;
    var SaveLoadListHolder;
    var SaveLoadPanel;
    var SettingsList;
    var SettingsPanel;
    var SystemDivider;
+   var TabPageSwitchBottomMem;
    var TopmostPanel;
    var VersionText;
-   var _acceptButton;
-   var _acceptControls;
-   var _cancelButton;
-   var _cancelControls;
-   var _characterSelectionControls;
-   var _defaultControls;
-   var _deleteButton;
-   var _deleteControls;
-   var _kinectControls;
-   var _showModMenu;
+   var _ShowModMenu;
    var _skyrimVersion;
    var _skyrimVersionBuild;
    var _skyrimVersionMinor;
-   var bDefaultButtonVisible;
+   var bDefaultsButtonVisible;
    var bIsRemoteDevice;
    var bMenuClosing;
    var bRemapMode;
    var bSavingSettings;
    var bSettingsChanged;
-   var CreationListPanel;
-   var CreationTextPanel;
-   var CreationsButtonHolder;
-   var CreationsList;
-   var CreationsText;
-   var CreationsTitleText;
    var bShowKinectTunerButton;
    var bUpdated;
    var iCurrentState;
@@ -76,8 +69,25 @@ class SystemPage extends MovieClip
    static var TRANSITIONING = 15;
    static var CHARACTER_LOAD_STATE = 16;
    static var CHARACTER_SELECTION_STATE = 17;
-   static var MOD_MANAGER_BUTTON_INDEX = 4;
+   // static var MOD_MANAGER_BUTTON_INDEX = 4;
    static var CONTROLLER_ORBIS = 3;
+   static var CONTROLLER_SCARLETT = 4;
+   static var CONTROLLER_PROSPERO = 5;
+
+   static var IDX_QUICKSAVE;
+   static var IDX_SAVE;
+   static var IDX_LOAD;
+
+   static var IDX_INSTALLED_CONTENT;
+   static var IDX_CREATIONS;
+   
+   static var IDX_SETTINGS;
+   static var IDX_MOD_CONFIG;
+   static var IDX_CONTROLS;
+   static var IDX_HELP;
+   static var IDX_QUIT;
+
+   var CancelButtonMappedTo = "Esc";
    function SystemPage()
    {
       super();
@@ -103,8 +113,16 @@ class SystemPage extends MovieClip
       this.bSavingSettings = false;
       this.bShowKinectTunerButton = false;
       this.iPlatform = 0;
-      this.bDefaultButtonVisible = false;
-      this._showModMenu = false;
+      this.bDefaultsButtonVisible = false;
+      this.TabPageSwitchBottomMem = new Array();
+      this._ShowModMenu = false;
+      var _loc3_ = JournalBottomBar.IDX_BUTTON1;
+      while(_loc3_ <= JournalBottomBar.IDX_LASTBUTTON)
+      {
+         this.TabPageSwitchBottomMem[_loc3_] = {Visible:false,Label:"",Art:undefined};
+         _loc3_ = _loc3_ + 1;
+      }
+      Shared.ButtonMapping.Initialize("SystemPage");
    }
    function GetIsRemoteDevice()
    {
@@ -112,46 +130,28 @@ class SystemPage extends MovieClip
    }
    function onLoad()
    {
+      this.CategoryList.bAllowUpToTabs = true;
       this.CategoryList.entryList.push({text:"$QUICKSAVE"});
       this.CategoryList.entryList.push({text:"$SAVE"});
       this.CategoryList.entryList.push({text:"$LOAD"});
-
-      gfx.io.GameDelegate.call("SetVersionText",[this.VersionText]);
-
-      var _loc2_;
-      var _loc3_;
-      var _loc4_;
-      var _loc5_;
-
-      _loc2_ = this.VersionText.text.split(".");
-      this._skyrimVersion = _loc2_[0];
-      this._skyrimVersionMinor = _loc2_[1];
-      this._skyrimVersionBuild = _loc2_[2];
-
-      _loc3_ = parseInt(this._skyrimVersion);
-      _loc4_ = parseInt(this._skyrimVersionMinor);
-      _loc5_ = parseInt(this._skyrimVersionBuild);
-      
-      if(_loc3_ > 1 || _loc3_ == 1 && _loc4_ > 6 || _loc3_ == 1 && _loc4_ == 6 && _loc5_ > 1130)
-      {
-         this.CategoryList.entryList.push({text:"$INSTALLED CONTENT"});
-      } else {
-         this.CategoryList.entryList.push({text:"$INSTALLED CONTENT", disabled: true});
-      }
-
       this.CategoryList.entryList.push({text:"$SETTINGS"});
       this.CategoryList.entryList.push({text:"$MOD CONFIGURATION"});
       this.CategoryList.entryList.push({text:"$CONTROLS"});
       this.CategoryList.entryList.push({text:"$HELP"});
       this.CategoryList.entryList.push({text:"$QUIT"});
+      this.UpdateIndices();
       this.CategoryList.InvalidateData();
       this.ConfirmPanel.handleInput = function()
       {
          return false;
       };
+      this.ConfirmPanel.ButtonRect.AcceptMouseButton.addEventListener("click",this,"onAcceptMousePress");
+      this.ConfirmPanel.ButtonRect.CancelMouseButton.addEventListener("click",this,"onCancelMousePress");
+      this.ConfirmPanel.ButtonRect.AcceptMouseButton.SetPlatform(0,false);
+      this.ConfirmPanel.ButtonRect.CancelMouseButton.SetPlatform(0,false);
       this.SaveLoadListHolder.addEventListener("saveGameSelected",this,"ConfirmSaveGame");
       this.SaveLoadListHolder.addEventListener("loadGameSelected",this,"ConfirmLoadGame");
-      this.SaveLoadListHolder.addEventListener("saveListCharactersPopulated",this,"OnSaveListCharactersOpenSuccess");
+      this.SaveLoadListHolder.addEventListener("saveListCharactersPopulated",this,"OnsaveListCharactersOpenSuccess");
       this.SaveLoadListHolder.addEventListener("saveListPopulated",this,"OnSaveListOpenSuccess");
       this.SaveLoadListHolder.addEventListener("saveListOnBatchAdded",this,"OnSaveListBatchAdded");
       this.SaveLoadListHolder.addEventListener("OnCharacterSelected",this,"OnCharacterSelected");
@@ -160,12 +160,6 @@ class SystemPage extends MovieClip
       gfx.io.GameDelegate.addCallBack("OnSaveDataEventLoadCANCEL",this,"OnSaveDataEventLoadCANCEL");
       this.SaveLoadListHolder.addEventListener("saveHighlighted",this,"onSaveHighlight");
       this.SaveLoadListHolder.List_mc.addEventListener("listPress",this,"onSaveLoadListPress");
-      this.CategoryList.addEventListener("itemPress",this,"onCategoryButtonPress");
-      this.CategoryList.addEventListener("listPress",this,"onCategoryListPress");
-      this.CategoryList.addEventListener("listMovedUp",this,"onCategoryListMoveUp");
-      this.CategoryList.addEventListener("listMovedDown",this,"onCategoryListMoveDown");
-      this.CategoryList.addEventListener("selectionChange",this,"onCategoryListMouseSelectionChange");
-      this.CategoryList.disableInput = true;
       this.SettingsList.entryList = [{text:"$Gameplay"},{text:"$Display"},{text:"$Audio"}];
       this.SettingsList.InvalidateData();
       this.SettingsList.addEventListener("itemPress",this,"onSettingsCategoryPress");
@@ -190,38 +184,70 @@ class SystemPage extends MovieClip
    }
    function SetShowMod(bshow)
    {
-      this._showModMenu = bshow;
-      if(this._showModMenu && this.CategoryList.entryList && this.CategoryList.entryList.length > 0)
+      this._ShowModMenu = bshow;
+      if(this._ShowModMenu && this.CategoryList.entryList && this.CategoryList.entryList.length > 0)
       {
-         this.CategoryList.entryList.splice(SystemPage.MOD_MANAGER_BUTTON_INDEX,0,{text:"$MOD MANAGER"});
+         this.CategoryList.entryList.splice(3,0,{text:"$MOD MANAGER"});
+         this.UpdateIndices();
          this.CategoryList.InvalidateData();
       }
    }
    function startPage()
    {
-      this.CategoryList.disableInput = false;
       var _loc2_;
       if(!this.bUpdated)
       {
          this.currentState = SystemPage.MAIN_STATE;
          gfx.io.GameDelegate.call("SetVersionText",[this.VersionText]);
-         _loc2_ = this.VersionText.text.split(".");
-         this._skyrimVersion = _loc2_[0];
-         this._skyrimVersionMinor = _loc2_[1];
-         this._skyrimVersionBuild = _loc2_[2];
+         this.ParseVersion();
+         if (this.IsVersionAtLeast1126()) {
+            this.CategoryList.entryList.splice(3, 0, {text:"$INSTALLED CONTENT"});
+            this.UpdateIndices();
+            this.CategoryList.InvalidateData();
+         }
          gfx.io.GameDelegate.call("ShouldShowKinectTunerOption",[],this,"SetShouldShowKinectTunerOption");
          this.UpdatePermissions();
+         this.BottomBar_mc.SetButtonVisibility(1,false,50);
          this.bUpdated = true;
       }
       else
       {
          this.UpdateStateFocus(this.iCurrentState);
+         _loc2_ = JournalBottomBar.IDX_BUTTON1;
+         while(_loc2_ <= JournalBottomBar.IDX_LASTBUTTON)
+         {
+            this.BottomBar_mc.SetButtonVisibility(_loc2_ + 1,this.TabPageSwitchBottomMem[_loc2_].Visible,100);
+            if(this.TabPageSwitchBottomMem[_loc2_].Visible)
+            {
+               this.BottomBar_mc.Buttons[_loc2_].label = this.TabPageSwitchBottomMem[_loc2_].Label;
+               this.BottomBar_mc.Buttons[_loc2_].SetArt(this.TabPageSwitchBottomMem[_loc2_].Art);
+            }
+            _loc2_ = _loc2_ + 1;
+         }
       }
+      this.CategoryList.addEventListener("itemPress",this,"onCategoryButtonPress");
+      this.CategoryList.addEventListener("listPress",this,"onCategoryListPress");
+      this.CategoryList.addEventListener("listMovedUp",this,"onCategoryListMoveUp");
+      this.CategoryList.addEventListener("listMovedDown",this,"onCategoryListMoveDown");
+      this.CategoryList.addEventListener("selectionChange",this,"onCategoryListMouseSelectionChange");
+      this.BottomBar_mc.addEventListener("OnBottomBarButtonMousePress",Shared.Proxy.create(this,this.OnBottomBarButtonMousePress));
    }
    function endPage()
    {
-      this.BottomBar_mc.buttonPanel.clearButtons();
-      this.CategoryList.disableInput = true;
+      this.CategoryList.removeEventListener("itemPress",this,"onCategoryButtonPress");
+      this.CategoryList.removeEventListener("listPress",this,"onCategoryListPress");
+      this.CategoryList.removeEventListener("listMovedUp",this,"onCategoryListMoveUp");
+      this.CategoryList.removeEventListener("listMovedDown",this,"onCategoryListMoveDown");
+      this.CategoryList.removeEventListener("selectionChange",this,"onCategoryListMouseSelectionChange");
+      this.BottomBar_mc.removeAllEventListeners();
+      var _loc2_ = JournalBottomBar.IDX_BUTTON1;
+      while(_loc2_ <= JournalBottomBar.IDX_LASTBUTTON)
+      {
+         this.TabPageSwitchBottomMem[_loc2_] = {Visible:this.BottomBar_mc.IsButtonVisible(_loc2_ + 1),Label:this.BottomBar_mc.Buttons[_loc2_].label,Art:this.BottomBar_mc.Buttons[_loc2_].GetArt()};
+         _loc2_ = _loc2_ + 1;
+      }
+      this.BottomBar_mc.SetButtonVisibility(1,false,100);
+      this.BottomBar_mc.SetButtonVisibility(2,false,100);
    }
    function get currentState()
    {
@@ -252,7 +278,7 @@ class SystemPage extends MovieClip
    }
    function OnSaveDataEventSaveSUCCESS()
    {
-      if(this.iPlatform == SystemPage.CONTROLLER_ORBIS)
+      if(this.IsPlatformSony())
       {
          this.bMenuClosing = true;
          this.EndState();
@@ -260,7 +286,7 @@ class SystemPage extends MovieClip
    }
    function OnSaveDataEventSaveCANCEL()
    {
-      if(this.iPlatform == SystemPage.CONTROLLER_ORBIS)
+      if(this.IsPlatformSony())
       {
          this.HideErrorText();
          this.EndState();
@@ -273,10 +299,10 @@ class SystemPage extends MovieClip
    }
    function handleInput(details, pathToFocus)
    {
-      var _loc4_ = false;
+      var _loc3_ = false;
       if(this.bRemapMode || this.bMenuClosing || this.bSavingSettings || this.iCurrentState == SystemPage.TRANSITIONING)
       {
-         _loc4_ = true;
+         _loc3_ = true;
       }
       else if(Shared.GlobalFunc.IsKeyPressed(details,this.iCurrentState != SystemPage.INPUT_MAPPING_STATE))
       {
@@ -293,49 +319,54 @@ class SystemPage extends MovieClip
          }
          if((details.navEquivalent == gfx.ui.NavigationCode.GAMEPAD_L2 || details.navEquivalent == gfx.ui.NavigationCode.GAMEPAD_R2) && this.isConfirming())
          {
-            _loc4_ = true;
+            _loc3_ = true;
          }
-         else if((details.navEquivalent == gfx.ui.NavigationCode.GAMEPAD_X || details.code == 88) && this.iCurrentState == SystemPage.SAVE_LOAD_STATE)
+         else if((details.navEquivalent == gfx.ui.NavigationCode.GAMEPAD_X || details.code == 88) && this.iCurrentState == SystemPage.SAVE_LOAD_STATE && this.BottomBar_mc.IsButtonVisible(1))
          {
-            if(this.iPlatform == SystemPage.CONTROLLER_ORBIS)
+            if(this.IsPlatformSony())
             {
                gfx.io.GameDelegate.call("ORBISDeleteSave",[]);
+               _loc3_ = true;
             }
             else
             {
                this.ConfirmDeleteSave();
+               _loc3_ = true;
             }
-            _loc4_ = true;
          }
-         else if((details.navEquivalent == gfx.ui.NavigationCode.GAMEPAD_Y || details.code == 84) && this.iCurrentState == SystemPage.SAVE_LOAD_STATE && !this.SaveLoadListHolder.isSaving)
+         else if((details.navEquivalent == gfx.ui.NavigationCode.GAMEPAD_Y || details.code == 84) && this.iCurrentState == SystemPage.SAVE_LOAD_STATE && !this.SaveLoadListHolder.isSaving && this.BottomBar_mc.IsButtonVisible(2))
          {
             this.StartState(SystemPage.CHARACTER_LOAD_STATE);
-            _loc4_ = true;
+            _loc3_ = true;
          }
-         else if((details.navEquivalent == gfx.ui.NavigationCode.GAMEPAD_Y || details.code == 84) && (this.iCurrentState == SystemPage.OPTIONS_LISTS_STATE || this.iCurrentState == SystemPage.INPUT_MAPPING_STATE))
+         else if((details.navEquivalent == gfx.ui.NavigationCode.GAMEPAD_Y || details.code == 84) && (this.iCurrentState == SystemPage.OPTIONS_LISTS_STATE || this.iCurrentState == SystemPage.INPUT_MAPPING_STATE) && this.bDefaultsButtonVisible === true)
          {
             this.ConfirmTextField.SetText("$Reset settings to default values?");
             this.StartState(SystemPage.DEFAULT_SETTINGS_CONFIRM_STATE);
-            _loc4_ = true;
+            _loc3_ = true;
          }
-         else if(this.bShowKinectTunerButton && details.navEquivalent == gfx.ui.NavigationCode.GAMEPAD_R1 && this.iCurrentState == SystemPage.OPTIONS_LISTS_STATE)
+         else if(details.navEquivalent == gfx.ui.NavigationCode.GAMEPAD_R1 && this.iCurrentState == SystemPage.OPTIONS_LISTS_STATE && this.BottomBar_mc.IsButtonVisible(2))
          {
             gfx.io.GameDelegate.call("OpenKinectTuner",[]);
-            _loc4_ = true;
+            _loc3_ = true;
          }
-         else if(!pathToFocus[0].handleInput(details,pathToFocus.slice(1)))
+         else if(pathToFocus != undefined && pathToFocus.length > 0)
          {
-            if(details.navEquivalent == gfx.ui.NavigationCode.ENTER)
-            {
-               _loc4_ = this.onAcceptPress();
-            }
-            else if(details.navEquivalent == gfx.ui.NavigationCode.TAB)
-            {
-               _loc4_ = this.onCancelPress();
+            _loc3_ = pathToFocus[0].handleInput(details, pathToFocus.slice(1));
+            
+            if (!_loc3_) {
+               if(details.navEquivalent == gfx.ui.NavigationCode.ENTER)
+               {
+                  _loc3_ = this.onAcceptPress();
+               }
+               else if(details.navEquivalent == gfx.ui.NavigationCode.TAB)
+               {
+                  _loc3_ = this.onCancelPress();
+               }
             }
          }
       }
-      return _loc4_;
+      return _loc3_;
    }
    function onAcceptPress()
    {
@@ -351,28 +382,28 @@ class SystemPage extends MovieClip
             if(this.SaveLoadListHolder.List_mc.disableSelection)
             {
                gfx.io.GameDelegate.call("PlaySound",["UIMenuOK"]);
-               if(this.iPlatform == SystemPage.CONTROLLER_ORBIS)
+               if(!this.IsPlatformSony())
                {
+                  this.bMenuClosing = true;
                   if(this.SaveLoadListHolder.isSaving)
                   {
+                     this.ConfirmPanel._visible = false;
+                     if(this.iPlatform == Shared.ButtonChange.PLATFORM_360)
+                     {
+                        this.ErrorText.SetText("$Saving content. Please don\'t turn off your console.");
+                     }
+                     else
+                     {
+                        this.ErrorText.SetText("$Saving...");
+                     }
                      this.iSaveDelayTimerID = setInterval(this,"DoSaveGame",1);
                      break;
                   }
                   gfx.io.GameDelegate.call("LoadGame",[this.SaveLoadListHolder.selectedIndex]);
                   break;
                }
-               this.bMenuClosing = true;
                if(this.SaveLoadListHolder.isSaving)
                {
-                  this.ConfirmPanel._visible = false;
-                  if(this.iPlatform > 1)
-                  {
-                     this.ErrorText.SetText("$Saving content. Please don\'t turn off your console.");
-                  }
-                  else
-                  {
-                     this.ErrorText.SetText("$Saving...");
-                  }
                   this.iSaveDelayTimerID = setInterval(this,"DoSaveGame",1);
                   break;
                }
@@ -402,6 +433,8 @@ class SystemPage extends MovieClip
             {
                this.GetPanelForState(SystemPage.SAVE_LOAD_STATE).gotoAndStop(1);
                this.GetPanelForState(SystemPage.DELETE_SAVE_CONFIRM_STATE).gotoAndStop(1);
+               this.BottomBar_mc.SetButtonVisibility(1,false);
+               this.BottomBar_mc.SetButtonVisibility(2,false);
                this.currentState = SystemPage.MAIN_STATE;
                this.SystemDivider.gotoAndStop("Right");
                break;
@@ -435,8 +468,8 @@ class SystemPage extends MovieClip
          case SystemPage.SAVE_LOAD_STATE:
             this.SaveLoadListHolder.ForceStopLoading();
          case SystemPage.PC_QUIT_LIST_STATE:
-         case SystemPage.CREATIONS_LIST_STATE:
          case SystemPage.HELP_LIST_STATE:
+         case SystemPage.CREATIONS_LIST_STATE:
          case SystemPage.SAVE_LOAD_CONFIRM_STATE:
          case SystemPage.QUIT_CONFIRM_STATE:
          case SystemPage.DEFAULT_SETTINGS_CONFIRM_STATE:
@@ -445,17 +478,17 @@ class SystemPage extends MovieClip
             gfx.io.GameDelegate.call("PlaySound",["UIMenuCancel"]);
             this.EndState();
             break;
-         case SystemPage.CREATIONS_TEXT_STATE:
-            gfx.io.GameDelegate.call("PlaySound",["UIMenuCancel"]);
-            this.EndState();
-            this.StartState(SystemPage.CREATIONS_LIST_STATE);
-            this.CreationListPanel.bCloseToMainState = true;
-            break;
          case SystemPage.HELP_TEXT_STATE:
             gfx.io.GameDelegate.call("PlaySound",["UIMenuCancel"]);
             this.EndState();
             this.StartState(SystemPage.HELP_LIST_STATE);
             this.HelpListPanel.bCloseToMainState = true;
+            break;
+         case SystemPage.CREATIONS_TEXT_STATE:
+            gfx.io.GameDelegate.call("PlaySound",["UIMenuCancel"]);
+            this.EndState();
+            this.StartState(SystemPage.CREATIONS_LIST_STATE);
+            this.CreationListPanel.bCloseToMainState = true;
             break;
          case SystemPage.OPTIONS_LISTS_STATE:
             gfx.io.GameDelegate.call("PlaySound",["UIMenuCancel"]);
@@ -506,43 +539,69 @@ class SystemPage extends MovieClip
          this.onCancelPress();
       }
    }
+   function OnBottomBarButtonMousePress(evt)
+   {
+      var _loc3_ = evt.target;
+      if(evt.target.label == "$Delete")
+      {
+         gfx.io.GameDelegate.call("PlaySound",["UIMenuOK"]);
+         this.ConfirmDeleteSave();
+      }
+      else if(evt.target.label == "$CharacterSelection")
+      {
+         gfx.io.GameDelegate.call("PlaySound",["UIMenuCancel"]);
+         this.StartState(SystemPage.CHARACTER_LOAD_STATE);
+      }
+      else if(evt.target.label == "$Defaults")
+      {
+         if(this.iCurrentState == SystemPage.OPTIONS_LISTS_STATE || this.iCurrentState == SystemPage.INPUT_MAPPING_STATE)
+         {
+            this.ConfirmTextField.SetText("$Reset settings to default values?");
+            this.StartState(SystemPage.DEFAULT_SETTINGS_CONFIRM_STATE);
+         }
+      }
+      else if(evt.target.label == "$Cancel")
+      {
+         this.onCancelPress();
+      }
+   }
    function onCategoryButtonPress(event)
    {
       if(event.entry.disabled)
       {
          gfx.io.GameDelegate.call("PlaySound",["UIMenuCancel"]);
-         return undefined;
+         return;
       }
-      var _loc4_;
       if(this.iCurrentState == SystemPage.MAIN_STATE)
       {
-         _loc4_ = event.index;
-         if(!this._showModMenu && _loc4_ >= SystemPage.MOD_MANAGER_BUTTON_INDEX)
+         this.CategoryList.setInteractive(false);
+      }
+      
+         switch(event.index)
          {
-            _loc4_ += 1;
-         }
-         switch(_loc4_)
-         {
-            case 0:
+            case this.IDX_QUICKSAVE:
                gfx.io.GameDelegate.call("PlaySound",["UIMenuOK"]);
                gfx.io.GameDelegate.call("QuickSave",[]);
+               this.CategoryList.setInteractive(true);
                return;
-            case 1:
+               
+            case this.IDX_SAVE:
                gfx.io.GameDelegate.call("UseCurrentCharacterFilter",[]);
                this.SaveLoadListHolder.isSaving = true;
-               if(this.iPlatform == 3)
+               if(this.IsPlatformSony())
                {
                   this.SaveLoadListHolder.PopulateEmptySaveList();
                   return;
                }
                gfx.io.GameDelegate.call("SAVE",[this.SaveLoadListHolder.List_mc.entryList,this.SaveLoadListHolder.batchSize]);
                return;
-               break;
-            case 2:
+               
+            case this.IDX_LOAD:
                this.SaveLoadListHolder.isSaving = false;
                gfx.io.GameDelegate.call("LOAD",[this.SaveLoadListHolder.List_mc.entryList,this.SaveLoadListHolder.batchSize]);
                return;
-            case 3:
+               
+            case this.IDX_INSTALLED_CONTENT:
                if(this.CreationsList.entryList.length == 0)
                {
                   gfx.io.GameDelegate.call("PopulateCreationClubTopics",[this.CreationsList.entryList]);
@@ -556,49 +615,63 @@ class SystemPage extends MovieClip
                   return;
                }
                gfx.io.GameDelegate.call("PlaySound",["UIMenuCancel"]);
+               this.CategoryList.setInteractive(true);
                return;
-            case 4:
+               
+            case this.IDX_CREATIONS:
                gfx.io.GameDelegate.call("ModManager",[]);
+               this.CategoryList.setInteractive(true);
                return;
-            case 5:
+               
+            case this.IDX_SETTINGS:
                this.StartState(SystemPage.SETTINGS_CATEGORY_STATE);
                gfx.io.GameDelegate.call("PlaySound",["UIMenuOK"]);
                return;
-            case 6:
+               
+            case this.IDX_MOD_CONFIG:
                _root.QuestJournalFader.Menu_mc.ConfigPanelOpen();
+               this.CategoryList.setInteractive(true);
                return;
-            case 7:
+               
+            case this.IDX_CONTROLS:
                if(this.MappingList.entryList.length == 0)
                {
-                  this.requestInputMappings();
+                  gfx.io.GameDelegate.call("RequestInputMappings",[this.MappingList.entryList]);
+                  this.MappingList.entryList.sort(this.inputMappingSort);
+                  this.MappingList.InvalidateData();
                }
                this.StartState(SystemPage.INPUT_MAPPING_STATE);
                gfx.io.GameDelegate.call("PlaySound",["UIMenuOK"]);
                return;
-            case 8:
+               
+            case this.IDX_HELP:
                if(this.HelpList.entryList.length == 0)
                {
                   gfx.io.GameDelegate.call("PopulateHelpTopics",[this.HelpList.entryList]);
                   this.HelpList.entryList.sort(this.doABCSort);
                   this.HelpList.InvalidateData();
                }
-               if(this.HelpList.entryList.length == 0)
+               if(this.HelpList.entryList.length != 0)
+               {
+                  this.StartState(SystemPage.HELP_LIST_STATE);
+                  gfx.io.GameDelegate.call("PlaySound",["UIMenuOK"]);
+               }
+               else
                {
                   gfx.io.GameDelegate.call("PlaySound",["UIMenuCancel"]);
-                  return;
+                  this.CategoryList.setInteractive(true);
                }
-               this.StartState(SystemPage.HELP_LIST_STATE);
-               gfx.io.GameDelegate.call("PlaySound",["UIMenuOK"]);
                return;
-               break;
-            case 9:
+               
+            case this.IDX_QUIT:
                gfx.io.GameDelegate.call("PlaySound",["UIMenuOK"]);
                gfx.io.GameDelegate.call("RequestIsOnPC",[],this,"populateQuitList");
                return;
+               
             default:
                gfx.io.GameDelegate.call("PlaySound",["UIMenuCancel"]);
+               this.CategoryList.setInteractive(true);
                return;
-         }
       }
    }
    function onCategoryListPress(event)
@@ -648,12 +721,12 @@ class SystemPage extends MovieClip
    }
    function OnCharacterSelected()
    {
-      if(this.iPlatform != 3)
+      if(!this.IsPlatformSony())
       {
          this.StartState(SystemPage.SAVE_LOAD_STATE);
       }
    }
-   function OnSaveListCharactersOpenSuccess()
+   function OnsaveListCharactersOpenSuccess()
    {
       if(this.SaveLoadListHolder.numSaves > 0)
       {
@@ -702,7 +775,7 @@ class SystemPage extends MovieClip
    {
       clearInterval(this.iSaveDelayTimerID);
       gfx.io.GameDelegate.call("SaveGame",[this.SaveLoadListHolder.selectedIndex]);
-      if(this.iPlatform != SystemPage.CONTROLLER_ORBIS)
+      if(!this.IsPlatformSony())
       {
          this._parent._parent.CloseMenu();
       }
@@ -711,10 +784,7 @@ class SystemPage extends MovieClip
    {
       if(this.iCurrentState == SystemPage.SAVE_LOAD_STATE && !this.SaveLoadListHolder.isShowingCharacterList)
       {
-         if(this._deleteButton != null)
-         {
-            this._deleteButton._alpha = event.index != -1 ? 100 : 50;
-         }
+         this.BottomBar_mc.SetButtonVisibility(1,true,event.index != -1 ? 100 : 50);
          if(this.iPlatform == 0)
          {
             gfx.io.GameDelegate.call("PlaySound",["UIMenuFocus"]);
@@ -749,60 +819,87 @@ class SystemPage extends MovieClip
    }
    function onSettingsCategoryPress()
    {
-      var _loc2_ = this.OptionsListsPanel.OptionsLists.List_mc;
-      var _loc3_;
-      var _loc4_;
-      var _loc5_;
+      var optionsList = this.OptionsListsPanel.OptionsLists.List_mc;
+      var entries = [];
+      
       switch(this.SettingsList.selectedIndex)
       {
-         case 0:
-            _loc3_ = parseInt(this._skyrimVersion);
-            _loc4_ = parseInt(this._skyrimVersionMinor);
-            _loc5_ = parseInt(this._skyrimVersionBuild);
-            if(_loc3_ > 1 || _loc3_ == 1 && _loc4_ > 6 || _loc3_ == 1 && _loc4_ == 6 && _loc5_ > 659)
+         case 0: // Gameplay
+            entries = [
+               {text:"$Invert Y", movieType:2},
+               {text:"$Look Sensitivity", movieType:0},
+               {text:"$Vibration", movieType:2},
+               {text:"$360 Controller", movieType:2},
+               {text:"$Survival Mode", movieType:2},
+               {text:"$Difficulty", movieType:1, options:["$Very Easy","$Easy","$Normal","$Hard","$Very Hard","$Legendary"]},
+               {text:"$Show Floating Markers", movieType:2},
+               {text:"$Save on Rest", movieType:2},
+               {text:"$Save on Wait", movieType:2},
+               {text:"$Save on Travel", movieType:2},
+               {text:"$Save on Pause", movieType:1, options:["$5 Mins","$10 Mins","$15 Mins","$30 Mins","$45 Mins","$60 Mins","$Disabled"]},
+               {text:"$Use Kinect Commands", movieType:2}
+            ];
+            // Insert "$SaveGameMissingCreationsCheck" only for Skyrim versions 1.6.659+.
+            // Backward compatibility: the engine requires a hard-coded indexing order in the parameter list for "RequestGameplayOptions" (it differs for versions before and after 1.6.659).
+            // Do NOT test this by simply changing the version number in condition, as it may break menu indexing.
+            if(this.IsVersionAtLeast(1, 6, 659))
             {
-               _loc2_.entryList = [{text:"$Invert Y",movieType:2},{text:"$Look Sensitivity",movieType:0},{text:"$Vibration",movieType:2},{text:"$360 Controller",movieType:2},{text:"$SaveGameMissingCreationsCheck",movieType:2},{text:"$Survival Mode",movieType:2},{text:"$Difficulty",movieType:1,options:["$Very Easy","$Easy","$Normal","$Hard","$Very Hard","$Legendary"]},{text:"$Show Floating Markers",movieType:2},{text:"$Save on Rest",movieType:2},{text:"$Save on Wait",movieType:2},{text:"$Save on Travel",movieType:2},{text:"$Save on Pause",movieType:1,options:["$5 Mins","$10 Mins","$15 Mins","$30 Mins","$45 Mins","$60 Mins","$Disabled"]},{text:"$Use Kinect Commands",movieType:2}];
+               entries.splice(4, 0, {text:"$SaveGameMissingCreationsCheck", movieType:2});
             }
-            else
-            {
-               _loc2_.entryList = [{text:"$Invert Y",movieType:2},{text:"$Look Sensitivity",movieType:0},{text:"$Vibration",movieType:2},{text:"$360 Controller",movieType:2},{text:"$Survival Mode",movieType:2},{text:"$Difficulty",movieType:1,options:["$Very Easy","$Easy","$Normal","$Hard","$Very Hard","$Legendary"]},{text:"$Show Floating Markers",movieType:2},{text:"$Save on Rest",movieType:2},{text:"$Save on Wait",movieType:2},{text:"$Save on Travel",movieType:2},{text:"$Save on Pause",movieType:1,options:["$5 Mins","$10 Mins","$15 Mins","$30 Mins","$45 Mins","$60 Mins","$Disabled"]},{text:"$Use Kinect Commands",movieType:2}];
-            }
-            gfx.io.GameDelegate.call("RequestGameplayOptions",[_loc2_.entryList]);
+            gfx.io.GameDelegate.call("RequestGameplayOptions", [entries]);
             break;
-         case 1:
-            _loc2_.entryList = [{text:"$Brightness",movieType:0},{text:"$HUD Opacity",movieType:0},{text:"$Actor Fade",movieType:0},{text:"$Item Fade",movieType:0},{text:"$Object Fade",movieType:0},{text:"$Grass Fade",movieType:0},{text:"$Shadow Fade",movieType:0},{text:"$Light Fade",movieType:0},{text:"$Specularity Fade",movieType:0},{text:"$Tree LOD Fade",movieType:0},{text:"$Crosshair",movieType:2},{text:"$Dialogue Subtitles",movieType:2},{text:"$General Subtitles",movieType:2},{text:"$DDOF Intensity",movieType:0}];
-            gfx.io.GameDelegate.call("RequestDisplayOptions",[_loc2_.entryList]);
+               
+         case 1: // Display
+            entries = [
+               {text:"$Brightness", movieType:0},
+               {text:"$HUD Opacity", movieType:0},
+               {text:"$Actor Fade", movieType:0},
+               {text:"$Item Fade", movieType:0},
+               {text:"$Object Fade", movieType:0},
+               {text:"$Grass Fade", movieType:0},
+               {text:"$Shadow Fade", movieType:0},
+               {text:"$Light Fade", movieType:0},
+               {text:"$Specularity Fade", movieType:0},
+               {text:"$Tree LOD Fade", movieType:0},
+               {text:"$Crosshair", movieType:2},
+               {text:"$Dialogue Subtitles", movieType:2},
+               {text:"$General Subtitles", movieType:2},
+               {text:"$DDOF Intensity", movieType:0}
+            ];
+            gfx.io.GameDelegate.call("RequestDisplayOptions", [entries]);
             break;
-         case 2:
-            _loc4_ = 0;
-            _loc2_.entryList = [{text:"$Master",movieType:0}];
-            gfx.io.GameDelegate.call("RequestAudioOptions",[_loc2_.entryList]);
-            for(_loc4_ in _loc2_.entryList)
+               
+         case 2: // Audio
+            entries = [{text:"$Master", movieType:0}];
+            gfx.io.GameDelegate.call("RequestAudioOptions", [entries]);
+            for(var i = 0; i < entries.length; i++)
             {
-               _loc2_.entryList[_loc4_].movieType = 0;
+               entries[i].movieType = 0;
             }
+            break;
       }
-      _loc3_ = 0;
-      while(_loc3_ < _loc2_.entryList.length)
+      // Items with ID = undefined are removed by this loop. The engine assigns IDs via "gfx.io.GameDelegate.call(Request...);".
+      // Missing an item (like $SaveGameMissingCreationsCheck) can shift indices, causing the engine to assign ID = undefined
+      // to elements such as $Difficulty, which the loop then removes. This explains why $Difficulty can disappear.
+      for(var i = entries.length - 1; i >= 0; i--)
       {
-         if(_loc2_.entryList[_loc3_].ID == undefined)
+         if(entries[i].ID == undefined)
          {
-            _loc2_.entryList.splice(_loc3_,1);
-         }
-         else
-         {
-            _loc3_ += 1;
+            entries.splice(i, 1);
          }
       }
+      optionsList.entryList = entries;
+      
       if(this.iPlatform != 0)
       {
-         _loc2_.selectedIndex = 0;
+         optionsList.selectedIndex = 0;
       }
-      _loc2_.InvalidateData();
+      
+      optionsList.InvalidateData();
       this.SettingsPanel.bCloseToMainState = false;
       this.EndState();
       this.StartState(SystemPage.OPTIONS_LISTS_STATE);
-      gfx.io.GameDelegate.call("PlaySound",["UIMenuOK"]);
+      gfx.io.GameDelegate.call("PlaySound", ["UIMenuOK"]);
       this.bSettingsChanged = true;
    }
    function ResetSettingsToDefaults()
@@ -849,14 +946,15 @@ class SystemPage extends MovieClip
       }
       this.MappingList.disableSelection = false;
       this.iDebounceRemapModeID = setInterval(this,"ClearRemapMode",200);
+      this.refreshBottomBarButtonText(this.iCurrentState);
    }
-   function inputMappingSort(a_obj1, a_obj2)
+   function inputMappingSort(aObj1, aObj2)
    {
-      if(a_obj1.sortIndex < a_obj2.sortIndex)
+      if(aObj1.sortIndex < aObj2.sortIndex)
       {
          return -1;
       }
-      if(a_obj1.sortIndex > a_obj2.sortIndex)
+      if(aObj1.sortIndex > aObj2.sortIndex)
       {
          return 1;
       }
@@ -875,23 +973,35 @@ class SystemPage extends MovieClip
       if(this.iDebounceRemapModeID != undefined)
       {
          clearInterval(this.iDebounceRemapModeID);
-         delete this.iDebounceRemapModeID;
       }
       this.bRemapMode = false;
    }
    function ResetControlsToDefaults()
    {
       gfx.io.GameDelegate.call("ResetControlsToDefaults",[this.MappingList.entryList]);
-      this.requestInputMappings(true);
+      this.MappingList.entryList.splice(0,this.MappingList.entryList.length);
+      gfx.io.GameDelegate.call("RequestInputMappings",[this.MappingList.entryList]);
+      this.MappingList.entryList.sort(this.inputMappingSort);
+      this.MappingList.UpdateList();
       this.bSettingsChanged = true;
    }
    function onHelpItemPress()
    {
+      trace("OnHelpItemPress");
       gfx.io.GameDelegate.call("RequestHelpText",[this.HelpList.selectedEntry.index,this.HelpTitleText,this.HelpText]);
       this.ApplyHelpTextButtonArt();
       this.HelpListPanel.bCloseToMainState = false;
       this.EndState();
       this.StartState(SystemPage.HELP_TEXT_STATE);
+   }
+   function onCreationsItemPress()
+   {
+      trace("OnCreationsItemPress");
+      gfx.io.GameDelegate.call("RequestCreationClubText",[this.CreationsList.selectedEntry.index,this.CreationsTitleText,this.CreationsText]);
+      this.ApplyCreationsTextButtonArt();
+      this.CreationListPanel.bCloseToMainState = false;
+      this.EndState();
+      this.StartState(SystemPage.CREATIONS_TEXT_STATE);
    }
    function ApplyHelpTextButtonArt()
    {
@@ -899,6 +1009,14 @@ class SystemPage extends MovieClip
       if(_loc2_ != undefined)
       {
          this.HelpText.htmlText = _loc2_;
+      }
+   }
+   function ApplyCreationsTextButtonArt()
+   {
+      var _loc2_ = this.CreationsButtonHolder.CreateButtonArt(this.CreationsText.textField);
+      if(_loc2_ != undefined)
+      {
+         this.CreationsText.htmlText = _loc2_;
       }
    }
    function populateQuitList(abOnPC)
@@ -910,11 +1028,13 @@ class SystemPage extends MovieClip
             this.PCQuitList.selectedIndex = 0;
          }
          this.StartState(SystemPage.PC_QUIT_LIST_STATE);
-         return undefined;
       }
-      this.ConfirmTextField.textAutoSize = "shrink";
-      this.ConfirmTextField.SetText("$Quit to main menu?  Any unsaved progress will be lost.");
-      this.StartState(SystemPage.QUIT_CONFIRM_STATE);
+      else
+      {
+         this.ConfirmTextField.textAutoSize = "shrink";
+         this.ConfirmTextField.SetText("$Quit to main menu?  Any unsaved progress will be lost.");
+         this.StartState(SystemPage.QUIT_CONFIRM_STATE);
+      }
    }
    function onPCQuitButtonPress(event)
    {
@@ -953,70 +1073,143 @@ class SystemPage extends MovieClip
    }
    function RefreshSystemButtons()
    {
-      if(this._showModMenu)
+      this.UpdateSystemButtons(true);
+   }
+   function refreshBottomBarButtonText(aiState)
+   {
+      var _loc2_;
+      switch(aiState)
       {
-         gfx.io.GameDelegate.call("SetSaveDisabled",[this.CategoryList.entryList[0],this.CategoryList.entryList[1],this.CategoryList.entryList[2],this.CategoryList.entryList[3],this.CategoryList.entryList[5],this.CategoryList.entryList[9],true]);
+         case SystemPage.CHARACTER_SELECTION_STATE:
+            this.BottomBar_mc.SetButtonInfo(1,"$Cancel",{PCArt:this.CancelButtonMappedTo,XBoxArt:"360_B",PS3Art:"PS3_B"});
+            break;
+         case SystemPage.SAVE_LOAD_STATE:
+            this.BottomBar_mc.SetButtonInfo(1,"$Delete",{PCArt:"X",XBoxArt:"360_X",PS3Art:"PS3_X"});
+            if(!this.SaveLoadListHolder.isSaving)
+            {
+               this.BottomBar_mc.SetButtonInfo(2,"$CharacterSelection",{PCArt:"T",XBoxArt:"360_Y",PS3Art:"PS3_Y"});
+               this.BottomBar_mc.SetButtonInfo(3,"$Cancel",{PCArt:this.CancelButtonMappedTo,XBoxArt:"360_B",PS3Art:"PS3_B"});
+            }
+            else
+            {
+               this.BottomBar_mc.SetButtonInfo(2,"$Cancel",{PCArt:this.CancelButtonMappedTo,XBoxArt:"360_B",PS3Art:"PS3_B"});
+            }
+            break;
+         case SystemPage.INPUT_MAPPING_STATE:
+            _loc2_ = 1;
+            if(!this.bIsRemoteDevice)
+            {
+               this.BottomBar_mc.SetButtonInfo(1,"$Defaults",{PCArt:"T",XBoxArt:"360_Y",PS3Art:"PS3_Y"});
+               _loc2_ = 2;
+            }
+            this.BottomBar_mc.SetButtonInfo(_loc2_,"$Cancel",{PCArt:this.CancelButtonMappedTo,XBoxArt:"360_B",PS3Art:"PS3_B"});
+            break;
+         case SystemPage.OPTIONS_LISTS_STATE:
+            this.BottomBar_mc.SetButtonInfo(1,"$Defaults",{PCArt:"T",XBoxArt:"360_Y",PS3Art:"PS3_Y"});
+            _loc2_ = 2;
+            if(this.bShowKinectTunerButton && this.iPlatform == 2 && this.SettingsList.selectedIndex == 0)
+            {
+               this.BottomBar_mc.SetButtonInfo(2,"$Kinect Tuner",{PCArt:"K",XBoxArt:"360_RB",PS3Art:"PS3_RB"});
+               _loc2_ = 3;
+            }
+            this.BottomBar_mc.SetButtonInfo(_loc2_,"$Cancel",{PCArt:this.CancelButtonMappedTo,XBoxArt:"360_B",PS3Art:"PS3_B"});
+            break;
+         case SystemPage.CREATIONS_TEXT_STATE:
+         case SystemPage.CREATIONS_LIST_STATE:
+         case SystemPage.HELP_TEXT_STATE:
+         case SystemPage.HELP_LIST_STATE:
+         case SystemPage.SETTINGS_CATEGORY_STATE:
+            this.BottomBar_mc.SetButtonInfo(1,"$Cancel",{PCArt:this.CancelButtonMappedTo,XBoxArt:"360_B",PS3Art:"PS3_B"});
+         case SystemPage.CHARACTER_LOAD_STATE:
+         case SystemPage.PC_QUIT_LIST_STATE:
+         case SystemPage.SAVE_LOAD_CONFIRM_STATE:
+         case SystemPage.QUIT_CONFIRM_STATE:
+         case SystemPage.PC_QUIT_CONFIRM_STATE:
+         case SystemPage.DELETE_SAVE_CONFIRM_STATE:
+         case SystemPage.DEFAULT_SETTINGS_CONFIRM_STATE:
+         default:
+            return;
       }
-      else
-      {
-         gfx.io.GameDelegate.call("SetSaveDisabled",[this.CategoryList.entryList[0],this.CategoryList.entryList[1],this.CategoryList.entryList[2],this.CategoryList.entryList[3],this.CategoryList.entryList[4],this.CategoryList.entryList[8],true]);
-      }
-      this.CategoryList.UpdateList();
    }
    function StartState(aiState)
    {
-      this.BottomBar_mc.buttonPanel.clearButtons();
+      var _loc2_;
       switch(aiState)
       {
          case SystemPage.CHARACTER_LOAD_STATE:
             this.SaveLoadListHolder.isShowingCharacterList = true;
             this.SystemDivider.gotoAndStop("Left");
             gfx.io.GameDelegate.call("PopulateCharacterList",[this.SaveLoadListHolder.List_mc.entryList,this.SaveLoadListHolder.batchSize]);
+            this.BottomBar_mc.SetButtonVisibility(1,false);
+            this.BottomBar_mc.SetButtonVisibility(2,false);
+            this.BottomBar_mc.SetButtonVisibility(3,false);
             break;
          case SystemPage.CHARACTER_SELECTION_STATE:
-            this.BottomBar_mc.buttonPanel.addButton({text:"$Cancel",controls:this._cancelControls});
+            this.BottomBar_mc.SetButtonInfo(1,"$Cancel",{PCArt:this.CancelButtonMappedTo,XBoxArt:"360_B",PS3Art:"PS3_B"});
+            this.BottomBar_mc.SetButtonVisibility(1,true,100);
+            this.BottomBar_mc.SetButtonVisibility(2,false);
+            this.BottomBar_mc.SetButtonVisibility(3,false);
             break;
          case SystemPage.SAVE_LOAD_STATE:
             this.SaveLoadListHolder.isShowingCharacterList = false;
             this.SystemDivider.gotoAndStop("Left");
-            this._deleteButton = this.BottomBar_mc.buttonPanel.addButton({text:"$Delete",controls:this._deleteControls});
-            if(this.SaveLoadListHolder.isSaving == false)
+            this.BottomBar_mc.SetButtonInfo(1,"$Delete",{PCArt:"X",XBoxArt:"360_X",PS3Art:"PS3_X"});
+            this.BottomBar_mc.SetButtonVisibility(1,true,100);
+            if(!this.SaveLoadListHolder.isSaving)
             {
-               this.BottomBar_mc.buttonPanel.addButton({text:"$CharacterSelection",controls:this._characterSelectionControls});
+               this.BottomBar_mc.SetButtonInfo(2,"$CharacterSelection",{PCArt:"T",XBoxArt:"360_Y",PS3Art:"PS3_Y"});
+               this.BottomBar_mc.SetButtonVisibility(2,true,100);
+               this.BottomBar_mc.SetButtonInfo(3,"$Cancel",{PCArt:this.CancelButtonMappedTo,XBoxArt:"360_B",PS3Art:"PS3_B"});
+               this.BottomBar_mc.SetButtonVisibility(3,true,100);
+               break;
             }
-            this.BottomBar_mc.buttonPanel.addButton({text:"$Cancel",controls:this._cancelControls});
-            this.BottomBar_mc.buttonPanel.updateButtons(true);
+            this.BottomBar_mc.SetButtonInfo(2,"$Cancel",{PCArt:this.CancelButtonMappedTo,XBoxArt:"360_B",PS3Art:"PS3_B"});
+            this.BottomBar_mc.SetButtonVisibility(2,true,100);
             break;
          case SystemPage.INPUT_MAPPING_STATE:
             this.SystemDivider.gotoAndStop("Left");
-            if(this.bIsRemoteDevice)
+            _loc2_ = 1;
+            if(!this.bIsRemoteDevice)
             {
-               this.bDefaultButtonVisible = false;
+               this.BottomBar_mc.SetButtonInfo(1,"$Defaults",{PCArt:"T",XBoxArt:"360_Y",PS3Art:"PS3_Y"});
+               this.BottomBar_mc.SetButtonVisibility(1,true,100);
+               this.bDefaultsButtonVisible = true;
+               _loc2_ = 2;
             }
             else
             {
-               this.BottomBar_mc.buttonPanel.addButton({text:"$Defaults",controls:this._defaultControls});
-               this.bDefaultButtonVisible = true;
+               this.BottomBar_mc.SetButtonVisibility(2,false);
+               this.bDefaultsButtonVisible = false;
             }
-            this.BottomBar_mc.buttonPanel.addButton({text:"$Cancel",controls:this._cancelControls});
-            this.BottomBar_mc.buttonPanel.updateButtons(true);
+            this.BottomBar_mc.SetButtonInfo(_loc2_,"$Cancel",{PCArt:this.CancelButtonMappedTo,XBoxArt:"360_B",PS3Art:"PS3_B"});
+            this.BottomBar_mc.SetButtonVisibility(_loc2_,true,100);
             break;
          case SystemPage.OPTIONS_LISTS_STATE:
-            this.BottomBar_mc.buttonPanel.addButton({text:"$Defaults",controls:this._defaultControls});
-            if(aiState == SystemPage.OPTIONS_LISTS_STATE && this.bShowKinectTunerButton && this.iPlatform == 2 && this.SettingsList.selectedIndex == 0)
+            this.BottomBar_mc.SetButtonInfo(1,"$Defaults",{PCArt:"T",XBoxArt:"360_Y",PS3Art:"PS3_Y"});
+            this.BottomBar_mc.SetButtonVisibility(1,true,100);
+            this.bDefaultsButtonVisible = true;
+            _loc2_ = 2;
+            if(this.bShowKinectTunerButton && this.iPlatform == 2 && this.SettingsList.selectedIndex == 0)
             {
-               this.BottomBar_mc.buttonPanel.addButton({text:"$Kinect Tuner",controls:this._kinectControls});
+               this.BottomBar_mc.SetButtonInfo(2,"$Kinect Tuner",{PCArt:"K",XBoxArt:"360_RB",PS3Art:"PS3_RB"});
+               this.BottomBar_mc.SetButtonVisibility(2,true,100);
+               _loc2_ = 3;
             }
-            this.BottomBar_mc.buttonPanel.addButton({text:"$Cancel",controls:this._cancelControls});
-            this.BottomBar_mc.buttonPanel.updateButtons(true);
+            else
+            {
+               this.BottomBar_mc.SetButtonVisibility(3,false);
+            }
+            this.BottomBar_mc.SetButtonInfo(_loc2_,"$Cancel",{PCArt:this.CancelButtonMappedTo,XBoxArt:"360_B",PS3Art:"PS3_B"});
+            this.BottomBar_mc.SetButtonVisibility(_loc2_,true,100);
             break;
-         case SystemPage.CREATIONS_LIST_STATE:
          case SystemPage.CREATIONS_TEXT_STATE:
+         case SystemPage.CREATIONS_LIST_STATE:
          case SystemPage.HELP_TEXT_STATE:
          case SystemPage.HELP_LIST_STATE:
          case SystemPage.SETTINGS_CATEGORY_STATE:
-            this.BottomBar_mc.buttonPanel.addButton({text:"$Cancel",controls:this._cancelControls});
-            this.BottomBar_mc.buttonPanel.updateButtons(true);
+            this.BottomBar_mc.SetButtonInfo(1,"$Cancel",{PCArt:this.CancelButtonMappedTo,XBoxArt:"360_B",PS3Art:"PS3_B"});
+            this.BottomBar_mc.SetButtonVisibility(1,true,100);
+         case SystemPage.PC_QUIT_LIST_STATE:
             this.SystemDivider.gotoAndStop("Left");
             break;
          case SystemPage.SAVE_LOAD_CONFIRM_STATE:
@@ -1027,12 +1220,12 @@ class SystemPage extends MovieClip
             this.ConfirmPanel.confirmType = aiState;
             this.ConfirmPanel.returnState = this.iCurrentState;
       }
+      this.refreshBottomBarButtonText(aiState);
       this.iCurrentState = SystemPage.TRANSITIONING;
       this.GetPanelForState(aiState).gotoAndPlay("start");
    }
    function EndState()
    {
-      this.BottomBar_mc.buttonPanel.clearButtons();
       switch(this.iCurrentState)
       {
          case SystemPage.CHARACTER_LOAD_STATE:
@@ -1040,13 +1233,32 @@ class SystemPage extends MovieClip
          case SystemPage.SAVE_LOAD_STATE:
          case SystemPage.INPUT_MAPPING_STATE:
          case SystemPage.CREATIONS_TEXT_STATE:
-         case SystemPage.HELP_TEXT_STATE:
-            if(this.iPlatform != SystemPage.CONTROLLER_ORBIS)
+            if(!this.IsPlatformSony())
             {
                this.SystemDivider.gotoAndStop("Right");
             }
+            this.BottomBar_mc.SetButtonVisibility(1,false);
+            this.BottomBar_mc.SetButtonVisibility(2,false);
+            this.BottomBar_mc.SetButtonVisibility(3,false);
+            break;
+         case SystemPage.HELP_TEXT_STATE:
+            if(!this.IsPlatformSony())
+            {
+               this.SystemDivider.gotoAndStop("Right");
+            }
+            this.BottomBar_mc.SetButtonVisibility(1,false);
+            this.BottomBar_mc.SetButtonVisibility(2,false);
+            this.BottomBar_mc.SetButtonVisibility(3,false);
+            break;
+         case SystemPage.OPTIONS_LISTS_STATE:
+            this.BottomBar_mc.SetButtonVisibility(1,false);
+            this.BottomBar_mc.SetButtonVisibility(2,false);
+            this.BottomBar_mc.SetButtonVisibility(3,false);
             break;
          case SystemPage.CREATIONS_LIST_STATE:
+            this.BottomBar_mc.SetButtonVisibility(1,false);
+            this.BottomBar_mc.SetButtonVisibility(2,false);
+            this.BottomBar_mc.SetButtonVisibility(3,false);
             this.CreationsList.disableInput = true;
             if(this.CreationListPanel.bCloseToMainState != false)
             {
@@ -1054,6 +1266,9 @@ class SystemPage extends MovieClip
             }
             break;
          case SystemPage.HELP_LIST_STATE:
+            this.BottomBar_mc.SetButtonVisibility(1,false);
+            this.BottomBar_mc.SetButtonVisibility(2,false);
+            this.BottomBar_mc.SetButtonVisibility(3,false);
             this.HelpList.disableInput = true;
             if(this.HelpListPanel.bCloseToMainState != false)
             {
@@ -1061,6 +1276,9 @@ class SystemPage extends MovieClip
             }
             break;
          case SystemPage.SETTINGS_CATEGORY_STATE:
+            this.BottomBar_mc.SetButtonVisibility(1,false);
+            this.BottomBar_mc.SetButtonVisibility(2,false);
+            this.BottomBar_mc.SetButtonVisibility(3,false);
             this.SettingsList.disableInput = true;
             if(this.SettingsPanel.bCloseToMainState != false)
             {
@@ -1069,8 +1287,6 @@ class SystemPage extends MovieClip
             break;
          case SystemPage.PC_QUIT_LIST_STATE:
             this.SystemDivider.gotoAndStop("Right");
-            break;
-         case SystemPage.OPTIONS_LISTS_STATE:
       }
       if(this.iCurrentState != SystemPage.MAIN_STATE)
       {
@@ -1120,6 +1336,7 @@ class SystemPage extends MovieClip
       switch(aiNewState)
       {
          case SystemPage.MAIN_STATE:
+            this.CategoryList.setInteractive(true);
             gfx.managers.FocusHandler.instance.setFocus(this.CategoryList,0);
             break;
          case SystemPage.SETTINGS_CATEGORY_STATE:
@@ -1132,9 +1349,9 @@ class SystemPage extends MovieClip
          case SystemPage.INPUT_MAPPING_STATE:
             gfx.managers.FocusHandler.instance.setFocus(this.MappingList,0);
             break;
-         case SystemPage.SAVE_LOAD_STATE:
          case SystemPage.CHARACTER_LOAD_STATE:
          case SystemPage.CHARACTER_SELECTION_STATE:
+         case SystemPage.SAVE_LOAD_STATE:
             gfx.managers.FocusHandler.instance.setFocus(this.SaveLoadListHolder.List_mc,0);
             this.SaveLoadListHolder.List_mc.disableSelection = false;
             break;
@@ -1166,44 +1383,40 @@ class SystemPage extends MovieClip
             return;
       }
    }
-   function SetPlatform(a_platform, a_bPS3Switch)
+   function SetPlatform(aiPlatform, abPS3Switch)
    {
-      this.BottomBar_mc.SetPlatform(a_platform,a_bPS3Switch);
-      this.CategoryList.SetPlatform(a_platform,a_bPS3Switch);
-      this.HelpButtonHolder.SetPlatform(a_platform,a_bPS3Switch);
-      this.CreationsButtonHolder.SetPlatform(a_platform,a_bPS3Switch);
-      if(a_platform != 0)
+      trace("SystemPage::SetPlatform: aiPlatform " + aiPlatform.toString() + ", aSwapPS3 " + abPS3Switch.toString());
+      this.iPlatform = aiPlatform;
+      this.PS3Switch = abPS3Switch;
+      this.ConfirmPanel.ButtonRect.AcceptGamepadButton._visible = aiPlatform != 0;
+      this.ConfirmPanel.ButtonRect.CancelGamepadButton._visible = aiPlatform != 0;
+      this.ConfirmPanel.ButtonRect.AcceptMouseButton._visible = aiPlatform == 0;
+      this.ConfirmPanel.ButtonRect.CancelMouseButton._visible = aiPlatform == 0;
+      this.BottomBar_mc.SetPlatform(aiPlatform,abPS3Switch);
+      this.CategoryList.SetPlatform(aiPlatform,abPS3Switch);
+      this.MappingList.SetPlatform(aiPlatform,abPS3Switch);
+      this.HelpButtonHolder.SetPlatform(aiPlatform,abPS3Switch);
+      this.CreationsButtonHolder.SetPlatform(aiPlatform,abPS3Switch);
+      var _loc4_;
+      if(aiPlatform != 0)
       {
+         this.ConfirmPanel.ButtonRect.AcceptGamepadButton.SetPlatform(aiPlatform,abPS3Switch);
+         this.ConfirmPanel.ButtonRect.CancelGamepadButton.SetPlatform(aiPlatform,abPS3Switch);
          this.SettingsList.selectedIndex = 0;
          this.PCQuitList.selectedIndex = 0;
          this.HelpList.selectedIndex = 0;
          this.CreationsList.selectedIndex = 0;
          this.MappingList.selectedIndex = 0;
-         this._deleteControls = {keyCode:278};
-         this._defaultControls = {keyCode:279};
-         this._kinectControls = {keyCode:275};
-         this._acceptControls = {keyCode:276};
-         this._cancelControls = {keyCode:277};
-         this._characterSelectionControls = {keyCode:279};
       }
       else
       {
-         this._deleteControls = {keyCode:45};
-         this._defaultControls = {keyCode:20};
-         this._kinectControls = {keyCode:37};
-         this._acceptControls = {keyCode:28};
-         this._cancelControls = {keyCode:15};
-         this._characterSelectionControls = {keyCode:20};
+         _loc4_ = this.ConfirmPanel.ButtonRect.AcceptMouseButton;
+         Shared.ButtonMapping.CorrectLabel(_loc4_);
+         _loc4_ = this.ConfirmPanel.ButtonRect.CancelMouseButton;
+         Shared.ButtonMapping.CorrectLabel(_loc4_);
       }
-      this.ConfirmPanel.buttonPanel.clearButtons();
-      this._acceptButton = this.ConfirmPanel.buttonPanel.addButton({text:"$Yes",controls:this._acceptControls});
-      this._acceptButton.addEventListener("click",this,"onAcceptMousePress");
-      this._cancelButton = this.ConfirmPanel.buttonPanel.addButton({text:"$No",controls:this._cancelControls});
-      this._cancelButton.addEventListener("click",this,"onCancelMousePress");
-      this.ConfirmPanel.buttonPanel.updateButtons(true);
-      this.iPlatform = a_platform;
-      this.SaveLoadListHolder.platform = a_platform;
-      this.requestInputMappings();
+      this.iPlatform = aiPlatform;
+      this.SaveLoadListHolder.SetPlatform(aiPlatform,abPS3Switch);
    }
    function BackOutFromLoadGame()
    {
@@ -1214,9 +1427,9 @@ class SystemPage extends MovieClip
    {
       this.bShowKinectTunerButton = abFlag == true;
    }
-   function SetRemoteDevice(abISRemoteDevice)
+   function SetRemoteDevice(abIsRemoteDevice)
    {
-      this.bIsRemoteDevice = abISRemoteDevice;
+      this.bIsRemoteDevice = abIsRemoteDevice;
       if(this.bIsRemoteDevice)
       {
          this.MappingList.entryList.clear();
@@ -1224,51 +1437,92 @@ class SystemPage extends MovieClip
    }
    function UpdatePermissions()
    {
-      if(this._showModMenu)
+      this.UpdateSystemButtons(false);
+   }
+   function IsPlatformSony()
+   {
+      return this.iPlatform == SystemPage.CONTROLLER_ORBIS || this.iPlatform == SystemPage.CONTROLLER_PROSPERO;
+   }
+   function UpdateIndices()
+   {
+      var list = this.CategoryList.entryList;
+      
+      this.IDX_INSTALLED_CONTENT = undefined;
+      this.IDX_CREATIONS = undefined;
+
+      for (var i = 0; i < list.length; i++)
       {
-         gfx.io.GameDelegate.call("SetSaveDisabled",[this.CategoryList.entryList[0],this.CategoryList.entryList[1],this.CategoryList.entryList[2],this.CategoryList.entryList[3],this.CategoryList.entryList[5],this.CategoryList.entryList[9],false]);
-         this.CategoryList.entryList[4].disabled = false;
-         this.CategoryList.entryList[6].disabled = false;
-         this.CategoryList.entryList[7].disabled = false;
-         this.CategoryList.entryList[8].disabled = false;
+         var itemText = list[i].text;
+         
+         if (itemText == "$QUICKSAVE")          this.IDX_QUICKSAVE = i;
+         else if (itemText == "$SAVE")          this.IDX_SAVE = i;
+         else if (itemText == "$LOAD")          this.IDX_LOAD = i;
+         else if (itemText == "$INSTALLED CONTENT") this.IDX_INSTALLED_CONTENT = i;
+         else if (itemText == "$MOD MANAGER")   this.IDX_CREATIONS = i;
+         else if (itemText == "$SETTINGS")      this.IDX_SETTINGS = i;
+         else if (itemText == "$MOD CONFIGURATION") this.IDX_MOD_CONFIG = i;
+         else if (itemText == "$CONTROLS")      this.IDX_CONTROLS = i;
+         else if (itemText == "$HELP")          this.IDX_HELP = i;
+         else if (itemText == "$QUIT")          this.IDX_QUIT = i;
       }
-      else
-      {
-         gfx.io.GameDelegate.call("SetSaveDisabled",[this.CategoryList.entryList[0],this.CategoryList.entryList[1],this.CategoryList.entryList[2],this.CategoryList.entryList[3],this.CategoryList.entryList[4],this.CategoryList.entryList[8],false]);
-         this.CategoryList.entryList[5].disabled = false;
-         this.CategoryList.entryList[6].disabled = false;
-         this.CategoryList.entryList[7].disabled = false;
+   }
+   function UpdateSystemButtons(abRefreshMode)
+   {
+      var list = this.CategoryList.entryList;
+      
+      var arr = [
+         list[this.IDX_QUICKSAVE],
+         list[this.IDX_SAVE],
+         list[this.IDX_LOAD]
+      ];
+      
+      if (this.IDX_INSTALLED_CONTENT !== undefined) {
+         arr.push(list[this.IDX_INSTALLED_CONTENT]);
       }
+      
+      if (this.IDX_CREATIONS !== undefined) {
+         arr.push(list[this.IDX_CREATIONS]);
+      }
+      
+      arr.push(
+         list[this.IDX_SETTINGS],
+         list[this.IDX_MOD_CONFIG],
+         list[this.IDX_CONTROLS],
+         list[this.IDX_HELP],
+         list[this.IDX_QUIT],
+         abRefreshMode
+      );
+
+      gfx.io.GameDelegate.call("SetSaveDisabled", arr);
+
+      if (!abRefreshMode) {
+         list[this.IDX_HELP].disabled = false;
+         list[this.IDX_QUIT].disabled = false;
+      }
+
       this.CategoryList.UpdateList();
    }
-   function requestInputMappings(a_updateOnly)
+   function ParseVersion()
    {
-      this.MappingList.entryList.splice(0);
-      gfx.io.GameDelegate.call("RequestInputMappings",[this.MappingList.entryList]);
-      this.MappingList.entryList.sort(this.inputMappingSort);
-      if(a_updateOnly)
-      {
-         this.MappingList.UpdateList();
-      }
-      else
-      {
-         this.MappingList.InvalidateData();
-      }
+      var clean = this.VersionText.text.split(" ")[0];
+      var parts = clean.split(".");
+
+      this._skyrimVersion = parseInt(parts[0]);
+      this._skyrimVersionMinor = parseInt(parts[1]);
+      this._skyrimVersionBuild = parseInt(parts[2]);
    }
-   function onCreationsItemPress()
+   function IsVersionAtLeast(major, minor, build)
    {
-      gfx.io.GameDelegate.call("RequestCreationClubText",[this.CreationsList.selectedEntry.index,this.CreationsTitleText,this.CreationsText]);
-      this.ApplyCreationsTextButtonArt();
-      this.CreationListPanel.bCloseToMainState = false;
-      this.EndState();
-      this.StartState(SystemPage.CREATIONS_TEXT_STATE);
+      if(this._skyrimVersion > major) return true;
+      if(this._skyrimVersion < major) return false;
+
+      if(this._skyrimVersionMinor > minor) return true;
+      if(this._skyrimVersionMinor < minor) return false;
+
+      return this._skyrimVersionBuild >= build;
    }
-   function ApplyCreationsTextButtonArt()
+   function IsVersionAtLeast1126()
    {
-      var _loc2_ = this.CreationsButtonHolder.CreateButtonArt(this.CreationsText.textField);
-      if(_loc2_ != undefined)
-      {
-         this.CreationsText.htmlText = _loc2_;
-      }
+      return skse.version.releaseIdx >= 70;
    }
 }
