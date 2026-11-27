@@ -112,134 +112,120 @@ class InventoryDataSetter extends ItemcardDataExtender
             return;
       }
    }
+   // keyword editorId -> {o: branch order, m: material, l: label key}. Built once from the former if/else-if
+   // chain (same keywords, same order): testing ~60 keyword properties per weapon/armor/ammo entry was a
+   // noticeable part of the first pass over large containers; now each entry only visits its own keywords.
+   static var _materialByKeyword;
+
+   static function putMaterial(t, a_keyword, a_order, a_material, a_label)
+   {
+      if(t[a_keyword] == undefined)
+      {
+         t[a_keyword] = {o:a_order,m:a_material,l:a_label};
+      }
+   }
+
+   static function buildMaterialTable()
+   {
+      var t = {};
+      InventoryDataSetter.putMaterial(t, "ArmorMaterialDaedric", 2, skyui.defines.Material.DAEDRIC, "$Daedric");
+      InventoryDataSetter.putMaterial(t, "WeapMaterialDaedric", 2, skyui.defines.Material.DAEDRIC, "$Daedric");
+      InventoryDataSetter.putMaterial(t, "ccBGSSSE025_ArmorMaterialDark", 2, skyui.defines.Material.DAEDRIC, "$Daedric");
+      InventoryDataSetter.putMaterial(t, "ccBGSSSE025_WeapMaterialDark", 2, skyui.defines.Material.DAEDRIC, "$Daedric");
+      InventoryDataSetter.putMaterial(t, "ccBGSSSE025_ArmorMaterialGolden", 2, skyui.defines.Material.DAEDRIC, "$Daedric");
+      InventoryDataSetter.putMaterial(t, "ccBGSSSE025_WeapMaterialGolden", 2, skyui.defines.Material.DAEDRIC, "$Daedric");
+      InventoryDataSetter.putMaterial(t, "ArmorMaterialDragonplate", 3, skyui.defines.Material.DRAGON, "$Dragon");
+      InventoryDataSetter.putMaterial(t, "ArmorMaterialDragonscale", 3, skyui.defines.Material.DRAGON, "$Dragon");
+      InventoryDataSetter.putMaterial(t, "DLC1WeapMaterialDragonbone", 3, skyui.defines.Material.DRAGON, "$Dragon");
+      InventoryDataSetter.putMaterial(t, "ArmorMaterialDwarven", 4, skyui.defines.Material.DWARVEN, "$Dwarven");
+      InventoryDataSetter.putMaterial(t, "WeapMaterialDwarven", 4, skyui.defines.Material.DWARVEN, "$Dwarven");
+      InventoryDataSetter.putMaterial(t, "ArmorMaterialEbony", 5, skyui.defines.Material.EBONY, "$Ebony");
+      InventoryDataSetter.putMaterial(t, "WeapMaterialEbony", 5, skyui.defines.Material.EBONY, "$Ebony");
+      InventoryDataSetter.putMaterial(t, "ArmorMaterialElven", 6, skyui.defines.Material.ELVEN, "$Elven");
+      InventoryDataSetter.putMaterial(t, "WeapMaterialElven", 6, skyui.defines.Material.ELVEN, "$Elven");
+      InventoryDataSetter.putMaterial(t, "ArmorMaterialElvenGilded", 6, skyui.defines.Material.ELVEN, "$Elven");
+      InventoryDataSetter.putMaterial(t, "ArmorMaterialGlass", 7, skyui.defines.Material.GLASS, "$Glass");
+      InventoryDataSetter.putMaterial(t, "WeapMaterialGlass", 7, skyui.defines.Material.GLASS, "$Glass");
+      InventoryDataSetter.putMaterial(t, "ArmorMaterialHide", 8, skyui.defines.Material.HIDE, "$Hide");
+      InventoryDataSetter.putMaterial(t, "ArmorMaterialScaled", 8, skyui.defines.Material.HIDE, "$Hide");
+      InventoryDataSetter.putMaterial(t, "ArmorMaterialStormcloak", 9, skyui.defines.Material.STORMCLOAK, "$Stormcloak");
+      InventoryDataSetter.putMaterial(t, "ArmorMaterialBearStormcloak", 9, skyui.defines.Material.STORMCLOAK, "$Stormcloak");
+      InventoryDataSetter.putMaterial(t, "ArmorMaterialImperialHeavy", 10, skyui.defines.Material.IMPERIAL, "$Imperial");
+      InventoryDataSetter.putMaterial(t, "ArmorMaterialImperialLight", 10, skyui.defines.Material.IMPERIAL, "$Imperial");
+      InventoryDataSetter.putMaterial(t, "WeapMaterialImperial", 10, skyui.defines.Material.IMPERIAL, "$Imperial");
+      InventoryDataSetter.putMaterial(t, "ArmorMaterialImperialStudded", 10, skyui.defines.Material.IMPERIAL, "$Imperial");
+      InventoryDataSetter.putMaterial(t, "ArmorMaterialStudded", 10, skyui.defines.Material.IMPERIAL, "$Imperial");
+      InventoryDataSetter.putMaterial(t, "ArmorMaterialIron", 11, skyui.defines.Material.IRON, "$Iron");
+      InventoryDataSetter.putMaterial(t, "WeapMaterialIron", 11, skyui.defines.Material.IRON, "$Iron");
+      InventoryDataSetter.putMaterial(t, "ArmorMaterialIronBanded", 11, skyui.defines.Material.IRON, "$Iron");
+      InventoryDataSetter.putMaterial(t, "ArmorMaterialLeather", 12, skyui.defines.Material.LEATHER, "$Leather");
+      InventoryDataSetter.putMaterial(t, "ArmorMaterialOrcish", 13, skyui.defines.Material.ORCISH, "$Orcish");
+      InventoryDataSetter.putMaterial(t, "WeapMaterialOrcish", 13, skyui.defines.Material.ORCISH, "$Orcish");
+      InventoryDataSetter.putMaterial(t, "ccBGSSSE055_ArmorMaterialOrcishLight", 13, skyui.defines.Material.ORCISH, "$Orcish");
+      InventoryDataSetter.putMaterial(t, "ArmorMaterialSteel", 14, skyui.defines.Material.STEEL, "$Steel");
+      InventoryDataSetter.putMaterial(t, "WeapMaterialSteel", 14, skyui.defines.Material.STEEL, "$Steel");
+      InventoryDataSetter.putMaterial(t, "ArmorMaterialSteelPlate", 14, skyui.defines.Material.STEEL, "$Steel");
+      InventoryDataSetter.putMaterial(t, "WeapMaterialDraugr", 14, skyui.defines.Material.STEEL, "$Steel");
+      InventoryDataSetter.putMaterial(t, "WeapMaterialDraugrHoned", 14, skyui.defines.Material.STEEL, "$Steel");
+      InventoryDataSetter.putMaterial(t, "WeapMaterialSilver", 15, skyui.defines.Material.SILVER, "$Silver");
+      InventoryDataSetter.putMaterial(t, "ArmorMaterialFalmer", 16, skyui.defines.Material.FALMER, "$Falmer");
+      InventoryDataSetter.putMaterial(t, "DLC1ArmorMaterialFalmerHardened", 16, skyui.defines.Material.FALMER, "$Falmer");
+      InventoryDataSetter.putMaterial(t, "DLC1ArmorMaterielFalmerHeavy", 16, skyui.defines.Material.FALMER, "$Falmer");
+      InventoryDataSetter.putMaterial(t, "DLC1ArmorMaterielFalmerHeavyOriginal", 16, skyui.defines.Material.FALMER, "$Falmer");
+      InventoryDataSetter.putMaterial(t, "DLC2ArmorMaterialBonemoldHeavy", 17, skyui.defines.Material.BONEMOLD, "$Bonemold");
+      InventoryDataSetter.putMaterial(t, "DLC2ArmorMaterialBonemoldLight", 17, skyui.defines.Material.BONEMOLD, "$Bonemold");
+      InventoryDataSetter.putMaterial(t, "DLC2ArmorMaterialChitinHeavy", 18, skyui.defines.Material.CHITIN, "$Chitin");
+      InventoryDataSetter.putMaterial(t, "DLC2ArmorMaterialChitinLight", 18, skyui.defines.Material.CHITIN, "$Chitin");
+      InventoryDataSetter.putMaterial(t, "DLC2ArmorMaterialMoragTong", 18, skyui.defines.Material.CHITIN, "$Chitin");
+      InventoryDataSetter.putMaterial(t, "DLC2ArmorMaterialNordicHeavy", 19, skyui.defines.Material.NORDIC, "$Nordic");
+      InventoryDataSetter.putMaterial(t, "DLC2ArmorMaterialNordicLight", 19, skyui.defines.Material.NORDIC, "$Nordic");
+      InventoryDataSetter.putMaterial(t, "DLC2WeaponMaterialNordic", 19, skyui.defines.Material.NORDIC, "$Nordic");
+      InventoryDataSetter.putMaterial(t, "DLC2ArmorMaterialStalhrimHeavy", 20, skyui.defines.Material.STALHRIM, "$Stalhrim");
+      InventoryDataSetter.putMaterial(t, "DLC2ArmorMaterialStalhrimLight", 20, skyui.defines.Material.STALHRIM, "$Stalhrim");
+      InventoryDataSetter.putMaterial(t, "DLC2WeaponMaterialStalhrim", 20, skyui.defines.Material.STALHRIM, "$Stalhrim");
+      InventoryDataSetter.putMaterial(t, "WeapMaterialFalmer", 21, skyui.defines.Material.FALMER, "$Falmer");
+      InventoryDataSetter.putMaterial(t, "WeapMaterialFalmerHoned", 21, skyui.defines.Material.FALMER, "$Falmer");
+      InventoryDataSetter.putMaterial(t, "ccASVSSE001_ArmorOrdinator", 22, skyui.defines.Material.ORDINATOR, "$Ordinator");
+      InventoryDataSetter.putMaterial(t, "ccASVSSE001_ArmorOrdinatorIndoril", 22, skyui.defines.Material.ORDINATOR, "$Ordinator");
+      InventoryDataSetter.putMaterial(t, "ccBGSSSE025_ArmorMaterialAmber", 23, skyui.defines.Material.AMBER, "$Amber");
+      InventoryDataSetter.putMaterial(t, "ccBGSSSE025_WeapMaterialAmber", 23, skyui.defines.Material.AMBER, "$Amber");
+      InventoryDataSetter.putMaterial(t, "ccBGSSSE025_ArmorMaterialMadness", 24, skyui.defines.Material.MADNESS, "$Madness");
+      InventoryDataSetter.putMaterial(t, "ccBGSSSE025_WeapMaterialMadness", 24, skyui.defines.Material.MADNESS, "$Madness");
+      InventoryDataSetter.putMaterial(t, "WeapMaterialWood", 25, skyui.defines.Material.WOOD, "$Wood");
+      return t;
+   }
+
    function processMaterialKeywords(a_entryObject)
    {
       a_entryObject.material = null;
       a_entryObject.materialDisplay = skyui.util.Translator.translate("$Other");
-      if(a_entryObject.keywords == undefined)
+      var keywords = a_entryObject.keywords;
+      if(keywords == undefined)
       {
          return undefined;
       }
-
-      if(a_entryObject.keywords.ArmorMaterialDaedric != undefined || a_entryObject.keywords.WeapMaterialDaedric != undefined || a_entryObject.keywords.ccBGSSSE025_ArmorMaterialDark != undefined || a_entryObject.keywords.ccBGSSSE025_WeapMaterialDark != undefined || a_entryObject.keywords.ccBGSSSE025_ArmorMaterialGolden != undefined || a_entryObject.keywords.ccBGSSSE025_WeapMaterialGolden != undefined)
+      var table = InventoryDataSetter._materialByKeyword;
+      if(table == undefined)
       {
-         a_entryObject.material = skyui.defines.Material.DAEDRIC;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Daedric");
+         table = InventoryDataSetter._materialByKeyword = InventoryDataSetter.buildMaterialTable();
       }
-      else if(a_entryObject.keywords.ArmorMaterialDragonplate != undefined || a_entryObject.keywords.ArmorMaterialDragonscale != undefined || a_entryObject.keywords.DLC1WeapMaterialDragonbone != undefined)
+      // The old chain took the first branch (in chain order) with any matching keyword: keep the lowest order.
+      var best = undefined;
+      for(var k in keywords)
       {
-         a_entryObject.material = skyui.defines.Material.DRAGON;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Dragon");
+         if(keywords[k] != undefined)
+         {
+            var e = table[k];
+            if(e != undefined && (best == undefined || e.o < best.o))
+            {
+               best = e;
+            }
+         }
       }
-      else if(a_entryObject.keywords.ArmorMaterialDwarven != undefined || a_entryObject.keywords.WeapMaterialDwarven != undefined)
+      if(best != undefined)
       {
-         a_entryObject.material = skyui.defines.Material.DWARVEN;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Dwarven");
-      }
-      else if(a_entryObject.keywords.ArmorMaterialEbony != undefined || a_entryObject.keywords.WeapMaterialEbony != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.EBONY;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Ebony");
-      }
-      else if(a_entryObject.keywords.ArmorMaterialElven != undefined || a_entryObject.keywords.WeapMaterialElven != undefined || a_entryObject.keywords.ArmorMaterialElvenGilded != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.ELVEN;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Elven");
-      }
-      else if(a_entryObject.keywords.ArmorMaterialGlass != undefined || a_entryObject.keywords.WeapMaterialGlass != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.GLASS;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Glass");
-      }
-      else if(a_entryObject.keywords.ArmorMaterialHide != undefined || a_entryObject.keywords.ArmorMaterialScaled != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.HIDE;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Hide");
-      }
-      else if(a_entryObject.keywords.ArmorMaterialStormcloak != undefined || a_entryObject.keywords.ArmorMaterialBearStormcloak != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.STORMCLOAK;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Stormcloak");
-      }
-      else if(a_entryObject.keywords.ArmorMaterialImperialHeavy != undefined || a_entryObject.keywords.ArmorMaterialImperialLight != undefined || a_entryObject.keywords.WeapMaterialImperial != undefined || a_entryObject.keywords.ArmorMaterialImperialStudded != undefined || a_entryObject.keywords.ArmorMaterialStudded != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.IMPERIAL;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Imperial");
-      }
-      else if(a_entryObject.keywords.ArmorMaterialIron != undefined || a_entryObject.keywords.WeapMaterialIron != undefined || a_entryObject.keywords.ArmorMaterialIronBanded != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.IRON;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Iron");
-      }
-      else if(a_entryObject.keywords.ArmorMaterialLeather != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.LEATHER;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Leather");
-      }
-      else if(a_entryObject.keywords.ArmorMaterialOrcish != undefined || a_entryObject.keywords.WeapMaterialOrcish != undefined || a_entryObject.keywords.ccBGSSSE055_ArmorMaterialOrcishLight != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.ORCISH;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Orcish");
-      }
-      else if(a_entryObject.keywords.ArmorMaterialSteel != undefined || a_entryObject.keywords.WeapMaterialSteel != undefined || a_entryObject.keywords.ArmorMaterialSteelPlate != undefined || a_entryObject.keywords.WeapMaterialDraugr != undefined || a_entryObject.keywords.WeapMaterialDraugrHoned != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.STEEL;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Steel");
-      }
-      else if(a_entryObject.keywords.WeapMaterialSilver != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.SILVER;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Silver");
-      }
-      else if(a_entryObject.keywords.ArmorMaterialFalmer != undefined || a_entryObject.keywords.DLC1ArmorMaterialFalmerHardened != undefined || a_entryObject.keywords.DLC1ArmorMaterielFalmerHeavy != undefined || a_entryObject.keywords.DLC1ArmorMaterielFalmerHeavyOriginal != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.FALMER;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Falmer");
-      }
-      else if(a_entryObject.keywords.DLC2ArmorMaterialBonemoldHeavy != undefined || a_entryObject.keywords.DLC2ArmorMaterialBonemoldLight != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.BONEMOLD;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Bonemold");
-      }
-      else if(a_entryObject.keywords.DLC2ArmorMaterialChitinHeavy != undefined || a_entryObject.keywords.DLC2ArmorMaterialChitinLight != undefined || a_entryObject.keywords.DLC2ArmorMaterialMoragTong != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.CHITIN;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Chitin");
-      }
-      else if(a_entryObject.keywords.DLC2ArmorMaterialNordicHeavy != undefined || a_entryObject.keywords.DLC2ArmorMaterialNordicLight != undefined || a_entryObject.keywords.DLC2WeaponMaterialNordic != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.NORDIC;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Nordic");
-      }
-      else if(a_entryObject.keywords.DLC2ArmorMaterialStalhrimHeavy != undefined || a_entryObject.keywords.DLC2ArmorMaterialStalhrimLight != undefined || a_entryObject.keywords.DLC2WeaponMaterialStalhrim != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.STALHRIM;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Stalhrim");
-      }
-      else if(a_entryObject.keywords.WeapMaterialFalmer != undefined || a_entryObject.keywords.WeapMaterialFalmerHoned != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.FALMER;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Falmer");
-      }
-      else if(a_entryObject.keywords.ccASVSSE001_ArmorOrdinator != undefined || a_entryObject.keywords.ccASVSSE001_ArmorOrdinatorIndoril != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.ORDINATOR;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Ordinator");
-      }
-      else if(a_entryObject.keywords.ccBGSSSE025_ArmorMaterialAmber != undefined || a_entryObject.keywords.ccBGSSSE025_WeapMaterialAmber != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.AMBER;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Amber");
-      }
-      else if(a_entryObject.keywords.ccBGSSSE025_ArmorMaterialMadness != undefined || a_entryObject.keywords.ccBGSSSE025_WeapMaterialMadness != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.MADNESS;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Madness");
-      }
-      else if(a_entryObject.keywords.WeapMaterialWood != undefined)
-      {
-         a_entryObject.material = skyui.defines.Material.WOOD;
-         a_entryObject.materialDisplay = skyui.util.Translator.translate("$Wood");
+         a_entryObject.material = best.m;
+         a_entryObject.materialDisplay = skyui.util.Translator.translate(best.l);
       }
    }
    function processWeaponType(a_entryObject)
