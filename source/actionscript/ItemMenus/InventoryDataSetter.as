@@ -235,7 +235,7 @@ class InventoryDataSetter extends ItemcardDataExtender
 
         // The old chain took the first branch (in chain order) with any matching keyword: keep the lowest order.
         var best: Object = undefined;
-        for (var k: String in keywords) {
+        for (var k in keywords) {
             if (keywords[k] != undefined) {
                 var e: Object = table[k];
                 if (e != undefined && (best == undefined || e.o < best.o))
