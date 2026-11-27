@@ -37,10 +37,11 @@ class skyui.components.list.BSList extends MovieClip
 	}
 	
 	
-  /* CONSTRUCTORS */
+  /* INITIALIZATION */
   
 	public function BSList()
 	{
+		super();
 		this._entryList = new Array();
 		this._selectedIndex = -1;
 	}
