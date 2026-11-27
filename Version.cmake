@@ -1,6 +1,6 @@
 # Release Version
 set(VER_MAJOR 6)
-set(VER_MINOR 9)
+set(VER_MINOR 11)
 set(VER_RELEASE_IDX 2026)
 set(VER_SUFFIX "SE")
 
