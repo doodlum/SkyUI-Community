@@ -116,6 +116,7 @@ function(Add_FPS_Patch)
             "${_TOOLS}/fps_swfxml.py"
             "${_TOOLS}/fps_patch_plan.json"
         COMMENT "[Build] FPS patch (${FPS_PATCH_TARGET} fps): ${ARG_SWF_REL}"
+        JOB_POOL fps_patch
         VERBATIM
     )
 

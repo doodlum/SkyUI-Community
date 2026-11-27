@@ -34,6 +34,10 @@ option(ENABLE_FPS_PATCH "Rebuild SWFs at a higher frame rate (FPS_PATCH_TARGET) 
 set(FPS_PATCH_TARGET "120" CACHE STRING "Frame rate the FPS patch converts SWFs to (an integer multiple of 24, 30 and 60)")
 if(ENABLE_FPS_PATCH)
     find_package(Python3 REQUIRED COMPONENTS Interpreter)
+    # Each patch step runs two FFDec JVMs and a Python pass over the SWF's XML (hudmenu: ~2 GB); cap how many
+    # run at once so a parallel build does not exhaust memory (Ninja only).
+    set(FPS_PATCH_JOBS "3" CACHE STRING "Maximum number of FPS patch steps running in parallel")
+    set_property(GLOBAL APPEND PROPERTY JOB_POOLS "fps_patch=${FPS_PATCH_JOBS}")
     message(STATUS "[Build] FPS patch   : ON -- SWFs listed in tools/fps_patch_plan.json are rebuilt at ${FPS_PATCH_TARGET} fps")
 else()
     message(STATUS "[Build] FPS patch   : OFF -- SWFs keep their original frame rates (-DENABLE_FPS_PATCH=ON to enable)")
