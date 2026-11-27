@@ -3,6 +3,8 @@
         "Which SWFs the FPS patch converts (tools/xml_fps_patcher.py, verified by tools/check_fps_patch.py).",
         "convert=true: frame rate -> target_fps, every timeline stretched by k = target_fps / original fps,",
         "  all frame-number references in the SWF's bytecode rescaled at run time by skyui.util.FpsScale.",
+        "played_at: for libraries other SWFs import (ImportAssets): their symbols play at the importer's frame rate, so they are stretched by target_fps / played_at; check_fps_patch.py verifies it against every importer.",
+        "keep_shallow: sprite ids whose own timeline stays unstretched (1-frame marker) while every timeline nested in it is stretched and gets its own k marker.",
         "convert=false: frame rate and timelines unchanged (code is still rewritten, with k = 1, because it may",
         "  drive clips of converted SWFs loaded into it).",
         "exclude=true: built exactly as with ENABLE_FPS_PATCH=OFF (no FpsScale class, no rewrite, no marker); for",
@@ -45,10 +47,10 @@
         "tweenmenu.swf":           {"convert": true},
         "exported/widgets/skyui/activeeffects.swf": {"convert": true},
         "exported/skyui/widgetloader.swf": {"convert": true},
-        "skyui/bottombar.swf":     {"convert": true},
-        "skyui/configpanel.swf":   {"convert": true},
+        "skyui/bottombar.swf":     {"convert": true, "played_at": 60, "reason": "imported (ImportAssets) by the item menus at 60 fps; its symbols play at their rate"},
+        "skyui/configpanel.swf":   {"convert": true, "played_at": 30, "reason": "imported (ImportAssets) by quest_journal.swf at 30 fps; its symbols play at that rate"},
         "skyui/inventorylists.swf": {"convert": true},
-        "skyui/itemcard.swf":      {"convert": true},
+        "skyui/itemcard.swf":      {"convert": true, "played_at": 60, "reason": "imported (ImportAssets) by the item menus at 60 fps; its symbols play at their rate"},
         "skyui/mcm_splash.swf":    {"convert": true},
         "skyui/skyui_splash.swf":  {"convert": true},
 
@@ -61,6 +63,16 @@
         "skyui/icons_category_straight.swf":    {"convert": false, "reason": "static icon library (gotoAndStop by label); nothing plays"},
         "skyui/icons_item_psychosteve.swf":     {"convert": false, "reason": "static icon library (gotoAndStop by label); nothing plays"},
         "exported/skyui/icons_effect_psychosteve.swf": {"convert": false, "reason": "static icon library (gotoAndStop by label); nothing plays"}
+    },
+    "compat": {
+        "_doc": "Compatibility profiles, chosen with the CMake option FPS_PATCH_COMPAT (comma separated; empty for none). Each overrides \"swfs\" entries so that other mods which read SkyUI's raw frame numbers keep working. SWFs loaded into a converted menu play at their own frame rate (checked in game), so an unconverted SWF inside a converted host animates at its normal speed.",
+        "morehud_inventory": {
+            "mod": "moreHUD Inventory Edition (ahzaab/moreHUDInventoryAS2)",
+            "why": "AHZmoreHUDInventory.as reads the item card's _totalframes and _currentframe and compares them with fixed frame numbers (AHZCCSkyUIFrames: MAX_FRAMES 221, EMPTY 151, ...). A stretched item card makes every comparison fail.",
+            "swfs": {
+                "skyui/itemcard.swf": {"convert": true, "played_at": 60, "keep_shallow": ["249"], "reason": "compat morehud_inventory: the ItemCard symbol (249) keeps its original 221 frames because moreHUD Inventory Edition reads its raw frame numbers; the animations nested in it are stretched"}
+            }
+        }
     },
     "keep_timelines": {
         "_doc": "Sprites (and everything nested in them) left unstretched inside a converted SWF because the game engine drives them by frame number from native code, which the patcher cannot rewrite. Each gets its own 1-frame __fpsScale marker so ActionScript sees k = 1 for them.",

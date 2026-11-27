@@ -109,6 +109,7 @@ function(Add_FPS_Patch)
         COMMAND "${Python3_EXECUTABLE}" "${_TOOLS}/xml_fps_patcher.py"
                 --in "${_XML_IN}" --out "${_XML_OUT}" --swf "${ARG_SWF_REL}"
                 --plan "${_TOOLS}/fps_patch_plan.json" --fps "${FPS_PATCH_TARGET}"
+                --compat "${FPS_PATCH_COMPAT_ARG}"
         COMMAND "${FFDEC_CLI}" -xml2swf "${_XML_OUT}" "${ARG_SWF_OUTPUT}"
         DEPENDS
             "${ARG_SWF_INPUT}"

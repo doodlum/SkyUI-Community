@@ -35,6 +35,7 @@ import copy
 import glob
 import json
 import os
+import re
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
@@ -197,15 +198,22 @@ def check_swf(key, entry, plan, before_xml, after_xml, notes):
     def err(msg):
         errors.append(msg)
 
+    # an imported library is stretched by its importers' factor (target / played_at); its own header rate is
+    # set to the target too but never used. eff_b / eff_a: the rate the timelines actually play at.
+    played_at = float(entry.get("played_at", fb))
     if convert:
         if abs(fa - target) > 1e-6:
             err("frame rate %g, expected %g" % (fa, target))
-    elif abs(fa - fb) > 1e-6:
-        err("frame rate changed %g -> %g although the plan keeps it" % (fb, fa))
-    k = int(round(fa / fb))
-    if abs(fa / fb - k) > 1e-9:
-        err("frame rate %g is not an integer multiple of %g" % (fa, fb))
-        return errors, {}
+        k = int(round(target / played_at))
+        if abs(target / played_at - k) > 1e-9 or k < 1:
+            err("target %g fps is not an integer multiple of %g" % (target, played_at))
+            return errors, {}
+    else:
+        if abs(fa - fb) > 1e-6:
+            err("frame rate changed %g -> %g although the plan keeps it" % (fb, fa))
+        k = 1
+    eff_b = played_at if convert else fb
+    eff_a = eff_b * k
 
     exports_a = sx.export_names(ta)
     helper_ids = {cid for cid, n in exports_a.items() if n == HELPER_EXPORT}
@@ -225,6 +233,17 @@ def check_swf(key, entry, plan, before_xml, after_xml, notes):
     for i in listed:
         if i not in tls_b:
             err("keep_timelines lists unknown sprite %s" % i)
+    # keep_shallow: the sprite itself stays unstretched (1-frame marker); stretched timelines nested in it get
+    # their own k-frame marker
+    shallow = set(str(i) for i in entry.get("keep_shallow", [])) if k > 1 else set()
+    for i in shallow - set(tls_b):
+        err("keep_shallow lists unknown sprite %s" % i)
+    shallow &= set(tls_b)
+
+    def _single(t):
+        return t.frame_count <= 1 or sum(1 for e in t.container if sx.tag_type(e) == "ShowFrameTag") <= 1
+    k_marked = {t for t in keep_closure(tls_b, list(shallow)) - shallow - kept if not _single(tls_b[t])}
+    kept = kept | shallow
 
     marker_id = one_id = None
     for tid in extra:
@@ -257,11 +276,11 @@ def check_swf(key, entry, plan, before_xml, after_xml, notes):
         nb, na = tl_b.frame_count, tl_a.frame_count
         stats["timelines"] += 1
         if na != nb * kt:
-            err("%s: %d frames -> %d, expected %d (duration %.4fs -> %.4fs)" % (name, nb, na, nb * kt, nb / fb, na / fa))
-        dur_b, dur_a = nb / fb, na / fa
+            err("%s: %d frames -> %d, expected %d (duration %.4fs -> %.4fs)" % (name, nb, na, nb * kt, nb / eff_b, na / eff_a))
+        dur_b, dur_a = nb / eff_b, na / eff_a
         if tid in kept:
             if nb > 1:
-                notes.append("%s: %s left unstretched (%d frames, engine-driven): plays %dx faster if played" % (key, name, nb, k))
+                notes.append("%s: %s left unstretched (%d frames; keep_timelines / keep_shallow): plays %dx faster if played" % (key, name, nb, k))
         elif not single and abs(dur_b - dur_a) > 1e-9:
             err("%s: duration %.6fs -> %.6fs" % (name, dur_b, dur_a))
         if nb > 1 and tid not in kept:
@@ -306,10 +325,11 @@ def check_swf(key, entry, plan, before_xml, after_xml, notes):
                     err("main timeline frame 1: FpsScale definition changed")
                 tags_b = [e for e in tags_b if not is_helper(e)]
                 tags_a = [e for e in tags_a if not is_helper(e)]
-            elif tid in kept and f == 0:
+            elif (tid in kept or tid in k_marked) and f == 0:
+                want_id = one_id if tid in kept else marker_id
                 places = [e for e in tags_a if sx.tag_type(e).startswith("PlaceObject") and e.get("name") == MARKER]
-                if len(places) != 1 or places[0].get("characterId") != one_id:
-                    err("%s: 1-frame %s marker not placed on frame 1" % (name, MARKER))
+                if len(places) != 1 or places[0].get("characterId") != want_id:
+                    err("%s: %s %s marker not placed on frame 1" % (name, "1-frame" if tid in kept else "%d-frame" % k, MARKER))
                 tags_a = [e for e in tags_a if not any(e is m for m in places)]
             cb = [canonical(e) for e in tags_b]
             ca = [canonical(e) for e in tags_a]
@@ -431,12 +451,21 @@ def main():
     ap.add_argument("--swf", action="append", help="only check these SWFs (relative to interface/)")
     ap.add_argument("--work", help="folder for the XML exports (default: <build>/staging/fps_check)")
     ap.add_argument("--fps", type=float, default=None, help="frame rate the build was patched to (default: plan target_fps)")
+    ap.add_argument("--compat", default="", help="compatibility profiles the build was patched with, comma separated")
     args = ap.parse_args()
 
     with open(args.plan, "r", encoding="utf-8") as f:
         plan = json.load(f)
     if args.fps is not None:
         plan["target_fps"] = args.fps
+    profiles = plan.get("compat", {})
+    for name in [c.strip() for c in args.compat.replace(";", ",").split(",") if c.strip()]:
+        if name not in profiles or name.startswith("_"):
+            print("check_fps_patch: unknown compatibility profile '%s'" % name)
+            return 2
+        for swf, override in profiles[name].get("swfs", {}).items():
+            plan["swfs"][swf] = dict(override)
+        print("compat profile %s: %s" % (name, ", ".join(sorted(profiles[name].get("swfs", {})))))
     build = os.path.abspath(args.build)
     unpatched_dir = os.path.join(build, "fps_unpatched")
     final_dir = os.path.join(build, "interface")
@@ -516,13 +545,37 @@ def main():
             continue
         tb = sx.load(before_xml)
         fb = float(tb.getroot().get("frameRate"))
-        k = st and int(round(float(plan["target_fps"]) / fb)) if entry.get("convert") else 1
+        k = st and int(round(float(plan["target_fps"]) / float(entry.get("played_at", fb)))) if entry.get("convert") else 1
         dur = ("%.2fs..%.2fs" % (st["dur_min"], st["dur_max"])) if st.get("dur_min") is not None else "-"
-        mode = "%g -> %g fps (x%d)" % (fb, fb * k, k) if entry.get("convert") else "kept at %g fps (%s)" % (fb, entry.get("reason", ""))
+        mode = ("%g -> %g fps (x%d)" % (fb, fb * k, k) if "played_at" not in entry else "%g fps library played at %g by its importers -> x%d" % (fb, float(entry["played_at"]), k)) if entry.get("convert") else "kept at %g fps (%s)" % (fb, entry.get("reason", ""))
         print("OK   %-42s %s; %d timelines (%d animated, %s, all durations equal; %d engine-driven + %d single-frame unstretched), %d labels, %d scripts; "
               "rescaled: %d prop, %d goto, %d GotoFrame, %d+%d onEnterFrame throttled; %d interpolated moves"
               % (s, mode, st["timelines"], st["animated"], dur, st["kept"], st["single"], st["labels"], st["scripts"], st["prop"], st["go"],
                  st["gotoframe"], st["throttle"], st["guard"], st["interp_moves"]))
+    # Imported libraries play at the importing SWF's frame rate: a converted library must be stretched by the
+    # same factor as every SWF that imports it, i.e. its "played_at" must be the importer's original rate.
+    rates, imports = {}, []
+    for s in built:
+        bx = os.path.join(build, "staging", "fps", s[:-4] + ".unpatched.xml")
+        if not os.path.exists(bx):
+            continue
+        with open(bx, "r", encoding="utf-8") as f:
+            text = f.read()
+        m = re.search(r'frameRate="([^"]+)"', text)
+        rates[s] = float(m.group(1)) if m else None
+        for url in re.findall(r'ImportAssets2?Tag"[^>]*url="([^"]+)"', text):
+            lib = os.path.normpath(os.path.join(os.path.dirname(s), url.replace("\\\\", "/").replace("\\", "/")))
+            imports.append((s, lib.replace("\\", "/").lower()))
+    for host, lib in imports:
+        le, he = plan["swfs"].get(lib), plan["swfs"].get(host)
+        if not le or not le.get("convert") or le.get("exclude") or lib not in rates:
+            continue
+        want = float(le.get("played_at", rates[lib]))
+        if not (he and he.get("convert")) or rates.get(host) is None or abs(rates[host] - want) > 1e-6:
+            failures += 1
+            print("FAIL %s imports %s: the library plays at %s's rate (%s fps, %s) but is stretched for %g fps "
+                  "(set \"played_at\" in the plan)" % (host, lib, host, rates.get(host),
+                                                       "converted" if he and he.get("convert") else "not converted", want))
     if notes:
         print("\nNotes (throttled per-frame handlers run once per original frame):")
         for n in sorted(set(notes)):

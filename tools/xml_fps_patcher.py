@@ -56,9 +56,30 @@ class PatchError(Exception):
 # Plan
 # ---------------------------------------------------------------------------
 
-def load_plan(path):
+def load_plan(path, compat=None):
+    """Loads the plan and applies the named compatibility profiles (plan["compat"]) on top of plan["swfs"].
+    compat: comma/semicolon separated profile names, a list, or None/"" for none."""
     with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
+        plan = json.load(f)
+    apply_compat(plan, compat)
+    return plan
+
+
+def apply_compat(plan, compat):
+    if isinstance(compat, str):
+        compat = [c.strip() for c in compat.replace(";", ",").split(",")]
+    names = [c for c in (compat or []) if c]
+    profiles = plan.get("compat", {})
+    for name in names:
+        if name not in profiles or name.startswith("_"):
+            raise PatchError("unknown FPS patch compatibility profile '%s' (known: %s)"
+                             % (name, ", ".join(sorted(k for k in profiles if not k.startswith("_")))))
+        for swf, override in profiles[name].get("swfs", {}).items():
+            if swf not in plan["swfs"]:
+                raise PatchError("compat profile '%s' lists %s, which is not in the plan" % (name, swf))
+            plan["swfs"][swf] = dict(override)
+    plan["compat_applied"] = names
+    return plan
 
 
 def plan_entry(plan, swf_rel):
@@ -438,10 +459,11 @@ def _first_frame_pos(container):
     return len(list(container))
 
 
-def add_markers(tree, k, kept):
+def add_markers(tree, k, kept, k_marked=()):
     """Main timeline: child "__fpsScale" with k frames.  Every timeline in `kept` (left unstretched inside a
     converted SWF) gets its own 1-frame "__fpsScale" child, so FpsScale.factor() returns 1 for it and for
-    everything nested in it."""
+    everything nested in it.  Every timeline in `k_marked` (stretched, but nested in an unstretched one) gets
+    its own k-frame child, so FpsScale.factor() finds k again before it reaches the 1-frame marker above."""
     swf = tree.getroot()
     tags = swf.find("tags")
     head = 0
@@ -455,13 +477,15 @@ def add_markers(tree, k, kept):
     tags.insert(head, _marker_sprite(root_id, k))
     depth = max([int(el.get("depth")) for el in tags if sx.tag_type(el).startswith("PlaceObject")] + [0]) + 1
     tags.insert(_first_frame_pos(tags), _marker_place(root_id, depth))
+    one_id = None
     if kept:
         one_id = free_character_id(tree)
         tags.insert(head, _marker_sprite(one_id, 1))
-        for tl in sx.timelines(tree):
-            if tl.id in kept:
-                d = max([int(el.get("depth")) for el in tl.container if sx.tag_type(el).startswith("PlaceObject")] + [0]) + 1
-                tl.container.insert(_first_frame_pos(tl.container), _marker_place(one_id, d))
+    for tl in sx.timelines(tree):
+        mark = one_id if tl.id in kept else (root_id if tl.id in k_marked else None)
+        if mark is not None:
+            d = max([int(el.get("depth")) for el in tl.container if sx.tag_type(el).startswith("PlaceObject")] + [0]) + 1
+            tl.container.insert(_first_frame_pos(tl.container), _marker_place(mark, d))
 
 
 def kept_closure(tree, ids):
@@ -489,12 +513,15 @@ def patch(tree, swf_key, entry, plan, target_fps):
                          "(reconfigure CMake after editing fps_patch_plan.json)" % swf_key)
     orig_fps = float(swf.get("frameRate"))
     convert = bool(entry.get("convert"))
+    # Libraries imported by other SWFs (ImportAssets) play at the importing SWF's frame rate, not their own:
+    # "played_at" is that rate, and the library is stretched by the same factor as its importers.
+    played_at = float(entry.get("played_at", orig_fps))
     k = 1
     if convert:
-        ratio = target_fps / orig_fps
+        ratio = target_fps / played_at
         k = int(round(ratio))
         if abs(ratio - k) > 1e-6 or k < 1:
-            raise PatchError("%s: %g fps is not an integer multiple of %g fps" % (swf_key, target_fps, orig_fps))
+            raise PatchError("%s: %g fps is not an integer multiple of %g fps" % (swf_key, target_fps, played_at))
     stats = {"prop": 0, "go": 0, "gotoframe": 0, "throttle": 0, "enterframe_free": 0, "clip_guard": 0,
              "timelines": 0, "kept_timelines": 0, "interp_tags": 0}
     # Timelines with one frame (or none) have no duration to keep and are never stretched: Flash plays a
@@ -509,6 +536,14 @@ def patch(tree, swf_key, entry, plan, target_fps):
     missing = [i for i in listed if i not in kept]
     if missing:
         raise PatchError("%s: keep_timelines lists unknown sprite(s) %s" % (swf_key, missing))
+    # "keep_shallow": sprites whose own timeline stays unstretched (other mods read their raw frame numbers)
+    # while everything nested in them is stretched as usual and carries its own k marker.
+    shallow = set(str(i) for i in entry.get("keep_shallow", []))
+    ids = {tl.id for tl in sx.timelines(tree)}
+    if shallow - ids:
+        raise PatchError("%s: keep_shallow lists unknown sprite(s) %s" % (swf_key, sorted(shallow - ids)))
+    k_marked = (kept_closure(tree, list(shallow)) - shallow - single - kept) if k > 1 else set()
+    kept = kept | shallow
 
     if convert and k > 1:
         for el in swf.iter("item"):
@@ -552,9 +587,11 @@ def patch(tree, swf_key, entry, plan, target_fps):
                 stats["single_frame"] += 1
                 continue
             stretch_timeline(tl, k, show_proto, stats)
-        swf.set("frameRate", "%.1f" % (orig_fps * k))
+        # = orig_fps * k, except for imported libraries (played_at), whose own header rate is never used and
+        # could exceed what the SWF header can hold (8.8 fixed point, < 256)
+        swf.set("frameRate", "%.1f" % target_fps)
 
-    add_markers(tree, k, kept if k > 1 else set())
+    add_markers(tree, k, kept if k > 1 else set(), k_marked)
     move_helper_first(tree, helper_ids)
     return k, stats
 
@@ -597,9 +634,14 @@ def main():
     ap.add_argument("--swf", required=True, help="SWF path relative to interface/, e.g. skyui/itemcard.swf")
     ap.add_argument("--plan", default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "fps_patch_plan.json"))
     ap.add_argument("--fps", type=float, default=None, help="target frame rate (default: plan target_fps)")
+    ap.add_argument("--compat", default="", help="compatibility profiles from the plan's \"compat\" section, comma separated")
     args = ap.parse_args()
 
-    plan = load_plan(args.plan)
+    try:
+        plan = load_plan(args.plan, args.compat)
+    except PatchError as e:
+        print("xml_fps_patcher: ERROR: %s" % e, file=sys.stderr)
+        return 1
     fps = args.fps if args.fps is not None else float(plan["target_fps"])
     try:
         key, entry = plan_entry(plan, args.swf)

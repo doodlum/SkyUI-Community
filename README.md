@@ -91,8 +91,17 @@ runtime side in `source/actionscript/Common/skyui/util/FpsScale.as`). Which SWFs
 - The configure log prints `[Build] FPS patch : ON` or `OFF`; the presets set it ON. A build folder configured
   by hand keeps whatever value is in its `CMakeCache.txt`, so pass `-DENABLE_FPS_PATCH=ON` (or `OFF`) when
   reusing one. With the patch OFF the SWFs keep their original frame rates.
+- Scaleform advances a movie by at most 3 frames per rendered game frame. A target keeps animations at their
+  original speed only while the game renders at least target / 3 fps (40 fps for 120, 80 fps for 240); below
+  that, menu animations play slower than intended. Measured in game: at ~55 fps the stats menu opening takes
+  ~0.57 s at 120 fps (main: ~0.55 s) but ~0.84 s at 240 fps.
+- Other mods: SWFs loaded into a converted menu (SkyUI widgets from other mods, moreHUD, Infinity UI patches)
+  keep playing at their own frame rate. Mods that read SkyUI's raw frame numbers need the SWF they read left
+  unconverted; `FPS_PATCH_COMPAT` (default `morehud_inventory`) selects these profiles from the plan's
+  `"compat"` section. `morehud_inventory` keeps `skyui/itemcard.swf` at its original rate for moreHUD Inventory
+  Edition. Set `-DFPS_PATCH_COMPAT=` to convert everything.
 - Verify a patched build with `cmake --build --preset debug --target check_fps_patch` (or
-  `python tools/check_fps_patch.py --build build/debug --ffdec <path to ffdec-cli> --fps 240`). It proves for every SWF
+  `python tools/check_fps_patch.py --build build/debug --ffdec <path to ffdec-cli> --fps 240 --compat morehud_inventory`, matching the build's options). It proves for every SWF
   that each timeline keeps its duration in seconds and that every frame-number reference in the bytecode was
   rescaled, and fails otherwise.
 

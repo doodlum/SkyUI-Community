@@ -32,6 +32,10 @@ endif()
 # when switching. The configure log and the build log ("[Build] FPS patch ...") show which state you got.
 option(ENABLE_FPS_PATCH "Rebuild SWFs at a higher frame rate (FPS_PATCH_TARGET) with timelines stretched to match" ON)
 set(FPS_PATCH_TARGET "240" CACHE STRING "Frame rate the FPS patch converts SWFs to (an integer multiple of 24, 30 and 60)")
+# Compatibility profiles (tools/fps_patch_plan.json "compat") keep the SWFs other mods read frame numbers from
+# unconverted. Comma separated; set to "" to convert everything.
+set(FPS_PATCH_COMPAT "morehud_inventory" CACHE STRING "FPS patch compatibility profiles for other mods (comma separated, empty for none)")
+string(REPLACE ";" "," FPS_PATCH_COMPAT_ARG "${FPS_PATCH_COMPAT}")
 if(ENABLE_FPS_PATCH)
     find_package(Python3 REQUIRED COMPONENTS Interpreter)
     # Each patch step runs two FFDec JVMs and a Python pass over the SWF's XML (hudmenu: ~2 GB); cap how many
@@ -41,7 +45,7 @@ if(ENABLE_FPS_PATCH)
     # Read at configure time: SWFs with "exclude": true are built without any FPS patch step
     file(READ "${CMAKE_CURRENT_SOURCE_DIR}/tools/fps_patch_plan.json" FPS_PATCH_PLAN_JSON)
     set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/tools/fps_patch_plan.json")
-    message(STATUS "[Build] FPS patch   : ON -- SWFs listed in tools/fps_patch_plan.json are rebuilt at ${FPS_PATCH_TARGET} fps")
+    message(STATUS "[Build] FPS patch   : ON -- SWFs listed in tools/fps_patch_plan.json are rebuilt at ${FPS_PATCH_TARGET} fps (compat: ${FPS_PATCH_COMPAT_ARG})")
 else()
     message(STATUS "[Build] FPS patch   : OFF -- SWFs keep their original frame rates (-DENABLE_FPS_PATCH=ON to enable)")
 endif()
@@ -178,6 +182,7 @@ if(ENABLE_FPS_PATCH)
     add_custom_target("check_fps_patch"
         COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tools/check_fps_patch.py"
                 --build "${CMAKE_BINARY_DIR}" --ffdec "${FFDEC_CLI}" --fps "${FPS_PATCH_TARGET}"
+                --compat "${FPS_PATCH_COMPAT_ARG}"
         USES_TERMINAL
         VERBATIM
     )
