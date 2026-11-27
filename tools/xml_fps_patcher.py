@@ -1,226 +1,546 @@
+"""FPS patch for SkyUI SWFs (FFDec XML export of the FINAL, script-injected SWF).
 
-import re
-import sys
+For every SWF listed as "convert" in tools/fps_patch_plan.json the frame rate is raised to --fps (an integer
+multiple k of the original rate) and EVERY timeline - the main timeline and every DefineSprite - is stretched
+by k, so animations keep their length in seconds:
+
+  * original frame f becomes frames (f-1)*k+1 .. f*k; its tags (frame scripts, labels, placements, ...) stay
+    on the first of them, in their original order;
+  * the k-1 new frames hold the display list, except that objects moved by a run of consecutive keyframes
+    (classic tweens) get interpolated PlaceObject2 moves, so tweens render at the higher rate.
+
+All ActionScript in the SWF (frame scripts, onClipEvent handlers and the classes injected by the build) is
+rewritten so it keeps working in ORIGINAL frame numbers, through skyui.util.FpsScale (which must be compiled
+into the SWF):
+
+  * mc._currentframe / _totalframes / _framesloaded  -> FpsScale.prop(name, mc)
+  * mc.gotoAndStop/gotoAndPlay/nextFrame/prevFrame()  -> FpsScale.go(name, mc, nargs, args...)
+  * GotoFrame (frame scripts' gotoAndStop(n) literal) -> frame index * k
+  * x.onEnterFrame = fn                               -> x.onEnterFrame = FpsScale.throttle(fn)
+    (per-frame code then still runs at the original rate), and onClipEvent(enterFrame) handlers get the
+    same guard; handlers listed under "enterframe_free_running" in the plan (time-based tweens) are left alone.
+
+Any frame-related construct the patcher cannot rewrite safely aborts the build with its location.
+SWFs listed as "keep" keep their frame rate and timelines; their code is still rewritten (with k = 1 for their
+own clips) because it may drive clips of converted SWFs loaded into them.
+
+A child clip "__fpsScale" with k frames is added to every patched main timeline; FpsScale reads k from it.
+check_fps_patch.py verifies the result independently.
+"""
+
+import argparse
+import copy
+import json
 import math
 import os
-import argparse
-import json
+import struct
+import sys
+import xml.etree.ElementTree as ET
 
-def interp_val(attr_name, v1, v2, t):
-    try:
-        f1 = float(v1)
-        f2 = float(v2)
-        res = f1 + (f2 - f1) * t
-        
-        int_attrs = {
-            'translateX', 'translateY', 
-            'alphaAddTerm', 'redAddTerm', 'greenAddTerm', 'blueAddTerm',
-            'alphaMultTerm', 'redMultTerm', 'greenMultTerm', 'blueMultTerm',
-            'ratio', 'depth', 'characterId', 'clipDepth', 'nbits',
-            'nRotateBits', 'nScaleBits', 'nTranslateBits'
-        }
-        
-        if attr_name in int_attrs:
-            return str(int(math.floor(res + 0.5)))
-        else:
-            return f"{res:.6f}".rstrip('0').rstrip('.')
-    except:
-        return v1
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import fps_avm1 as avm1  # noqa: E402
+import fps_swfxml as sx  # noqa: E402
 
-def split_tags(body):
-    """Stack-based tag splitting to handle nested <item> tags."""
-    tags = []
-    pos = 0
-    while pos < len(body):
-        start = body.find('<item', pos)
-        if start == -1: break
-        
-        first_tag_end = body.find('>', start)
-        if first_tag_end == -1: break
-        
-        if body[first_tag_end-1] == '/':
-            tags.append(body[start:first_tag_end+1])
-            pos = first_tag_end + 1
+HELPER_EXPORT = "__Packages.skyui.util.FpsScale"
+HELPER_PATH = ("skyui", "util", "FpsScale")
+MARKER_NAME = "__fpsScale"
+ROTATION_LIMIT = math.radians(45)
+
+
+class PatchError(Exception):
+    pass
+
+
+# ---------------------------------------------------------------------------
+# Plan
+# ---------------------------------------------------------------------------
+
+def load_plan(path):
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def plan_entry(plan, swf_rel):
+    key = swf_rel.replace("\\", "/").lower()
+    entry = plan["swfs"].get(key)
+    if entry is None:
+        raise PatchError("%s is not listed in fps_patch_plan.json; add it under \"swfs\" with "
+                         "\"convert\": true/false and a reason" % key)
+    return key, entry
+
+
+# ---------------------------------------------------------------------------
+# Bytecode rewriting
+# ---------------------------------------------------------------------------
+
+def helper_call(method, nargs_push=None):
+    """Actions that call skyui.util.FpsScale.<method> with the arguments already on the stack.
+    If nargs_push is given it is pushed as the argument count first."""
+    out = []
+    if nargs_push is not None:
+        out.append(avm1.mk_push(nargs_push, HELPER_PATH[0]))
+    else:
+        out.append(avm1.mk_push(HELPER_PATH[0]))
+    out.append(avm1.mk(0x1C))  # GetVariable skyui
+    for part in HELPER_PATH[1:]:
+        out.append(avm1.mk_push(part))
+        out.append(avm1.mk(0x4E))  # GetMember
+    out.append(avm1.mk_push(method))
+    out.append(avm1.mk(0x52))  # CallMethod
+    return out
+
+
+def guard_prefix(key, code_len_after):
+    """if (!FpsScale.tick(this, key)) skip the rest of the handler."""
+    acts = [avm1.mk_push(key, "this"), avm1.mk(0x1C)] + helper_call("tick", 2) + [avm1.mk(0x12)]
+    head = b"".join(a.encode() for a in acts)
+    jump = avm1.mk(0x9D, struct.pack("<h", code_len_after))
+    return head + jump.encode()
+
+
+# frame operations that act on "the current timeline" and so would follow a tellTarget()
+TIMELINE_OPS = ("gotoframe", "gotoframe2", "nextframe", "prevframe", "getprop", "var_read", "call_function")
+
+
+def rewrite_blob(blob, k_own, free_running, override_ok, stats, guard_key):
+    code = blob.code
+    actions = avm1.parse(code)
+    popped, _ = avm1.analyse(actions)
+    refs = sx.scan(actions, popped)
+    kinds = {r.kind for r in refs}
+    if "settarget" in kinds and kinds & set(TIMELINE_OPS):
+        raise PatchError("%s: tellTarget combined with timeline actions" % blob.where)
+    repl = {}
+    for r in refs:
+        a = actions[r.idx]
+        if r.kind in ("settarget", "gettime") or (r.kind == "tween_new" and r.ok):
+            continue
+        if r.kind == "tween_useframes" and blob.where in free_running:
+            continue  # the tween engine's own reserved-property table
+        if r.kind == "method_override":
+            if blob.where in override_ok:
+                continue
+            raise PatchError("%s: defines its own %s(); if this is not a MovieClip class add it to "
+                             "\"method_override_allowed\" in the plan" % (blob.where, r.detail))
+        if not r.ok:
+            raise PatchError("%s: cannot rescale %s %s (action %d)" % (blob.where, r.kind, r.detail, r.idx))
+        if r.kind == "member_read":
+            repl[r.idx] = helper_call("prop", 2)
+            stats["prop"] += 1
+        elif r.kind == "call_method":
+            nargs = int(r.detail.split("/")[1])
+            repl[r.idx] = helper_call("go", nargs + 3)
+            stats["go"] += 1
+        elif r.kind == "gotoframe":
+            idx = int.from_bytes(a.payload[:2], "little")
+            new = idx * k_own
+            if new > 0xFFFF:
+                raise PatchError("%s: GotoFrame %d out of range after stretching" % (blob.where, idx + 1))
+            repl[r.idx] = [avm1.mk(0x81, new.to_bytes(2, "little"))]
+            stats["gotoframe"] += 1
+        elif r.kind == "enterframe_assign":
+            if blob.where in free_running:
+                stats["enterframe_free"] += 1
+                continue
+            repl[r.idx] = helper_call("throttle", 1) + [a]
+            stats["throttle"] += 1
         else:
-            depth = 1
-            search_pos = first_tag_end + 1
-            while depth > 0:
-                next_open = body.find('<item', search_pos)
-                next_close = body.find('</item>', search_pos)
-                if next_close == -1: break
-                if next_open != -1 and next_open < next_close:
-                    next_open_end = body.find('>', next_open)
-                    if body[next_open_end-1] != '/': depth += 1
-                    search_pos = next_open_end + 1
+            raise PatchError("%s: unhandled frame reference %s" % (blob.where, r))
+    new_code = avm1.assemble(actions, repl, len(code)) if repl else code
+    if blob.enter_frame and blob.where not in free_running:
+        flags = blob.el.find("eventFlags")
+        others = [k for k, v in flags.attrib.items()
+                  if k.startswith("clipEvent") and v == "true" and k != "clipEventEnterFrame"]
+        if others:
+            raise PatchError("%s: onClipEvent(enterFrame) shares its handler with %s" % (blob.where, others))
+        body = new_code
+        last = avm1.parse(body)[-1] if body else None
+        target = last.offset if (last is not None and last.code == 0x00) else len(body)  # skip to End
+        new_code = guard_prefix(guard_key, target) + body
+        stats["clip_guard"] += 1
+    if new_code != code:
+        blob.code = new_code
+
+
+# ---------------------------------------------------------------------------
+# Timeline stretching
+# ---------------------------------------------------------------------------
+
+def _f(el, name, default=0.0):
+    v = el.get(name)
+    return float(v) if v is not None else default
+
+
+def read_matrix(el):
+    if el is None:
+        return None
+    hs = el.get("hasScale") == "true"
+    hr = el.get("hasRotate") == "true"
+    return {
+        "hasScale": hs, "hasRotate": hr,
+        "a": _f(el, "scaleX") if hs else 1.0,
+        "d": _f(el, "scaleY") if hs else 1.0,
+        "b": _f(el, "rotateSkew0") if hr else 0.0,
+        "c": _f(el, "rotateSkew1") if hr else 0.0,
+        "tx": int(el.get("translateX", "0")),
+        "ty": int(el.get("translateY", "0")),
+    }
+
+
+CX_TERMS = ("redMultTerm", "greenMultTerm", "blueMultTerm", "alphaMultTerm",
+            "redAddTerm", "greenAddTerm", "blueAddTerm", "alphaAddTerm")
+
+
+def read_cx(el):
+    if el is None:
+        return None
+    hm = el.get("hasMultTerms") == "true"
+    ha = el.get("hasAddTerms") == "true"
+    res = {"type": el.get("type"), "hasMult": hm, "hasAdd": ha}
+    for t in CX_TERMS:
+        if t.endswith("MultTerm"):
+            res[t] = int(el.get(t, "256")) if hm else 256
+        else:
+            res[t] = int(el.get(t, "0")) if ha else 0
+    return res
+
+
+def sbits(vals):
+    vals = [int(v) for v in vals]
+    if not any(vals):
+        return 0
+    return max((v if v >= 0 else ~v).bit_length() for v in vals) + 1
+
+
+def fixed(v):
+    return round(v * 65536) / 65536.0
+
+
+def _angle(x, y):
+    return math.atan2(y, x)
+
+
+def _adiff(a1, a2):
+    d = abs(a1 - a2) % (2 * math.pi)
+    return min(d, 2 * math.pi - d)
+
+
+def lerp_matrix(m1, m2, t):
+    if _adiff(_angle(m1["a"], m1["b"]), _angle(m2["a"], m2["b"])) > ROTATION_LIMIT:
+        return None
+    if _adiff(_angle(m1["d"], -m1["c"]), _angle(m2["d"], -m2["c"])) > ROTATION_LIMIT:
+        return None
+    r = {k: m1[k] + (m2[k] - m1[k]) * t for k in ("a", "b", "c", "d")}
+    r["tx"] = int(math.floor(m1["tx"] + (m2["tx"] - m1["tx"]) * t + 0.5))
+    r["ty"] = int(math.floor(m1["ty"] + (m2["ty"] - m1["ty"]) * t + 0.5))
+    r["hasScale"] = m1["hasScale"] or m2["hasScale"]
+    r["hasRotate"] = m1["hasRotate"] or m2["hasRotate"]
+    return r
+
+
+def matrix_el(m):
+    a, d = (fixed(m["a"]), fixed(m["d"])) if m["hasScale"] else (0.0, 0.0)
+    b, c = (fixed(m["b"]), fixed(m["c"])) if m["hasRotate"] else (0.0, 0.0)
+    el = ET.Element("matrix")
+    el.set("type", "MATRIX")
+    el.set("hasRotate", "true" if m["hasRotate"] else "false")
+    el.set("hasScale", "true" if m["hasScale"] else "false")
+    el.set("nRotateBits", str(sbits([b * 65536, c * 65536]) if m["hasRotate"] else 0))
+    el.set("nScaleBits", str(sbits([a * 65536, d * 65536]) if m["hasScale"] else 0))
+    el.set("nTranslateBits", str(sbits([m["tx"], m["ty"]])))
+    el.set("rotateSkew0", repr(b))
+    el.set("rotateSkew1", repr(c))
+    el.set("scaleX", repr(a))
+    el.set("scaleY", repr(d))
+    el.set("translateX", str(m["tx"]))
+    el.set("translateY", str(m["ty"]))
+    return el
+
+
+def lerp_cx(c1, c2, t):
+    r = {"type": "CXFORMWITHALPHA", "hasMult": c1["hasMult"] or c2["hasMult"], "hasAdd": c1["hasAdd"] or c2["hasAdd"]}
+    for term in CX_TERMS:
+        r[term] = int(math.floor(c1[term] + (c2[term] - c1[term]) * t + 0.5))
+    return r
+
+
+def cx_el(c):
+    el = ET.Element("colorTransform")
+    el.set("type", "CXFORMWITHALPHA")
+    vals = []
+    for term in CX_TERMS:
+        on = c["hasMult"] if term.endswith("MultTerm") else c["hasAdd"]
+        v = c[term] if on else 0
+        el.set(term, str(v))
+        if on:
+            vals.append(v)
+    el.set("hasAddTerms", "true" if c["hasAdd"] else "false")
+    el.set("hasMultTerms", "true" if c["hasMult"] else "false")
+    el.set("nbits", str(max(1, sbits(vals))))
+    return el
+
+
+def move_tag(depth, matrix=None, cx=None, ratio=None):
+    el = ET.Element("item")
+    el.set("type", "PlaceObject2Tag")
+    el.set("characterId", "0")
+    el.set("clipDepth", "0")
+    el.set("depth", str(depth))
+    el.set("forceWriteAsLong", "false")
+    el.set("placeFlagHasCharacter", "false")
+    el.set("placeFlagHasClipActions", "false")
+    el.set("placeFlagHasClipDepth", "false")
+    el.set("placeFlagHasColorTransform", "true" if cx else "false")
+    el.set("placeFlagHasMatrix", "true" if matrix else "false")
+    el.set("placeFlagHasName", "false")
+    el.set("placeFlagHasRatio", "true" if ratio is not None else "false")
+    el.set("placeFlagMove", "true")
+    el.set("ratio", str(ratio if ratio is not None else 0))
+    if matrix:
+        el.append(matrix_el(matrix))
+    if cx:
+        el.append(cx_el(cx))
+    return el
+
+
+def display_states(frames):
+    """Per frame: (state dict depth->(inst, matrix, cx, ratio), moved depths, placed depths)."""
+    state = {}
+    inst_counter = 0
+    res = []
+    for tags in frames:
+        moved, placed = set(), set()
+        for el in tags:
+            t = sx.tag_type(el)
+            if t.startswith("PlaceObject"):
+                d = int(el.get("depth"))
+                has_char = t == "PlaceObjectTag" or el.get("placeFlagHasCharacter") == "true"
+                mx = read_matrix(el.find("matrix")) if (t == "PlaceObjectTag" or el.get("placeFlagHasMatrix") == "true") else None
+                cxe = el.find("colorTransform")
+                cx = read_cx(cxe) if (cxe is not None and (t == "PlaceObjectTag" or el.get("placeFlagHasColorTransform") == "true")) else None
+                ratio = int(el.get("ratio")) if el.get("placeFlagHasRatio") == "true" else None
+                if has_char or d not in state:
+                    inst_counter += 1
+                    state[d] = [inst_counter, mx, cx, ratio]
+                    placed.add(d)
                 else:
-                    depth -= 1
-                    search_pos = next_close + 7
-            tags.append(body[start:search_pos])
-            pos = search_pos
-    return tags
+                    s = state[d]
+                    if mx is not None:
+                        s[1] = mx
+                    if cx is not None:
+                        s[2] = cx
+                    if ratio is not None:
+                        s[3] = ratio
+                    moved.add(d)
+            elif t.startswith("RemoveObject"):
+                state.pop(int(el.get("depth")), None)
+        res.append(({d: tuple(v) for d, v in state.items()}, moved, placed))
+    return res
 
-def get_opening_tag_attrs(tag_full):
-    match = re.match(r'<item([^>]*)>', tag_full)
-    if not match: return {}
-    return dict(re.findall(r'(\w+)="([^"]*)"', match.group(1)))
 
-def build_tag_str(t_type, attrs, children_str=""):
-    pref_order = ['characterId', 'clipDepth', 'depth', 'forceWriteAsLong', 'name', 'placeFlagHasCharacter', 'placeFlagHasClipActions', 'placeFlagHasClipDepth', 'placeFlagHasColorTransform', 'placeFlagHasMatrix', 'placeFlagHasName', 'placeFlagHasRatio', 'placeFlagMove', 'ratio']
-    filtered = {k: v for k, v in attrs.items() if k not in ['type', 'reserved']}
-    attr_parts = []
-    for k in pref_order:
-        if k in filtered: attr_parts.append(f'{k}="{filtered[k]}"')
-    for k in sorted(filtered.keys()):
-        if k not in pref_order: attr_parts.append(f'{k}="{filtered[k]}"')
-    attr_str = " ".join(attr_parts)
-    if children_str: return f'        <item type="{t_type}" {attr_str}>\n{children_str}        </item>'
-    else: return f'        <item type="{t_type}" {attr_str}/>'
-
-def patch_xml(input_file, output_file, target_fps=120.0, whitelist=None):
-    input_file = os.path.normpath(input_file)
-    output_file = os.path.normpath(output_file)
-    filename = os.path.basename(input_file).lower()
-    
-    print(f"Patching {input_file} to {target_fps} fps...")
-    
-    # Get whitelist for this specific file
-    file_whitelist = whitelist.get(filename, []) if whitelist else []
-    if not file_whitelist:
-        print(f"  Info: No whitelist entries for {filename}. Skipping sprites.")
-
-    with open(input_file, 'r', encoding='utf-8') as f: content = f.read()
-    fr_match = re.search(r'frameRate="([^"]+)"', content)
-    if not fr_match: return
-    orig_fps_val = float(fr_match.group(1))
-    
-    if orig_fps_val >= target_fps:
-        if input_file != output_file:
-            with open(output_file, 'w', encoding='utf-8', newline='\n') as f: f.write(content)
-        return
-
-    multiplier = target_fps / orig_fps_val
-    print(f"  Multiplier: {multiplier:.4f} ({orig_fps_val} -> {target_fps})")
-    content = re.sub(r'frameRate="[^"]+"', f'frameRate="{target_fps}"', content, count=1)
-
-    def sprite_repl(match):
-        header_full, body, footer = match.groups()
-        header_attrs = dict(re.findall(r'(\w+)="([^"]*)"', header_full))
-        sprite_id = header_attrs.get('spriteId')
-        
-        # WHITELIST CHECK: Only patch if spriteId is in the list for this file
-        if sprite_id not in file_whitelist:
-            return match.group(0)
-            
-        if 'type' in header_attrs: del header_attrs['type']
-        old_count = int(header_attrs.get('frameCount', 0))
-        if old_count <= 1: return match.group(0)
-        
-        new_count = int(round(old_count * multiplier))
-        header_attrs['frameCount'] = str(new_count)
-        attr_str = " ".join(f'{k}="{v}"' for k, v in sorted(header_attrs.items()))
-        new_header = f'    <item type="DefineSpriteTag" {attr_str}>\n      <subTags>\n'
-        orig_tags = split_tags(body)
-        frames = []; curr = []
-        for t in orig_tags:
-            type_m = re.search(r'type="([^"]+)"', t)
-            if not type_m: continue
-            t_type = type_m.group(1)
-            curr.append((t_type, t))
-            if t_type == 'ShowFrameTag': frames.append(curr); curr = []
-        if curr: frames.append(curr)
-        depth_states = {}; new_frames = [[] for _ in range(new_count)]
-        for i, f_tags in enumerate(frames):
-            for t_type, t_full in f_tags:
-                if t_type.startswith('PlaceObject'):
-                    attrs = get_opening_tag_attrs(t_full)
-                    d = attrs.get('depth')
-                    if d:
-                        if d not in depth_states: depth_states[d] = {'history': []}
-                        inner_raw = ""
-                        inner_m = re.match(r'<item[^>]*>(.*)</item>', t_full, re.DOTALL)
-                        if inner_m: inner_raw = inner_m.group(1).strip()
-                        m_m = re.search(r'<matrix ([^/>]*/>)', t_full)
-                        c_m = re.search(r'<colorTransform ([^/>]*/>)', t_full)
-                        depth_states[d]['history'].append({
-                            'frame': i, 'type': t_type, 'attrs': attrs, 'full': t_full,
-                            'matrix_attrs': dict(re.findall(r'(\w+)="([^"]*)"', m_m.group(1))) if m_m else None,
-                            'color_attrs': dict(re.findall(r'(\w+)="([^"]*)"', c_m.group(1))) if c_m else None,
-                            'inner_raw': inner_raw
-                        })
-                elif t_type.startswith('RemoveObject'):
-                    attrs = get_opening_tag_attrs(t_full)
-                    d = attrs.get('depth')
-                    if d:
-                        if d not in depth_states: depth_states[d] = {'history': []}
-                        depth_states[d]['history'].append({'frame': i, 'remove': True, 'type': t_type, 'full': t_full})
-                elif t_type != 'ShowFrameTag':
-                    idx = int(round(i * multiplier))
-                    if idx < new_count: new_frames[idx].append(t_full)
-        for d, data in depth_states.items():
-            hist = data['history']
-            for k, s1 in enumerate(hist):
-                idx1 = int(round(s1['frame'] * multiplier))
-                if 'remove' in s1:
-                    if idx1 < new_count: new_frames[idx1].append(s1['full'])
+def stretch_timeline(tl, k, show_proto, stats):
+    frames = []
+    cur = []
+    trailing = []
+    children = list(tl.container)
+    nshow = 0
+    for el in children:
+        if sx.tag_type(el) == "ShowFrameTag":
+            frames.append(cur)
+            cur = []
+            nshow += 1
+        else:
+            cur.append(el)
+    trailing = cur
+    states = display_states(frames)
+    n = len(frames)
+    new_children = []
+    for i in range(n):
+        new_children.extend(frames[i])
+        new_children.append(copy.copy(show_proto))
+        nxt = states[i + 1] if i + 1 < n else None
+        interp = []
+        if nxt is not None:
+            s_i, moved_i, placed_i = states[i]
+            s_n, moved_n, _ = nxt
+            moved_n2 = states[i + 2][1] if i + 2 < n else set()
+            for d in sorted(moved_n):
+                if d not in s_i or d not in s_n or s_i[d][0] != s_n[d][0]:
                     continue
-                s2 = hist[k+1] if k+1 < len(hist) else None
-                idx2 = int(round(s2['frame'] * multiplier)) if s2 else new_count
-                
-                is_animating = False
-                if s2 and not 'remove' in s2 and s2['frame'] == s1['frame'] + 1:
-                    if s1['matrix_attrs'] != s2['matrix_attrs'] or s1['color_attrs'] != s2['color_attrs']:
-                        is_animating = True
+                if not (d in moved_i or d in placed_i or d in moved_n2):
+                    continue  # isolated jump, not a tween: keep the snap
+                interp.append((d, s_i[d], s_n[d]))
+        for j in range(1, k):
+            t = j / float(k)
+            for d, a, b in interp:
+                mx = cx = ratio = None
+                if a[1] is not None and b[1] is not None and a[1] != b[1]:
+                    mx = lerp_matrix(a[1], b[1], t)
+                if a[2] is not None and b[2] is not None and a[2] != b[2]:
+                    cx = lerp_cx(a[2], b[2], t)
+                if a[3] is not None and b[3] is not None and a[3] != b[3]:
+                    ratio = int(math.floor(a[3] + (b[3] - a[3]) * t + 0.5))
+                if mx or cx or ratio is not None:
+                    new_children.append(move_tag(d, mx, cx, ratio))
+                    stats["interp_tags"] += 1
+            new_children.append(copy.copy(show_proto))
+    new_children.extend(trailing)
+    for el in children:
+        tl.container.remove(el)
+    for el in new_children:
+        tl.container.append(el)
+    tl.header.set("frameCount", str(int(tl.header.get("frameCount")) * k))
+    stats["timelines"] += 1
 
-                for j in range(idx1, min(idx2, new_count)):
-                    if j == idx1:
-                        new_frames[j].append(s1['full']); continue
-                    if not is_animating: continue
-                    t = (j / multiplier - s1['frame'])
-                    cur_attrs = s1['attrs'].copy()
-                    cur_attrs['placeFlagMove'] = 'true'; cur_attrs['placeFlagHasCharacter'] = 'false'
-                    child_lines = []
-                    if s1['attrs'].get('placeFlagHasMatrix') == 'true':
-                        m2 = s2['matrix_attrs'] if (s2 and not 'remove' in s2 and s2['matrix_attrs']) else s1['matrix_attrs']
-                        m_cur = {attr: interp_val(attr, val, m2.get(attr, val), t) for attr, val in s1['matrix_attrs'].items() if attr != 'type'}
-                        m_cur['type'] = 'MATRIX'; m_attrs = " ".join(f'{attr}="{m_cur[attr]}"' for attr in sorted(m_cur.keys()))
-                        child_lines.append(f'          <matrix {m_attrs}/>')
-                    if s1['attrs'].get('placeFlagHasColorTransform') == 'true':
-                        c2 = s2['color_attrs'] if (s2 and not 'remove' in s2 and s2['color_attrs']) else s1['color_attrs']
-                        c_cur = {attr: interp_val(attr, val, c2.get(attr, val), t) for attr, val in s1['color_attrs'].items() if attr != 'type'}
-                        c_cur['type'] = 'CXFORMWITHALPHA'; c_attrs = " ".join(f'{attr}="{c_cur[attr]}"' for attr in sorted(c_cur.keys()))
-                        child_lines.append(f'          <colorTransform {c_attrs}/>')
-                    if s1['inner_raw']:
-                        for line in s1['inner_raw'].split('\n'):
-                            l = line.strip()
-                            if l and not l.startswith('<matrix') and not l.startswith('<colorTransform'):
-                                child_lines.append('          ' + l)
-                    new_frames[j].append(build_tag_str(s1['type'], cur_attrs, "\n".join(child_lines) + "\n" if child_lines else ""))
-        res_body = ""
-        for ftags in new_frames:
-            for tag in ftags: res_body += tag.strip() + "\n"
-            res_body += '        <item type="ShowFrameTag" forceWriteAsLong="false"/>\n'
-        return new_header + res_body + footer
 
-    content = re.sub(r'(<item type="DefineSpriteTag"[^>]*>)\s*<subTags>(.*?)(</subTags>\s*</item>)', sprite_repl, content, flags=re.DOTALL)
-    with open(output_file, 'w', encoding='utf-8', newline='\n') as f: f.write(content)
+# ---------------------------------------------------------------------------
+# Marker
+# ---------------------------------------------------------------------------
+
+def free_character_id(tree):
+    used = {int(v) for el in tree.getroot().iter() for a, v in el.attrib.items()
+            if (a.endswith("Id") or a.endswith("ID")) and v.isdigit()}
+    i = 1
+    while i in used:
+        i += 1
+    if i > 65535:
+        raise PatchError("no free character id")
+    return i
+
+
+def add_marker(tree, k):
+    swf = tree.getroot()
+    tags = swf.find("tags")
+    root_depths = [int(el.get("depth")) for el in tags if sx.tag_type(el).startswith("PlaceObject")]
+    sprite_id = free_character_id(tree)
+    depth = max(root_depths + [0]) + 1
+    if depth >= 16384:
+        raise PatchError("no free timeline depth for the FPS marker")
+
+    sprite = ET.Element("item")
+    sprite.set("type", "DefineSpriteTag")
+    sprite.set("forceWriteAsLong", "true")
+    sprite.set("frameCount", str(k))
+    sprite.set("hasEndTag", "true")
+    sprite.set("spriteId", str(sprite_id))
+    sub = ET.SubElement(sprite, "subTags")
+    for _ in range(k):
+        sf = ET.SubElement(sub, "item")
+        sf.set("type", "ShowFrameTag")
+        sf.set("forceWriteAsLong", "false")
+
+    place = ET.Element("item")
+    place.set("type", "PlaceObject2Tag")
+    place.set("characterId", str(sprite_id))
+    place.set("clipDepth", "0")
+    place.set("depth", str(depth))
+    place.set("forceWriteAsLong", "true")
+    place.set("name", MARKER_NAME)
+    place.set("placeFlagHasCharacter", "true")
+    place.set("placeFlagHasClipActions", "false")
+    place.set("placeFlagHasClipDepth", "false")
+    place.set("placeFlagHasColorTransform", "false")
+    place.set("placeFlagHasMatrix", "false")
+    place.set("placeFlagHasName", "true")
+    place.set("placeFlagHasRatio", "false")
+    place.set("placeFlagMove", "false")
+    place.set("ratio", "0")
+
+    children = list(tags)
+    pos = None
+    for i, el in enumerate(children):
+        t = sx.tag_type(el)
+        if t.startswith("PlaceObject") or t == "ShowFrameTag":
+            pos = i
+            break
+    if pos is None:
+        pos = len(children)
+    tags.insert(pos, place)
+    tags.insert(pos, sprite)
+    return sprite_id, depth
+
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
+def patch(tree, swf_key, entry, plan, target_fps):
+    swf = tree.getroot()
+    orig_fps = float(swf.get("frameRate"))
+    convert = bool(entry.get("convert"))
+    k = 1
+    if convert:
+        ratio = target_fps / orig_fps
+        k = int(round(ratio))
+        if abs(ratio - k) > 1e-6 or k < 1:
+            raise PatchError("%s: %g fps is not an integer multiple of %g fps" % (swf_key, target_fps, orig_fps))
+    stats = {"prop": 0, "go": 0, "gotoframe": 0, "throttle": 0, "enterframe_free": 0, "clip_guard": 0,
+             "timelines": 0, "interp_tags": 0}
+
+    if convert and k > 1:
+        for el in swf.iter("item"):
+            t = sx.tag_type(el)
+            if t in ("SoundStreamHeadTag", "SoundStreamHead2Tag", "SoundStreamBlockTag", "DefineVideoStreamTag", "VideoFrameTag"):
+                raise PatchError("%s: contains %s, which is frame-synchronised and cannot be stretched" % (swf_key, t))
+
+    exports = sx.export_names(tree)
+    helper_ids = {cid for cid, name in exports.items() if name == HELPER_EXPORT}
+    if not helper_ids:
+        raise PatchError("%s: skyui.util.FpsScale is not compiled into this SWF (the build adds it when "
+                         "ENABLE_FPS_PATCH is ON)" % swf_key)
+
+    # code blobs may only live where fps_swfxml.blobs() looks for them
+    for el in swf.iter("item"):
+        if el.get("actionBytes") is not None and sx.tag_type(el) not in ("DoActionTag", "DoInitActionTag", "CLIPACTIONRECORD"):
+            raise PatchError("%s: unexpected code in %s" % (swf_key, sx.tag_type(el)))
+
+    free_running = set(plan.get("enterframe_free_running", {}).keys())
+    override_ok = set(plan.get("method_override_allowed", {}).keys())
+    guard_n = 0
+    for blob in list(sx.blobs(tree)):
+        if blob.kind == "DoInitAction" and blob.el.get("spriteId") in helper_ids:
+            continue
+        guard_n += 1
+        rewrite_blob(blob, k, free_running, override_ok, stats, "__fpsTickCE%d" % guard_n)
+
+    if convert and k > 1:
+        show_proto = None
+        for el in swf.iter("item"):
+            if sx.tag_type(el) == "ShowFrameTag":
+                show_proto = copy.copy(el)
+                break
+        for tl in sx.timelines(tree):
+            stretch_timeline(tl, k, show_proto, stats)
+        swf.set("frameRate", "%.1f" % (orig_fps * k))
+
+    add_marker(tree, k)
+    return k, stats
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    ap.add_argument("--in", dest="inp", required=True, help="FFDec XML export of the unpatched SWF")
+    ap.add_argument("--out", required=True, help="patched XML to write")
+    ap.add_argument("--swf", required=True, help="SWF path relative to interface/, e.g. skyui/itemcard.swf")
+    ap.add_argument("--plan", default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "fps_patch_plan.json"))
+    ap.add_argument("--fps", type=float, default=None, help="target frame rate (default: plan target_fps)")
+    args = ap.parse_args()
+
+
+    plan = load_plan(args.plan)
+    fps = args.fps if args.fps is not None else float(plan["target_fps"])
+    try:
+        key, entry = plan_entry(plan, args.swf)
+        tree = sx.load(args.inp)
+        k, stats = patch(tree, key, entry, plan, fps)
+    except PatchError as e:
+        print("xml_fps_patcher: ERROR: %s" % e, file=sys.stderr)
+        return 1
+    sx.save(tree, args.out)
+    mode = "x%d -> %g fps" % (k, fps) if entry.get("convert") else "kept at original rate"
+    print("[fps] %s: %s; %s" % (key, mode, ", ".join("%s=%d" % kv for kv in stats.items())))
+    return 0
+
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Patch SkyUI XML for higher frame rates')
-    parser.add_argument('--file', required=True, help='Path to XML file to patch in-place')
-    parser.add_argument('--fps', type=float, default=120.0, help='Target frame rate')
-    parser.add_argument('--whitelist', help='Path to whitelist JSON file')
-    args = parser.parse_args()
-    
-    whitelist_data = None
-    if args.whitelist and os.path.exists(args.whitelist):
-        with open(args.whitelist, 'r') as f:
-            whitelist_data = json.load(f)
-    elif not args.whitelist:
-        # Try to find it in the same dir as the script
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        default_wl = os.path.join(script_dir, 'fps_whitelist.json')
-        if os.path.exists(default_wl):
-            with open(default_wl, 'r') as f:
-                whitelist_data = json.load(f)
-
-    if args.file: patch_xml(args.file, args.file, target_fps=args.fps, whitelist=whitelist_data)
+    sys.exit(main())

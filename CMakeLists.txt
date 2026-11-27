@@ -26,7 +26,18 @@ endif()
 # Options & Core Paths
 # ---------------------------------------------------------------------------
 
-option(ENABLE_FPS_PATCH "Enable FPS patching" ON)
+# FPS patch: rebuild the SWFs at FPS_PATCH_TARGET fps with every timeline stretched so animations keep their
+# real-time speed (tools/xml_fps_patcher.py, tools/fps_patch_plan.json). Like any option this is cached: an
+# existing build folder keeps the value it was configured with, so pass -DENABLE_FPS_PATCH=ON/OFF explicitly
+# when switching. The configure log and the build log ("[Build] FPS patch ...") show which state you got.
+option(ENABLE_FPS_PATCH "Rebuild SWFs at a higher frame rate (FPS_PATCH_TARGET) with timelines stretched to match" ON)
+set(FPS_PATCH_TARGET "120" CACHE STRING "Frame rate the FPS patch converts SWFs to (an integer multiple of 24, 30 and 60)")
+if(ENABLE_FPS_PATCH)
+    find_package(Python3 REQUIRED COMPONENTS Interpreter)
+    message(STATUS "[Build] FPS patch   : ON -- SWFs listed in tools/fps_patch_plan.json are rebuilt at ${FPS_PATCH_TARGET} fps")
+else()
+    message(STATUS "[Build] FPS patch   : OFF -- SWFs keep their original frame rates (-DENABLE_FPS_PATCH=ON to enable)")
+endif()
 
 # SkyrimSE_PATH: absolute path to the game directory. 
 # Defaults to the standard Steam library location if not provided.
@@ -154,6 +165,17 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/source/swfsources.cmake")
 AS_GlobalAssemble_Finalize()
 
 add_custom_target("ActionScript" DEPENDS ${AS_TARGETS})
+
+if(ENABLE_FPS_PATCH)
+    # Proves the FPS patch kept every timeline's duration and rescaled every frame reference (not part of ALL).
+    add_custom_target("check_fps_patch"
+        COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/tools/check_fps_patch.py"
+                --build "${CMAKE_BINARY_DIR}" --ffdec "${FFDEC_CLI}"
+        USES_TERMINAL
+        VERBATIM
+    )
+    add_dependencies("check_fps_patch" "ActionScript")
+endif()
 
 # ---------------------------------------------------------------------------
 # Debug Mode -- Direct Deployment

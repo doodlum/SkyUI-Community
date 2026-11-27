@@ -73,17 +73,36 @@ macro(Add_SWF _TARGET_NAME _SWF_REL _XML_PATH)
             XML_PATH   "${_XML_PATH}"
         )
 
+        if(ENABLE_FPS_PATCH)
+            # The patched bytecode calls skyui.util.FpsScale (see tools/xml_fps_patcher.py)
+            list(APPEND _SOURCES "Common/skyui/util/FpsScale.as")
+            set(_AS_SWF "${CMAKE_CURRENT_BINARY_DIR}/fps_unpatched/${_SWF_REL}")
+        else()
+            set(_AS_SWF "${_FINAL_SWF}")
+        endif()
+
         # Inject ActionScript sources into that base
         Add_AS(
             TARGET_NAME  AS_${_TARGET_NAME}
             SWF_REL      "${_SWF_REL}"
             SWF_INPUT    "${_BASE_SWF}"
-            SWF_OUTPUT   "${_FINAL_SWF}"
+            SWF_OUTPUT   "${_AS_SWF}"
             SOURCES      ${_SOURCES}
         )
 
-        list(APPEND AS_TARGETS           AS_${_TARGET_NAME})
-        list(APPEND SWF_COMPILED_OUTPUTS ${AS_${_TARGET_NAME}_OUTPUT})
+        if(ENABLE_FPS_PATCH)
+            Add_FPS_Patch(
+                TARGET_NAME FPS_${_TARGET_NAME}
+                SWF_REL     "${_SWF_REL}"
+                SWF_INPUT   "${_AS_SWF}"
+                SWF_OUTPUT  "${_FINAL_SWF}"
+            )
+            list(APPEND AS_TARGETS           FPS_${_TARGET_NAME})
+            list(APPEND SWF_COMPILED_OUTPUTS "${_FINAL_SWF}")
+        else()
+            list(APPEND AS_TARGETS           AS_${_TARGET_NAME})
+            list(APPEND SWF_COMPILED_OUTPUTS ${AS_${_TARGET_NAME}_OUTPUT})
+        endif()
     else()
         message(STATUS "[Build] Skipping ${_TARGET_NAME} (release build)")
     endif()
