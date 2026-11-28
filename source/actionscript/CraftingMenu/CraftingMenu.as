@@ -626,11 +626,16 @@ class CraftingMenu extends MovieClip
          _loc3_.listState.restoredActiveColumnState = _loc2_[4];
          _loc3_.onUnsuspend = function()
          {
+            // CraftingLists listens through itemList.onInvalidate (onItemListInvalidate): chain to it once for the
+            // restore and put it back afterwards, instead of replacing and deleting it
+            var prevInvalidate = this.onInvalidate;
             this.onInvalidate = function()
             {
+               if (prevInvalidate != undefined)
+                  prevInvalidate.apply(this, arguments);
                this.scrollPosition = this.listState.restoredScrollPosition;
                this.selectedIndex = this.listState.restoredSelectedIndex;
-               delete this.onInvalidate;
+               this.onInvalidate = prevInvalidate;
             };
             this.layout.restoreColumnState(this.listState.restoredActiveColumnIndex,this.listState.restoredActiveColumnState);
             delete this.onUnsuspend;
