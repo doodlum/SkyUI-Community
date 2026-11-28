@@ -38,6 +38,15 @@ class CraftingMenu extends MovieClip
    var _platform = 0;
    var currentMenuType = "";
    var dbgIntvl = 0;
+
+   // Save Indices vars
+   var _lastCatIdx = -1;
+   var _lastItemIdx = -1;
+   var _lastScrollPos = -1;
+   var _lastColIdx = -1;
+   var _lastColState = -1;
+   var _pendingRestore;
+
    function CraftingMenu()
    {
       super();
@@ -116,6 +125,7 @@ class CraftingMenu extends MovieClip
       };
       this.bCanCraft = false;
       this.positionFixedElements();
+      this.RestoreIndices();
    }
    function SetPartitionedFilterMode(a_bPartitioned)
    {
@@ -552,5 +562,119 @@ class CraftingMenu extends MovieClip
       {
          this.onItemsListInputCatcherClick();
       }
+   }
+
+   function saveIndices(abForceSave)
+   {
+      if (this._subtypeName == undefined || this.CategoryList == undefined || this.ItemList == undefined || this.ItemList.layout == undefined)
+         return;
+
+      var catIdx = this.CategoryList.CategoriesList.selectedIndex;
+      var itemIdx = this.ItemList.selectedIndex;
+      var scrollPos = this.ItemList.scrollPosition;
+      var colIdx = this.ItemList.layout.activeColumnIndex;
+      var colState = this.ItemList.layout.activeColumnState;
+      
+      if (abForceSave == true)
+      {
+         var _loc2_ = new Array();
+         _loc2_.push(catIdx);
+         _loc2_.push(itemIdx);
+         _loc2_.push(scrollPos);
+         _loc2_.push(colIdx);
+         _loc2_.push(colState);
+         skse.StoreIndices(this._subtypeName, _loc2_);
+         return;
+      }
+      
+      if (this._lastCatIdx != catIdx || this._lastItemIdx != itemIdx || 
+          this._lastScrollPos != scrollPos || this._lastColIdx != colIdx || 
+          this._lastColState != colState)
+      {
+         this._lastCatIdx = catIdx;
+         this._lastItemIdx = itemIdx;
+         this._lastScrollPos = scrollPos;
+         this._lastColIdx = colIdx;
+         this._lastColState = colState;
+         
+         var _loc3_ = new Array();
+         _loc3_.push(catIdx);
+         _loc3_.push(itemIdx);
+         _loc3_.push(scrollPos);
+         _loc3_.push(colIdx);
+         _loc3_.push(colState);
+         skse.StoreIndices(this._subtypeName, _loc3_);
+      }
+   }
+
+   function RestoreIndices()
+   {
+      var _loc2_ = new Array();
+      skse.LoadIndices(this._subtypeName,_loc2_);
+      var _loc4_ = this.CategoryList.CategoriesList;
+      var _loc3_ = this.ItemList;
+      if(_loc2_.length == 5 && _loc2_[0] != -1)
+      {
+         _loc4_.listState.restoredItem = _loc2_[0];
+         _loc4_.onUnsuspend = function()
+         {
+            this.onItemPress(this.listState.restoredItem,0);
+            delete this.onUnsuspend;
+         };
+         _loc3_.listState.restoredActiveColumnIndex = _loc2_[3];
+         _loc3_.listState.restoredActiveColumnState = _loc2_[4];
+         _loc3_.onUnsuspend = function()
+         {
+            this.layout.restoreColumnState(this.listState.restoredActiveColumnIndex,this.listState.restoredActiveColumnState);
+            delete this.onUnsuspend;
+         };
+         // The item and scroll position are applied by onEnterFrame once the restored category's items are listed
+         // (pressing the category clears both). itemList.onInvalidate belongs to CraftingLists and is left alone.
+         this._pendingRestore = {category: _loc2_[0], selectedIndex: _loc2_[1], scrollPosition: _loc2_[2], frames: 0};
+      }
+      else
+      {
+         _loc4_.onUnsuspend = function()
+         {
+            this.onItemPress(0,0);
+            delete this.onUnsuspend;
+         };
+      }
+   }
+
+   // Puts back the saved item and scroll position the way pressing Right does (CraftingLists keeps its own focus
+   // state). Saving waits until this is done, so the empty initial state never overwrites what was stored.
+   function applyPendingRestore()
+   {
+      var p = this._pendingRestore;
+      var list = this.ItemList;
+      var lists = this.CategoryList;
+      p.frames++;
+      if (p.frames > 120)
+      {
+         this._pendingRestore = undefined;
+         return;
+      }
+      if (lists.CategoriesList.selectedIndex != p.category || !(list.itemCount > 0))
+         return;
+      this._pendingRestore = undefined;
+      if (p.scrollPosition >= 0)
+         list.scrollPosition = p.scrollPosition;
+      if (p.selectedIndex >= 0 && p.selectedIndex < list.entryList.length)
+      {
+         lists._savedSelectionIndex = p.selectedIndex;
+         lists._bFocusItemList = true;
+         list.selectedIndex = p.selectedIndex;
+      }
+   }
+
+   function onEnterFrame()
+   {
+      if (this._pendingRestore != undefined)
+      {
+         this.applyPendingRestore();
+         return;
+      }
+      this.saveIndices(false);
    }
 }
