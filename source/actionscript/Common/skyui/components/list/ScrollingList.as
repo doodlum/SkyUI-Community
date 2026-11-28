@@ -244,12 +244,6 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
                 
                 if (this.isPressOnMove)
                     this.onItemPress();
-            } else if (this.getListEnumSize() > 0) {
-                this.doSetSelectedIndex(this.getListEnumEntry(this.getListEnumSize() - 1).itemIndex, skyui.components.list.BasicList.SELECT_KEYBOARD);
-                this.isMouseDrivenNav = false;
-                
-                if (this.isPressOnMove)
-                    this.onItemPress();
             }
         } else if (a_bScrollPage) {
             var t = this.scrollPosition - this._listIndex;
@@ -267,12 +261,6 @@ class skyui.components.list.ScrollingList extends skyui.components.list.BasicLis
                 this.selectDefaultIndex(true);
             } else if (this.getSelectedListEnumIndex() < this.getListEnumSize() - this.scrollDelta) {
                 this.doSetSelectedIndex(this.getListEnumRelativeIndex(this.scrollDelta), skyui.components.list.BasicList.SELECT_KEYBOARD);
-                this.isMouseDrivenNav = false;
-                
-                if (this.isPressOnMove)
-                    this.onItemPress();
-            } else if (this.getListEnumSize() > 0) {
-                this.doSetSelectedIndex(this.getListEnumEntry(0).itemIndex, skyui.components.list.BasicList.SELECT_KEYBOARD);
                 this.isMouseDrivenNav = false;
                 
                 if (this.isPressOnMove)
