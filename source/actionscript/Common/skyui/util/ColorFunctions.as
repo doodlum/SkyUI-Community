@@ -301,6 +301,6 @@ class skyui.util.ColorFunctions
         // > 0
         // $ trace(loopValue(-1, 360))
         // > 359
-        return ((a_val % a_max) + a_max) % a_max;
+        return (a_val % a_max);
     }
 }

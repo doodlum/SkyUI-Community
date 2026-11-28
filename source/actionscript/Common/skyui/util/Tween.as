@@ -15,9 +15,7 @@ class skyui.util.Tween
 		}
 
 		var current: Number = a_obj[a_prop];
-		// a_start == a_end would divide by zero; tween the full duration unless already at the target.
-		var range: Number = a_end - a_start;
-		var duration = (range == 0) ? (current == a_end ? 0 : a_duration) : Math.abs((a_end - current) / range) * a_duration;
+		var duration = Math.abs((a_end - current)/(a_end - a_start)) * a_duration;
 
 		a_obj[tweenPropName] = new mx.transitions.Tween(a_obj, a_prop, mx.transitions.easing.None.easeNone, current, a_end, duration, true);
 
