@@ -517,13 +517,10 @@ class ItemMenu extends MovieClip
         // inventory's layout (the others place the card 29 px higher; same card width and centre). So only the inventory
         // menu sets and reports it; the others keep the value the HUD and the inventory set.
         if (this.ownsItem3DPosition()) {
-            var item3D = this._config.ItemInfo.item3D;
-            var item3DSettings = skyui.util.ItemCardLayout.item3DSettings(item3D.xOffset, item3D.yOffset, item3D.disabled);
-            var pos3D = skyui.util.ItemCardLayout.withOffsets(
-                skyui.util.ItemCardLayout.item3DPosition(card.centreX + metrics.ox, card.top + metrics.oy, vr), item3DSettings);
-            // Only with SkyUI's own MCM script active (it always sends ItemInfo$item3D$disabled): if an older
+            var pos3D = skyui.util.ItemCardLayout.item3DPosition(card.centreX + metrics.ox, card.top + metrics.oy, vr);
+            // Only with SkyUI's own MCM script active (it always sends ItemInfo$item3D$managed): if an older
             // SKI_ConfigMenu.pex replaced ours, it keeps control of the 3D item as before.
-            if (!item3DSettings.disabled && ItemMenu.hasConfigOverride("ItemInfo$item3D$disabled"))
+            if (ItemMenu.hasConfigOverride("ItemInfo$item3D$managed"))
                 skyui.util.ItemCardLayout.applyItem3D(pos3D);
             // The applied position goes along too: SKI_ConfigMenu re-applies it at game load in case the HUD widget
             // loader is missing (replaced by another mod).

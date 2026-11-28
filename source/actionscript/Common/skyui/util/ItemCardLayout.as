@@ -126,24 +126,6 @@ class skyui.util.ItemCardLayout
         return true;
     }
 
-    // The MCM / config.txt 3D item settings (ItemInfo.item3D.*): offsets from the automatic centre, in 3D item position
-    // units, and whether SkyUI should leave the position alone (Disable Positioning, or a skin's own values).
-    public static function item3DSettings(a_xOffset, a_yOffset, a_disabled)
-    {
-        var x = Number(a_xOffset);
-        var z = Number(a_yOffset);
-        return {
-            x: isNaN(x) ? 0 : x,
-            z: isNaN(z) ? 0 : z,
-            disabled: (a_disabled == true || String(a_disabled).toLowerCase() == "true")
-        };
-    }
-
-    public static function withOffsets(a_pos, a_item3D)
-    {
-        return {x: a_pos.x + a_item3D.x, z: a_pos.z + a_item3D.z};
-    }
-
     // Writes the 3D item position for the inventory-type menus and the magic menu.
     public static function applyItem3D(a_pos: Object)
     {

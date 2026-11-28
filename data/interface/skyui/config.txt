@@ -24,11 +24,6 @@ autoupdate.delay = 0
 itemcard.align = center
 itemcard.xOffset = 0
 itemcard.yOffset = 0
-; 3D item: SkyUI centres it over the item card. Offsets move it from there (3D item position units); disabled = true
-; leaves the position to the game's own INI values. The MCM's 3D Item options override these.
-item3D.xOffset = 0
-item3D.yOffset = 0
-item3D.disabled = false
 
 
 ; =====================================================================================================================
