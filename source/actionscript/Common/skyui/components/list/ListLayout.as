@@ -98,6 +98,14 @@ class skyui.components.list.ListLayout
         this._entryWidth = a_width;
     }
 
+    // Extra space before each text column (config.txt defaults.columnMargin), taken from the weighted Name column.
+    private var _columnMargin: Number = 0;
+
+    public function get columnMargin()
+    {
+        return this._columnMargin;
+    }
+
     private var _entryHeight: Number;
 
     public function get entryHeight()
@@ -157,7 +165,11 @@ class skyui.components.list.ListLayout
 
         if (this._entryWidth == undefined)
             this._entryWidth = this._defaultsData.entryWidth;
-        
+
+        // Missing or invalid key (older or third-party config.txt): no extra spacing.
+        var margin = Number(this._defaultsData.columnMargin);
+        this._columnMargin = (isNaN(margin) || margin < 0) ? 0 : margin;
+
         this.updateViewList();
         this.updateColumnList();
         
@@ -351,7 +363,10 @@ class skyui.components.list.ListLayout
             
             if (col.indent != undefined)
                 weightedWidth -= col.indent;
-            
+
+            if (col.type == skyui.components.list.ListLayout.COL_TYPE_TEXT)
+                weightedWidth -= this._columnMargin;
+
             // Height including borders for maxHeight
             var curHeight = 0;
             
@@ -473,6 +488,9 @@ class skyui.components.list.ListLayout
             
             if (col.indent != undefined)
                 xPos += col.indent;
+
+            if (col.type == skyui.components.list.ListLayout.COL_TYPE_TEXT)
+                xPos += this._columnMargin;
 
             columnLayoutData.labelX = xPos;
 

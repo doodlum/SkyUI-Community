@@ -234,6 +234,7 @@ Add_SWF(craftingmenu
         BasicListEntry.as
         TabularListEntry.as
         ScrollingList.as
+        ListLayout.as
     }
     CraftingMenu {
         CraftingDataSetter.as
@@ -717,6 +718,7 @@ Add_SWF(skyui_inventorylists
         BasicListEntry.as
         TabularListEntry.as
         ScrollingList.as
+        ListLayout.as
     }
     ItemMenus {
         CategoryList.as
