@@ -56,6 +56,9 @@ vars.a_textBorder.value = <0, 0, 1.1, 0> ; left right top bottom
 vars.n_iconSize.value = 18
 
 defaults.entryWidth = 530
+; Extra space (pixels) before each value column (type, weight, value, ...). The Name column gets narrower by the
+; same total, so the list keeps its width. Raise it if values overlap with a large or replacement font.
+defaults.columnMargin = 0
 
 ; Default text format defaults -------------------------------------------------------
 defaults.entry.textFormat.font = '$EverywhereMediumFont'
