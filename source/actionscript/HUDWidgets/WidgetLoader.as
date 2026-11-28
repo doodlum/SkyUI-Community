@@ -31,6 +31,9 @@ class WidgetLoader extends MovieClip
       _root.HUDMovieBaseInstance.ValueTranslated._alpha = 0;
       _root.HUDMovieBaseInstance.QuestUpdateBaseInstance.LevelUpTextInstance._alpha = 0;
       this.loadItemCardConfig();
+      // config.txt can change while the game runs (the item menus re-read it on every open): keep up with it, so the
+      // position applied here never lags behind what the next menu will use.
+      setInterval(this,"loadItemCardConfig",WidgetLoader.ITEMCARD_POLL_MS);
    }
 
    /* 3D ITEM POSITION
@@ -43,6 +46,10 @@ class WidgetLoader extends MovieClip
    var _itemCardOverrides;     // "Section$key" -> value string, from the MCM
    var _itemCardOverrideKeys;
    var _itemCardMetrics;       // reported by the item menus
+   var _itemCardReadySent;
+   var _itemCardApplied;       // "x,z" last written, to skip identical writes
+
+   static var ITEMCARD_POLL_MS = 3000;
 
    static var ITEMCARD_KEYS = {
       ListLayout$defaults$entryWidth: "entryWidth",
@@ -100,8 +107,12 @@ class WidgetLoader extends MovieClip
       }
       this._itemCardFile = file;
       this.updateItem3D();
-      // Ask Papyrus for the MCM overrides and the item menus' metrics (they call the setters below).
-      skse.SendModEvent("SKIIM_hudItemCardReady");
+      if(!this._itemCardReadySent)
+      {
+         // Ask Papyrus for the MCM overrides and the item menus' metrics (they call the setters below).
+         this._itemCardReadySent = true;
+         skse.SendModEvent("SKIIM_hudItemCardReady");
+      }
    }
 
    static function parseItemCardValue(a_str)
@@ -173,7 +184,9 @@ class WidgetLoader extends MovieClip
          return undefined;
       }
       this._itemCardMetrics = {panel:a_panel,w:a_w,xMin:a_xMin,xMax:a_xMax,yMin:a_yMin,y:a_y,safe:a_safe,ox:a_ox,oy:a_oy};
-      this.updateItem3D();
+      // An item menu just opened with whatever config.txt says now: re-read it before computing, so this never writes
+      // a position from an older config over the one the menu just set.
+      this.loadItemCardConfig();
    }
 
    function updateItem3D()
@@ -191,7 +204,12 @@ class WidgetLoader extends MovieClip
       var settings = skyui.util.ItemCardLayout.cardSettings(eff.entryWidth,eff.align,eff.xOffset,eff.yOffset);
       var vr = skyui.util.ItemCardLayout.visibleRectForAspect(Stage.visibleRect.width / Stage.visibleRect.height);
       var m = this._itemCardMetrics != undefined ? this._itemCardMetrics : skyui.util.ItemCardLayout.DEFAULT_METRICS;
-      skyui.util.ItemCardLayout.applyItem3D(skyui.util.ItemCardLayout.predictItem3D(settings,vr,m));
+      var pos = skyui.util.ItemCardLayout.predictItem3D(settings,vr,m);
+      var applied = pos.x + "," + pos.z;
+      if(applied != this._itemCardApplied && skyui.util.ItemCardLayout.applyItem3D(pos))
+      {
+         this._itemCardApplied = applied;
+      }
    }
    function onLoadInit(a_widgetHolder)
    {

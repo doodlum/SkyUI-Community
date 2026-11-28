@@ -23,7 +23,7 @@ class skyui.util.ItemCardLayout
     // Metrics of the stock SkyUI item menus (inventory list and item card), used until an item menu reports its own.
     // panel: list right edge + 25 px, from the visible left edge, at entryWidth 530; w: card width; xMin/xMax/yMin: card
     // bounds in its own space; y: card y before yOffset; safe: Stage.safeRect.x; ox/oy: stage position of the card's parent.
-    public static var DEFAULT_METRICS = {panel: 582.4, w: 433.4, xMin: -4.9, xMax: 428.5, yMin: -24, y: 434.3, safe: 0, ox: 0, oy: 0};
+    public static var DEFAULT_METRICS = {panel: 582.45, w: 428.5, xMin: 0, xMax: 428.51, yMin: -24, y: 434.3, safe: 15, ox: 0, oy: 0};
 
     public static var INI_KEYS_X = ["fInventory3DItemPosX:Interface", "fInventory3DItemPosXWide:Interface",
                                     "fMagic3DItemPosX:Interface", "fMagic3DItemPosXWide:Interface"];
