@@ -111,6 +111,12 @@ Add_SWF(bartermenu
         NameFilter.as
         SortFilter.as
     }
+    Common/skyui/props {
+        CompoundProperty.as
+        ItemFilter.as
+        PropertyDataExtender.as
+        PropertyLookup.as
+    }
     ItemMenus {
         BarterDataSetter.as
         BarterMenu.as
@@ -174,6 +180,12 @@ Add_SWF(containermenu
         NameFilter.as
         SortFilter.as
     }
+    Common/skyui/props {
+        CompoundProperty.as
+        ItemFilter.as
+        PropertyDataExtender.as
+        PropertyLookup.as
+    }
     ItemMenus {
         BottomBar.as
         CategoryList.as
@@ -211,6 +223,12 @@ Add_SWF(craftingmenu
         ItemTypeFilter.as
         NameFilter.as
         SortFilter.as
+    }
+    Common/skyui/props {
+        CompoundProperty.as
+        ItemFilter.as
+        PropertyDataExtender.as
+        PropertyLookup.as
     }
     Common/skyui/components/list {
         BasicListEntry.as
@@ -355,6 +373,12 @@ Add_SWF(giftmenu
         NameFilter.as
         SortFilter.as
     }
+    Common/skyui/props {
+        CompoundProperty.as
+        ItemFilter.as
+        PropertyDataExtender.as
+        PropertyLookup.as
+    }
     ItemMenus {
         BottomBar.as
         CategoryList.as
@@ -421,6 +445,12 @@ Add_SWF(inventorymenu
         ItemTypeFilter.as
         NameFilter.as
         SortFilter.as
+    }
+    Common/skyui/props {
+        CompoundProperty.as
+        ItemFilter.as
+        PropertyDataExtender.as
+        PropertyLookup.as
     }
     ItemMenus {
         BottomBar.as
@@ -497,6 +527,12 @@ Add_SWF(magicmenu
         ItemTypeFilter.as
         NameFilter.as
         SortFilter.as
+    }
+    Common/skyui/props {
+        CompoundProperty.as
+        ItemFilter.as
+        PropertyDataExtender.as
+        PropertyLookup.as
     }
     ItemMenus {
         BottomBar.as
