@@ -507,8 +507,12 @@ class ItemMenu extends MovieClip
         itemCardContainer._y = card.y;
 
         // Centre the 3D item over the card, and report the metrics so the HUD's prediction matches this menu.
-        var pos3D = skyui.util.ItemCardLayout.item3DPosition(card.centreX + metrics.ox, card.top + metrics.oy, vr);
-        skyui.util.ItemCardLayout.applyItem3D(pos3D);
+        var item3D = this._config.ItemInfo.item3D;
+        var item3DSettings = skyui.util.ItemCardLayout.item3DSettings(item3D.xOffset, item3D.yOffset, item3D.disabled);
+        var pos3D = skyui.util.ItemCardLayout.withOffsets(
+            skyui.util.ItemCardLayout.item3DPosition(card.centreX + metrics.ox, card.top + metrics.oy, vr), item3DSettings);
+        if (!item3DSettings.disabled)
+            skyui.util.ItemCardLayout.applyItem3D(pos3D);
         // The applied position goes along too: SKI_ConfigMenu re-applies it at game load in case the HUD widget loader
         // is missing (replaced by another mod).
         if (_global.skse != undefined)

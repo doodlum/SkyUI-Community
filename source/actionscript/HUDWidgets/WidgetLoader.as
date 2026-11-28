@@ -57,7 +57,10 @@ class WidgetLoader extends MovieClip
       ListLayout$defaults$entryWidth: "entryWidth",
       ItemInfo$itemcard$align: "align",
       ItemInfo$itemcard$xOffset: "xOffset",
-      ItemInfo$itemcard$yOffset: "yOffset"
+      ItemInfo$itemcard$yOffset: "yOffset",
+      ItemInfo$item3D$xOffset: "item3DX",
+      ItemInfo$item3D$yOffset: "item3DZ",
+      ItemInfo$item3D$disabled: "item3DDisabled"
    };
 
    function loadItemCardConfig()
@@ -213,7 +216,12 @@ class WidgetLoader extends MovieClip
       var vr = skyui.util.ItemCardLayout.visibleRectForAspect(Stage.visibleRect.width / Stage.visibleRect.height);
       var m = this._itemCardMetrics != undefined ? this._itemCardMetrics : skyui.util.ItemCardLayout.DEFAULT_METRICS;
 
-      var pos = skyui.util.ItemCardLayout.predictItem3D(settings,vr,m);
+      var item3D = skyui.util.ItemCardLayout.item3DSettings(eff.item3DX,eff.item3DZ,eff.item3DDisabled);
+      if(item3D.disabled)
+      {
+         return undefined;
+      }
+      var pos = skyui.util.ItemCardLayout.withOffsets(skyui.util.ItemCardLayout.predictItem3D(settings,vr,m),item3D);
       // Write when the live values differ (not just when this computation changed), so a value set by anything else,
       // another mod or an older SkyUI script, is corrected within one poll.
       if(!skyui.util.ItemCardLayout.isApplied(pos))
