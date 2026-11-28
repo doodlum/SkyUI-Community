@@ -483,6 +483,12 @@ class ItemMenu extends MovieClip
         var itemcardPosition = this._config.ItemInfo.itemcard;
         var itemiconPosition = this._config.ItemInfo.itemicon;
 
+        // A build without skyui.util.ItemCardLayout compiled in (its slot left empty) must still place the card.
+        if (skyui.util.ItemCardLayout.placeCard == undefined) {
+            this.positionItemCardLegacy(vr, safe, panelEdge, itemCardContainer, itemcardPosition, itemiconPosition);
+            return;
+        }
+
         // Placement and the 3D item position come from skyui.util.ItemCardLayout, which the HUD also uses to set the 3D
         // item position before a menu opens (the game reads it at open, before this code runs).
         var settings = skyui.util.ItemCardLayout.cardSettings(this._config.ListLayout.defaults.entryWidth, itemcardPosition.align,
@@ -515,25 +521,31 @@ class ItemMenu extends MovieClip
             var item3DSettings = skyui.util.ItemCardLayout.item3DSettings(item3D.xOffset, item3D.yOffset, item3D.disabled);
             var pos3D = skyui.util.ItemCardLayout.withOffsets(
                 skyui.util.ItemCardLayout.item3DPosition(card.centreX + metrics.ox, card.top + metrics.oy, vr), item3DSettings);
-            if (!item3DSettings.disabled)
+            // Only with SkyUI's own MCM script active (it always sends ItemInfo$item3D$disabled): if an older
+            // SKI_ConfigMenu.pex replaced ours, it keeps control of the 3D item as before.
+            if (!item3DSettings.disabled && ItemMenu.hasConfigOverride("ItemInfo$item3D$disabled"))
                 skyui.util.ItemCardLayout.applyItem3D(pos3D);
             // The applied position goes along too: SKI_ConfigMenu re-applies it at game load in case the HUD widget
             // loader is missing (replaced by another mod).
             if (_global.skse != undefined)
                 skse.SendModEvent("SKIIM_itemCardMetrics", [metrics.panel, metrics.w, metrics.xMin, metrics.xMax, metrics.yMin,
-                                                            metrics.y, metrics.safe, metrics.ox, metrics.oy, pos3D.x, pos3D.z,
-                                                            this.itemCard._x, this.itemCard._y].join(","), 0);
+                                                            metrics.y, metrics.safe, metrics.ox, metrics.oy, pos3D.x, pos3D.z].join(","), 0);
         }
 
+        this.finishFloatingElements(itemCardContainer);
+    }
+
+    private function finishFloatingElements(a_container)
+    {
         if (this.mouseRotationRect != undefined) {
             MovieClip(this.mouseRotationRect).Lock("T");
             this.mouseRotationRect._x = this.itemCard._parent._x;
-            this.mouseRotationRect._width = itemCardContainer._width;
+            this.mouseRotationRect._width = a_container._width;
             this.mouseRotationRect._height = 0.55 * Stage.visibleRect.height;
         }
-            
+
         this._bItemCardPositioned = true;
-        
+
         // Delayed fade in if positioned wasn't set
         if (this._bItemCardFadedIn) {
             gfx.io.GameDelegate.call("UpdateItem3D", [true]);
@@ -541,6 +553,36 @@ class ItemMenu extends MovieClip
         }
     }
     
+    private static function hasConfigOverride(a_key: String)
+    {
+        var keys = skyui.util.ConfigManager.in_overrideKeys;
+        for (var i = 0; i < keys.length; i++)
+            if (keys[i] == a_key)
+                return true;
+        return false;
+    }
+
+    // The item card placement before skyui.util.ItemCardLayout (only used if it is missing from the build).
+    private function positionItemCardLegacy(a_vr, a_safe, a_panelEdge, a_container, a_itemcardPosition, a_itemiconPosition)
+    {
+        var rightEdge = a_vr.x + a_vr.width - a_safe;
+        var scaleMult = (rightEdge - a_panelEdge) / a_container._width;
+        if (scaleMult < 1.0) {
+            a_container._width *= scaleMult;
+            a_container._height *= scaleMult;
+            a_itemiconPosition.scale *= scaleMult;
+        }
+        var align = String(a_itemcardPosition.align).toLowerCase();
+        if (align == "left")
+            a_container._x = a_panelEdge + a_safe + a_itemcardPosition.xOffset;
+        else if (align == "right")
+            a_container._x = rightEdge - a_container._width + a_itemcardPosition.xOffset;
+        else
+            a_container._x = a_panelEdge + a_itemcardPosition.xOffset + (a_vr.x + a_vr.width - a_panelEdge - a_container._width) / 2;
+        a_container._y = a_container._y + a_itemcardPosition.yOffset;
+        this.finishFloatingElements(a_container);
+    }
+
     // Whether this menu's layout defines the shared 3D item position (the inventory menu overrides this).
     private function ownsItem3DPosition()
     {

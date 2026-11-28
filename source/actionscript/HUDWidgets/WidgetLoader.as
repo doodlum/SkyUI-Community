@@ -47,6 +47,11 @@ class WidgetLoader extends MovieClip
    var _itemCardOverrideKeys;
    var _itemCardMetrics;       // reported by the inventory menu
    var _itemCardReadySent;
+   // The game's own 3D item values (from its INI files), taken by SKI_ConfigMenu at the first load of the game session,
+   // before SkyUI changes them. Kept here because this loader lives for the whole session (see setItemCardGameValues).
+   var _itemCardHasGameValues;
+   var _itemCardGame;
+   var _itemCardWasDisabled;
 
    static var ITEMCARD_KEYS = {
       ListLayout$defaults$entryWidth: "entryWidth",
@@ -211,21 +216,40 @@ class WidgetLoader extends MovieClip
       this.updateItem3D();
    }
 
-   function setItemCardMetrics(a_panel, a_w, a_xMin, a_xMax, a_yMin, a_y, a_safe, a_ox, a_oy, a_cardX, a_cardY)
+   function setItemCardMetrics(a_panel, a_w, a_xMin, a_xMax, a_yMin, a_y, a_safe, a_ox, a_oy)
    {
       if(isNaN(a_panel) || !(a_w > 0))
       {
          return undefined;
       }
-      this._itemCardMetrics = {panel:a_panel,w:a_w,xMin:a_xMin,xMax:a_xMax,yMin:a_yMin,y:a_y,safe:a_safe,ox:a_ox,oy:a_oy,cardX:(isNaN(a_cardX) ? 0 : a_cardX),cardY:(isNaN(a_cardY) ? -24 : a_cardY)};
+      this._itemCardMetrics = {panel:a_panel,w:a_w,xMin:a_xMin,xMax:a_xMax,yMin:a_yMin,y:a_y,safe:a_safe,ox:a_ox,oy:a_oy};
       // The inventory just opened with whatever config.txt says now: re-read it before computing, so this never writes
       // a position from an older config over the one the menu just set.
       this.loadItemCardConfig();
    }
 
+   // Game values for the 3D item: position in INI_KEYS_X then INI_KEYS_Z order (8 values), then the 4 scale values.
+   // Kept only for SKI_ConfigMenu to read back on later loads in this session; the first values received win.
+   function setItemCardGameValues()
+   {
+      if(arguments.length < 8 || this._itemCardHasGameValues)
+      {
+         return undefined;
+      }
+      this._itemCardGame = [];
+      for(var i = 0; i < arguments.length; i++)
+      {
+         this._itemCardGame[i] = Number(arguments[i]);
+      }
+      this._itemCardHasGameValues = true;
+   }
+
    function updateItem3D()
    {
-      if(this._itemCardFile == undefined)
+      // Do nothing until SkyUI's own MCM script has sent its 3D item settings (ItemInfo$item3D$*): before that, the
+      // MCM's offsets and Disable Positioning are unknown, and if an older SKI_ConfigMenu.pex replaced ours, the 3D
+      // item stays entirely under its control, as before this change.
+      if(this._itemCardFile == undefined || this._itemCardOverrides == undefined || this._itemCardOverrides.item3DDisabled == undefined)
       {
          return undefined;
       }
@@ -237,14 +261,25 @@ class WidgetLoader extends MovieClip
          eff[name] = this.resolveItemCardVar(k.slice(0,k.indexOf("$")),v);
       }
       var settings = skyui.util.ItemCardLayout.cardSettings(eff.entryWidth,eff.align,eff.xOffset,eff.yOffset);
-      var vr = skyui.util.ItemCardLayout.visibleRectForAspect(Stage.visibleRect.width / Stage.visibleRect.height);
+      var vr = skyui.util.ItemCardLayout.visibleRectForAspect(this.itemCardScreenAspect());
       var m = this._itemCardMetrics != undefined ? this._itemCardMetrics : skyui.util.ItemCardLayout.DEFAULT_METRICS;
 
       var item3D = skyui.util.ItemCardLayout.item3DSettings(eff.item3DX,eff.item3DZ,eff.item3DDisabled);
       if(item3D.disabled)
       {
+         // Disable Positioning: hand the position back to the game (or a skin's own values) once, then leave it.
+         if(!this._itemCardWasDisabled && this._itemCardHasGameValues)
+         {
+            for(var g = 0; g < skyui.util.ItemCardLayout.INI_KEYS_X.length; g++)
+            {
+               skse.SetINISetting(skyui.util.ItemCardLayout.INI_KEYS_X[g],this._itemCardGame[g]);
+               skse.SetINISetting(skyui.util.ItemCardLayout.INI_KEYS_Z[g],this._itemCardGame[g + skyui.util.ItemCardLayout.INI_KEYS_X.length]);
+            }
+         }
+         this._itemCardWasDisabled = true;
          return undefined;
       }
+      this._itemCardWasDisabled = false;
       var pos = skyui.util.ItemCardLayout.withOffsets(skyui.util.ItemCardLayout.predictItem3D(settings,vr,m),item3D);
       // Write when the live values differ (not just when this computation changed), so a value something else set is
       // replaced too.
@@ -252,6 +287,19 @@ class WidgetLoader extends MovieClip
       {
          skyui.util.ItemCardLayout.applyItem3D(pos);
       }
+   }
+
+   // The game's render size (iSize W/H, as SKI_ConfigMenu always used) gives the item menus' visible area; the HUD's
+   // own stage is the fallback, since a HUD replacer could set it up differently.
+   function itemCardScreenAspect()
+   {
+      var w = Number(skse.GetINISetting("iSize W:Display"));
+      var h = Number(skse.GetINISetting("iSize H:Display"));
+      if(w > 0 && h > 0)
+      {
+         return w / h;
+      }
+      return Stage.visibleRect.width / Stage.visibleRect.height;
    }
 
    // A value naming a section variable (vars.<name>.value) resolves to that variable, an MCM override of it first.

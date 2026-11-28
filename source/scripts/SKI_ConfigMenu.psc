@@ -41,8 +41,6 @@ float		_itemYBaseW
 
 ; Item card layout measured by the item menus (SKIIM_itemCardMetrics), passed to the HUD widget loader.
 string		_itemCardMetrics			= ""
-; Whether the game's own 3D item values (_fInventory3DItemPos*, ...) have been taken; see CaptureGame3DItemValues.
-bool		_game3DItemValuesCaptured	= false
 
 
 ; -- Version 2 --
@@ -1550,6 +1548,7 @@ function ApplySettings()
 	RegisterForModEvent("SKIIM_itemCardMetrics", "OnItemCardMetrics")
 	RegisterForModEvent("SKIIM_hudItemCardReady", "OnHudItemCardReady")
 	CaptureGame3DItemValues()
+	Apply3DItemDisabled()
 	Apply3DItemXOffset()
 	Apply3DItemYOffset()
 	Apply3DItemPosition()
@@ -1599,7 +1598,11 @@ event OnItemCardMetrics(string a_eventName, string a_strArg, float a_numArg, For
 endEvent
 
 event OnHudItemCardReady(string a_eventName, string a_strArg, float a_numArg, Form a_sender)
+	PushGame3DItemValuesToHUD()
 	PushItemCardMetricsToHUD()
+	if (_3DItemDisablePositioning)
+		Apply3DItemDisabled()
+	endIf
 endEvent
 
 function PushItemCardMetricsToHUD()
@@ -1610,34 +1613,28 @@ function PushItemCardMetricsToHUD()
 	if (parts.length < 9)
 		return
 	endIf
-	; panel..oy (fields 1-9), then the card offset in its holder (fields 12-13) when reported
-	float[] args = new float[11]
+	float[] args = new float[9]
 	int i = 0
 	while (i < 9)
 		args[i] = parts[i] as float
 		i += 1
 	endWhile
-	if (parts.length >= 13)
-		args[9] = parts[11] as float
-		args[10] = parts[12] as float
-	else
-		args[9] = 0.0
-		args[10] = -24.0
-	endIf
 	UI.InvokeFloatA("HUD Menu", "_root.widgetLoaderContainer.widgetLoader.setItemCardMetrics", args)
 endFunction
 
 ; The 3D item settings reach the item menus and the HUD widget loader as config overrides (ItemInfo.item3D.*), so they
 ; apply before the next open: Horizontal/Vertical Offset move the model from the automatic centre over the item card
 ; (3D item position units, as before), Disable Positioning leaves the position to the game (or a skin's own values).
+; Disable Positioning goes first, so every override push the HUD and menus receive already carries it (the pushes run
+; later on the UI thread, in order).
 function Apply3DItemXOffset()
-	SKI_SettingsManagerInstance.SetOverride("ItemInfo$item3D$xOffset", _3DItemXOffset as string)
 	Apply3DItemDisabled()
+	SKI_SettingsManagerInstance.SetOverride("ItemInfo$item3D$xOffset", _3DItemXOffset as string)
 endFunction
 
 function Apply3DItemYOffset()
-	SKI_SettingsManagerInstance.SetOverride("ItemInfo$item3D$yOffset", _3DItemYOffset as string)
 	Apply3DItemDisabled()
+	SKI_SettingsManagerInstance.SetOverride("ItemInfo$item3D$yOffset", _3DItemYOffset as string)
 endFunction
 
 function Apply3DItemDisabled()
@@ -1656,27 +1653,59 @@ function Apply3DItemDisabled()
 	endIf
 endFunction
 
-; The game's own 3D item values (from its INI files), for Disable Positioning. Taken once, before SkyUI has changed
-; them: re-reading them on every load could pick up SkyUI's values from earlier in the same session.
+; The game's own 3D item values (from its INI files, or a skin's), for Disable Positioning. Taken at the first load of
+; a game session, before SkyUI changes them, and kept in the HUD widget loader, which lives for the whole session:
+; later loads in the session take them from there instead of re-reading values SkyUI may have changed meanwhile. A
+; new session takes them again, so INI changes (a skin installed later) are picked up.
+string property		HUD_ITEMCARD_LOADER	= "_root.widgetLoaderContainer.widgetLoader" autoReadonly
+
 function CaptureGame3DItemValues()
-	if (_game3DItemValuesCaptured)
+	if (UI.GetBool("HUD Menu", HUD_ITEMCARD_LOADER + "._itemCardHasGameValues"))
+		_fInventory3DItemPosX			= UI.GetFloat("HUD Menu", HUD_ITEMCARD_LOADER + "._itemCardGame.0")
+		_fInventory3DItemPosXWide		= UI.GetFloat("HUD Menu", HUD_ITEMCARD_LOADER + "._itemCardGame.1")
+		_fMagic3DItemPosX				= UI.GetFloat("HUD Menu", HUD_ITEMCARD_LOADER + "._itemCardGame.2")
+		_fMagic3DItemPosXWide			= UI.GetFloat("HUD Menu", HUD_ITEMCARD_LOADER + "._itemCardGame.3")
+		_fInventory3DItemPosZ			= UI.GetFloat("HUD Menu", HUD_ITEMCARD_LOADER + "._itemCardGame.4")
+		_fInventory3DItemPosZWide		= UI.GetFloat("HUD Menu", HUD_ITEMCARD_LOADER + "._itemCardGame.5")
+		_fMagic3DItemPosZ				= UI.GetFloat("HUD Menu", HUD_ITEMCARD_LOADER + "._itemCardGame.6")
+		_fMagic3DItemPosZWide			= UI.GetFloat("HUD Menu", HUD_ITEMCARD_LOADER + "._itemCardGame.7")
+		_fInventory3DItemPosScale		= UI.GetFloat("HUD Menu", HUD_ITEMCARD_LOADER + "._itemCardGame.8")
+		_fInventory3DItemPosScaleWide	= UI.GetFloat("HUD Menu", HUD_ITEMCARD_LOADER + "._itemCardGame.9")
+		_fMagic3DItemPosScale			= UI.GetFloat("HUD Menu", HUD_ITEMCARD_LOADER + "._itemCardGame.10")
+		_fMagic3DItemPosScaleWide		= UI.GetFloat("HUD Menu", HUD_ITEMCARD_LOADER + "._itemCardGame.11")
 		return
 	endIf
+	_fInventory3DItemPosX			= Utility.GetINIFloat("fInventory3DItemPosX:Interface")
 	_fInventory3DItemPosXWide		= Utility.GetINIFloat("fInventory3DItemPosXWide:Interface")
-	_fInventory3DItemPosX 			= Utility.GetINIFloat("fInventory3DItemPosX:Interface")
-	_fMagic3DItemPosXWide 			= Utility.GetINIFloat("fMagic3DItemPosXWide:Interface")
-	_fMagic3DItemPosX 				= Utility.GetINIFloat("fMagic3DItemPosX:Interface")
+	_fMagic3DItemPosX				= Utility.GetINIFloat("fMagic3DItemPosX:Interface")
+	_fMagic3DItemPosXWide			= Utility.GetINIFloat("fMagic3DItemPosXWide:Interface")
+	_fInventory3DItemPosZ			= Utility.GetINIFloat("fInventory3DItemPosZ:Interface")
 	_fInventory3DItemPosZWide		= Utility.GetINIFloat("fInventory3DItemPosZWide:Interface")
-	_fInventory3DItemPosZ 			= Utility.GetINIFloat("fInventory3DItemPosZ:Interface")
-	_fMagic3DItemPosZWide 			= Utility.GetINIFloat("fMagic3DItemPosZWide:Interface")
-	_fMagic3DItemPosZ 				= Utility.GetINIFloat("fMagic3DItemPosZ:Interface")
-	_fInventory3DItemPosScaleWide	= Utility.GetINIFloat("fInventory3DItemPosScaleWide:Interface")
-	_fMagic3DItemPosScaleWide		= Utility.GetINIFloat("fMagic3DItemPosScaleWide:Interface")
+	_fMagic3DItemPosZ				= Utility.GetINIFloat("fMagic3DItemPosZ:Interface")
+	_fMagic3DItemPosZWide			= Utility.GetINIFloat("fMagic3DItemPosZWide:Interface")
 	_fInventory3DItemPosScale		= Utility.GetINIFloat("fInventory3DItemPosScale:Interface")
+	_fInventory3DItemPosScaleWide	= Utility.GetINIFloat("fInventory3DItemPosScaleWide:Interface")
 	_fMagic3DItemPosScale			= Utility.GetINIFloat("fMagic3DItemPosScale:Interface")
-	_game3DItemValuesCaptured = true
+	_fMagic3DItemPosScaleWide		= Utility.GetINIFloat("fMagic3DItemPosScaleWide:Interface")
 endFunction
 
+; Hands the game values to the HUD widget loader (same order as skyui.util.ItemCardLayout.INI_KEYS_X / _Z, then scale).
+function PushGame3DItemValuesToHUD()
+	float[] v = new float[12]
+	v[0] = _fInventory3DItemPosX
+	v[1] = _fInventory3DItemPosXWide
+	v[2] = _fMagic3DItemPosX
+	v[3] = _fMagic3DItemPosXWide
+	v[4] = _fInventory3DItemPosZ
+	v[5] = _fInventory3DItemPosZWide
+	v[6] = _fMagic3DItemPosZ
+	v[7] = _fMagic3DItemPosZWide
+	v[8] = _fInventory3DItemPosScale
+	v[9] = _fInventory3DItemPosScaleWide
+	v[10] = _fMagic3DItemPosScale
+	v[11] = _fMagic3DItemPosScaleWide
+	UI.InvokeFloatA("HUD Menu", HUD_ITEMCARD_LOADER + ".setItemCardGameValues", v)
+endFunction
 ; Fallback for a missing HUD widget loader: the 3D item position the item menus last applied (fields 10 and 11 of the
 ; metrics, offsets included), set at game load so a session starts centred. The HUD's own computation replaces it.
 function Apply3DItemPosition()
