@@ -31,6 +31,7 @@ class WidgetLoader extends MovieClip
       _root.HUDMovieBaseInstance.ValueTranslated._alpha = 0;
       _root.HUDMovieBaseInstance.QuestUpdateBaseInstance.LevelUpTextInstance._alpha = 0;
       this.loadItemCardConfig();
+      this.measureItemCard();
       // config.txt can change while the game runs (the item menus re-read it on every open): keep up with it, so the
       // position applied here never lags behind what the next menu will use.
       setInterval(this,"loadItemCardConfig",WidgetLoader.ITEMCARD_POLL_MS);
@@ -47,8 +48,13 @@ class WidgetLoader extends MovieClip
    var _itemCardOverrideKeys;
    var _itemCardMetrics;       // reported by the item menus
    var _itemCardReadySent;
+   var _itemCardRaw;           // config.txt text last parsed
+   var _itemCardSymbol;        // bounds of the item card symbol in skyui/ItemCard.swf, measured here
+   var _itemCardProbeLoader;
 
-   static var ITEMCARD_POLL_MS = 3000;
+   // Short enough that nobody can edit config.txt, switch back to the game and open a menu in between; unchanged file
+   // text is not parsed again.
+   static var ITEMCARD_POLL_MS = 250;
 
    static var ITEMCARD_KEYS = {
       ListLayout$defaults$entryWidth: "entryWidth",
@@ -63,6 +69,12 @@ class WidgetLoader extends MovieClip
       var lv = new LoadVars();
       lv.onData = function(a_data)
       {
+         if(a_data != undefined && a_data == loader._itemCardRaw && loader._itemCardFile != undefined)
+         {
+            loader.updateItem3D();
+            return undefined;
+         }
+         loader._itemCardRaw = a_data;
          loader.parseItemCardConfig(a_data);
       };
       lv.load("skyui/config.txt");
@@ -176,13 +188,47 @@ class WidgetLoader extends MovieClip
       this.updateItem3D();
    }
 
-   function setItemCardMetrics(a_panel, a_w, a_xMin, a_xMax, a_yMin, a_y, a_safe, a_ox, a_oy)
+   // Loads the item card on its own (hidden) and measures it, so a replaced item card of a different size is right
+   // before any item menu has reported. The ItemCard code only sets itself up (no calls into the game).
+   function measureItemCard()
+   {
+      var holder = _root.createEmptyMovieClip("itemCardProbe",_root.getNextHighestDepth());
+      holder._visible = false;
+      holder._x = -10000;
+      var target = holder.createEmptyMovieClip("swf",1);
+      var owner = this;
+      var listener = {};
+      listener.onLoadInit = function(a_target)
+      {
+         var card = a_target.attachMovie("ItemCard","card",1);
+         if(card != undefined)
+         {
+            var b = card.getBounds(card);
+            if(b.xMax > b.xMin)
+            {
+               owner._itemCardSymbol = {xMin:b.xMin,xMax:b.xMax,yMin:b.yMin};
+            }
+         }
+         owner._itemCardProbeLoader.unloadClip(a_target);
+         holder.removeMovieClip();
+         owner.updateItem3D();
+      };
+      listener.onLoadError = function(a_target)
+      {
+         holder.removeMovieClip();
+      };
+      this._itemCardProbeLoader = new MovieClipLoader();
+      this._itemCardProbeLoader.addListener(listener);
+      this._itemCardProbeLoader.loadClip("skyui/ItemCard.swf",target);
+   }
+
+   function setItemCardMetrics(a_panel, a_w, a_xMin, a_xMax, a_yMin, a_y, a_safe, a_ox, a_oy, a_cardX, a_cardY)
    {
       if(isNaN(a_panel) || !(a_w > 0))
       {
          return undefined;
       }
-      this._itemCardMetrics = {panel:a_panel,w:a_w,xMin:a_xMin,xMax:a_xMax,yMin:a_yMin,y:a_y,safe:a_safe,ox:a_ox,oy:a_oy};
+      this._itemCardMetrics = {panel:a_panel,w:a_w,xMin:a_xMin,xMax:a_xMax,yMin:a_yMin,y:a_y,safe:a_safe,ox:a_ox,oy:a_oy,cardX:(isNaN(a_cardX) ? 0 : a_cardX),cardY:(isNaN(a_cardY) ? -24 : a_cardY)};
       // An item menu just opened with whatever config.txt says now: re-read it before computing, so this never writes
       // a position from an older config over the one the menu just set.
       this.loadItemCardConfig();
@@ -203,6 +249,11 @@ class WidgetLoader extends MovieClip
       var settings = skyui.util.ItemCardLayout.cardSettings(eff.entryWidth,eff.align,eff.xOffset,eff.yOffset);
       var vr = skyui.util.ItemCardLayout.visibleRectForAspect(Stage.visibleRect.width / Stage.visibleRect.height);
       var m = this._itemCardMetrics != undefined ? this._itemCardMetrics : skyui.util.ItemCardLayout.DEFAULT_METRICS;
+      if(this._itemCardSymbol != undefined)
+      {
+         // The card measured here reflects the installed skyui/ItemCard.swf even if the saved metrics are older.
+         m = skyui.util.ItemCardLayout.withCardSymbol(m,this._itemCardSymbol);
+      }
       var pos = skyui.util.ItemCardLayout.predictItem3D(settings,vr,m);
       // Write when the live values differ (not just when this computation changed), so a value set by anything else,
       // another mod or an older SkyUI script, is corrected within one poll.

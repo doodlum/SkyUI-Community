@@ -1510,12 +1510,20 @@ function PushItemCardMetricsToHUD()
 	if (parts.length < 9)
 		return
 	endIf
-	float[] args = new float[9]
+	; panel..oy (fields 1-9), then the card offset in its holder (fields 12-13) when reported
+	float[] args = new float[11]
 	int i = 0
 	while (i < 9)
 		args[i] = parts[i] as float
 		i += 1
 	endWhile
+	if (parts.length >= 13)
+		args[9] = parts[11] as float
+		args[10] = parts[12] as float
+	else
+		args[9] = 0.0
+		args[10] = -24.0
+	endIf
 	UI.InvokeFloatA("HUD Menu", "_root.widgetLoaderContainer.widgetLoader.setItemCardMetrics", args)
 endFunction
 

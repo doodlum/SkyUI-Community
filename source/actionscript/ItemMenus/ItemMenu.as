@@ -513,7 +513,8 @@ class ItemMenu extends MovieClip
         // is missing (replaced by another mod).
         if (_global.skse != undefined)
             skse.SendModEvent("SKIIM_itemCardMetrics", [metrics.panel, metrics.w, metrics.xMin, metrics.xMax, metrics.yMin,
-                                                        metrics.y, metrics.safe, metrics.ox, metrics.oy, pos3D.x, pos3D.z].join(","), 0);
+                                                        metrics.y, metrics.safe, metrics.ox, metrics.oy, pos3D.x, pos3D.z,
+                                                        this.itemCard._x, this.itemCard._y].join(","), 0);
 
         if (this.mouseRotationRect != undefined) {
             MovieClip(this.mouseRotationRect).Lock("T");
