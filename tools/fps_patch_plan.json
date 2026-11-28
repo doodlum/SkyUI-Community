@@ -1,0 +1,91 @@
+{
+    "_doc": [
+        "Which SWFs the FPS patch converts (tools/xml_fps_patcher.py, verified by tools/check_fps_patch.py).",
+        "convert=true: every timeline stretched by k, the largest whole factor with original fps * k <= target_fps (a cap),",
+        "  all frame-number references in the SWF's bytecode rescaled at run time by skyui.util.FpsScale.",
+        "played_at: for libraries other SWFs import (ImportAssets): their symbols play at the importer's frame rate, so their k is computed from played_at instead of their own rate; check_fps_patch.py verifies it against every importer.",
+        "keep_shallow: sprite ids whose own timeline stays unstretched (1-frame marker) while every timeline nested in it is stretched and gets its own k marker.",
+        "convert=false: frame rate and timelines unchanged (code is still rewritten, with k = 1, because it may",
+        "  drive clips of converted SWFs loaded into it).",
+        "exclude=true: built exactly as with ENABLE_FPS_PATCH=OFF (no FpsScale class, no rewrite, no marker); for",
+        "  SWFs that must not be touched at all. Only valid for SWFs whose code drives no converted SWF's clips.",
+        "Every SWF the build produces must be listed here; the patcher refuses unknown SWFs.",
+        "enterframe_free_running: code locations whose onEnterFrame handlers are time-based (getTimer) and may run",
+        "  every frame; all other onEnterFrame handlers are throttled to the original frame rate.",
+        "method_override_allowed: classes that define nextFrame/prevFrame/gotoAndStop/gotoAndPlay themselves but",
+        "  are not MovieClips (FpsScale.go passes calls on non-MovieClip objects through unchanged)."
+    ],
+    "target_fps": 90,
+    "swfs": {
+        "bartermenu.swf":          {"convert": true},
+        "console.swf":             {"convert": true},
+        "containermenu.swf":       {"convert": true},
+        "craftingmenu.swf":        {"convert": true},
+        "dialoguemenu.swf":        {"convert": true},
+        "fadermenu.swf":           {"convert": true},
+        "favoritesmenu.swf":       {"convert": true},
+        "giftmenu.swf":            {"convert": true},
+        "hudmenu.swf":             {"convert": true, "keep_shallow": ["387"], "reason": "sprite 387 (Compass Marker, 152 frames) is an icon atlas addressed by frame number; Map Marker Framework, DbSkseFunctions, ShowUnlooted and SkyBuild read and extend its raw frame layout from native code, so its own timeline stays unstretched"},
+        "inventorymenu.swf":       {"convert": true},
+        "levelupmenu.swf":         {"convert": true},
+        "loadingmenu.swf":         {"convert": true},
+        "loadwaitspinner.swf":     {"convert": true},
+        "lockpickingmenu.swf":     {"convert": true},
+        "magicmenu.swf":           {"convert": true},
+        "map.swf":                 {"convert": true},
+        "messagebox.swf":          {"convert": true},
+        "quest_journal.swf":       {"convert": true},
+        "racesex_menu.swf":        {"convert": true},
+        "sharedcomponents.swf":    {"convert": true},
+        "sleepwaitmenu.swf":       {"convert": true},
+        "startmenu.swf":           {"convert": true},
+        "statsmenu.swf":           {"convert": true},
+        "textentry.swf":           {"convert": true},
+        "titles.swf":              {"convert": true},
+        "trainingmenu.swf":        {"convert": true},
+        "tutorialmenu.swf":        {"convert": true},
+        "tweenmenu.swf":           {"convert": true},
+        "exported/widgets/skyui/activeeffects.swf": {"convert": true},
+        "exported/skyui/widgetloader.swf": {"convert": true},
+        "skyui/bottombar.swf":     {"convert": true, "played_at": 60, "reason": "imported (ImportAssets) by the item menus at 60 fps; its symbols play at their rate"},
+        "skyui/configpanel.swf":   {"convert": true, "played_at": 30, "reason": "imported (ImportAssets) by quest_journal.swf at 30 fps; its symbols play at that rate"},
+        "skyui/inventorylists.swf": {"convert": true},
+        "skyui/itemcard.swf":      {"convert": true, "played_at": 60, "reason": "imported (ImportAssets) by the item menus at 60 fps; its symbols play at their rate"},
+        "skyui/mcm_splash.swf":    {"convert": true},
+        "skyui/skyui_splash.swf":  {"convert": true},
+
+        "gfxfontlib.swf":          {"convert": false, "reason": "font library, one frame, nothing animates"},
+        "skyui/buttonart.swf":     {"convert": false, "reason": "static art library (one frame per button, picked by label); nothing plays"},
+        "skyui/mapmarkerart.swf":  {"convert": false, "reason": "static art library (map marker icons); nothing plays"},
+        "skyui/icons_category_celtic.swf":      {"convert": false, "reason": "static icon library (gotoAndStop by label); nothing plays"},
+        "skyui/icons_category_curved.swf":      {"convert": false, "reason": "static icon library (gotoAndStop by label); nothing plays"},
+        "skyui/icons_category_psychosteve.swf": {"convert": false, "reason": "static icon library (gotoAndStop by label); nothing plays"},
+        "skyui/icons_category_straight.swf":    {"convert": false, "reason": "static icon library (gotoAndStop by label); nothing plays"},
+        "skyui/icons_item_psychosteve.swf":     {"convert": false, "reason": "static icon library (gotoAndStop by label); nothing plays"},
+        "exported/skyui/icons_effect_psychosteve.swf": {"convert": false, "reason": "static icon library (gotoAndStop by label); nothing plays"}
+    },
+    "compat": {
+        "_doc": "Compatibility profiles, chosen with the CMake option FPS_PATCH_COMPAT (comma separated; empty for none). Each overrides \"swfs\" entries so that other mods which read SkyUI's raw frame numbers keep working. SWFs loaded into a converted menu play at their own frame rate (checked in game), so an unconverted SWF inside a converted host animates at its normal speed.",
+        "morehud_inventory": {
+            "mod": "moreHUD Inventory Edition (ahzaab/moreHUDInventoryAS2)",
+            "why": "AHZmoreHUDInventory.as reads the item card's _totalframes and _currentframe and compares them with fixed frame numbers (AHZCCSkyUIFrames: MAX_FRAMES 221, EMPTY 151, ...). A stretched item card makes every comparison fail.",
+            "swfs": {
+                "skyui/itemcard.swf": {"convert": true, "played_at": 60, "keep_shallow": ["249"], "reason": "compat morehud_inventory: the ItemCard symbol (249) keeps its original 221 frames because moreHUD Inventory Edition reads its raw frame numbers; the animations nested in it are stretched"}
+            }
+        }
+    },
+    "keep_timelines": {
+        "_doc": "Sprites (and everything nested in them) left unstretched inside a converted SWF because the game engine drives them by frame number from native code, which the patcher cannot rewrite. Each gets its own 1-frame __fpsScale marker so ActionScript sees k = 1 for them.",
+        "hudmenu.swf": {
+            "714": "StealthMeterInstance.SneakAnimInstance (120 frames): handed to the engine by RegisterHUDComponents, which sets the stealth eye by frame number",
+            "820": "EnemyHealth_mc.BracketsInstance (100 frames): handed to the engine by RegisterHUDComponents, which sizes the enemy-name brackets by frame number"
+        }
+    },
+    "enterframe_free_running": {
+        "init __Packages.mx.transitions.Tween": "time-based when constructed with useSeconds=true; check_fps_patch.py requires every 'new Tween(...)' to pass a literal true",
+        "init __Packages.com.greensock.TweenNano": "time-based (getTimer) unless useFrames is set; check_fps_patch.py rejects useFrames outside TweenNano itself"
+    },
+    "method_override_allowed": {
+        "init __Packages.mx.transitions.Tween": "Tween.nextFrame/prevFrame step the tween, Tween is not a MovieClip"
+    }
+}

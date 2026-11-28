@@ -7,6 +7,7 @@
 - [CMake 4.2+](https://cmake.org/download/)
 - [Visual Studio 2026](https://visualstudio.microsoft.com/) (or another CMake-supported generator; on Linux, the default make generator is used)
 - [Java](https://www.java.com/en/download/) (required by the bundled ffdec-cli)
+- [Python 3](https://www.python.org/downloads/) (required by the FPS patch, which is on by default; see below)
 - [Proton](https://github.com/ValveSoftware/Proton) *(Linux only)* — auto-detected from your Steam installation. Skyrim SE must have been launched via Steam at least once to create the Proton prefix.
 - A clean Skyrim Special Edition installation with:
   - The [Creation Kit](https://store.steampowered.com/app/1946180/Skyrim_Special_Edition_Creation_Kit/) installed and **run at least once** to unpack the base game script sources
@@ -77,6 +78,42 @@ Alternatively, from the command line (ensure `SkyrimSE_PATH` is exported first):
 cmake --preset debug
 cmake --build --preset debug
 ```
+
+### FPS patch (smoother menu animations)
+
+By default the build raises each SWF's frame rate as far as it can while keeping animations at their original
+speed down to 30 game fps (`ENABLE_FPS_PATCH=ON`, cap set by `FPS_PATCH_TARGET`, default 90). Scaleform advances
+a movie by at most 3 frames per rendered game frame, so a SWF at N fps keeps real time only while the game renders
+at least N / 3 fps. Each SWF is stretched by the largest whole factor that stays at or below the cap: with the
+default 90, 24 fps menus (HUD, stats) become 72 fps (x3), 30 fps menus 90 fps (x3), and 60 fps menus (the item
+menus, favorites, map) stay at 60. `-DFPS_PATCH_TARGET=120` converts everything to 120 (correct from 40 game fps),
+`240` to 240 (from 80). Every timeline with more than one frame is stretched by the SWF's factor so animations keep
+their real-time length, tweens are interpolated, and the compiled ActionScript is rewritten to keep using original
+frame numbers (`tools/xml_fps_patcher.py`, runtime side in `source/actionscript/Common/skyui/util/FpsScale.as`).
+Which SWFs are converted is listed in `tools/fps_patch_plan.json`.
+
+- The configure log prints `[Build] FPS patch : ON` or `OFF`; the presets set it ON. A build folder configured
+  by hand keeps whatever value is in its `CMakeCache.txt`, so pass `-DENABLE_FPS_PATCH=ON` (or `OFF`) when
+  reusing one. With the patch OFF the SWFs keep their original frame rates.
+- Measured in game at ~55 fps: the stats menu opening takes ~0.55 s on main, ~0.57 s at 120 fps and ~0.84 s at
+  240 fps (above the 3-frames-per-frame limit).
+- Libraries other SWFs import (`itemcard`, `bottombar`, `configpanel`) play at the importing menu's rate; the plan
+  gives them `played_at` and the checker verifies every importer. Every exported symbol carries its own scale
+  marker, so art libraries picked by frame number (key icons, map markers) stay correct inside converted menus.
+- Other mods: SWFs loaded into a converted menu (SkyUI widgets from other mods, moreHUD, Infinity UI patches)
+  keep playing at their own frame rate. Mods that read SkyUI's raw frame numbers need those timelines left
+  unstretched; `FPS_PATCH_COMPAT` (default `morehud_inventory`) selects profiles from the plan's `"compat"`
+  section. `morehud_inventory` keeps the item card's own 221-frame timeline for moreHUD Inventory Edition (only
+  relevant when the cap stretches the item menus, i.e. 120 or more). Set `-DFPS_PATCH_COMPAT=` for none.
+- Always kept for native HUD mods: the HUD's "Compass Marker" icon atlas keeps its original frame layout (Map
+  Marker Framework, DbSkseFunctions, ShowUnlooted and SkyBuild read and extend it from SKSE), and
+  `gotoAndPlay(n)` with the clip's raw current frame resumes from that frame (SKSE code such as Blood Magic's
+  `Health.PlayForward(Health._currentFrame)`). Known limitation: SkyUI-Navbar's stats-menu intro skip checks
+  `_totalframes == 31` and switches itself off on a patched statsmenu.swf.
+- Verify a patched build with `cmake --build --preset debug --target check_fps_patch` (or
+  `python tools/check_fps_patch.py --build build/debug --ffdec <path to ffdec-cli> --fps 90 --compat morehud_inventory`,
+  matching the build's options). It proves for every SWF that each timeline keeps its duration in seconds and
+  that every frame-number reference in the bytecode was rescaled, and fails otherwise.
 
 ### Output
 

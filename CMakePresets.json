@@ -13,6 +13,10 @@
                 "SkyrimSE_PATH": {
                     "type": "PATH",
                     "value": "$env{SkyrimSE_PATH}"
+                },
+                "ENABLE_FPS_PATCH": {
+                    "type": "BOOL",
+                    "value": "ON"
                 }
             }
         },
