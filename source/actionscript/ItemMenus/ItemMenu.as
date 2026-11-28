@@ -114,6 +114,12 @@ class ItemMenu extends MovieClip
     {
         this._config = a_config;
 
+        // Widen the list before placing the item card: positionFloatingElements measures the list background (#173).
+        var listLayout = a_config["ListLayout"];
+        var entryWidth = listLayout.defaults.entryWidth;
+        if (entryWidth != undefined && entryWidth > 0)
+            this.inventoryLists.applyDynamicWidth(entryWidth);
+
         this.positionFloatingElements();
         
         var itemListState = this.inventoryLists.itemList.listState;
@@ -149,11 +155,6 @@ class ItemMenu extends MovieClip
         
         this._searchKey = input.controls.pc.search;
         this._searchControls = {keyCode: this._searchKey};
-        
-        var listLayout = a_config["ListLayout"];
-        var entryWidth = listLayout.defaults.entryWidth;
-        if (entryWidth != undefined && entryWidth > 0)
-            this.inventoryLists.applyDynamicWidth(entryWidth);
 
         this.updateBottomBar(false);
     }
