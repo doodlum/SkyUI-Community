@@ -231,34 +231,39 @@ class ContainerMenu extends ItemMenu
         if (a_bSelected && this.inventoryLists.itemList.selectedIndex != -1 && this.inventoryLists.currentState == InventoryLists.SHOW_PANEL) {
             if (this.isViewingContainer()) {
                 if (this._platform != 0) {
-                    this.navPanel.addButton({text: "$Take", controls: skyui.defines.Input.Activate});
+                    this.navPanel.addButton({text: "$Take", controls: this._activateControls});
                     this.navPanel.addButton(this.getEquipButtonData(this.itemCard.itemInfo.type, true));
                 } else {
                     if (this._bEquipMode)
                         this.navPanel.addButton(this.getEquipButtonData(this.itemCard.itemInfo.type));
                     else
-                        this.navPanel.addButton({text: "$Take", controls: skyui.defines.Input.Activate});
+                        this.navPanel.addButton({text: "$Take", controls: this._activateControls});
                 }
                 if (!this.bNPCMode)
                     this.navPanel.addButton({text: "$Take All", controls: skyui.defines.Input.XButton});
             } else {
                 if (this._platform != 0) {
-                    this.navPanel.addButton({text: this.bNPCMode ? "$Give" : "$Store", controls: skyui.defines.Input.Activate});
+                    this.navPanel.addButton({text: this.bNPCMode ? "$Give" : "$Store", controls: this._activateControls});
                     this.navPanel.addButton(this.getEquipButtonData(this.itemCard.itemInfo.type, true));
                 } else {
                     if (this._bEquipMode)
                         this.navPanel.addButton(this.getEquipButtonData(this.itemCard.itemInfo.type));
                     else
-                        this.navPanel.addButton({text: this.bNPCMode ? "$Give" : "$Store", controls: skyui.defines.Input.Activate});
+                        this.navPanel.addButton({text: this.bNPCMode ? "$Give" : "$Store", controls: this._activateControls});
                 }
 
                 this.navPanel.addButton({text: this.itemCard.itemInfo.favorite ? "$Unfavorite" : "$Favorite", controls: skyui.defines.Input.YButton});
             }
+            // On gamepad an item is nearly always selected, so the switch prompt has to be shown here too (GH #97).
+            if (this._platform != 0)
+                this.navPanel.addButton({text: "$Switch Tab", controls: this._switchControls});
             if (!this._bEquipMode)
                 this.navPanel.addButton({text: "$Equip Mode", controls: this._equipModeControls});
         } else {
             this.navPanel.addButton({text: "$Exit", controls: this._cancelControls});
-            this.navPanel.addButton({text: "$Search", controls: this._searchControls});
+            // Search is keyboard-only (InventoryLists reacts to the PC search key).
+            if (this._platform == 0)
+                this.navPanel.addButton({text: "$Search", controls: this._searchControls});
             if (this._platform != 0) {
                 this.navPanel.addButton({text: "$Column", controls: this._sortColumnControls});
                 this.navPanel.addButton({text: "$Order", controls: this._sortOrderControls});

@@ -188,10 +188,16 @@ class MagicMenu extends ItemMenu
     
             if (this.itemCard.itemInfo.showUnlocked)
                 this.navPanel.addButton({text: "$Unlock", controls: skyui.defines.Input.XButton});
-                
+
+            // On gamepad a spell is nearly always selected, so the switch prompt has to be shown here too.
+            if (this._platform != 0)
+                this.navPanel.addButton({text: "$Inventory", controls: this._switchControls});
+
         } else {
             this.navPanel.addButton({text: "$Exit", controls: this._cancelControls});
-            this.navPanel.addButton({text: "$Search", controls: this._searchControls});
+            // Search is keyboard-only (InventoryLists reacts to the PC search key).
+            if (this._platform == 0)
+                this.navPanel.addButton({text: "$Search", controls: this._searchControls});
             if (this._platform != 0) {
                 this.navPanel.addButton({text: "$Column", controls: this._sortColumnControls});
                 this.navPanel.addButton({text: "$Order", controls: this._sortOrderControls});

@@ -117,10 +117,12 @@ class GiftMenu extends ItemMenu
         this.navPanel.clearButtons();
         
         if (a_bSelected) {
-            this.navPanel.addButton({text: (this._bGivingGifts ? "$Give" : "$Take"), controls: skyui.defines.Input.Activate});
+            this.navPanel.addButton({text: (this._bGivingGifts ? "$Give" : "$Take"), controls: this._activateControls});
         } else {
             this.navPanel.addButton({text: "$Exit", controls: this._cancelControls});
-            this.navPanel.addButton({text: "$Search", controls: this._searchControls});
+            // Search is keyboard-only (InventoryLists reacts to the PC search key).
+            if (this._platform == 0)
+                this.navPanel.addButton({text: "$Search", controls: this._searchControls});
             if (this._platform != 0) {
                 this.navPanel.addButton({text: "$Column", controls: this._sortColumnControls});
                 this.navPanel.addButton({text: "$Order", controls: this._sortOrderControls});

@@ -274,10 +274,16 @@ class InventoryMenu extends ItemMenu
     
             if (this.itemCard.itemInfo.charge != undefined && this.itemCard.itemInfo.charge < 100)
                 this.navPanel.addButton({text: "$Charge", controls: skyui.defines.Input.ChargeItem});
-                
+
+            // On gamepad an item is nearly always selected, so the switch prompt has to be shown here too.
+            if (this._platform != 0)
+                this.navPanel.addButton({text: "$Magic", controls: this._switchControls});
+
         } else {
             this.navPanel.addButton({text: "$Exit", controls: this._cancelControls});
-            this.navPanel.addButton({text: "$Search", controls: this._searchControls});
+            // Search is keyboard-only (InventoryLists reacts to the PC search key).
+            if (this._platform == 0)
+                this.navPanel.addButton({text: "$Search", controls: this._searchControls});
             if (this._platform != 0) {
                 this.navPanel.addButton({text: "$Column", controls: this._sortColumnControls});
                 this.navPanel.addButton({text: "$Order", controls: this._sortOrderControls});
