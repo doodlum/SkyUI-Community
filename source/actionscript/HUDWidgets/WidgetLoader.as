@@ -47,7 +47,6 @@ class WidgetLoader extends MovieClip
    var _itemCardOverrideKeys;
    var _itemCardMetrics;       // reported by the item menus
    var _itemCardReadySent;
-   var _itemCardApplied;       // "x,z" last written, to skip identical writes
 
    static var ITEMCARD_POLL_MS = 3000;
 
@@ -205,10 +204,11 @@ class WidgetLoader extends MovieClip
       var vr = skyui.util.ItemCardLayout.visibleRectForAspect(Stage.visibleRect.width / Stage.visibleRect.height);
       var m = this._itemCardMetrics != undefined ? this._itemCardMetrics : skyui.util.ItemCardLayout.DEFAULT_METRICS;
       var pos = skyui.util.ItemCardLayout.predictItem3D(settings,vr,m);
-      var applied = pos.x + "," + pos.z;
-      if(applied != this._itemCardApplied && skyui.util.ItemCardLayout.applyItem3D(pos))
+      // Write when the live values differ (not just when this computation changed), so a value set by anything else,
+      // another mod or an older SkyUI script, is corrected within one poll.
+      if(!skyui.util.ItemCardLayout.isApplied(pos))
       {
-         this._itemCardApplied = applied;
+         skyui.util.ItemCardLayout.applyItem3D(pos);
       }
    }
    function onLoadInit(a_widgetHolder)

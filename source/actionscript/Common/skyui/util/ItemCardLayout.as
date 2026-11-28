@@ -111,6 +111,20 @@ class skyui.util.ItemCardLayout
         return skyui.util.ItemCardLayout.item3DPosition(card.centreX + a_m.ox, card.top + a_m.oy, a_vr);
     }
 
+    // Whether all the 3D item position settings already hold a_pos (to within 0.01 units).
+    public static function isApplied(a_pos)
+    {
+        if (_global.skse == undefined || _global.skse.GetINISetting == undefined)
+            return false;
+        for (var i = 0; i < skyui.util.ItemCardLayout.INI_KEYS_X.length; i++) {
+            var x = Number(_global.skse.GetINISetting(skyui.util.ItemCardLayout.INI_KEYS_X[i]));
+            var z = Number(_global.skse.GetINISetting(skyui.util.ItemCardLayout.INI_KEYS_Z[i]));
+            if (!(Math.abs(x - a_pos.x) < 0.01) || !(Math.abs(z - a_pos.z) < 0.01))
+                return false;
+        }
+        return true;
+    }
+
     // Writes the 3D item position for the inventory-type menus and the magic menu.
     public static function applyItem3D(a_pos: Object)
     {
