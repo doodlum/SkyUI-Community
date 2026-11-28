@@ -26,22 +26,6 @@ class skyui.util.ItemCardLayout
     public static var DEFAULT_METRICS = {panel: 582.45, w: 428.5, xMin: 0, xMax: 428.51, yMin: -24, y: 434.3, safe: 15, ox: 0, oy: 0,
                                          cardX: 0, cardY: -24};
 
-    // Card size from the item card symbol itself (skyui/ItemCard.swf, measured by the HUD) placed at the card offset
-    // inside its holder (cardX/cardY): lets a replaced item card of another size be right before any menu reports.
-    public static function withCardSymbol(a_m, a_sym)
-    {
-        var m = {};
-        for (var k in a_m)
-            m[k] = a_m[k];
-        var cx = isNaN(a_m.cardX) ? 0 : a_m.cardX;
-        var cy = isNaN(a_m.cardY) ? 0 : a_m.cardY;
-        m.xMin = cx + a_sym.xMin;
-        m.xMax = cx + a_sym.xMax;
-        m.yMin = cy + a_sym.yMin;
-        m.w = a_sym.xMax - a_sym.xMin;
-        return m;
-    }
-
     public static var INI_KEYS_X = ["fInventory3DItemPosX:Interface", "fInventory3DItemPosXWide:Interface",
                                     "fMagic3DItemPosX:Interface", "fMagic3DItemPosXWide:Interface"];
     public static var INI_KEYS_Z = ["fInventory3DItemPosZ:Interface", "fInventory3DItemPosZWide:Interface",
