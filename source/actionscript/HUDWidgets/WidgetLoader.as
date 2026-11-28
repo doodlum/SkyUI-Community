@@ -36,7 +36,7 @@ class WidgetLoader extends MovieClip
    /* 3D ITEM POSITION
     * The game reads the 3D item position when an item menu opens, before the menu's code runs, so it has to be right
     * beforehand. The HUD is always loaded: it reads the item card settings from config.txt, gets the MCM overrides and
-    * the item menus' measured layout from Papyrus (SKI_SettingsManager / SKI_ConfigMenu), and applies the position
+    * the item menus' measured layout from Papyrus (SKI_SettingsManager / SKI_WidgetManager), and applies the position
     * skyui.util.ItemCardLayout computes, the same code the item menus place the card with. */
 
    // config.txt is read when the HUD loads and again whenever the inventory reports its layout (it re-reads config.txt
@@ -53,8 +53,7 @@ class WidgetLoader extends MovieClip
       ListLayout$defaults$entryWidth: "entryWidth",
       ItemInfo$itemcard$align: "align",
       ItemInfo$itemcard$xOffset: "xOffset",
-      ItemInfo$itemcard$yOffset: "yOffset",
-      ItemInfo$item3D$managed: "item3DManaged"
+      ItemInfo$itemcard$yOffset: "yOffset"
    };
 
    function loadItemCardConfig()
@@ -120,7 +119,8 @@ class WidgetLoader extends MovieClip
       this.updateItem3D();
       if(!this._itemCardReadySent)
       {
-         // Ask Papyrus for the MCM overrides and the item menus' metrics (they call the setters below).
+         // Ask Papyrus for the MCM overrides (SKI_SettingsManager) and the inventory's measured layout (SKI_WidgetManager);
+      // they call the setters below. Neither is replaced by MCM Helper, which only replaces SKI_ConfigMenu.
          this._itemCardReadySent = true;
          skse.SendModEvent("SKIIM_hudItemCardReady");
       }
@@ -224,9 +224,9 @@ class WidgetLoader extends MovieClip
 
    function updateItem3D()
    {
-      // Do nothing until SkyUI's own MCM script has said it manages the 3D item (ItemInfo$item3D$managed, sent with the
-      // overrides): if an older SKI_ConfigMenu.pex replaced ours, the 3D item stays under its control, as before.
-      if(this._itemCardFile == undefined || this._itemCardOverrides == undefined || this._itemCardOverrides.item3DManaged == undefined)
+      // Wait for the MCM overrides (SKI_SettingsManager sends them when this loader is ready), so the item card settings
+      // they change are known before the first write.
+      if(this._itemCardFile == undefined || this._itemCardOverrides == undefined)
       {
          return undefined;
       }

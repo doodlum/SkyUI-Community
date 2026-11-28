@@ -518,11 +518,8 @@ class ItemMenu extends MovieClip
         // menu sets and reports it; the others keep the value the HUD and the inventory set.
         if (this.ownsItem3DPosition()) {
             var pos3D = skyui.util.ItemCardLayout.item3DPosition(card.centreX + metrics.ox, card.top + metrics.oy, vr);
-            // Only with SkyUI's own MCM script active (it always sends ItemInfo$item3D$managed): if an older
-            // SKI_ConfigMenu.pex replaced ours, it keeps control of the 3D item as before.
-            if (ItemMenu.hasConfigOverride("ItemInfo$item3D$managed"))
-                skyui.util.ItemCardLayout.applyItem3D(pos3D);
-            // The applied position goes along too: SKI_ConfigMenu re-applies it at game load in case the HUD widget
+            skyui.util.ItemCardLayout.applyItem3D(pos3D);
+            // The applied position goes along too: SKI_WidgetManager re-applies it at game load in case the HUD widget
             // loader is missing (replaced by another mod).
             if (_global.skse != undefined)
                 skse.SendModEvent("SKIIM_itemCardMetrics", [metrics.panel, metrics.w, metrics.xMin, metrics.xMax, metrics.yMin,
@@ -550,15 +547,6 @@ class ItemMenu extends MovieClip
         }
     }
     
-    private static function hasConfigOverride(a_key: String)
-    {
-        var keys = skyui.util.ConfigManager.in_overrideKeys;
-        for (var i = 0; i < keys.length; i++)
-            if (keys[i] == a_key)
-                return true;
-        return false;
-    }
-
     // The item card placement before skyui.util.ItemCardLayout (only used if it is missing from the build).
     private function positionItemCardLegacy(a_vr, a_safe, a_panelEdge, a_container, a_itemcardPosition, a_itemiconPosition)
     {

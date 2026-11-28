@@ -14,6 +14,10 @@ int					_curWidgetID	= 0
 string[]			_widgetSources
 SKI_WidgetBase[]	_widgets
 
+; Item card layout reported by the inventory menu (SKIIM_itemCardMetrics): passed to the HUD widget loader, which uses it
+; to centre the 3D item before an item menu opens. Kept here rather than in SKI_ConfigMenu, which MCM Helper replaces.
+string				_itemCardMetrics = ""
+
 
 ; INITIALIZATION ----------------------------------------------------------------------------------
 
@@ -28,6 +32,9 @@ endEvent
 event OnGameReload()
 	RegisterForModEvent("SKIWF_widgetLoaded", "OnWidgetLoad")
 	RegisterForModEvent("SKIWF_widgetError", "OnWidgetError")
+	RegisterForModEvent("SKIIM_itemCardMetrics", "OnItemCardMetrics")
+	RegisterForModEvent("SKIIM_hudItemCardReady", "OnHudItemCardReady")
+	Apply3DItemPosition()
 	CleanUp()
 	if (UI.IsMenuOpen(HUD_MENU))
 		InitWidgetLoader()
@@ -156,4 +163,57 @@ function CleanUp()
 		endIf
 		i += 1
 	endWhile
+endFunction
+
+
+; 3D ITEM POSITION --------------------------------------------------------------------------------
+
+; Sent by ItemMenu.positionFloatingElements each time an item menu places its card: the measured layout
+; ("panel,w,xMin,xMax,yMin,y,safe,ox,oy", see skyui.util.ItemCardLayout). Kept in the save for the HUD.
+event OnItemCardMetrics(string a_eventName, string a_strArg, float a_numArg, Form a_sender)
+	if (a_strArg == _itemCardMetrics)
+		return
+	endIf
+	_itemCardMetrics = a_strArg
+	PushItemCardMetricsToHUD()
+endEvent
+
+event OnHudItemCardReady(string a_eventName, string a_strArg, float a_numArg, Form a_sender)
+	PushItemCardMetricsToHUD()
+endEvent
+
+function PushItemCardMetricsToHUD()
+	if (_itemCardMetrics == "")
+		return
+	endIf
+	string[] parts = StringUtil.Split(_itemCardMetrics, ",")
+	if (parts.length < 9)
+		return
+	endIf
+	float[] args = new float[9]
+	int i = 0
+	while (i < 9)
+		args[i] = parts[i] as float
+		i += 1
+	endWhile
+	UI.InvokeFloatA("HUD Menu", "_root.widgetLoaderContainer.widgetLoader.setItemCardMetrics", args)
+endFunction
+
+; Fallback for a missing HUD widget loader: the 3D item position the item menus last applied (fields 10 and 11 of the
+; metrics, offsets included), set at game load so a session starts centred. The HUD's own computation replaces it.
+function Apply3DItemPosition()
+	string[] parts = StringUtil.Split(_itemCardMetrics, ",")
+	if (parts.length < 11)
+		return
+	endIf
+	float x = parts[9] as float
+	float z = parts[10] as float
+	Utility.SetINIFloat("fInventory3DItemPosX:Interface", x)
+	Utility.SetINIFloat("fInventory3DItemPosXWide:Interface", x)
+	Utility.SetINIFloat("fMagic3DItemPosX:Interface", x)
+	Utility.SetINIFloat("fMagic3DItemPosXWide:Interface", x)
+	Utility.SetINIFloat("fInventory3DItemPosZ:Interface", z)
+	Utility.SetINIFloat("fInventory3DItemPosZWide:Interface", z)
+	Utility.SetINIFloat("fMagic3DItemPosZ:Interface", z)
+	Utility.SetINIFloat("fMagic3DItemPosZWide:Interface", z)
 endFunction
