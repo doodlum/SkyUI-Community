@@ -14,7 +14,7 @@ class CraftingDataSetter implements skyui.components.list.IListProcessor
         
         for (var i = 0; i < entryList.length; i++) {
             var e = entryList[i];
-            if (e.skyui_itemDataProcessed || e.filterFlag == 0)
+            if (e.skyui_itemDataProcessed)
                 continue;
                 
             e.skyui_itemDataProcessed = true;
@@ -166,7 +166,7 @@ class CraftingDataSetter implements skyui.components.list.IListProcessor
             a_entryObject.material = skyui.defines.Material.DRAGON;
             a_entryObject.materialDisplay = skyui.util.Translator.translate("$Dragon");
         
-        } else if (a_entryObject.keywords["ArmorMaterialDwarven"] != undefined || a_entryObject.keywords["WeapMaterialDwarven"] != undefined) {
+        } else if (a_entryObject.keywords["ArmorMaterialDwarven"] != undefined || a_entryObject.keywords["WeapMaterialDwarven"] != undefined || a_entryObject.keywords["DLC1LD_CraftingMaterialAetherium"] != undefined) {
             a_entryObject.material = skyui.defines.Material.DWARVEN;
             a_entryObject.materialDisplay = skyui.util.Translator.translate("$Dwarven");
         
@@ -227,7 +227,7 @@ class CraftingDataSetter implements skyui.components.list.IListProcessor
             a_entryObject.material = skyui.defines.Material.CHITIN;
             a_entryObject.materialDisplay = skyui.util.Translator.translate("$Chitin");
         
-        } else if (a_entryObject.keywords["DLC2ArmorMaterialNordicHeavy"] != undefined || a_entryObject.keywords["DLC2ArmorMaterialNordicLight"] != undefined || a_entryObject.keywords["DLC2WeaponMaterialNordic"] != undefined) {
+        } else if (a_entryObject.keywords["DLC2ArmorMaterialNordicHeavy"] != undefined || a_entryObject.keywords["DLC2ArmorMaterialNordicLight"] != undefined || a_entryObject.keywords["DLC2WeaponMaterialNordic"] != undefined || a_entryObject.keywords["ccEDHSSE001_NordicJewelryKeyword"] != undefined) {
             a_entryObject.material = skyui.defines.Material.NORDIC;
             a_entryObject.materialDisplay = skyui.util.Translator.translate("$Nordic");
         

@@ -256,7 +256,7 @@ class BottomBar extends MovieClip
             switch(itemType) {
                 case skyui.defines.Inventory.ICT_ARMOR:
                     infoCard.gotoAndStop("Barter_Armor");
-                    var strArmor: String = Math.floor(_playerInfoObj.armor).toString();
+                    var strArmor: String = Math.floor(this._playerInfoObj.armor).toString();
                     if (a_itemUpdateObj.armorChange != undefined) {
                         var iArmorDelta: Number = Math.round(a_itemUpdateObj.armorChange);
                         if (iArmorDelta > 0) 
