@@ -336,7 +336,14 @@ class Map.MapMenu
       this._journalButton.disabled = a_bGamepad;
       this._playerLocButton.disabled = a_bGamepad;
       this._findLocButton.disabled = a_bGamepad;
-      this._findLocButton.visible = (skse.version == undefined) ? !a_bGamepad : a_bGamepad;
+      // Keyboard/mouse: always shown, as in 5.x. Gamepad: shown only with SKSE, which handles its hotkey (handleInput).
+      // LocalMap re-shows the prompt on state changes from this flag (the button stays disabled on gamepad).
+      var bFindLoc = !a_bGamepad || skse.version != undefined;
+      this._findLocButton.visible = bFindLoc;
+      if(this.LocalMapMenu != undefined)
+      {
+         this.LocalMapMenu.findLocAvailable = bFindLoc;
+      }
       this._searchButton.visible = false;
       _loc2_.updateButtons(true);
    }

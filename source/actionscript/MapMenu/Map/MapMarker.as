@@ -149,6 +149,12 @@ class Map.MapMarker extends gfx.controls.Button
       super.setState(a_state);
       switch(this._iconName)
       {
+         // Quest and you-are-here markers keep their size and alpha on hover (5.x order: these cases first).
+         case "QuestTargetMarker":
+         case "QuestTargetDoorMarker":
+         case "MultipleQuestTargetMarker":
+         case "YouAreHereMarker":
+            return;
          case "PlayerSetMarker":
          case "DoorMarker":
          default:
@@ -176,10 +182,6 @@ class Map.MapMarker extends gfx.controls.Button
                   skyui.util.Tween.LinearTween(this.IconClip,"_alpha",100,Map.MapMarker.MARKER_ALPHA_MIN,Map.MapMarker.TWEEN_TIME,null);
                }
             }
-         case "QuestTargetMarker":
-         case "QuestTargetDoorMarker":
-         case "MultipleQuestTargetMarker":
-         case "YouAreHereMarker":
             return;
       }
    }
