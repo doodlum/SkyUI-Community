@@ -483,13 +483,6 @@ class ItemMenu extends MovieClip
         var itemcardPosition = this._config.ItemInfo.itemcard;
         var itemiconPosition = this._config.ItemInfo.itemicon;
 
-        // Where the card would be centred with the default layout (entryWidth 530, centre align, no offset). The 3D item
-        // position in SKI_ConfigMenu is calibrated to that spot; the difference is sent so the model follows the card.
-        var entryWidth = Number(this._config.ListLayout.defaults.entryWidth);
-        var refPanelEdge = panelEdge - ((entryWidth > 0) ? (entryWidth - 530) : 0);
-        var refCardWidth = Math.min(itemCardContainer._width, rightEdge - refPanelEdge);
-        var refCenterX = refPanelEdge + (Stage.visibleRect.x + Stage.visibleRect.width - refPanelEdge - refCardWidth) / 2 + refCardWidth / 2;
-
         var scaleMult = (rightEdge - panelEdge) / itemCardContainer._width;
         
         // Scale down if necessary
@@ -508,16 +501,7 @@ class ItemMenu extends MovieClip
 
         itemCardContainer._y = itemCardContainer._y + itemcardPosition.yOffset;
 
-        // Tell SKI_ConfigMenu where the card's centre is for each alignment with no offset, relative to the default layout
-        // (stage px, "left,right,center"). It adds the MCM align/offsets itself, so an MCM change moves the 3D item on the
-        // very next open; the engine only reads the 3D item position when a menu opens.
-        if (_global.skse != undefined) {
-            var w = itemCardContainer._width;
-            var centerLeft = panelEdge + leftEdge + w / 2 - refCenterX;
-            var centerRight = rightEdge - w / 2 - refCenterX;
-            var centerCenter = (panelEdge + Stage.visibleRect.x + Stage.visibleRect.width) / 2 - refCenterX;
-            skse.SendModEvent("SKIIM_itemCardOffset", centerLeft + "," + centerRight + "," + centerCenter, 0);
-        }
+        this.position3DItem(itemCardContainer);
 
         if (this.mouseRotationRect != undefined) {
             MovieClip(this.mouseRotationRect).Lock("T");
@@ -535,6 +519,38 @@ class ItemMenu extends MovieClip
         }
     }
     
+    // The game draws the 3D item where the fInventory/Magic3DItemPos{X,Z}[Wide] INI settings say (1 unit = 8 px of a
+    // 1280 x 720 stage at 16:9, 0 = screen centre, +X left, +Z up) and reads them when it starts showing items. Set them
+    // here, after the card is placed and before the first UpdateItem3D, so the model is always centred over the card
+    // wherever the card ends up: any aspect ratio, entryWidth, or item card align/offset from config.txt or the MCM.
+    private static var ITEM3D_GAP: Number = 160;    // model centre above the card's top edge (stage px)
+
+    private function position3DItem(a_card: MovieClip)
+    {
+        if (_global.skse == undefined || skse.SetINISetting == undefined)
+            return;
+
+        var b = a_card.getBounds(a_card._parent);
+        var p = {x: (b.xMin + b.xMax) / 2, y: b.yMin - ItemMenu.ITEM3D_GAP};
+        a_card._parent.localToGlobal(p);
+
+        var vr = Stage.visibleRect;
+        var unitPx = 8 * vr.width / 1280;
+        var x = -(p.x - (vr.x + vr.width / 2)) / unitPx;
+        var z = -(p.y - (vr.y + vr.height / 2)) / unitPx;
+
+        var menus = ["Inventory", "Magic"];
+        for (var i = 0; i < menus.length; i++) {
+            skse.SetINISetting("f" + menus[i] + "3DItemPosX:Interface", x);
+            skse.SetINISetting("f" + menus[i] + "3DItemPosXWide:Interface", x);
+            skse.SetINISetting("f" + menus[i] + "3DItemPosZ:Interface", z);
+            skse.SetINISetting("f" + menus[i] + "3DItemPosZWide:Interface", z);
+        }
+
+        // SKI_ConfigMenu keeps the values in the save and applies them at load, so a fresh session starts centred too.
+        skse.SendModEvent("SKIIM_item3DPosition", x + "," + z, 0);
+    }
+
     private function shouldProcessItemsListInput(abCheckIfOverRect)
    {
       var bCanProcess = this.bFadedIn == true && 

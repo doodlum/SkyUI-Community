@@ -24,8 +24,8 @@ int			_itemcardAlignIdx			= 2
 float		_itemcardXOffset			= 0.0
 float		_itemcardYOffset			= 0.0
 
-; No longer used: the 3D item is centred on the item card automatically (OnItemCardOffset), so the MCM 3D item
-; offset sliders were removed and values saved by older versions are ignored. Kept so old saves load cleanly.
+; No longer used: the item menus centre the 3D item on the item card themselves, so the MCM 3D item offset sliders
+; were removed and values saved by older versions are ignored. Kept so old saves load cleanly.
 float		_3DItemXOffset				= 0.0
 float		_3DItemYOffset				= 0.0
 float		_3DItemScale				= 1.5
@@ -34,21 +34,16 @@ int			_searchKey					= 57
 int			_switchTabKey				= 56
 int			_equipModeKey				= 42
 
-; Internal
+; Internal (no longer used: replaced by the item menus' own centring; kept so old saves load cleanly)
 float		_itemXBase
 float		_itemYBase
 float		_itemXBaseW
 float		_itemYBaseW
 
-; Where the item card's centre sits, for each alignment with no offset, relative to the default layout (stage px).
-; Reported by the item menus (SKIIM_itemCardOffset) after they place the card, which depends on the list width and
-; screen. Saved, so a loaded game positions the 3D item correctly before the first menu opens.
-float		_itemCardLeftX				= 0.0
-float		_itemCardRightX				= 0.0
-float		_itemCardCenterX			= 0.0
-; Resulting card offset (alignment + MCM offsets); the 3D item is moved by the same amount so it stays over the card.
-float		_itemCardOffsetX			= 0.0
-float		_itemCardOffsetY			= 0.0
+; Last 3D item position the item menus applied (SKIIM_item3DPosition), saved and re-applied at game load.
+float		_item3DX					= 0.0
+float		_item3DZ					= 0.0
+bool		_item3DPositionKnown		= false
 
 
 ; -- Version 2 --
@@ -69,7 +64,7 @@ int			_sortOrderButton			= 272 ; LEFT_THUMB
 
 ; -- Version 3 --
 
-; State
+; State (no longer used: Disable Positioning was removed; kept so old saves load cleanly)
 bool		_3DItemDisablePositioning		= false
 
 ; Internal
@@ -435,8 +430,7 @@ event OnPageReset(string a_page)
 		SetCursorFillMode(TOP_TO_BOTTOM)
 
 		AddHeaderOption("$3D Item")
-		AddSliderOptionST("XD_ITEM_SCALE", "$Scale", _3DItemScale, "{1}", _3DItemFlags)
-		AddToggleOptionST("XD_ITEM_POSITIONING", "$Disable Positioning", _3DItemDisablePositioning)
+		AddSliderOptionST("XD_ITEM_SCALE", "$Scale", _3DItemScale, "{1}")
 
 		AddEmptyOption()
 
@@ -1339,14 +1333,12 @@ state ITEMCARD_ALIGN ; TEXT
 			_itemcardAlignIdx = 0
 		endif
 		SKI_SettingsManagerInstance.SetOverride("ItemInfo$itemcard$align", _alignmentValues[_itemcardAlignIdx])
-		UpdateItemCardOffset()
 		SetTextOptionValueST(_alignments[_itemcardAlignIdx])
 	endEvent
 
 	event OnDefaultST()
 		_itemcardAlignIdx = 2
 		SKI_SettingsManagerInstance.SetOverride("ItemInfo$itemcard$align", _alignmentValues[_itemcardAlignIdx])
-		UpdateItemCardOffset()
 		SetTextOptionValueST(_alignments[_itemcardAlignIdx])
 	endEvent
 
@@ -1369,14 +1361,12 @@ state ITEMCARD_XOFFSET ; SLIDER
 		_itemcardXOffset = a_value
 		SetSliderOptionValueST(_itemcardXOffset)
 		SKI_SettingsManagerInstance.SetOverride("ItemInfo$itemcard$xOffset", _itemcardXOffset)
-		UpdateItemCardOffset()
 	endEvent
 
 	event OnDefaultST()
 		_itemcardXOffset = 0.0
 		SetSliderOptionValueST(_itemcardXOffset)
 		SKI_SettingsManagerInstance.SetOverride("ItemInfo$itemcard$xOffset", _itemcardXOffset)
-		UpdateItemCardOffset()
 	endEvent
 
 	event OnHighlightST()
@@ -1398,14 +1388,12 @@ state ITEMCARD_YOFFSET ; SLIDER
 		_itemcardYOffset = a_value
 		SetSliderOptionValueST(_itemcardYOffset)
 		SKI_SettingsManagerInstance.SetOverride("ItemInfo$itemcard$yOffset", _itemcardYOffset)
-		UpdateItemCardOffset()
 	endEvent
 
 	event OnDefaultST()
 		_itemcardYOffset = 0.0
 		SetSliderOptionValueST(_itemcardYOffset)
 		SKI_SettingsManagerInstance.SetOverride("ItemInfo$itemcard$yOffset", _itemcardYOffset)
-		UpdateItemCardOffset()
 	endEvent
 
 	event OnHighlightST()
@@ -1443,41 +1431,6 @@ state XD_ITEM_SCALE ; SLIDER
 
 endState
 
-state XD_ITEM_POSITIONING ; TOGGLE
-
-	event OnSelectST()
-		bool newVal = !_3DItemDisablePositioning
-		_3DItemDisablePositioning = newVal
-
-		if (newVal)
-			_3DItemFlags = OPTION_FLAG_DISABLED
-		else
-			_3DItemFlags = OPTION_FLAG_NONE
-		endIf
-
-		SetOptionFlagsST(_3DItemFlags, true, "XD_ITEM_SCALE")
-		SetToggleOptionValueST(newVal)
-		Apply3DItemXOffset()
-		Apply3DItemYOffset()
-		Apply3DItemScale()
-	endEvent
-
-	event OnDefaultST()
-		_3DItemDisablePositioning = false
-		_3DItemFlags = OPTION_FLAG_NONE
-		SetOptionFlagsST(_3DItemFlags, true, "XD_ITEM_SCALE")
-		SetToggleOptionValueST(false)
-		Apply3DItemXOffset()
-		Apply3DItemYOffset()
-		Apply3DItemScale()
-	endEvent
-
-	event OnHighlightST()
-		SetInfoText("$SKI_INFO4{$Off}")
-	endEvent
-
-endState
-
 ; -------------------------------------------------------
 
 ; FUNCTIONS ---------------------------------------------------------------------------------------
@@ -1497,53 +1450,10 @@ endFunction
 function ApplySettings()
 	; Apply settings that aren't handled by SKI_SettingsManagerInstance
 
-	_fInventory3DItemPosXWide		= Utility.GetINIFloat("fInventory3DItemPosXWide:Interface")
-	_fInventory3DItemPosX 			= Utility.GetINIFloat("fInventory3DItemPosX:Interface")
-	_fMagic3DItemPosXWide 			= Utility.GetINIFloat("fMagic3DItemPosXWide:Interface")
-	_fMagic3DItemPosX 				= Utility.GetINIFloat("fMagic3DItemPosX:Interface")
-
-	_fInventory3DItemPosZWide		= Utility.GetINIFloat("fInventory3DItemPosZWide:Interface")
-	_fInventory3DItemPosZ 			= Utility.GetINIFloat("fInventory3DItemPosZ:Interface")
-	_fMagic3DItemPosZWide 			= Utility.GetINIFloat("fMagic3DItemPosZWide:Interface")
-	_fMagic3DItemPosZ 				= Utility.GetINIFloat("fMagic3DItemPosZ:Interface")
-
-	_fInventory3DItemPosScaleWide	= Utility.GetINIFloat("fInventory3DItemPosScaleWide:Interface")
-	_fMagic3DItemPosScaleWide		= Utility.GetINIFloat("fMagic3DItemPosScaleWide:Interface")
-	_fInventory3DItemPosScale		= Utility.GetINIFloat("fInventory3DItemPosScale:Interface")
-	_fMagic3DItemPosScale			= Utility.GetINIFloat("fMagic3DItemPosScale:Interface")
-
-	float fStageCenterX      = 640.0 ; Stage Center X (1280 / 2)
-	float fStageCenterY      = 360.0 ; Stage Center Y (720 / 2)
-	float fStageUnitsPerUnit = 8.0   ; 1 unit 3DItemPos = 8px in 1280x720
-	float fTargetX 					 ; ItemCard Center X
-	float fTargetY 					 ; ItemCard Center Y
-
-	float fWidth  = Utility.GetINIInt("iSize W:Display") as float
-	float fHeight = Utility.GetINIInt("iSize H:Display") as float
-
-	float fAspect = fWidth / fHeight
-
-	if (fAspect > 3.0)     ; 32:9 (Super Ultrawide)
-    	fTargetX = 785.5
-		fTargetY = 300.0
-	elseif (fAspect > 2.0) ; 21:9 (Ultrawide)
-		fTargetX = 858.0
-		fTargetY = 275.0
-	else                   ; 16:9 / 16:10 / 4:3 (Standard)
-		fTargetX = 931.225
-		fTargetY = 250.0
-	endif
-
-	_itemXBaseW = -(fTargetX - fStageCenterX) / fStageUnitsPerUnit
-	_itemXBase  = _itemXBaseW
-
-	_itemYBaseW = -(fTargetY - fStageCenterY) / fStageUnitsPerUnit
-	_itemYBase  = _itemYBaseW
-
-	RegisterForModEvent("SKIIM_itemCardOffset", "OnItemCardOffset")
-
-	Apply3DItemXOffset()
-	Apply3DItemYOffset()
+	; The item menus centre the 3D item on the item card themselves (ItemMenu.position3DItem) and report the values;
+	; re-apply the last ones so the first menu of a session is centred even before the menu sets them.
+	RegisterForModEvent("SKIIM_item3DPosition", "OnItem3DPosition")
+	Apply3DItemPosition()
 	Apply3DItemScale()
 endFunction
 
@@ -1578,80 +1488,36 @@ function ApplyItemListFontSize()
 	endIf
 endFunction
 
-function Apply3DItemXOffset()
-	; Negative values shift the 3D item to the right
-	if (_3DItemDisablePositioning)
-		Utility.SetINIFloat("fInventory3DItemPosXWide:Interface", _fInventory3DItemPosXWide)
-		Utility.SetINIFloat("fInventory3DItemPosX:Interface", _fInventory3DItemPosX)
-		Utility.SetINIFloat("fMagic3DItemPosXWide:Interface", _fMagic3DItemPosXWide)
-		Utility.SetINIFloat("fMagic3DItemPosX:Interface", _fMagic3DItemPosX)
-	else
-		Utility.SetINIFloat("fInventory3DItemPosXWide:Interface", (_itemXBaseW - _itemCardOffsetX / 8.0))
-		Utility.SetINIFloat("fInventory3DItemPosX:Interface", (_itemXBase - _itemCardOffsetX / 8.0))
-		Utility.SetINIFloat("fMagic3DItemPosXWide:Interface", (_itemXBaseW - _itemCardOffsetX / 8.0))
-		Utility.SetINIFloat("fMagic3DItemPosX:Interface", (_itemXBase - _itemCardOffsetX / 8.0))
-	endIf
-endFunction
-
-function Apply3DItemYOffset()
-	; Negative values shift the 3D item to the bottom
-	if (_3DItemDisablePositioning)
-		Utility.SetINIFloat("fInventory3DItemPosZWide:Interface", _fInventory3DItemPosZWide)
-		Utility.SetINIFloat("fInventory3DItemPosZ:Interface", _fInventory3DItemPosZ)
-		Utility.SetINIFloat("fMagic3DItemPosZWide:Interface", _fMagic3DItemPosZWide)
-		Utility.SetINIFloat("fMagic3DItemPosZ:Interface", _fMagic3DItemPosZ)
-	else
-		Utility.SetINIFloat("fInventory3DItemPosZWide:Interface", (_itemYBaseW - _itemCardOffsetY / 8.0))
-		Utility.SetINIFloat("fInventory3DItemPosZ:Interface", (_itemYBase - _itemCardOffsetY / 8.0))
-		Utility.SetINIFloat("fMagic3DItemPosZWide:Interface", (_itemYBaseW - _itemCardOffsetY / 8.0))
-		Utility.SetINIFloat("fMagic3DItemPosZ:Interface", (_itemYBase - _itemCardOffsetY / 8.0))
-	endIf
-endFunction
-
-; Sent by ItemMenu.positionFloatingElements each time an item menu places its card. a_strArg is "left,right,center":
-; the card centre for each alignment with no offset, relative to the default layout, in 1280x720 stage px.
-event OnItemCardOffset(string a_eventName, string a_strArg, float a_numArg, Form a_sender)
+; Sent by ItemMenu.position3DItem each time an item menu places its card: "x,z" in 3D item position units.
+event OnItem3DPosition(string a_eventName, string a_strArg, float a_numArg, Form a_sender)
 	string[] parts = StringUtil.Split(a_strArg, ",")
-	if (parts.length != 3)
+	if (parts.length != 2)
 		return
 	endIf
-	_itemCardLeftX = parts[0] as float
-	_itemCardRightX = parts[1] as float
-	_itemCardCenterX = parts[2] as float
-	UpdateItemCardOffset()
+	_item3DX = parts[0] as float
+	_item3DZ = parts[1] as float
+	_item3DPositionKnown = true
 endEvent
 
-; Card offset = reported alignment position + MCM horizontal/vertical offset. The engine reads the 3D item position
-; when a menu opens, so this takes effect from the next open.
-function UpdateItemCardOffset()
-	float offsetX = _itemCardCenterX
-	if (_itemcardAlignIdx == 0)
-		offsetX = _itemCardLeftX
-	elseIf (_itemcardAlignIdx == 1)
-		offsetX = _itemCardRightX
-	endIf
-	offsetX += _itemcardXOffset
-	if (offsetX == _itemCardOffsetX && _itemcardYOffset == _itemCardOffsetY)
+function Apply3DItemPosition()
+	if (!_item3DPositionKnown)
 		return
 	endIf
-	_itemCardOffsetX = offsetX
-	_itemCardOffsetY = _itemcardYOffset
-	Apply3DItemXOffset()
-	Apply3DItemYOffset()
+	Utility.SetINIFloat("fInventory3DItemPosXWide:Interface", _item3DX)
+	Utility.SetINIFloat("fInventory3DItemPosX:Interface", _item3DX)
+	Utility.SetINIFloat("fMagic3DItemPosXWide:Interface", _item3DX)
+	Utility.SetINIFloat("fMagic3DItemPosX:Interface", _item3DX)
+	Utility.SetINIFloat("fInventory3DItemPosZWide:Interface", _item3DZ)
+	Utility.SetINIFloat("fInventory3DItemPosZ:Interface", _item3DZ)
+	Utility.SetINIFloat("fMagic3DItemPosZWide:Interface", _item3DZ)
+	Utility.SetINIFloat("fMagic3DItemPosZ:Interface", _item3DZ)
 endFunction
 
 function Apply3DItemScale()
-	if (_3DItemDisablePositioning)
-		Utility.SetINIFloat("fInventory3DItemPosScaleWide:Interface", _fInventory3DItemPosScaleWide)
-		Utility.SetINIFloat("fMagic3DItemPosScaleWide:Interface", _fMagic3DItemPosScaleWide)
-		Utility.SetINIFloat("fInventory3DItemPosScale:Interface", _fInventory3DItemPosScale)
-		Utility.SetINIFloat("fMagic3DItemPosScale:Interface", _fMagic3DItemPosScale)
-	else
-		Utility.SetINIFloat("fInventory3DItemPosScaleWide:Interface", _3DItemScale)
-		Utility.SetINIFloat("fMagic3DItemPosScaleWide:Interface", _3DItemScale)
-		Utility.SetINIFloat("fInventory3DItemPosScale:Interface", _3DItemScale)
-		Utility.SetINIFloat("fMagic3DItemPosScale:Interface", _3DItemScale)
-	endIf
+	Utility.SetINIFloat("fInventory3DItemPosScaleWide:Interface", _3DItemScale)
+	Utility.SetINIFloat("fMagic3DItemPosScaleWide:Interface", _3DItemScale)
+	Utility.SetINIFloat("fInventory3DItemPosScale:Interface", _3DItemScale)
+	Utility.SetINIFloat("fMagic3DItemPosScale:Interface", _3DItemScale)
 endFunction
 
 bool function ValidateKey(int a_keyCode, bool a_gamepad)
