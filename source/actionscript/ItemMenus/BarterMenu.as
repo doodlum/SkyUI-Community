@@ -196,10 +196,15 @@ class BarterMenu extends ItemMenu
         this.navPanel.clearButtons();
         
         if (a_bSelected) {
-            this.navPanel.addButton({text: (this.isViewingVendorItems() ? "$Buy" : "$Sell"), controls: skyui.defines.Input.Activate});
+            this.navPanel.addButton({text: (this.isViewingVendorItems() ? "$Buy" : "$Sell"), controls: this._activateControls});
+            // On gamepad an item is nearly always selected, so the switch prompt has to be shown here too.
+            if (this._platform != 0)
+                this.navPanel.addButton({text: "$Switch Tab", controls: this._switchControls});
         } else {
             this.navPanel.addButton({text: "$Exit", controls: this._cancelControls});
-            this.navPanel.addButton({text: "$Search", controls: this._searchControls});
+            // Search is keyboard-only (InventoryLists reacts to the PC search key).
+            if (this._platform == 0)
+                this.navPanel.addButton({text: "$Search", controls: this._searchControls});
             if (this._platform != 0) {
                 this.navPanel.addButton({text: "$Column", controls: this._sortColumnControls});
                 this.navPanel.addButton({text: "$Order", controls: this._sortOrderControls});

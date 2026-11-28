@@ -14,6 +14,7 @@ class SaveLoadPanel extends MovieClip
    var SelectGamepadButton;
    var SelectMouseButton;
    var bSaving;
+   var _bMouseListenersAdded = false;
    var dispatchEvent;
    var iBatchSize;
    var iPlatform;
@@ -99,8 +100,13 @@ class SaveLoadPanel extends MovieClip
       {
          this.BackMouseButton.SetPlatform(this.iPlatform);
          this.SelectMouseButton.SetPlatform(this.iPlatform);
-         this.BackMouseButton.addEventListener("click",Shared.Proxy.create(this,this.OnBackClicked));
-         this.SelectMouseButton.addEventListener("click",Shared.Proxy.create(this,this.OnSelectClicked));
+         // StartMenu calls SetPlatform several times: add the click listeners once, or one click runs the action repeatedly.
+         if(!this._bMouseListenersAdded)
+         {
+            this.BackMouseButton.addEventListener("click",Shared.Proxy.create(this,this.OnBackClicked));
+            this.SelectMouseButton.addEventListener("click",Shared.Proxy.create(this,this.OnSelectClicked));
+            this._bMouseListenersAdded = true;
+         }
          _loc2_ = this.SelectMouseButton.getBounds(this);
          this.SelectMouseButton._x += this.CharacterSelectionHint_mc._x - _loc2_.xMin;
       }

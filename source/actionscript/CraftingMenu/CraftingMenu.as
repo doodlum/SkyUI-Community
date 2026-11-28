@@ -140,12 +140,17 @@ class CraftingMenu extends MovieClip
       this.navPanel.clearButtons();
       if(this.getItemShown())
       {
-         this.navPanel.addButton({text:this.ButtonText[CraftingMenu.SELECT_BUTTON],controls:skyui.defines.Input.Activate});
+         // Gamepad: the menu Accept button selects, so prompt that rather than the (remappable) gameplay Activate key.
+         this.navPanel.addButton({text:this.ButtonText[CraftingMenu.SELECT_BUTTON],controls:(this._platform != 0 ? skyui.defines.Input.Accept : skyui.defines.Input.Activate)});
       }
       else
       {
          this.navPanel.addButton({text:"$Exit",controls:this._cancelControls});
-         this.navPanel.addButton({text:"$Search",controls:this._searchControls});
+         // Search is keyboard-only.
+         if(this._platform == 0)
+         {
+            this.navPanel.addButton({text:"$Search",controls:this._searchControls});
+         }
          if(this._platform != 0)
          {
             this.navPanel.addButton({text:"$Column",controls:this._sortColumnControls});

@@ -17,6 +17,9 @@ class ItemMenu extends MovieClip
     
     private var _acceptControls: Object;
     private var _cancelControls: Object;
+    // Prompt for the primary item action (take, store, buy, use): the gameplay Activate key on PC, as in 5.x, and
+    // the menu Accept button on gamepad, which is what performs it there (a remapped Activate showed the wrong glyph).
+    private var _activateControls: Object;
     private var _searchControls: Object;
     private var _switchControls: Object;
     private var _sortColumnControls: Array;
@@ -166,13 +169,15 @@ class ItemMenu extends MovieClip
         if (a_platform == 0) {
             this._acceptControls = skyui.defines.Input.Enter;
             this._cancelControls = skyui.defines.Input.Tab;
-            
+            this._activateControls = skyui.defines.Input.Activate;
+
             // Defaults
             this._switchControls = skyui.defines.Input.Alt;
         } else {
             this._acceptControls = skyui.defines.Input.Accept;
             this._cancelControls = skyui.defines.Input.Cancel;
-            
+            this._activateControls = skyui.defines.Input.Accept;
+
             // Defaults
             this._switchControls = skyui.defines.Input.GamepadBack;
             this._sortColumnControls = skyui.defines.Input.SortColumn;
@@ -583,7 +588,7 @@ class ItemMenu extends MovieClip
     {
         var btnData = {};
         
-        var useControls = skyui.defines.Input.Activate;
+        var useControls = this._activateControls != undefined ? this._activateControls : skyui.defines.Input.Activate;
         var equipControls = skyui.defines.Input.Equip;
         
         switch (a_itemType) {
