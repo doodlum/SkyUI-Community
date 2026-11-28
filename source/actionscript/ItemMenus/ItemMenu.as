@@ -472,9 +472,9 @@ class ItemMenu extends MovieClip
     
     private function positionFloatingElements()
     {
-        var leftEdge = Stage.visibleRect.x + Stage.safeRect.x;
-        var rightEdge = Stage.visibleRect.x + Stage.visibleRect.width - Stage.safeRect.x;
-        
+        var vr = Stage.visibleRect;
+        var safe = Stage.safeRect.x;
+
         var a = this.inventoryLists.getContentBounds();
         // 25 is hardcoded cause thats the final offset after the animation of the panel container is done
         var panelEdge = this.inventoryLists._x + a[0] + a[2] + 25;
@@ -483,25 +483,34 @@ class ItemMenu extends MovieClip
         var itemcardPosition = this._config.ItemInfo.itemcard;
         var itemiconPosition = this._config.ItemInfo.itemicon;
 
-        var scaleMult = (rightEdge - panelEdge) / itemCardContainer._width;
-        
+        // Placement and the 3D item position come from skyui.util.ItemCardLayout, which the HUD also uses to set the 3D
+        // item position before a menu opens (the game reads it at open, before this code runs).
+        var settings = skyui.util.ItemCardLayout.cardSettings(this._config.ListLayout.defaults.entryWidth, itemcardPosition.align,
+                                                              itemcardPosition.xOffset, itemcardPosition.yOffset);
+        var bounds = itemCardContainer.getBounds(itemCardContainer);
+        var origin = {x: 0, y: 0};
+        itemCardContainer._parent.localToGlobal(origin);
+        var metrics = {
+            panel: panelEdge - vr.x - (settings.entryWidth - skyui.util.ItemCardLayout.DEFAULT_ENTRY_WIDTH),
+            w: itemCardContainer._width, xMin: bounds.xMin, xMax: bounds.xMax, yMin: bounds.yMin,
+            y: itemCardContainer._y, safe: safe, ox: origin.x, oy: origin.y
+        };
+        var card = skyui.util.ItemCardLayout.placeCard(settings, vr, safe, panelEdge, metrics);
+
         // Scale down if necessary
-        if (scaleMult < 1.0) {
-            itemCardContainer._width *= scaleMult;
-            itemCardContainer._height *= scaleMult;
-            itemiconPosition.scale *= scaleMult;
+        if (card.scale < 1.0) {
+            itemCardContainer._width *= card.scale;
+            itemCardContainer._height *= card.scale;
+            itemiconPosition.scale *= card.scale;
         }
-        
-        if (itemcardPosition.align == "left")
-            itemCardContainer._x = panelEdge + leftEdge + itemcardPosition.xOffset;
-        else if (itemcardPosition.align == "right")
-            itemCardContainer._x = rightEdge - itemCardContainer._width + itemcardPosition.xOffset;
-        else
-            itemCardContainer._x = panelEdge + itemcardPosition.xOffset + (Stage.visibleRect.x + Stage.visibleRect.width - panelEdge - itemCardContainer._width) / 2;
+        itemCardContainer._x = card.x;
+        itemCardContainer._y = card.y;
 
-        itemCardContainer._y = itemCardContainer._y + itemcardPosition.yOffset;
-
-        this.position3DItem(itemCardContainer);
+        // Centre the 3D item over the card, and report the metrics so the HUD's prediction matches this menu.
+        skyui.util.ItemCardLayout.applyItem3D(skyui.util.ItemCardLayout.item3DPosition(card.centreX + metrics.ox, card.top + metrics.oy, vr));
+        if (_global.skse != undefined)
+            skse.SendModEvent("SKIIM_itemCardMetrics", [metrics.panel, metrics.w, metrics.xMin, metrics.xMax, metrics.yMin,
+                                                        metrics.y, metrics.safe, metrics.ox, metrics.oy].join(","), 0);
 
         if (this.mouseRotationRect != undefined) {
             MovieClip(this.mouseRotationRect).Lock("T");
@@ -519,38 +528,6 @@ class ItemMenu extends MovieClip
         }
     }
     
-    // The game draws the 3D item where the fInventory/Magic3DItemPos{X,Z}[Wide] INI settings say (1 unit = 8 px of a
-    // 1280 x 720 stage at 16:9, 0 = screen centre, +X left, +Z up) and reads them when it starts showing items. Set them
-    // here, after the card is placed and before the first UpdateItem3D, so the model is always centred over the card
-    // wherever the card ends up: any aspect ratio, entryWidth, or item card align/offset from config.txt or the MCM.
-    private static var ITEM3D_GAP: Number = 160;    // model centre above the card's top edge (stage px)
-
-    private function position3DItem(a_card: MovieClip)
-    {
-        if (_global.skse == undefined || skse.SetINISetting == undefined)
-            return;
-
-        var b = a_card.getBounds(a_card._parent);
-        var p = {x: (b.xMin + b.xMax) / 2, y: b.yMin - ItemMenu.ITEM3D_GAP};
-        a_card._parent.localToGlobal(p);
-
-        var vr = Stage.visibleRect;
-        var unitPx = 8 * vr.width / 1280;
-        var x = -(p.x - (vr.x + vr.width / 2)) / unitPx;
-        var z = -(p.y - (vr.y + vr.height / 2)) / unitPx;
-
-        var menus = ["Inventory", "Magic"];
-        for (var i = 0; i < menus.length; i++) {
-            skse.SetINISetting("f" + menus[i] + "3DItemPosX:Interface", x);
-            skse.SetINISetting("f" + menus[i] + "3DItemPosXWide:Interface", x);
-            skse.SetINISetting("f" + menus[i] + "3DItemPosZ:Interface", z);
-            skse.SetINISetting("f" + menus[i] + "3DItemPosZWide:Interface", z);
-        }
-
-        // SKI_ConfigMenu keeps the values in the save and applies them at load, so a fresh session starts centred too.
-        skse.SendModEvent("SKIIM_item3DPosition", x + "," + z, 0);
-    }
-
     private function shouldProcessItemsListInput(abCheckIfOverRect)
    {
       var bCanProcess = this.bFadedIn == true && 

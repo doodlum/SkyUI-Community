@@ -117,6 +117,7 @@ Add_SWF(bartermenu
         PropertyDataExtender.as
         PropertyLookup.as
     }
+    Common/skyui/util/ItemCardLayout.as
     ItemMenus {
         BarterDataSetter.as
         BarterMenu.as
@@ -186,6 +187,7 @@ Add_SWF(containermenu
         PropertyDataExtender.as
         PropertyLookup.as
     }
+    Common/skyui/util/ItemCardLayout.as
     ItemMenus {
         BottomBar.as
         CategoryList.as
@@ -290,6 +292,7 @@ Add_SWF(exported_skyui_widgetloader
     exported/skyui/widgetloader.swf
     exported/skyui/widgetloader.xml
     Common/skyui/defines/Input.as
+    Common/skyui/util/ItemCardLayout.as
     HUDWidgets/WidgetLoader.as
 )
 
@@ -379,6 +382,7 @@ Add_SWF(giftmenu
         PropertyDataExtender.as
         PropertyLookup.as
     }
+    Common/skyui/util/ItemCardLayout.as
     ItemMenus {
         BottomBar.as
         CategoryList.as
@@ -452,6 +456,7 @@ Add_SWF(inventorymenu
         PropertyDataExtender.as
         PropertyLookup.as
     }
+    Common/skyui/util/ItemCardLayout.as
     ItemMenus {
         BottomBar.as
         CategoryList.as
@@ -534,6 +539,7 @@ Add_SWF(magicmenu
         PropertyDataExtender.as
         PropertyLookup.as
     }
+    Common/skyui/util/ItemCardLayout.as
     ItemMenus {
         BottomBar.as
         CategoryList.as

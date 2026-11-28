@@ -30,6 +30,168 @@ class WidgetLoader extends MovieClip
       _root.HUDMovieBaseInstance.WeightTranslated._alpha = 0;
       _root.HUDMovieBaseInstance.ValueTranslated._alpha = 0;
       _root.HUDMovieBaseInstance.QuestUpdateBaseInstance.LevelUpTextInstance._alpha = 0;
+      this.loadItemCardConfig();
+   }
+
+   /* 3D ITEM POSITION
+    * The game reads the 3D item position when an item menu opens, before the menu's code runs, so it has to be right
+    * beforehand. The HUD is always loaded: it reads the item card settings from config.txt, gets the MCM overrides and
+    * the item menus' measured layout from Papyrus (SKI_SettingsManager / SKI_ConfigMenu), and applies the position
+    * skyui.util.ItemCardLayout computes, the same code the item menus place the card with. */
+
+   var _itemCardFile;          // {entryWidth, align, xOffset, yOffset} from config.txt (undefined until loaded)
+   var _itemCardOverrides;     // "Section$key" -> value string, from the MCM
+   var _itemCardOverrideKeys;
+   var _itemCardMetrics;       // reported by the item menus
+
+   static var ITEMCARD_KEYS = {
+      ListLayout$defaults$entryWidth: "entryWidth",
+      ItemInfo$itemcard$align: "align",
+      ItemInfo$itemcard$xOffset: "xOffset",
+      ItemInfo$itemcard$yOffset: "yOffset"
+   };
+
+   function loadItemCardConfig()
+   {
+      var loader = this;
+      var lv = new LoadVars();
+      lv.onData = function(a_data)
+      {
+         loader.parseItemCardConfig(a_data);
+      };
+      lv.load("skyui/config.txt");
+   }
+
+   // Reads the four keys the item card depends on, the way skyui.util.ConfigManager reads config.txt.
+   function parseItemCardConfig(a_data)
+   {
+      var file = {};
+      if(a_data != undefined)
+      {
+         var lines = a_data.split("\r\n");
+         if(lines.length == 1)
+         {
+            lines = a_data.split("\n");
+         }
+         var section = undefined;
+         for(var i = 0; i < lines.length; i++)
+         {
+            var line = lines[i];
+            if(line.charAt(0) == ";")
+            {
+               continue;
+            }
+            if(line.charAt(0) == "[")
+            {
+               section = line.slice(1,line.lastIndexOf("]"));
+               continue;
+            }
+            if(line.length < 3 || section == undefined || line.indexOf("=") == -1)
+            {
+               continue;
+            }
+            var key = WidgetLoader.trimItemCardText(line.slice(0,line.indexOf("=")));
+            var name = WidgetLoader.ITEMCARD_KEYS[section + "$" + key.split(".").join("$")];
+            if(name != undefined)
+            {
+               file[name] = WidgetLoader.parseItemCardValue(line.slice(line.indexOf("=") + 1));
+            }
+         }
+      }
+      this._itemCardFile = file;
+      this.updateItem3D();
+      // Ask Papyrus for the MCM overrides and the item menus' metrics (they call the setters below).
+      skse.SendModEvent("SKIIM_hudItemCardReady");
+   }
+
+   static function parseItemCardValue(a_str)
+   {
+      var s = WidgetLoader.trimItemCardText(a_str);
+      if(s == undefined || s == "")
+      {
+         return undefined;
+      }
+      if(!isNaN(s))
+      {
+         return Number(s);
+      }
+      if(s.charAt(0) == "'" && s.lastIndexOf("'") > 0)
+      {
+         return s.slice(1,s.lastIndexOf("'"));
+      }
+      return s;
+   }
+
+   static function trimItemCardText(a_str)
+   {
+      if(a_str == undefined)
+      {
+         return undefined;
+      }
+      var s = String(a_str);
+      var i = 0;
+      var j = s.length - 1;
+      while(i <= j && (s.charAt(i) == " " || s.charAt(i) == "\t"))
+      {
+         i++;
+      }
+      while(j >= i && (s.charAt(j) == " " || s.charAt(j) == "\t" || s.charAt(j) == "\r"))
+      {
+         j--;
+      }
+      return s.slice(i,j + 1);
+   }
+
+   // Same two-phase call as ConfigManager.setExternalOverrideKeys / Values.
+   function setItemCardOverrideKeys()
+   {
+      this._itemCardOverrideKeys = [];
+      for(var i = 0; i < arguments.length; i++)
+      {
+         this._itemCardOverrideKeys[i] = arguments[i];
+      }
+   }
+
+   function setItemCardOverrideValues()
+   {
+      this._itemCardOverrides = {};
+      for(var i = 0; i < arguments.length; i++)
+      {
+         var k = this._itemCardOverrideKeys[i];
+         if(k != undefined && k != "" && WidgetLoader.ITEMCARD_KEYS[k] != undefined)
+         {
+            this._itemCardOverrides[WidgetLoader.ITEMCARD_KEYS[k]] = WidgetLoader.parseItemCardValue(arguments[i]);
+         }
+      }
+      this.updateItem3D();
+   }
+
+   function setItemCardMetrics(a_panel, a_w, a_xMin, a_xMax, a_yMin, a_y, a_safe, a_ox, a_oy)
+   {
+      if(isNaN(a_panel) || !(a_w > 0))
+      {
+         return undefined;
+      }
+      this._itemCardMetrics = {panel:a_panel,w:a_w,xMin:a_xMin,xMax:a_xMax,yMin:a_yMin,y:a_y,safe:a_safe,ox:a_ox,oy:a_oy};
+      this.updateItem3D();
+   }
+
+   function updateItem3D()
+   {
+      if(this._itemCardFile == undefined)
+      {
+         return undefined;
+      }
+      var eff = {};
+      for(var k in WidgetLoader.ITEMCARD_KEYS)
+      {
+         var name = WidgetLoader.ITEMCARD_KEYS[k];
+         eff[name] = (this._itemCardOverrides != undefined && this._itemCardOverrides[name] != undefined) ? this._itemCardOverrides[name] : this._itemCardFile[name];
+      }
+      var settings = skyui.util.ItemCardLayout.cardSettings(eff.entryWidth,eff.align,eff.xOffset,eff.yOffset);
+      var vr = skyui.util.ItemCardLayout.visibleRectForAspect(Stage.visibleRect.width / Stage.visibleRect.height);
+      var m = this._itemCardMetrics != undefined ? this._itemCardMetrics : skyui.util.ItemCardLayout.DEFAULT_METRICS;
+      skyui.util.ItemCardLayout.applyItem3D(skyui.util.ItemCardLayout.predictItem3D(settings,vr,m));
    }
    function onLoadInit(a_widgetHolder)
    {

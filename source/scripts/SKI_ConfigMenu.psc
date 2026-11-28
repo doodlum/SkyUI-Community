@@ -40,10 +40,8 @@ float		_itemYBase
 float		_itemXBaseW
 float		_itemYBaseW
 
-; Last 3D item position the item menus applied (SKIIM_item3DPosition), saved and re-applied at game load.
-float		_item3DX					= 0.0
-float		_item3DZ					= 0.0
-bool		_item3DPositionKnown		= false
+; Item card layout measured by the item menus (SKIIM_itemCardMetrics), passed to the HUD widget loader.
+string		_itemCardMetrics			= ""
 
 
 ; -- Version 2 --
@@ -1450,10 +1448,11 @@ endFunction
 function ApplySettings()
 	; Apply settings that aren't handled by SKI_SettingsManagerInstance
 
-	; The item menus centre the 3D item on the item card themselves (ItemMenu.position3DItem) and report the values;
-	; re-apply the last ones so the first menu of a session is centred even before the menu sets them.
-	RegisterForModEvent("SKIIM_item3DPosition", "OnItem3DPosition")
-	Apply3DItemPosition()
+	; The 3D item is centred on the item card by skyui.util.ItemCardLayout: the item menus as they place the card, and
+	; the HUD widget loader before each open. The HUD needs the item menus' measured layout, which is kept here.
+	RegisterForModEvent("SKIIM_itemCardMetrics", "OnItemCardMetrics")
+	RegisterForModEvent("SKIIM_hudItemCardReady", "OnHudItemCardReady")
+	PushItemCardMetricsToHUD()
 	Apply3DItemScale()
 endFunction
 
@@ -1488,29 +1487,35 @@ function ApplyItemListFontSize()
 	endIf
 endFunction
 
-; Sent by ItemMenu.position3DItem each time an item menu places its card: "x,z" in 3D item position units.
-event OnItem3DPosition(string a_eventName, string a_strArg, float a_numArg, Form a_sender)
-	string[] parts = StringUtil.Split(a_strArg, ",")
-	if (parts.length != 2)
+; Sent by ItemMenu.positionFloatingElements each time an item menu places its card: the measured layout
+; ("panel,w,xMin,xMax,yMin,y,safe,ox,oy", see skyui.util.ItemCardLayout). Kept in the save for the HUD.
+event OnItemCardMetrics(string a_eventName, string a_strArg, float a_numArg, Form a_sender)
+	if (a_strArg == _itemCardMetrics)
 		return
 	endIf
-	_item3DX = parts[0] as float
-	_item3DZ = parts[1] as float
-	_item3DPositionKnown = true
+	_itemCardMetrics = a_strArg
+	PushItemCardMetricsToHUD()
 endEvent
 
-function Apply3DItemPosition()
-	if (!_item3DPositionKnown)
+event OnHudItemCardReady(string a_eventName, string a_strArg, float a_numArg, Form a_sender)
+	PushItemCardMetricsToHUD()
+endEvent
+
+function PushItemCardMetricsToHUD()
+	if (_itemCardMetrics == "")
 		return
 	endIf
-	Utility.SetINIFloat("fInventory3DItemPosXWide:Interface", _item3DX)
-	Utility.SetINIFloat("fInventory3DItemPosX:Interface", _item3DX)
-	Utility.SetINIFloat("fMagic3DItemPosXWide:Interface", _item3DX)
-	Utility.SetINIFloat("fMagic3DItemPosX:Interface", _item3DX)
-	Utility.SetINIFloat("fInventory3DItemPosZWide:Interface", _item3DZ)
-	Utility.SetINIFloat("fInventory3DItemPosZ:Interface", _item3DZ)
-	Utility.SetINIFloat("fMagic3DItemPosZWide:Interface", _item3DZ)
-	Utility.SetINIFloat("fMagic3DItemPosZ:Interface", _item3DZ)
+	string[] parts = StringUtil.Split(_itemCardMetrics, ",")
+	if (parts.length != 9)
+		return
+	endIf
+	float[] args = new float[9]
+	int i = 0
+	while (i < 9)
+		args[i] = parts[i] as float
+		i += 1
+	endWhile
+	UI.InvokeFloatA("HUD Menu", "_root.widgetLoaderContainer.widgetLoader.setItemCardMetrics", args)
 endFunction
 
 function Apply3DItemScale()
