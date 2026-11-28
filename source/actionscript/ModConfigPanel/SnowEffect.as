@@ -11,6 +11,7 @@ class SnowEffect extends ParticleEmitter
   /* PRIVATE VARIABLES */
 
     private var _framesPerSpawn: Number = 5;
+    private var _frameTicker: Number = 0;
     
     private var _windSpeed: Number;
 

@@ -151,7 +151,9 @@ class ItemMenu extends MovieClip
         this._searchControls = {keyCode: this._searchKey};
         
         var listLayout = a_config["ListLayout"];
-        this.inventoryLists.applyDynamicWidth(listLayout.defaults.entryWidth);
+        var entryWidth = listLayout.defaults.entryWidth;
+        if (entryWidth != undefined && entryWidth > 0)
+            this.inventoryLists.applyDynamicWidth(entryWidth);
 
         this.updateBottomBar(false);
     }
