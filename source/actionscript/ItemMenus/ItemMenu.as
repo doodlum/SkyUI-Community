@@ -507,10 +507,13 @@ class ItemMenu extends MovieClip
         itemCardContainer._y = card.y;
 
         // Centre the 3D item over the card, and report the metrics so the HUD's prediction matches this menu.
-        skyui.util.ItemCardLayout.applyItem3D(skyui.util.ItemCardLayout.item3DPosition(card.centreX + metrics.ox, card.top + metrics.oy, vr));
+        var pos3D = skyui.util.ItemCardLayout.item3DPosition(card.centreX + metrics.ox, card.top + metrics.oy, vr);
+        skyui.util.ItemCardLayout.applyItem3D(pos3D);
+        // The applied position goes along too: SKI_ConfigMenu re-applies it at game load in case the HUD widget loader
+        // is missing (replaced by another mod).
         if (_global.skse != undefined)
             skse.SendModEvent("SKIIM_itemCardMetrics", [metrics.panel, metrics.w, metrics.xMin, metrics.xMax, metrics.yMin,
-                                                        metrics.y, metrics.safe, metrics.ox, metrics.oy].join(","), 0);
+                                                        metrics.y, metrics.safe, metrics.ox, metrics.oy, pos3D.x, pos3D.z].join(","), 0);
 
         if (this.mouseRotationRect != undefined) {
             MovieClip(this.mouseRotationRect).Lock("T");

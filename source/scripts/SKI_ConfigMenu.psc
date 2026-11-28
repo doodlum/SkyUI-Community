@@ -1452,6 +1452,7 @@ function ApplySettings()
 	; the HUD widget loader before each open. The HUD needs the item menus' measured layout, which is kept here.
 	RegisterForModEvent("SKIIM_itemCardMetrics", "OnItemCardMetrics")
 	RegisterForModEvent("SKIIM_hudItemCardReady", "OnHudItemCardReady")
+	Apply3DItemPosition()
 	PushItemCardMetricsToHUD()
 	Apply3DItemScale()
 endFunction
@@ -1506,7 +1507,7 @@ function PushItemCardMetricsToHUD()
 		return
 	endIf
 	string[] parts = StringUtil.Split(_itemCardMetrics, ",")
-	if (parts.length != 9)
+	if (parts.length < 9)
 		return
 	endIf
 	float[] args = new float[9]
@@ -1516,6 +1517,25 @@ function PushItemCardMetricsToHUD()
 		i += 1
 	endWhile
 	UI.InvokeFloatA("HUD Menu", "_root.widgetLoaderContainer.widgetLoader.setItemCardMetrics", args)
+endFunction
+
+; Fallback for a missing HUD widget loader: the 3D item position the item menus last applied (fields 10 and 11 of the
+; metrics), set at game load so a session starts centred. The HUD's own computation replaces it when it runs.
+function Apply3DItemPosition()
+	string[] parts = StringUtil.Split(_itemCardMetrics, ",")
+	if (parts.length < 11)
+		return
+	endIf
+	float x = parts[9] as float
+	float z = parts[10] as float
+	Utility.SetINIFloat("fInventory3DItemPosX:Interface", x)
+	Utility.SetINIFloat("fInventory3DItemPosXWide:Interface", x)
+	Utility.SetINIFloat("fMagic3DItemPosX:Interface", x)
+	Utility.SetINIFloat("fMagic3DItemPosXWide:Interface", x)
+	Utility.SetINIFloat("fInventory3DItemPosZ:Interface", z)
+	Utility.SetINIFloat("fInventory3DItemPosZWide:Interface", z)
+	Utility.SetINIFloat("fMagic3DItemPosZ:Interface", z)
+	Utility.SetINIFloat("fMagic3DItemPosZWide:Interface", z)
 endFunction
 
 function Apply3DItemScale()

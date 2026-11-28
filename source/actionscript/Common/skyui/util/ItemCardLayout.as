@@ -34,11 +34,12 @@ class skyui.util.ItemCardLayout
   /* PUBLIC FUNCTIONS */
 
     // Visible area of the item menus' stage for a screen aspect ratio (width / height).
-    public static function visibleRectForAspect(a_aspect: Number): Object
+    public static function visibleRectForAspect(a_aspect: Number)
     {
         if (isNaN(a_aspect) || a_aspect <= 0)
             a_aspect = 16 / 9;
-        var w = 1280, h = 720;
+        var w = 1280;
+        var h = 720;
         if (a_aspect >= 1280 / 720)
             w = 720 * a_aspect;
         else
@@ -48,7 +49,7 @@ class skyui.util.ItemCardLayout
 
     // Item card settings as the item menus read them: entryWidth (> 0, else 530), align ("left", "right" or centre),
     // xOffset and yOffset (numbers, else 0).
-    public static function cardSettings(a_entryWidth, a_align, a_xOffset, a_yOffset): Object
+    public static function cardSettings(a_entryWidth, a_align, a_xOffset, a_yOffset)
     {
         var e = Number(a_entryWidth);
         var xo = Number(a_xOffset);
@@ -63,7 +64,7 @@ class skyui.util.ItemCardLayout
 
     // Where the card goes: its x, y and scale in the item menu (whose coordinates are stage px), plus its visual centre
     // and top edge. a_panelEdge is the list's right edge + 25 px (the menu passes the live value; the HUD derives it).
-    public static function placeCard(a_settings: Object, a_vr: Object, a_safe: Number, a_panelEdge: Number, a_m: Object): Object
+    public static function placeCard(a_settings: Object, a_vr: Object, a_safe: Number, a_panelEdge: Number, a_m: Object)
     {
         var leftEdge = a_vr.x + a_safe;
         var rightEdge = a_vr.x + a_vr.width - a_safe;
@@ -92,7 +93,7 @@ class skyui.util.ItemCardLayout
     }
 
     // 3D item position for a card whose visual centre / top edge are (a_centreX, a_top) in stage px.
-    public static function item3DPosition(a_centreX: Number, a_top: Number, a_vr: Object): Object
+    public static function item3DPosition(a_centreX: Number, a_top: Number, a_vr: Object)
     {
         var unitPx = 8 * a_vr.width / 1280;
         return {
@@ -102,7 +103,7 @@ class skyui.util.ItemCardLayout
     }
 
     // Full prediction (HUD): settings + screen + reported metrics -> 3D item position.
-    public static function predictItem3D(a_settings: Object, a_vr: Object, a_m: Object): Object
+    public static function predictItem3D(a_settings: Object, a_vr: Object, a_m: Object)
     {
         var panelEdge = a_vr.x + a_m.panel + (a_settings.entryWidth - skyui.util.ItemCardLayout.DEFAULT_ENTRY_WIDTH);
         var card = skyui.util.ItemCardLayout.placeCard(a_settings, a_vr, a_m.safe, panelEdge, a_m);
@@ -110,7 +111,7 @@ class skyui.util.ItemCardLayout
     }
 
     // Writes the 3D item position for the inventory-type menus and the magic menu.
-    public static function applyItem3D(a_pos: Object): Boolean
+    public static function applyItem3D(a_pos: Object)
     {
         if (_global.skse == undefined || _global.skse.SetINISetting == undefined || isNaN(a_pos.x) || isNaN(a_pos.z))
             return false;
