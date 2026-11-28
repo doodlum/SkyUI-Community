@@ -619,6 +619,7 @@ class CraftingMenu extends MovieClip
          _loc4_.onUnsuspend = function()
          {
             this.onItemPress(this.listState.restoredItem,0);
+            this.listState.restoredItemPressed = true;
             delete this.onUnsuspend;
          };
          _loc3_.listState.restoredActiveColumnIndex = _loc2_[3];
@@ -655,7 +656,15 @@ class CraftingMenu extends MovieClip
          this._pendingRestore = undefined;
          return;
       }
-      if (lists.CategoriesList.selectedIndex != p.category || !(list.itemCount > 0))
+      if (lists.CategoriesList.selectedIndex != p.category)
+      {
+         // Once the saved category has been pressed, a different selection means the player moved on, or the saved
+         // index no longer exists: stop restoring so their choices are saved again.
+         if (lists.CategoriesList.listState.restoredItemPressed == true)
+            this._pendingRestore = undefined;
+         return;
+      }
+      if (!(list.itemCount > 0))
          return;
       this._pendingRestore = undefined;
       if (p.scrollPosition >= 0)
