@@ -17,6 +17,8 @@ class Map.LocalMap extends MovieClip
    var _bShow = false;
    var _state = Map.LocalMap.STATE_HIDDEN;
    var _bRequestFindLoc = false;
+   // Set by MapMenu.createButtons: whether the Find Location prompt belongs in the bar on this platform.
+   var findLocAvailable = true;
    var _textureWidth = 800;
    var _textureHeight = 450;
    function LocalMap()
@@ -111,7 +113,7 @@ class Map.LocalMap extends MovieClip
          _loc2_.button0.label = "$World Map";
          _loc2_.button2.visible = true;
          _loc2_.button3.visible = true;
-         if(!_loc2_.button4.disabled)
+         if(this.findLocAvailable)
          {
             _loc2_.button4.visible = true;
          }
@@ -152,7 +154,7 @@ class Map.LocalMap extends MovieClip
          _loc2_.button0.label = "$Local Map";
          _loc2_.button2.visible = true;
          _loc2_.button3.visible = true;
-         if(!_loc2_.button4.disabled)
+         if(this.findLocAvailable)
          {
             _loc2_.button4.visible = true;
          }
