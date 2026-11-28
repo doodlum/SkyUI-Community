@@ -335,6 +335,9 @@ class StatsMenu extends MovieClip
       {
          _loc2_.CardNameTextInstance.SetText("");
          _loc2_.SkillRequirementText.html = true;
+         // The field is one line (statsmenu.xml widens it to fit the skill and requirement side by side): shrink
+         // the text instead of clipping it when a wide font or a long translation still doesn't fit.
+         _loc2_.SkillRequirementText.textAutoSize = "shrink";
          _loc2_.SkillRequirementText.htmlText = aSkill.toUpperCase() + "          " + aRequirements.toUpperCase();
          if(this.PerksLeft != undefined)
          {

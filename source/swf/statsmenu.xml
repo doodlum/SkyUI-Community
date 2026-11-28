@@ -12072,8 +12072,8 @@ Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMi
         <item type="ShowFrameTag" forceWriteAsLong="false"/>
       </subTags>
     </item>
-    <item type="DefineEditTextTag" align="2" autoSize="false" border="false" characterID="111" fontHeight="440" fontId="1" forceWriteAsLong="true" hasFont="true" hasFontClass="false" hasLayout="true" hasMaxLength="false" hasText="true" hasTextColor="true" html="true" indent="0" initialText="&lt;p align=&quot;center&quot;&gt;&lt;/p&gt;" leading="40" leftMargin="0" maxLength="0" multiline="true" noSelect="false" password="false" readOnly="true" rightMargin="0" useOutlines="true" variableName="" wasStatic="false" wordWrap="true">
-      <bounds type="RECT" Xmax="7239" Xmin="-40" Ymax="727" Ymin="-40" nbits="14"/>
+    <item type="DefineEditTextTag" align="2" autoSize="false" border="false" characterID="111" fontHeight="440" fontId="1" forceWriteAsLong="true" hasFont="true" hasFontClass="false" hasLayout="true" hasMaxLength="false" hasText="true" hasTextColor="true" html="true" indent="0" initialText="&lt;p align=&quot;center&quot;&gt;&lt;/p&gt;" leading="40" leftMargin="0" maxLength="0" multiline="false" noSelect="false" password="false" readOnly="true" rightMargin="0" useOutlines="true" variableName="" wasStatic="false" wordWrap="false">
+      <bounds type="RECT" Xmax="17239" Xmin="-40" Ymax="727" Ymin="-40" nbits="16"/>
       <textColor type="RGBA" alpha="255" blue="153" green="153" red="153"/>
     </item>
     <item type="CSMSettingsTag" forceWriteAsLong="true" gridFit="2" reserved="0" reserved2="0" sharpness="0.0" textID="111" thickness="0.0" useFlashType="1"/>
@@ -12114,7 +12114,7 @@ Make sure you use compatible reader/writer based on _xmlExportMajor/_xmlExportMi
           <matrix type="MATRIX" hasRotate="false" hasScale="false" nRotateBits="0" nScaleBits="0" nTranslateBits="13" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.0" scaleY="0.0" translateX="1743" translateY="2947"/>
         </item>
         <item type="PlaceObject3Tag" bitmapCache="0" blendMode="0" characterId="111" clipDepth="0" depth="5" forceWriteAsLong="true" name="SkillRequirementText" placeFlagHasBlendMode="false" placeFlagHasCacheAsBitmap="false" placeFlagHasCharacter="true" placeFlagHasClassName="false" placeFlagHasClipActions="false" placeFlagHasClipDepth="false" placeFlagHasColorTransform="false" placeFlagHasFilterList="true" placeFlagHasImage="false" placeFlagHasMatrix="true" placeFlagHasName="true" placeFlagHasRatio="false" placeFlagHasVisible="false" placeFlagMove="false" placeFlagOpaqueBackground="false" ratio="0" reserved="false" visible="0">
-          <matrix type="MATRIX" hasRotate="false" hasScale="false" nRotateBits="0" nScaleBits="0" nTranslateBits="13" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.0" scaleY="0.0" translateX="720" translateY="3140"/>
+          <matrix type="MATRIX" hasRotate="false" hasScale="false" nRotateBits="0" nScaleBits="0" nTranslateBits="14" rotateSkew0="0.0" rotateSkew1="0.0" scaleX="0.0" scaleY="0.0" translateX="-4280" translateY="3140"/>
           <surfaceFilterList>
             <item type="DROPSHADOWFILTER" angle="0.7853851318359375" blurX="2.0" blurY="2.0" compositeSource="true" distance="2.0" id="0" innerShadow="false" knockout="false" passes="1" strength="1.5">
               <dropShadowColor type="RGBA" alpha="255" blue="0" green="0" red="0"/>
