@@ -1,45 +1,45 @@
 class skyui.defines.Weapon
 {
-   static var ANIM_HANDTOHANDMELEE = 0;
-   static var ANIM_ONEHANDSWORD = 1;
-   static var ANIM_ONEHANDDAGGER = 2;
-   static var ANIM_ONEHANDAXE = 3;
-   static var ANIM_ONEHANDMACE = 4;
-   static var ANIM_TWOHANDSWORD = 5;
-   static var ANIM_TWOHANDAXE = 6;
-   static var ANIM_BOW = 7;
-   static var ANIM_STAFF = 8;
-   static var ANIM_CROSSBOW = 9;
-   static var ANIM_H2H = 10;
-   static var ANIM_1HS = 11;
-   static var ANIM_1HD = 12;
-   static var ANIM_1HA = 13;
-   static var ANIM_1HM = 14;
-   static var ANIM_2HS = 15;
-   static var ANIM_2HA = 16;
-   static var ANIM_BOW2 = 17;
-   static var ANIM_STAFF2 = 18;
-   static var ANIM_CBOW = 19;
-   static var TYPE_MELEE = 0;
-   static var TYPE_SWORD = 1;
-   static var TYPE_DAGGER = 2;
-   static var TYPE_WARAXE = 3;
-   static var TYPE_MACE = 4;
-   static var TYPE_GREATSWORD = 5;
-   static var TYPE_BATTLEAXE = 6;
-   static var TYPE_WARHAMMER = 7;
-   static var TYPE_BOW = 8;
-   static var TYPE_CROSSBOW = 9;
-   static var TYPE_STAFF = 10;
-   static var TYPE_PICKAXE = 11;
-   static var TYPE_WOODAXE = 12;
-   static var TYPE_FISHINGROD = 13;
-   static var AMMO_ARROW = 0;
-   static var AMMO_BOLT = 1;
-   static var AMMOFLAG_IGNORESNORMALWEAPONRESISTANCE = 1;
-   static var AMMOFLAG_NONPLAYABLE = 2;
-   static var AMMOFLAG_NONBOLT = 4;
-   function Weapon()
-   {
-   }
+    public static var ANIM_HANDTOHANDMELEE: Number = 0;
+    public static var ANIM_ONEHANDSWORD: Number    = 1;
+    public static var ANIM_ONEHANDDAGGER: Number   = 2;
+    public static var ANIM_ONEHANDAXE: Number      = 3;
+    public static var ANIM_ONEHANDMACE: Number     = 4;
+    public static var ANIM_TWOHANDSWORD: Number    = 5;
+    public static var ANIM_TWOHANDAXE: Number      = 6;
+    public static var ANIM_BOW: Number             = 7;
+    public static var ANIM_STAFF: Number           = 8;
+    public static var ANIM_CROSSBOW: Number        = 9;
+    public static var ANIM_H2H: Number             = 10;
+    public static var ANIM_1HS: Number             = 11;
+    public static var ANIM_1HD: Number             = 12;
+    public static var ANIM_1HA: Number             = 13;
+    public static var ANIM_1HM: Number             = 14;
+    public static var ANIM_2HS: Number             = 15;
+    public static var ANIM_2HA: Number             = 16;
+    public static var ANIM_BOW2: Number            = 17;
+    public static var ANIM_STAFF2: Number          = 18;
+    public static var ANIM_CBOW: Number            = 19;
+
+    public static var TYPE_MELEE: Number      = 0;
+    public static var TYPE_SWORD: Number      = 1;
+    public static var TYPE_DAGGER: Number     = 2;
+    public static var TYPE_WARAXE: Number     = 3;
+    public static var TYPE_MACE: Number       = 4;
+    public static var TYPE_GREATSWORD: Number = 5;
+    public static var TYPE_BATTLEAXE: Number  = 6;
+    public static var TYPE_WARHAMMER: Number  = 7;
+    public static var TYPE_BOW: Number        = 8;
+    public static var TYPE_CROSSBOW: Number   = 9;
+    public static var TYPE_STAFF: Number      = 10;
+    public static var TYPE_PICKAXE: Number    = 11;
+    public static var TYPE_WOODAXE: Number    = 12;
+    public static var TYPE_FISHINGROD: Number = 13;
+
+    public static var AMMO_ARROW: Number = 0;
+    public static var AMMO_BOLT: Number  = 1;
+
+    public static var AMMOFLAG_IGNORESNORMALWEAPONRESISTANCE: Number = 0x0001;
+    public static var AMMOFLAG_NONPLAYABLE: Number                   = 0x0002;
+    public static var AMMOFLAG_NONBOLT: Number                       = 0x0004;
 }

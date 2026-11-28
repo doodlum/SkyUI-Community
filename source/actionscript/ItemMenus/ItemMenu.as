@@ -1,458 +1,520 @@
 class ItemMenu extends MovieClip
 {
-   var _acceptControls;
-   var _bPlayBladeSound;
-   var _cancelControls;
-   var _config;
-   var _platform;
-   var _searchControls;
-   var _searchKey;
-   var _sortColumnControls;
-   var _sortOrderControls;
-   var _switchControls;
-   var _switchTabKey;
-   var bottomBar;
-   var exitMenuRect;
-   var inventoryLists;
-   var itemCard;
-   var itemCardFadeHolder;
-   var layout;
-   var listState;
-   var mouseRotationRect;
-   var navPanel;
-   var onInvalidate;
-   var onItemPress;
-   var onUnsuspend;
-   var scrollPosition;
-   var selectedIndex;
-   var _bItemCardFadedIn = false;
-   var _bItemCardPositioned = false;
-   var _quantityMinCount = 5;
-   var bEnableTabs = false;
-   var bPCControlsReady = true;
-   var bFadedIn = true;
-   function ItemMenu()
-   {
-      super();
-      this.itemCard = this.itemCardFadeHolder.ItemCard_mc;
-      this.navPanel = this.bottomBar.buttonPanel;
-      Mouse.addListener(this);
-      skyui.util.ConfigManager.registerLoadCallback(this,"onConfigLoad");
-      this.bFadedIn = true;
-      this._bItemCardFadedIn = false;
-   }
-   function InitExtensions(a_bPlayBladeSound)
-   {
-      Stage.scaleMode = "showAll";
-      Shared.GlobalFunc.SetLockFunction();
-      skse.ExtendData(true);
-      skse.ForceContainerCategorization(true);
-      this._bPlayBladeSound = a_bPlayBladeSound;
-      this.inventoryLists.InitExtensions();
-      if(this.bEnableTabs)
-      {
-         this.inventoryLists.enableTabBar();
-      }
-      gfx.io.GameDelegate.addCallBack("UpdatePlayerInfo",this,"UpdatePlayerInfo");
-      gfx.io.GameDelegate.addCallBack("UpdateItemCardInfo",this,"UpdateItemCardInfo");
-      gfx.io.GameDelegate.addCallBack("ToggleMenuFade",this,"ToggleMenuFade");
-      gfx.io.GameDelegate.addCallBack("RestoreIndices",this,"RestoreIndices");
-      this.inventoryLists.addEventListener("categoryChange",this,"onCategoryChange");
-      this.inventoryLists.addEventListener("itemHighlightChange",this,"onItemHighlightChange");
-      this.inventoryLists.addEventListener("showItemsList",this,"onShowItemsList");
-      this.inventoryLists.addEventListener("hideItemsList",this,"onHideItemsList");
-      this.inventoryLists.itemList.addEventListener("itemPress",this,"onItemSelect");
-      this.itemCard.addEventListener("quantitySelect",this,"onQuantityMenuSelect");
-      this.itemCard.addEventListener("subMenuAction",this,"onItemCardSubMenuAction");
-      this.positionFixedElements();
-      this.itemCard._visible = false;
-      this.navPanel.hideButtons();
-      this.exitMenuRect.onMouseDown = function()
-      {
-         if(this._parent.bFadedIn == true && Mouse.getTopMostEntity() == this)
-         {
-            this._parent.onExitMenuRectClick();
-         }
-      };
-   }
-   function setConfig(a_config)
-   {
-      this._config = a_config;
-   
-      var customWidth = a_config.ListLayout.defaults.entryWidth;
-      
-      if (customWidth != undefined && customWidth > 0) {
-         this.inventoryLists.applyDynamicWidth(customWidth);
-      }
+  /* PRIVATE VARIABLES */
 
-      this.positionFloatingElements();
-      var _loc3_ = this.inventoryLists.itemList.listState;
-      var _loc8_ = this.inventoryLists.categoryList.listState;
-      var _loc2_ = a_config.Appearance;
-      _loc8_.iconSource = _loc2_.icons.category.source;
-      _loc3_.iconSource = _loc2_.icons.item.source;
-      _loc3_.showStolenIcon = _loc2_.icons.item.showStolen;
-      _loc3_.defaultEnabledColor = _loc2_.colors.text.enabled;
-      _loc3_.negativeEnabledColor = _loc2_.colors.negative.enabled;
-      _loc3_.stolenEnabledColor = _loc2_.colors.stolen.enabled;
-      _loc3_.defaultDisabledColor = _loc2_.colors.text.disabled;
-      _loc3_.negativeDisabledColor = _loc2_.colors.negative.disabled;
-      _loc3_.stolenDisabledColor = _loc2_.colors.stolen.disabled;
-      this._quantityMinCount = a_config.ItemList.quantityMenu.minCount;
-      var _loc6_;
-      var _loc5_;
-      var _loc7_;
-      if(this._platform == 0)
-      {
-         this._switchTabKey = a_config.Input.controls.pc.switchTab;
-      }
-      else
-      {
-         this._switchTabKey = a_config.Input.controls.gamepad.switchTab;
-         _loc6_ = a_config.Input.controls.gamepad.prevColumn;
-         _loc5_ = a_config.Input.controls.gamepad.nextColumn;
-         _loc7_ = a_config.Input.controls.gamepad.sortOrder;
-         this._sortColumnControls = [{keyCode:_loc6_},{keyCode:_loc5_}];
-         this._sortOrderControls = {keyCode:_loc7_};
-      }
-      this._switchControls = {keyCode:this._switchTabKey};
-      this._searchKey = a_config.Input.controls.pc.search;
-      this._searchControls = {keyCode:this._searchKey};
-      this.updateBottomBar(false);
-   }
-   function SetPlatform(a_platform, a_bPS3Switch)
-   {
-      this._platform = a_platform;
-      if(a_platform == 0)
-      {
-         this._acceptControls = skyui.defines.Input.Enter;
-         this._cancelControls = skyui.defines.Input.Tab;
-         this._switchControls = skyui.defines.Input.Alt;
-      }
-      else
-      {
-         this._acceptControls = skyui.defines.Input.Accept;
-         this._cancelControls = skyui.defines.Input.Cancel;
-         this._switchControls = skyui.defines.Input.GamepadBack;
-         this._sortColumnControls = skyui.defines.Input.SortColumn;
-         this._sortOrderControls = skyui.defines.Input.SortOrder;
-      }
-      this._searchControls = skyui.defines.Input.Space;
-      this.inventoryLists.setPlatform(a_platform,a_bPS3Switch);
-      this.itemCard.SetPlatform(a_platform,a_bPS3Switch);
-      this.bottomBar.setPlatform(a_platform,a_bPS3Switch);
-   }
-   function GetInventoryItemList()
-   {
-      return this.inventoryLists.itemList;
-   }
-   function handleInput(details, pathToFocus)
-   {
-      if(!this.bFadedIn)
-      {
-         return true;
-      }
-      var _loc3_ = pathToFocus.shift();
-      if(_loc3_.handleInput(details,pathToFocus))
-      {
-         return true;
-      }
-      if(Shared.GlobalFunc.IsKeyPressed(details) && (details.navEquivalent == gfx.ui.NavigationCode.TAB || details.navEquivalent == gfx.ui.NavigationCode.SHIFT_TAB))
-      {
-         gfx.io.GameDelegate.call("CloseMenu",[]);
-      }
-      return true;
-   }
-   function UpdatePlayerInfo(aUpdateObj)
-   {
-      this.bottomBar.UpdatePlayerInfo(aUpdateObj,this.itemCard.itemInfo);
-   }
-   function UpdateItemCardInfo(aUpdateObj)
-   {
-      this.itemCard.itemInfo = aUpdateObj;
-      this.bottomBar.updatePerItemInfo(aUpdateObj);
-   }
-   function ToggleMenuFade()
-   {
-      if(this.bFadedIn)
-      {
-         this._parent.gotoAndPlay("fadeOut");
-         this.bFadedIn = false;
-         this.inventoryLists.itemList.disableSelection = true;
-         this.inventoryLists.itemList.disableInput = true;
-         this.inventoryLists.categoryList.disableSelection = true;
-         this.inventoryLists.categoryList.disableInput = true;
-      }
-      else
-      {
-         this._parent.gotoAndPlay("fadeIn");
-      }
-   }
-   function SetFadedIn()
-   {
-      this.bFadedIn = true;
-      this.inventoryLists.itemList.disableSelection = false;
-      this.inventoryLists.itemList.disableInput = false;
-      this.inventoryLists.categoryList.disableSelection = false;
-      this.inventoryLists.categoryList.disableInput = false;
-   }
-   function RestoreIndices()
-   {
-      var _loc4_ = this.inventoryLists.categoryList;
-      var _loc3_ = this.inventoryLists.itemList;
-      if(arguments[0] != undefined && arguments[0] != -1 && arguments.length == 5)
-      {
-         _loc4_.listState.restoredItem = arguments[0];
-         _loc4_.onUnsuspend = function()
-         {
-            this.onItemPress(this.listState.restoredItem,0);
-            delete this.onUnsuspend;
-         };
-         _loc3_.listState.restoredScrollPosition = arguments[2];
-         _loc3_.listState.restoredSelectedIndex = arguments[1];
-         _loc3_.listState.restoredActiveColumnIndex = arguments[3];
-         _loc3_.listState.restoredActiveColumnState = arguments[4];
-         _loc3_.onUnsuspend = function()
-         {
-            this.onInvalidate = function()
+    private var _platform: Number;
+    private var _bItemCardFadedIn: Boolean = false;
+    private var _bItemCardPositioned: Boolean = false;
+    
+    private var _quantityMinCount: Number = 5;
+    
+    private var _config: Object;
+    
+    private var _bPlayBladeSound: Boolean;
+    
+    private var _searchKey: Number;
+    private var _switchTabKey: Number;
+    
+    private var _acceptControls: Object;
+    private var _cancelControls: Object;
+    private var _searchControls: Object;
+    private var _switchControls: Object;
+    private var _sortColumnControls: Array;
+    private var _sortOrderControls: Object;
+    
+    
+  /* STAGE ELEMENTS */
+    
+    public var inventoryLists: InventoryLists;
+    
+    public var itemCardFadeHolder: MovieClip;
+
+    public var bottomBar: BottomBar;
+    
+    public var mouseRotationRect: MovieClip;
+    public var exitMenuRect: MovieClip;
+    
+    
+  /* PROPERTIES */
+    
+    public var itemCard: MovieClip;
+    
+    public var navPanel: ButtonPanel;
+    
+    public var bEnableTabs: Boolean = false;
+    
+    // @GFx
+    public var bPCControlsReady: Boolean = true;
+    
+    public var bFadedIn: Boolean = true;
+    
+    
+  /* INITIALIZATION */
+
+    public function ItemMenu()
+    {
+        super();
+        
+        this.itemCard = this.itemCardFadeHolder.ItemCard_mc;
+        this.navPanel = this.bottomBar.buttonPanel;
+        
+        Mouse.addListener(this);
+        skyui.util.ConfigManager.registerLoadCallback(this, "onConfigLoad");
+        
+        this.bFadedIn = true;
+        this._bItemCardFadedIn = false;
+    }
+
+  /* PUBLIC FUNCTIONS */
+
+    // @API
+    public function InitExtensions(a_bPlayBladeSound)
+    {
+        Stage.scaleMode = "showAll";
+        Shared.GlobalFunc.SetLockFunction();
+        skse.ExtendData(true);
+        skse.ForceContainerCategorization(true);
+        
+        this._bPlayBladeSound = a_bPlayBladeSound;
+        
+        this.inventoryLists.InitExtensions();
+        
+        if (this.bEnableTabs)
+            this.inventoryLists.enableTabBar();
+        
+        gfx.io.GameDelegate.addCallBack("UpdatePlayerInfo", this, "UpdatePlayerInfo");
+        gfx.io.GameDelegate.addCallBack("UpdateItemCardInfo", this, "UpdateItemCardInfo");
+        gfx.io.GameDelegate.addCallBack("ToggleMenuFade", this, "ToggleMenuFade");
+        gfx.io.GameDelegate.addCallBack("RestoreIndices", this, "RestoreIndices");
+        
+        this.inventoryLists.addEventListener("categoryChange", this, "onCategoryChange");
+        this.inventoryLists.addEventListener("itemHighlightChange", this, "onItemHighlightChange");
+        this.inventoryLists.addEventListener("showItemsList", this, "onShowItemsList");
+        this.inventoryLists.addEventListener("hideItemsList", this, "onHideItemsList");
+        
+        this.inventoryLists.itemList.addEventListener("itemPress", this ,"onItemSelect");
+        
+        this.itemCard.addEventListener("quantitySelect", this, "onQuantityMenuSelect");
+        this.itemCard.addEventListener("subMenuAction", this, "onItemCardSubMenuAction");
+        
+        this.positionFixedElements();
+        this.updateDynamicListHeight();
+        
+        this.itemCard._visible = false;
+        this.navPanel.hideButtons();
+        
+        this.exitMenuRect.onMouseDown = function()
+        {
+            if (this._parent.bFadedIn == true && Mouse.getTopMostEntity() == this)
+                this._parent.onExitMenuRectClick();
+        };
+    }
+    
+    public function setConfig(a_config: Object)
+    {
+        this._config = a_config;
+
+        this.positionFloatingElements();
+        
+        var itemListState = this.inventoryLists.itemList.listState;
+        var categoryListState = this.inventoryLists.categoryList.listState;
+        var appearance = a_config["Appearance"];
+        
+        categoryListState.iconSource = appearance.icons.category.source;
+        
+        itemListState.iconSource = appearance.icons.item.source;
+        itemListState.showStolenIcon = appearance.icons.item.showStolen;
+        
+        itemListState.defaultEnabledColor = appearance.colors.text.enabled;
+        itemListState.negativeEnabledColor = appearance.colors.negative.enabled;
+        itemListState.stolenEnabledColor = appearance.colors.stolen.enabled;
+        itemListState.defaultDisabledColor = appearance.colors.text.disabled;
+        itemListState.negativeDisabledColor = appearance.colors.negative.disabled;
+        itemListState.stolenDisabledColor = appearance.colors.stolen.disabled;
+
+        var itemList = a_config["ItemList"];
+        this._quantityMinCount = itemList.quantityMenu.minCount;
+        
+        var input = a_config["Input"];
+        if (this._platform == 0) {
+            this._switchTabKey = input.controls.pc.switchTab;
+        } else {
+            var gamepad = input.controls.gamepad;
+            this._switchTabKey = gamepad.switchTab;
+            this._sortColumnControls = [{keyCode: gamepad.prevColumn}, {keyCode: gamepad.nextColumn}];
+            this._sortOrderControls = {keyCode: gamepad.sortOrder};
+        }
+        
+        this._switchControls = {keyCode: this._switchTabKey};
+        
+        this._searchKey = input.controls.pc.search;
+        this._searchControls = {keyCode: this._searchKey};
+        
+        var listLayout = a_config["ListLayout"];
+        this.inventoryLists.applyDynamicWidth(listLayout.defaults.entryWidth);
+
+        this.updateBottomBar(false);
+    }
+
+    // @API
+    public function SetPlatform(a_platform: Number, a_bPS3Switch: Boolean)
+    {
+        this._platform = a_platform;
+        
+        if (a_platform == 0) {
+            this._acceptControls = skyui.defines.Input.Enter;
+            this._cancelControls = skyui.defines.Input.Tab;
+            
+            // Defaults
+            this._switchControls = skyui.defines.Input.Alt;
+        } else {
+            this._acceptControls = skyui.defines.Input.Accept;
+            this._cancelControls = skyui.defines.Input.Cancel;
+            
+            // Defaults
+            this._switchControls = skyui.defines.Input.GamepadBack;
+            this._sortColumnControls = skyui.defines.Input.SortColumn;
+            this._sortOrderControls = skyui.defines.Input.SortOrder;
+        }
+        
+        // Defaults
+        this._searchControls = skyui.defines.Input.Space;
+        
+        this.inventoryLists.setPlatform(a_platform,a_bPS3Switch);
+        this.itemCard.SetPlatform(a_platform,a_bPS3Switch);
+        this.bottomBar.setPlatform(a_platform,a_bPS3Switch);
+    }
+
+    // @API
+    public function GetInventoryItemList()
+    {
+        return this.inventoryLists.itemList;
+    }
+
+    // @GFx
+    public function handleInput(details: gfx.ui.InputDetails, pathToFocus: Array)
+    {
+        if (!this.bFadedIn)
+            return true;
+            
+        var nextClip = pathToFocus.shift();
+            
+        if (nextClip.handleInput(details, pathToFocus))
+            return true;
+        
+        if (Shared.GlobalFunc.IsKeyPressed(details) && (details.navEquivalent == gfx.ui.NavigationCode.TAB || details.navEquivalent == gfx.ui.NavigationCode.SHIFT_TAB))
+            gfx.io.GameDelegate.call("CloseMenu", []);
+
+        return true;
+    }
+
+    // @API
+    public function UpdatePlayerInfo(aUpdateObj: Object)
+    {
+        this.bottomBar.UpdatePlayerInfo(aUpdateObj, this.itemCard.itemInfo);
+    }
+
+    // @API
+    public function UpdateItemCardInfo(aUpdateObj: Object)
+    {
+        this.itemCard.itemInfo = aUpdateObj;
+        this.bottomBar.updatePerItemInfo(aUpdateObj);
+    }
+
+    // @API
+    public function ToggleMenuFade()
+    {
+        if (this.bFadedIn) {
+            this._parent.gotoAndPlay("fadeOut");
+            this.bFadedIn = false;
+            this.inventoryLists.itemList.disableSelection = true;
+            this.inventoryLists.itemList.disableInput = true;
+            this.inventoryLists.categoryList.disableSelection = true;
+            this.inventoryLists.categoryList.disableInput = true;
+        } else {
+            this._parent.gotoAndPlay("fadeIn");
+        }
+    }
+
+    // @API
+    public function SetFadedIn()
+    {
+        this.bFadedIn = true;
+        this.inventoryLists.itemList.disableSelection = false;
+        this.inventoryLists.itemList.disableInput = false;
+        this.inventoryLists.categoryList.disableSelection = false;
+        this.inventoryLists.categoryList.disableInput = false;
+    }
+    
+    // @API
+    public function RestoreIndices()
+    {
+        var categoryList = this.inventoryLists.categoryList;
+        var itemList = this.inventoryLists.itemList;
+        
+        if (arguments[0] != undefined && arguments[0] != -1 && arguments.length == 5) {
+            categoryList.listState.restoredItem = arguments[0];
+            categoryList.onUnsuspend = function()
             {
-               this.scrollPosition = this.listState.restoredScrollPosition;
-               this.selectedIndex = this.listState.restoredSelectedIndex;
-               delete this.onInvalidate;
+                this.onItemPress(this.listState.restoredItem, 0);
+                delete this.onUnsuspend;
             };
-            this.layout.restoreColumnState(this.listState.restoredActiveColumnIndex,this.listState.restoredActiveColumnState);
-            delete this.onUnsuspend;
-         };
-      }
-      else
-      {
-         _loc4_.onUnsuspend = function()
-         {
-            this.onItemPress(1,0);
-            delete this.onUnsuspend;
-         };
-      }
-   }
-   function onItemCardSubMenuAction(event)
-   {
-      if(event.opening == true)
-      {
-         this.inventoryLists.itemList.disableSelection = true;
-         this.inventoryLists.itemList.disableInput = true;
-         this.inventoryLists.categoryList.disableSelection = true;
-         this.inventoryLists.categoryList.disableInput = true;
-      }
-      else if(event.opening == false)
-      {
-         this.inventoryLists.itemList.disableSelection = false;
-         this.inventoryLists.itemList.disableInput = false;
-         this.inventoryLists.categoryList.disableSelection = false;
-         this.inventoryLists.categoryList.disableInput = false;
-      }
-   }
-   function onConfigLoad(event)
-   {
-      this.setConfig(event.config);
-      this.inventoryLists.showPanel(this._bPlayBladeSound);
-   }
-   function onMouseWheel(delta)
-   {
-      if(this.mouseRotationRect != undefined && this.mouseRotationRect.hitTest(_root._xmouse, _root._ymouse, true))
-      {
-         if(this.shouldProcessItemsListInput(false) || (!this.bFadedIn && delta == -1))
-         {
-            gfx.io.GameDelegate.call("ZoomItemModel",[delta]);
-         }
-      }
-   }
-   function onExitMenuRectClick()
-   {
-      gfx.io.GameDelegate.call("CloseMenu",[]);
-   }
-   function onCategoryChange(event)
-   {
-   }
-   function onItemHighlightChange(event)
-   {
-      if(event.index != -1)
-      {
-         if(!this._bItemCardFadedIn)
-         {
-            this._bItemCardFadedIn = true;
-            if(this._bItemCardPositioned)
+            
+            itemList.listState.restoredScrollPosition = arguments[2];
+            itemList.listState.restoredSelectedIndex = arguments[1];
+            itemList.listState.restoredActiveColumnIndex = arguments[3];
+            itemList.listState.restoredActiveColumnState = arguments[4];
+
+            itemList.onUnsuspend = function()
             {
-               this.itemCard.FadeInCard();
+                this.onInvalidate = function()
+                {
+                    this.scrollPosition = this.listState.restoredScrollPosition;
+                    this.selectedIndex = this.listState.restoredSelectedIndex;
+                    delete this.onInvalidate;
+                };
+                
+                this.layout.restoreColumnState(this.listState.restoredActiveColumnIndex, this.listState.restoredActiveColumnState);
+                delete this.onUnsuspend;
+            };
+        } else {
+            
+            categoryList.onUnsuspend = function()
+            {
+                this.onItemPress(1, 0); // ALL
+                delete this.onUnsuspend;
+            };
+        }
+    }
+    
+    
+  /* PRIVATE FUNCTIONS */
+
+    public function onItemCardSubMenuAction(event: Object)
+    {
+        if (event.opening == true) {
+            this.inventoryLists.itemList.disableSelection = true;
+            this.inventoryLists.itemList.disableInput = true;
+            this.inventoryLists.categoryList.disableSelection = true;
+            this.inventoryLists.categoryList.disableInput = true;
+        } else if (event.opening == false) {
+            this.inventoryLists.itemList.disableSelection = false;
+            this.inventoryLists.itemList.disableInput = false;
+            this.inventoryLists.categoryList.disableSelection = false;
+            this.inventoryLists.categoryList.disableInput = false;
+        }
+    }
+    
+    private function onConfigLoad(event: Object)
+    {
+        this.setConfig(event.config);
+
+        this.inventoryLists.showPanel(this._bPlayBladeSound);
+    }
+
+    private function onMouseWheel(delta)
+    {
+        if(this.mouseRotationRect != undefined && this.mouseRotationRect.hitTest(_root._xmouse, _root._ymouse, true))
+        {
+            if(this.shouldProcessItemsListInput(false) || (!this.bFadedIn && delta == -1))
+            {
+                gfx.io.GameDelegate.call("ZoomItemModel", [delta]);
             }
-         }
-         if(this._bItemCardPositioned)
-         {
-            gfx.io.GameDelegate.call("UpdateItem3D",[true]);
-         }
-         gfx.io.GameDelegate.call("RequestItemCardInfo",[],this,"UpdateItemCardInfo");
-      }
-      else
-      {
-         if(!this.bFadedIn)
-         {
-            this.resetMenu();
-         }
-         if(this._bItemCardFadedIn)
-         {
-            this._bItemCardFadedIn = false;
-            this.onHideItemsList();
-         }
-      }
-   }
-   function onShowItemsList(event)
-   {
-      this.onItemHighlightChange(event);
-   }
-   function onHideItemsList(event)
-   {
-      gfx.io.GameDelegate.call("UpdateItem3D",[false]);
-      this.itemCard.FadeOutCard();
-   }
-   function onItemSelect(event)
-   {
-      if(event.entry.enabled)
-      {
-         if(this._quantityMinCount < 1 || event.entry.count < this._quantityMinCount)
-         {
-            this.onQuantityMenuSelect({amount:1});
-         }
-         else
-         {
-            this.itemCard.ShowQuantityMenu(event.entry.count);
-         }
-      }
-      else
-      {
-         gfx.io.GameDelegate.call("DisabledItemSelect",[]);
-      }
-   }
-   function onQuantityMenuSelect(event)
-   {
-      gfx.io.GameDelegate.call("ItemSelect",[event.amount]);
-   }
-   function onMouseRotationStart()
-   {
-      gfx.io.GameDelegate.call("StartMouseRotation",[]);
-      this.inventoryLists.categoryList.disableSelection = true;
-      this.inventoryLists.itemList.disableSelection = true;
-   }
-   function onMouseRotationStop()
-   {
-      gfx.io.GameDelegate.call("StopMouseRotation",[]);
-      this.inventoryLists.categoryList.disableSelection = false;
-      this.inventoryLists.itemList.disableSelection = false;
-   }
-   function onMouseRotationFastClick()
-   {
-      if(this.shouldProcessItemsListInput(false))
-      {
-         this.onItemSelect({entry:this.inventoryLists.itemList.selectedEntry,keyboardOrMouse:0});
-      }
-   }
-   function saveIndices()
-   {
-      var _loc2_ = new Array();
-      _loc2_.push(this.inventoryLists.categoryList.selectedIndex);
-      _loc2_.push(this.inventoryLists.itemList.selectedIndex);
-      _loc2_.push(this.inventoryLists.itemList.scrollPosition);
-      _loc2_.push(this.inventoryLists.itemList.layout.activeColumnIndex);
-      _loc2_.push(this.inventoryLists.itemList.layout.activeColumnState);
-      gfx.io.GameDelegate.call("SaveIndices",[_loc2_]);
-   }
-   function updateDynamicListHeight()
-   {
-      var listPoint = {
-         x: this.inventoryLists.itemList._x, 
-         y: this.inventoryLists.itemList._y
-      };
-      this._parent.globalToLocal(listPoint);
-      this.inventoryLists.panelContainer.localToGlobal(listPoint);
+        }
+    }
 
-      var tab = this.inventoryLists.panelContainer.tabBar;
-      var paddingItemList = 0;
-      var minHeightItemList = 100;
-      var heightItemList = this.bottomBar._y - listPoint.y - paddingItemList;
+    private function onExitMenuRectClick()
+    {
+        gfx.io.GameDelegate.call("CloseMenu", []);
+    }
 
-      if (heightItemList < minHeightItemList)
-      {
-         heightItemList = minHeightItemList;
-      }
-      if (tab)
-      {
-         heightItemList -= tab._height;
-      }
-      this.inventoryLists.itemList.listHeight = heightItemList;
-      this.inventoryLists.itemList.requestUpdate();
-   }
+    private function onCategoryChange(event: Object)
+    {
+    }
+    
+    private function onItemHighlightChange(event: Object)
+    {		
+        if (event.index != -1) {
+            if (!this._bItemCardFadedIn) {
+                this._bItemCardFadedIn = true;
+                
+                if (this._bItemCardPositioned)
+                    this.itemCard.FadeInCard();
+            }
+            
+            if (this._bItemCardPositioned)
+                gfx.io.GameDelegate.call("UpdateItem3D", [true]);
+                
+            gfx.io.GameDelegate.call("RequestItemCardInfo", [], this, "UpdateItemCardInfo");
+            
+        } else {
+            if (!this.bFadedIn)
+                this.resetMenu();
+            
+            if (this._bItemCardFadedIn) {
+                this._bItemCardFadedIn = false;
+                this.onHideItemsList();
+            }
+        }
+    }
 
-   function positionFixedElements()
-   {
-      this.inventoryLists.Lock("TL");
-      this.inventoryLists._x -= 20;
-      this.inventoryLists._y -= Stage.safeRect.y;
-      
-      var leftOffset = Stage.visibleRect.x + Stage.safeRect.x;
-      var rightOffset = Stage.visibleRect.x - Stage.safeRect.x + Stage.visibleRect.width;
-      var marginBottomBar = 17;
+    private function onShowItemsList(event: Object)
+    {
+        this.onItemHighlightChange(event);
+    }
 
-      this.bottomBar.Lock("B");
-      this.bottomBar._y += Stage.safeRect.y - this.bottomBar._height + marginBottomBar;
-      this.bottomBar.positionElements(leftOffset, rightOffset);
-      
-      MovieClip(this.exitMenuRect).Lock("TL");
-      this.exitMenuRect._x -= Stage.safeRect.x;
-      this.exitMenuRect._y -= Stage.safeRect.y;
+    private function onHideItemsList(event: Object)
+    {
+        gfx.io.GameDelegate.call("UpdateItem3D", [false]);
+        this.itemCard.FadeOutCard();
+    }
 
-      this.updateDynamicListHeight();
-   }
-   function positionFloatingElements()
-   {
-      var _loc8_ = Stage.visibleRect.x + Stage.safeRect.x;
-      var _loc6_ = Stage.visibleRect.x + Stage.visibleRect.width - Stage.safeRect.x;
-      var _loc7_ = this.inventoryLists.getContentBounds();
-      var _loc5_ = this.inventoryLists._x + _loc7_[0] + _loc7_[2] + 25;
-      var _loc2_ = this.itemCard._parent;
-      var _loc3_ = this._config.ItemInfo.itemcard;
-      var _loc9_ = this._config.ItemInfo.itemicon;
-      var _loc4_ = (_loc6_ - _loc5_) / _loc2_._width;
-      if(_loc4_ < 1)
-      {
-         _loc2_._width *= _loc4_;
-         _loc2_._height *= _loc4_;
-         _loc9_.scale *= _loc4_;
-      }
-      if(_loc3_.align == "left")
-      {
-         _loc2_._x = _loc5_ + _loc8_ + _loc3_.xOffset;
-      }
-      else if(_loc3_.align == "right")
-      {
-         _loc2_._x = _loc6_ - _loc2_._width + _loc3_.xOffset;
-      }
-      else
-      {
-         _loc2_._x = _loc5_ + _loc3_.xOffset + (Stage.visibleRect.x + Stage.visibleRect.width - _loc5_ - _loc2_._width) / 2;
-      }
-      _loc2_._y += _loc3_.yOffset;
-      if(this.mouseRotationRect != undefined)
-      {
-         MovieClip(this.mouseRotationRect).Lock("T");
-         this.mouseRotationRect._x = this.itemCard._parent._x;
-         this.mouseRotationRect._width = _loc2_._width;
-         this.mouseRotationRect._height = 0.55 * Stage.visibleRect.height;
-      }
-      this._bItemCardPositioned = true;
-      if(this._bItemCardFadedIn)
-      {
-         gfx.io.GameDelegate.call("UpdateItem3D",[true]);
-         this.itemCard.FadeInCard();
-      }
-   }
-   function shouldProcessItemsListInput(abCheckIfOverRect)
+    private function onItemSelect(event: Object)
+    {
+        if (event.entry.enabled) {
+            if (this._quantityMinCount < 1 || (event.entry.count < this._quantityMinCount))
+                this.onQuantityMenuSelect({amount:1});
+            else
+                this.itemCard.ShowQuantityMenu(event.entry.count);
+        } else {
+            gfx.io.GameDelegate.call("DisabledItemSelect", []);
+        }
+
+
+    }
+
+    private function onQuantityMenuSelect(event: Object)
+    {
+        gfx.io.GameDelegate.call("ItemSelect", [event.amount]);
+    }
+
+    private function onMouseRotationStart()
+    {
+        gfx.io.GameDelegate.call("StartMouseRotation", []);
+        this.inventoryLists.categoryList.disableSelection = true;
+        this.inventoryLists.itemList.disableSelection = true;
+    }
+
+    private function onMouseRotationStop()
+    {
+        gfx.io.GameDelegate.call("StopMouseRotation", []);
+        this.inventoryLists.categoryList.disableSelection = false;
+        this.inventoryLists.itemList.disableSelection = false;
+    }
+
+    private function onMouseRotationFastClick()
+    {
+        if (this.shouldProcessItemsListInput(false))
+            this.onItemSelect({entry: this.inventoryLists.itemList.selectedEntry, keyboardOrMouse: 0});
+    }
+
+    private function saveIndices()
+    {
+        var a = new Array();
+        
+        // Save selected category, selected item and relative scroll position
+        a.push(this.inventoryLists.categoryList.selectedIndex);
+        a.push(this.inventoryLists.itemList.selectedIndex);
+        a.push(this.inventoryLists.itemList.scrollPosition);
+        a.push(this.inventoryLists.itemList.layout.activeColumnIndex);
+        a.push(this.inventoryLists.itemList.layout.activeColumnState);
+        
+        gfx.io.GameDelegate.call("SaveIndices", [a]);
+    }
+
+    function updateDynamicListHeight()
+    {
+        var listPoint = {
+            x: this.inventoryLists.itemList._x, 
+            y: this.inventoryLists.itemList._y
+        };
+        this._parent.globalToLocal(listPoint);
+        this.inventoryLists.panelContainer.localToGlobal(listPoint);
+
+        var tab = this.inventoryLists.panelContainer.tabBar;
+        var paddingItemList = 0;
+        var minHeightItemList = 100;
+        var heightItemList = this.bottomBar._y - listPoint.y - paddingItemList;
+
+        if (heightItemList < minHeightItemList)
+        {
+            heightItemList = minHeightItemList;
+        }
+        if (tab)
+        {
+            heightItemList -= tab._height;
+        }
+        this.inventoryLists.itemList.listHeight = heightItemList;
+        this.inventoryLists.itemList.requestUpdate();
+    }
+    
+    private function positionFixedElements()
+    {
+        this.inventoryLists.Lock("TL");
+        this.inventoryLists._x -= 20;
+        this.inventoryLists._y -= Stage.safeRect.y;
+        
+        var leftEdge = Stage.visibleRect.x + Stage.safeRect.x;
+        var rightEdge = Stage.visibleRect.x - Stage.safeRect.x + Stage.visibleRect.width;
+        var marginBottomBar = 17;
+        
+        this.bottomBar.Lock("B");
+        this.bottomBar._y += Stage.safeRect.y - this.bottomBar._height + marginBottomBar;
+        this.bottomBar.positionElements(leftEdge, rightEdge);
+        
+        MovieClip(this.exitMenuRect).Lock("TL");
+        this.exitMenuRect._x -= Stage.safeRect.x;
+        this.exitMenuRect._y -= Stage.safeRect.y;
+    }
+    
+    private function positionFloatingElements()
+    {
+        var leftEdge = Stage.visibleRect.x + Stage.safeRect.x;
+        var rightEdge = Stage.visibleRect.x + Stage.visibleRect.width - Stage.safeRect.x;
+        
+        var a = this.inventoryLists.getContentBounds();
+        // 25 is hardcoded cause thats the final offset after the animation of the panel container is done
+        var panelEdge = this.inventoryLists._x + a[0] + a[2] + 25;
+
+        var itemCardContainer = this.itemCard._parent;
+        var itemcardPosition = this._config.ItemInfo.itemcard;
+        var itemiconPosition = this._config.ItemInfo.itemicon;
+        
+        var scaleMult = (rightEdge - panelEdge) / itemCardContainer._width;
+        
+        // Scale down if necessary
+        if (scaleMult < 1.0) {
+            itemCardContainer._width *= scaleMult;
+            itemCardContainer._height *= scaleMult;
+            itemiconPosition.scale *= scaleMult;
+        }
+        
+        if (itemcardPosition.align == "left")
+            itemCardContainer._x = panelEdge + leftEdge + itemcardPosition.xOffset;
+        else if (itemcardPosition.align == "right")
+            itemCardContainer._x = rightEdge - itemCardContainer._width + itemcardPosition.xOffset;
+        else
+            itemCardContainer._x = panelEdge + itemcardPosition.xOffset + (Stage.visibleRect.x + Stage.visibleRect.width - panelEdge - itemCardContainer._width) / 2;
+
+        itemCardContainer._y = itemCardContainer._y + itemcardPosition.yOffset;
+
+        if (this.mouseRotationRect != undefined) {
+            MovieClip(this.mouseRotationRect).Lock("T");
+            this.mouseRotationRect._x = this.itemCard._parent._x;
+            this.mouseRotationRect._width = itemCardContainer._width;
+            this.mouseRotationRect._height = 0.55 * Stage.visibleRect.height;
+        }
+            
+        this._bItemCardPositioned = true;
+        
+        // Delayed fade in if positioned wasn't set
+        if (this._bItemCardFadedIn) {
+            gfx.io.GameDelegate.call("UpdateItem3D", [true]);
+            this.itemCard.FadeInCard();
+        }
+    }
+    
+    private function shouldProcessItemsListInput(abCheckIfOverRect)
    {
       var bCanProcess = this.bFadedIn == true && 
                         this.inventoryLists.currentState == InventoryLists.SHOW_PANEL && 
@@ -465,67 +527,90 @@ class ItemMenu extends MovieClip
       
       return bCanProcess;
    }
-   function confirmSelectedEntry()
-   {
-      if(this._platform != 0) return true;
-      
-      var list = this.inventoryLists.itemList;
-      if(list.selectedIndex != -1 && list.selectedEntry != undefined && list.selectedEntry.clipIndex != undefined) 
-      {
-         var clip = list.getClipByIndex(list.selectedEntry.clipIndex);
-         if (clip != undefined && clip._visible && clip.hitTest(_root._xmouse, _root._ymouse, true))
-            return true;
-      }
-      return false;
-   }
-   function resetMenu()
-   {
-      this.saveIndices();
-      gfx.io.GameDelegate.call("CloseMenu",[]);
-      skse.OpenMenu("Inventory Menu");
-   }
-   function checkBook(a_entryObject)
-   {
-      if(a_entryObject.type != skyui.defines.Inventory.ICT_BOOK || _global.skse == null)
-      {
-         return false;
-      }
-      a_entryObject.flags |= skyui.defines.Item.BOOKFLAG_READ;
-      a_entryObject.skyui_itemDataProcessed = false;
-      this.inventoryLists.itemList.requestInvalidate();
-      return true;
-   }
-   function getEquipButtonData(a_itemType, a_bAlwaysEquip)
-   {
-      var _loc1_ = {};
-      var _loc3_ = skyui.defines.Input.Activate;
-      var _loc2_ = skyui.defines.Input.Equip;
-      switch(a_itemType)
-      {
-         case skyui.defines.Inventory.ICT_ARMOR:
-            _loc1_.text = "$Equip";
-            _loc1_.controls = !a_bAlwaysEquip ? _loc3_ : _loc2_;
-            break;
-         case skyui.defines.Inventory.ICT_BOOK:
-            _loc1_.text = "$Read";
-            _loc1_.controls = !a_bAlwaysEquip ? _loc3_ : _loc2_;
-            break;
-         case skyui.defines.Inventory.ICT_FOOD:
-         case skyui.defines.Inventory.ICT_INGREDIENT:
-            _loc1_.text = "$Eat";
-            _loc1_.controls = !a_bAlwaysEquip ? _loc3_ : _loc2_;
-            break;
-         case skyui.defines.Inventory.ICT_WEAPON:
-            _loc1_.text = "$Equip";
-            _loc1_.controls = _loc2_;
-            break;
-         default:
-            _loc1_.text = "$Use";
-            _loc1_.controls = !a_bAlwaysEquip ? _loc3_ : _loc2_;
-      }
-      return _loc1_;
-   }
-   function updateBottomBar(a_bSelected)
-   {
-   }
+
+    // Added to prevent clicks on the scrollbar from equipping/using stuff
+    function confirmSelectedEntry()
+    {
+        // only confirm when using mouse
+        if(this._platform != 0) return true;
+        
+        var list = this.inventoryLists.itemList;
+        if(list.selectedIndex != -1 && list.selectedEntry != undefined && list.selectedEntry.clipIndex != undefined) 
+        {
+            var clip = list.getClipByIndex(list.selectedEntry.clipIndex);
+            if (clip != undefined && clip._visible && clip.hitTest(_root._xmouse, _root._ymouse, true))
+                return true;
+        }
+        return false;
+    }
+
+    /*
+        This method is only used for the InventoryMenu Favorites Category.
+        It prevents a lockup when unfavoriting the last item from favorites list by
+        resetting the menu.
+    */
+    private function resetMenu()
+    {
+        this.saveIndices();
+        gfx.io.GameDelegate.call("CloseMenu", []);
+        skse.OpenMenu("Inventory Menu");
+    }
+
+    /*
+        This method is only used in InventoryMenu and ContainerMenu.
+        It it allows determination of read books.
+        Item list isn't re-sent when you activate a book, unlike other items,
+        so the flags don't get updated.
+        If the item is a book, we apply the book read flag and invalidate locally
+    */
+    private function checkBook(a_entryObject: Object)
+    {
+
+        if (a_entryObject.type != skyui.defines.Inventory.ICT_BOOK || _global.skse == null)
+            return false;
+
+        a_entryObject.flags |= skyui.defines.Item.BOOKFLAG_READ;
+        a_entryObject.skyui_itemDataProcessed = false;
+        
+        this.inventoryLists.itemList.requestInvalidate();
+
+        return true;
+    }
+    
+    private function getEquipButtonData(a_itemType: Number, a_bAlwaysEquip: Boolean)
+    {
+        var btnData = {};
+        
+        var useControls = skyui.defines.Input.Activate;
+        var equipControls = skyui.defines.Input.Equip;
+        
+        switch (a_itemType) {
+            case skyui.defines.Inventory.ICT_ARMOR :
+                btnData.text = "$Equip";
+                btnData.controls = a_bAlwaysEquip ? equipControls : useControls;
+                break;
+            case skyui.defines.Inventory.ICT_BOOK :
+                btnData.text = "$Read";
+                btnData.controls = a_bAlwaysEquip ? equipControls : useControls;
+                break;
+            case skyui.defines.Inventory.ICT_FOOD :
+            case skyui.defines.Inventory.ICT_INGREDIENT :
+                btnData.text = "$Eat";
+                btnData.controls = a_bAlwaysEquip ? equipControls : useControls;
+                break;
+            case skyui.defines.Inventory.ICT_WEAPON :
+                btnData.text = "$Equip";
+                btnData.controls = equipControls;
+                break;
+
+            default :
+                btnData.text = "$Use";
+                btnData.controls = a_bAlwaysEquip ? equipControls : useControls;
+        }
+        
+        return btnData;
+    }
+    
+    // @abstract
+    private function updateBottomBar(a_bSelected: Boolean) {}
 }

@@ -1,47 +1,44 @@
 class MultiColumnScrollBar extends gfx.controls.ScrollBar
 {
-    var _position;
-    var _scrollDelta = 1;
-    var _trackScrollPageSize = 1;
-    function MultiColumnScrollBar()
+    private var _scrollDelta = 1;
+    private var _trackScrollPageSize = 1;
+
+    public function MultiColumnScrollBar()
     {
         super();
     }
-    function get trackScrollPageSize()
-    {
-        return this._trackScrollPageSize;
-    }
-    function set trackScrollPageSize(a_val)
+
+    public function get trackScrollPageSize() { return this._trackScrollPageSize; }
+    public function set trackScrollPageSize(a_val: Number)
     {
         this._trackScrollPageSize = Math.ceil(a_val / this._scrollDelta) * this._scrollDelta;
     }
-    function get scrollDelta()
-    {
-        return this._scrollDelta;
-    }
-    function set scrollDelta(a_val)
+
+    public function get scrollDelta() { return this._scrollDelta; }
+    public function set scrollDelta(a_val: Number)
     {
         this._scrollDelta = a_val;
         this._trackScrollPageSize = Math.ceil(this._trackScrollPageSize / a_val) * a_val;
     }
-    function get position()
+
+    public function get position() { return this._position; }
+    public function set position(a_val: Number)
     {
-        return this._position;
-    }
-    function set position(a_val)
-    {
-        a_val -= a_val % this._scrollDelta;
+        a_val -= (a_val % this._scrollDelta);
         super.position = a_val;
     }
-    function scrollWheel(a_delta)
+
+    private function scrollWheel(a_delta: Number)
     {
-        this.position -= a_delta * this._trackScrollPageSize;
+        this.position -= (a_delta * this._trackScrollPageSize);
     }
-    function scrollUp()
+
+    private function scrollUp()
     {
         this.position -= this._scrollDelta;
     }
-    function scrollDown()
+    
+    private function scrollDown()
     {
         this.position += this._scrollDelta;
     }
