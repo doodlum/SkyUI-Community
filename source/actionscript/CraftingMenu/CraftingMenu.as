@@ -357,11 +357,13 @@ class CraftingMenu extends MovieClip
          _loc2_._height *= _loc4_;
          _loc5_ *= _loc4_;
       }
-      if(_loc3_.align == "left")
+      // The MCM value can come back from Papyrus as "Left"/"Right": compare case-insensitively.
+      var cardAlign = String(_loc3_.align).toLowerCase();
+      if(cardAlign == "left")
       {
          _loc2_._x = _loc6_ + _loc3_.xOffset;
       }
-      else if(_loc3_.align == "right")
+      else if(cardAlign == "right")
       {
          _loc2_._x = _loc7_ - _loc5_ + _loc3_.xOffset;
       }

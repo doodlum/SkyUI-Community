@@ -56,7 +56,8 @@ class skyui.util.ItemCardLayout
         var yo = Number(a_yOffset);
         return {
             entryWidth: (e > 0) ? e : skyui.util.ItemCardLayout.DEFAULT_ENTRY_WIDTH,
-            align: String(a_align),
+            // Papyrus may hand the MCM value back with different case ("Right"): compare case-insensitively.
+            align: String(a_align).toLowerCase(),
             xOffset: isNaN(xo) ? 0 : xo,
             yOffset: isNaN(yo) ? 0 : yo
         };
