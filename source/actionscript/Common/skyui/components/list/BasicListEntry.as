@@ -21,38 +21,48 @@ class skyui.components.list.BasicListEntry extends MovieClip
 
   /* PUBLIC FUNCTIONS */
 
+    // Walk up the display tree to find the list -- entries may live in a sub-clip
+    // (entriesContainer), so this._parent isn't always the list itself.
+    private function findOwningList()
+    {
+        var p = this._parent;
+        while (p != undefined && p.onItemPress == undefined)
+            p = p._parent;
+        return p;
+    }
+
     // @override MovieClip
     public function onRollOver()
     {
-        var list = this._parent;
-        
+        var list = this.findOwningList();
+
         if (this.itemIndex != undefined && (this.isEnabled || list.canSelectDisabled))
             list.onItemRollOver(this.itemIndex);
     }
-        
+
     // @override MovieClip
     public function onRollOut()
     {
-        var list = this._parent;
-        
+        var list = this.findOwningList();
+
         if (this.itemIndex != undefined && (this.isEnabled || list.canSelectDisabled))
             list.onItemRollOut(this.itemIndex);
     }
-        
+
     // @override MovieClip
     public function onPress(a_mouseIndex: Number, a_keyboardOrMouse: Number)
     {
-        var list = this._parent;
-            
+        var list = this.findOwningList();
+
         if (this.itemIndex != undefined && (this.isEnabled || list.canSelectDisabled))
             list.onItemPress(this.itemIndex, a_keyboardOrMouse);
     }
-        
+
     // @override MovieClip
     public function onPressAux(a_mouseIndex: Number, a_keyboardOrMouse: Number, a_buttonIndex: Number)
     {
-        var list = this._parent;
-            
+        var list = this.findOwningList();
+
         if (this.itemIndex != undefined && (this.isEnabled || list.canSelectDisabled))
             list.onItemPressAux(this.itemIndex, a_keyboardOrMouse, a_buttonIndex);
     }

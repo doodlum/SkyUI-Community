@@ -232,7 +232,10 @@ Add_SWF(craftingmenu
     }
     Common/skyui/components/list {
         BasicListEntry.as
+        TabularList.as
         TabularListEntry.as
+        EntryClipManager.as
+        ScrollTweener.as
         ScrollingList.as
     }
     CraftingMenu {
@@ -715,7 +718,10 @@ Add_SWF(skyui_inventorylists
     }
     Common/skyui/components/list {
         BasicListEntry.as
+        TabularList.as
         TabularListEntry.as
+        EntryClipManager.as
+        ScrollTweener.as
         ScrollingList.as
     }
     ItemMenus {

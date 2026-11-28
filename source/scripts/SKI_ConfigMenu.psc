@@ -3,7 +3,7 @@ scriptname SKI_ConfigMenu extends SKI_ConfigBase
 ; SCRIPT VERSION ----------------------------------------------------------------------------------
 
 int function GetVersion()
-	return 9
+	return 10
 endFunction
 
 
@@ -115,6 +115,13 @@ string[]	_favGroupNames
 
 ; State
 int			_favCurGroupIdx				= 0
+
+
+; -- Version 10 --
+
+; State
+bool		_smoothScrollEnabled		= false
+int			_smoothScrollDuration		= 150
 
 
 ; PROPERTIES --------------------------------------------------------------------------------------
@@ -324,6 +331,14 @@ event OnVersionUpdate(int a_version)
 		_categoryIconThemeValues[3] = "skyui\\icons_category_straight.swf"
 	endIf
 
+	if (a_version >= 10 && CurrentVersion < 10)
+		Debug.Trace(self + ": Updating to script version 10")
+
+		; Field initializers don't fire on save-game upgrade; set non-zero defaults explicitly.
+		_smoothScrollEnabled = false
+		_smoothScrollDuration = 150
+	endIf
+
 
 endEvent
 
@@ -350,6 +365,13 @@ event OnPageReset(string a_page)
 		AddSliderOptionST("ITEMLIST_QUANTITY_MIN_COUNT", "$Quantity Menu Min. Count", _itemlistQuantityMinCount)
 		AddMenuOptionST("ITEMLIST_CATEGORY_ICON_THEME", "$Category Icon Theme", _categoryIconThemeShortNames[_categoryIconThemeIdx])
 		AddToggleOptionST("ITEMLIST_NO_ICON_COLORS", "$Disable Icon Colors", _itemlistNoIconColors)
+
+		int smoothScrollFlags = OPTION_FLAG_NONE
+		if (!_smoothScrollEnabled)
+			smoothScrollFlags = OPTION_FLAG_DISABLED
+		endIf
+		AddToggleOptionST("ITEMLIST_SMOOTH_SCROLL", "$Smooth Scrolling", _smoothScrollEnabled)
+		AddSliderOptionST("ITEMLIST_SMOOTH_SCROLL_DURATION", "$Scroll Duration", _smoothScrollDuration, "{0} ms", smoothScrollFlags)
 
 		AddEmptyOption()
 
@@ -887,6 +909,64 @@ state ITEMLIST_NO_ICON_COLORS ; TOGGLE
 
 	event OnHighlightST()
 		SetInfoText("$SKI_INFO1{$Off}")
+	endEvent
+
+endState
+
+; -------------------------------------------------------
+
+state ITEMLIST_SMOOTH_SCROLL ; TOGGLE
+
+	event OnSelectST()
+		_smoothScrollEnabled = !_smoothScrollEnabled
+		SetToggleOptionValueST(_smoothScrollEnabled)
+		SKI_SettingsManagerInstance.SetOverride("ListLayout$smoothScroll$enabled", _smoothScrollEnabled)
+
+		int flags = OPTION_FLAG_NONE
+		if (!_smoothScrollEnabled)
+			flags = OPTION_FLAG_DISABLED
+		endIf
+		SetOptionFlagsST(flags, true, "ITEMLIST_SMOOTH_SCROLL_DURATION")
+	endEvent
+
+	event OnDefaultST()
+		_smoothScrollEnabled = false
+		SetToggleOptionValueST(_smoothScrollEnabled)
+		SKI_SettingsManagerInstance.SetOverride("ListLayout$smoothScroll$enabled", _smoothScrollEnabled)
+		SetOptionFlagsST(OPTION_FLAG_DISABLED, true, "ITEMLIST_SMOOTH_SCROLL_DURATION")
+	endEvent
+
+	event OnHighlightST()
+		SetInfoText("$SKI_INFO1{$On}")
+	endEvent
+
+endState
+
+; -------------------------------------------------------
+
+state ITEMLIST_SMOOTH_SCROLL_DURATION ; SLIDER
+
+	event OnSliderOpenST()
+		SetSliderDialogStartValue(_smoothScrollDuration)
+		SetSliderDialogDefaultValue(150)
+		SetSliderDialogRange(50, 500)
+		SetSliderDialogInterval(10)
+	endEvent
+
+	event OnSliderAcceptST(float a_value)
+		_smoothScrollDuration = a_value as int
+		SetSliderOptionValueST(_smoothScrollDuration, "{0} ms")
+		SKI_SettingsManagerInstance.SetOverride("ListLayout$smoothScroll$durationMs", _smoothScrollDuration)
+	endEvent
+
+	event OnDefaultST()
+		_smoothScrollDuration = 150
+		SetSliderOptionValueST(_smoothScrollDuration, "{0} ms")
+		SKI_SettingsManagerInstance.SetOverride("ListLayout$smoothScroll$durationMs", _smoothScrollDuration)
+	endEvent
+
+	event OnHighlightST()
+		SetInfoText("$SKI_INFO1{150}")
 	endEvent
 
 endState
