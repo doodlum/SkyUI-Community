@@ -67,6 +67,12 @@ class InventoryMenu extends ItemMenu
             layout.changeFilterFlag(this.inventoryLists.categoryList.selectedEntry.flag);
     }
 
+    // @override ItemMenu: the shared 3D item position follows the inventory's layout (as in SkyUI 5.x).
+    private function ownsItem3DPosition()
+    {
+        return true;
+    }
+
     // @GFx
     public function handleInput(details: InputDetails, pathToFocus: Array)
     {

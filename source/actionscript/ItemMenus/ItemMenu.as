@@ -114,6 +114,12 @@ class ItemMenu extends MovieClip
     {
         this._config = a_config;
 
+        // Widen the list before placing the item card: positionFloatingElements measures the list background (#173).
+        var listLayout = a_config["ListLayout"];
+        var entryWidth = listLayout.defaults.entryWidth;
+        if (entryWidth != undefined && entryWidth > 0)
+            this.inventoryLists.applyDynamicWidth(entryWidth);
+
         this.positionFloatingElements();
         
         var itemListState = this.inventoryLists.itemList.listState;
@@ -149,11 +155,6 @@ class ItemMenu extends MovieClip
         
         this._searchKey = input.controls.pc.search;
         this._searchControls = {keyCode: this._searchKey};
-        
-        var listLayout = a_config["ListLayout"];
-        var entryWidth = listLayout.defaults.entryWidth;
-        if (entryWidth != undefined && entryWidth > 0)
-            this.inventoryLists.applyDynamicWidth(entryWidth);
 
         this.updateBottomBar(false);
     }
@@ -471,9 +472,9 @@ class ItemMenu extends MovieClip
     
     private function positionFloatingElements()
     {
-        var leftEdge = Stage.visibleRect.x + Stage.safeRect.x;
-        var rightEdge = Stage.visibleRect.x + Stage.visibleRect.width - Stage.safeRect.x;
-        
+        var vr = Stage.visibleRect;
+        var safe = Stage.safeRect.x;
+
         var a = this.inventoryLists.getContentBounds();
         // 25 is hardcoded cause thats the final offset after the animation of the panel container is done
         var panelEdge = this.inventoryLists._x + a[0] + a[2] + 25;
@@ -481,34 +482,64 @@ class ItemMenu extends MovieClip
         var itemCardContainer = this.itemCard._parent;
         var itemcardPosition = this._config.ItemInfo.itemcard;
         var itemiconPosition = this._config.ItemInfo.itemicon;
-        
-        var scaleMult = (rightEdge - panelEdge) / itemCardContainer._width;
-        
-        // Scale down if necessary
-        if (scaleMult < 1.0) {
-            itemCardContainer._width *= scaleMult;
-            itemCardContainer._height *= scaleMult;
-            itemiconPosition.scale *= scaleMult;
+
+        // A build without skyui.util.ItemCardLayout compiled in (its slot left empty) must still place the card.
+        if (skyui.util.ItemCardLayout.placeCard == undefined) {
+            this.positionItemCardLegacy(vr, safe, panelEdge, itemCardContainer, itemcardPosition, itemiconPosition);
+            return;
         }
-        
-        if (itemcardPosition.align == "left")
-            itemCardContainer._x = panelEdge + leftEdge + itemcardPosition.xOffset;
-        else if (itemcardPosition.align == "right")
-            itemCardContainer._x = rightEdge - itemCardContainer._width + itemcardPosition.xOffset;
-        else
-            itemCardContainer._x = panelEdge + itemcardPosition.xOffset + (Stage.visibleRect.x + Stage.visibleRect.width - panelEdge - itemCardContainer._width) / 2;
 
-        itemCardContainer._y = itemCardContainer._y + itemcardPosition.yOffset;
+        // Placement and the 3D item position come from skyui.util.ItemCardLayout, which the HUD also uses to set the 3D
+        // item position before a menu opens (the game reads it at open, before this code runs).
+        var settings = skyui.util.ItemCardLayout.cardSettings(this._config.ListLayout.defaults.entryWidth, itemcardPosition.align,
+                                                              itemcardPosition.xOffset, itemcardPosition.yOffset);
+        var bounds = itemCardContainer.getBounds(itemCardContainer);
+        var origin = {x: 0, y: 0};
+        itemCardContainer._parent.localToGlobal(origin);
+        var metrics = {
+            panel: panelEdge - vr.x - (settings.entryWidth - skyui.util.ItemCardLayout.DEFAULT_ENTRY_WIDTH),
+            w: itemCardContainer._width, xMin: bounds.xMin, xMax: bounds.xMax, yMin: bounds.yMin,
+            y: itemCardContainer._y, safe: safe, ox: origin.x, oy: origin.y
+        };
+        var card = skyui.util.ItemCardLayout.placeCard(settings, vr, safe, panelEdge, metrics);
 
+        // Scale down if necessary
+        if (card.scale < 1.0) {
+            itemCardContainer._width *= card.scale;
+            itemCardContainer._height *= card.scale;
+            itemiconPosition.scale *= card.scale;
+        }
+        itemCardContainer._x = card.x;
+        itemCardContainer._y = card.y;
+
+        // Centre the 3D item over the card, and report the metrics so the HUD's prediction matches this menu.
+        // The inventory, container, barter and gift menus share one 3D item position, and like SkyUI 5.x it follows the
+        // inventory's layout (the others place the card 29 px higher; same card width and centre). So only the inventory
+        // menu sets and reports it; the others keep the value the HUD and the inventory set.
+        if (this.ownsItem3DPosition()) {
+            var pos3D = skyui.util.ItemCardLayout.item3DPosition(card.centreX + metrics.ox, card.top + metrics.oy, vr);
+            skyui.util.ItemCardLayout.applyItem3D(pos3D);
+            // The applied position goes along too: SKI_WidgetManager re-applies it at game load in case the HUD widget
+            // loader is missing (replaced by another mod).
+            if (_global.skse != undefined)
+                skse.SendModEvent("SKIIM_itemCardMetrics", [metrics.panel, metrics.w, metrics.xMin, metrics.xMax, metrics.yMin,
+                                                            metrics.y, metrics.safe, metrics.ox, metrics.oy, pos3D.x, pos3D.z].join(","), 0);
+        }
+
+        this.finishFloatingElements(itemCardContainer);
+    }
+
+    private function finishFloatingElements(a_container)
+    {
         if (this.mouseRotationRect != undefined) {
             MovieClip(this.mouseRotationRect).Lock("T");
             this.mouseRotationRect._x = this.itemCard._parent._x;
-            this.mouseRotationRect._width = itemCardContainer._width;
+            this.mouseRotationRect._width = a_container._width;
             this.mouseRotationRect._height = 0.55 * Stage.visibleRect.height;
         }
-            
+
         this._bItemCardPositioned = true;
-        
+
         // Delayed fade in if positioned wasn't set
         if (this._bItemCardFadedIn) {
             gfx.io.GameDelegate.call("UpdateItem3D", [true]);
@@ -516,6 +547,33 @@ class ItemMenu extends MovieClip
         }
     }
     
+    // The item card placement before skyui.util.ItemCardLayout (only used if it is missing from the build).
+    private function positionItemCardLegacy(a_vr, a_safe, a_panelEdge, a_container, a_itemcardPosition, a_itemiconPosition)
+    {
+        var rightEdge = a_vr.x + a_vr.width - a_safe;
+        var scaleMult = (rightEdge - a_panelEdge) / a_container._width;
+        if (scaleMult < 1.0) {
+            a_container._width *= scaleMult;
+            a_container._height *= scaleMult;
+            a_itemiconPosition.scale *= scaleMult;
+        }
+        var align = String(a_itemcardPosition.align).toLowerCase();
+        if (align == "left")
+            a_container._x = a_panelEdge + a_safe + a_itemcardPosition.xOffset;
+        else if (align == "right")
+            a_container._x = rightEdge - a_container._width + a_itemcardPosition.xOffset;
+        else
+            a_container._x = a_panelEdge + a_itemcardPosition.xOffset + (a_vr.x + a_vr.width - a_panelEdge - a_container._width) / 2;
+        a_container._y = a_container._y + a_itemcardPosition.yOffset;
+        this.finishFloatingElements(a_container);
+    }
+
+    // Whether this menu's layout defines the shared 3D item position (the inventory menu overrides this).
+    private function ownsItem3DPosition()
+    {
+        return false;
+    }
+
     private function shouldProcessItemsListInput(abCheckIfOverRect)
    {
       var bCanProcess = this.bFadedIn == true && 

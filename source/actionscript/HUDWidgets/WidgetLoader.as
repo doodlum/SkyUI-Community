@@ -30,7 +30,257 @@ class WidgetLoader extends MovieClip
       _root.HUDMovieBaseInstance.WeightTranslated._alpha = 0;
       _root.HUDMovieBaseInstance.ValueTranslated._alpha = 0;
       _root.HUDMovieBaseInstance.QuestUpdateBaseInstance.LevelUpTextInstance._alpha = 0;
+      this.loadItemCardConfig();
    }
+
+   /* 3D ITEM POSITION
+    * The game reads the 3D item position when an item menu opens, before the menu's code runs, so it has to be right
+    * beforehand. The HUD is always loaded: it reads the item card settings from config.txt, gets the MCM overrides and
+    * the item menus' measured layout from Papyrus (SKI_SettingsManager / SKI_WidgetManager), and applies the position
+    * skyui.util.ItemCardLayout computes, the same code the item menus place the card with. */
+
+   // config.txt is read when the HUD loads and again whenever the inventory reports its layout (it re-reads config.txt
+   // on every open), so the HUD never computes from an older config.txt than the menus use.
+   var _itemCardFile;          // {values: name -> value, vars: section -> {var -> value}} from config.txt
+   var _itemCardOverrides;     // name -> value, from the MCM (SKI_SettingsManager)
+   var _itemCardVarOverrides;  // section -> {var -> value}, from the MCM
+   var _itemCardOverrideKeys;
+   var _itemCardMetrics;       // reported by the inventory menu
+   var _itemCardReadySent;
+
+
+   static var ITEMCARD_KEYS = {
+      ListLayout$defaults$entryWidth: "entryWidth",
+      ItemInfo$itemcard$align: "align",
+      ItemInfo$itemcard$xOffset: "xOffset",
+      ItemInfo$itemcard$yOffset: "yOffset"
+   };
+
+   function loadItemCardConfig()
+   {
+      var loader = this;
+      var lv = new LoadVars();
+      lv.onData = function(a_data)
+      {
+         loader.parseItemCardConfig(a_data);
+      };
+      lv.load("skyui/config.txt");
+   }
+
+   // Reads the keys the item card and 3D item depend on, and the section variables they may refer to, the way
+   // skyui.util.ConfigManager reads config.txt (inline "; comments" removed, "name = varName" resolved).
+   function parseItemCardConfig(a_data)
+   {
+      var file = {values:{},vars:{}};
+      if(a_data != undefined)
+      {
+         var lines = a_data.split("\r\n");
+         if(lines.length == 1)
+         {
+            lines = a_data.split("\n");
+         }
+         var section = undefined;
+         for(var i = 0; i < lines.length; i++)
+         {
+            var line = lines[i];
+            if(line.charAt(0) == ";")
+            {
+               continue;
+            }
+            if(line.charAt(0) == "[")
+            {
+               section = line.slice(1,line.lastIndexOf("]"));
+               continue;
+            }
+            if(line.length < 3 || section == undefined || line.indexOf("=") == -1)
+            {
+               continue;
+            }
+            var key = WidgetLoader.trimItemCardText(line.slice(0,line.indexOf("=")));
+            var value = WidgetLoader.parseItemCardValue(line.slice(line.indexOf("=") + 1));
+            var parts = key.split(".");
+            if(parts.length == 3 && parts[0] == "vars" && parts[2] == "value")
+            {
+               if(file.vars[section] == undefined)
+               {
+                  file.vars[section] = {};
+               }
+               file.vars[section][parts[1]] = value;
+               continue;
+            }
+            var name = WidgetLoader.ITEMCARD_KEYS[section + "$" + parts.join("$")];
+            if(name != undefined)
+            {
+               file.values[name] = value;
+            }
+         }
+      }
+      this._itemCardFile = file;
+      this.updateItem3D();
+      if(!this._itemCardReadySent)
+      {
+         // Ask Papyrus for the MCM overrides (SKI_SettingsManager) and the inventory's measured layout (SKI_WidgetManager);
+      // they call the setters below. Neither is replaced by MCM Helper, which only replaces SKI_ConfigMenu.
+         this._itemCardReadySent = true;
+         skse.SendModEvent("SKIIM_hudItemCardReady");
+      }
+   }
+
+   static function parseItemCardValue(a_str)
+   {
+      var raw = String(a_str);
+      // Like GlobalFunctions.clean: drop an inline comment.
+      if(raw.indexOf(";") > 0)
+      {
+         raw = raw.slice(0,raw.indexOf(";"));
+      }
+      var s = WidgetLoader.trimItemCardText(raw);
+      if(s == undefined || s == "")
+      {
+         return undefined;
+      }
+      if(!isNaN(s))
+      {
+         return Number(s);
+      }
+      if(s.charAt(0) == "'" && s.lastIndexOf("'") > 0)
+      {
+         return s.slice(1,s.lastIndexOf("'"));
+      }
+      return s;
+   }
+
+   static function trimItemCardText(a_str)
+   {
+      if(a_str == undefined)
+      {
+         return undefined;
+      }
+      var s = String(a_str);
+      var i = 0;
+      var j = s.length - 1;
+      while(i <= j && (s.charAt(i) == " " || s.charAt(i) == "\t"))
+      {
+         i++;
+      }
+      while(j >= i && (s.charAt(j) == " " || s.charAt(j) == "\t" || s.charAt(j) == "\r"))
+      {
+         j--;
+      }
+      return s.slice(i,j + 1);
+   }
+
+   // Same two-phase call as ConfigManager.setExternalOverrideKeys / Values.
+   function setItemCardOverrideKeys()
+   {
+      this._itemCardOverrideKeys = [];
+      for(var i = 0; i < arguments.length; i++)
+      {
+         this._itemCardOverrideKeys[i] = arguments[i];
+      }
+   }
+
+   function setItemCardOverrideValues()
+   {
+      this._itemCardOverrides = {};
+      this._itemCardVarOverrides = {};
+      for(var i = 0; i < arguments.length; i++)
+      {
+         var k = this._itemCardOverrideKeys[i];
+         if(k == undefined || k == "")
+         {
+            continue;
+         }
+         if(WidgetLoader.ITEMCARD_KEYS[k] != undefined)
+         {
+            this._itemCardOverrides[WidgetLoader.ITEMCARD_KEYS[k]] = WidgetLoader.parseItemCardValue(arguments[i]);
+            continue;
+         }
+         // "Section$vars$name$value": an overridden section variable
+         var p = k.split("$");
+         if(p.length == 4 && p[1] == "vars" && p[3] == "value")
+         {
+            if(this._itemCardVarOverrides[p[0]] == undefined)
+            {
+               this._itemCardVarOverrides[p[0]] = {};
+            }
+            this._itemCardVarOverrides[p[0]][p[2]] = WidgetLoader.parseItemCardValue(arguments[i]);
+         }
+      }
+      this.updateItem3D();
+   }
+
+   function setItemCardMetrics(a_panel, a_w, a_xMin, a_xMax, a_yMin, a_y, a_safe, a_ox, a_oy)
+   {
+      if(isNaN(a_panel) || !(a_w > 0))
+      {
+         return undefined;
+      }
+      this._itemCardMetrics = {panel:a_panel,w:a_w,xMin:a_xMin,xMax:a_xMax,yMin:a_yMin,y:a_y,safe:a_safe,ox:a_ox,oy:a_oy};
+      // The inventory just opened with whatever config.txt says now: re-read it before computing, so this never writes
+      // a position from an older config over the one the menu just set.
+      this.loadItemCardConfig();
+   }
+
+   function updateItem3D()
+   {
+      // Wait for the MCM overrides (SKI_SettingsManager sends them when this loader is ready), so the item card settings
+      // they change are known before the first write.
+      if(this._itemCardFile == undefined || this._itemCardOverrides == undefined)
+      {
+         return undefined;
+      }
+      var eff = {};
+      for(var k in WidgetLoader.ITEMCARD_KEYS)
+      {
+         var name = WidgetLoader.ITEMCARD_KEYS[k];
+         var v = (this._itemCardOverrides != undefined && this._itemCardOverrides[name] != undefined) ? this._itemCardOverrides[name] : this._itemCardFile.values[name];
+         eff[name] = this.resolveItemCardVar(k.slice(0,k.indexOf("$")),v);
+      }
+      var settings = skyui.util.ItemCardLayout.cardSettings(eff.entryWidth,eff.align,eff.xOffset,eff.yOffset);
+      var vr = skyui.util.ItemCardLayout.visibleRectForAspect(this.itemCardScreenAspect());
+      var m = this._itemCardMetrics != undefined ? this._itemCardMetrics : skyui.util.ItemCardLayout.DEFAULT_METRICS;
+
+      var pos = skyui.util.ItemCardLayout.predictItem3D(settings,vr,m);
+      // Write when the live values differ (not just when this computation changed), so a value something else set is
+      // replaced too.
+      if(!skyui.util.ItemCardLayout.isApplied(pos))
+      {
+         skyui.util.ItemCardLayout.applyItem3D(pos);
+      }
+   }
+
+   // The game's render size (iSize W/H, as SKI_ConfigMenu always used) gives the item menus' visible area; the HUD's
+   // own stage is the fallback, since a HUD replacer could set it up differently.
+   function itemCardScreenAspect()
+   {
+      var w = Number(skse.GetINISetting("iSize W:Display"));
+      var h = Number(skse.GetINISetting("iSize H:Display"));
+      if(w > 0 && h > 0)
+      {
+         return w / h;
+      }
+      return Stage.visibleRect.width / Stage.visibleRect.height;
+   }
+
+   // A value naming a section variable (vars.<name>.value) resolves to that variable, an MCM override of it first.
+   function resolveItemCardVar(a_section, a_value)
+   {
+      if(typeof a_value != "string")
+      {
+         return a_value;
+      }
+      if(this._itemCardVarOverrides != undefined && this._itemCardVarOverrides[a_section] != undefined && this._itemCardVarOverrides[a_section][a_value] != undefined)
+      {
+         return this._itemCardVarOverrides[a_section][a_value];
+      }
+      if(this._itemCardFile.vars[a_section] != undefined && this._itemCardFile.vars[a_section][a_value] != undefined)
+      {
+         return this._itemCardFile.vars[a_section][a_value];
+      }
+      return a_value;
+   }
+
    function onLoadInit(a_widgetHolder)
    {
       if(a_widgetHolder.widget == undefined)

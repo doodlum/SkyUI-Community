@@ -11,6 +11,10 @@ string property		BARTER_MENU		= "BarterMenu" autoReadonly
 string property		GIFT_MENU		= "GiftMenu" autoReadonly
 string property		CRAFTING_MENU	= "Crafting Menu" autoReadonly
 
+; The HUD widget loader keeps the 3D item centred on the item card between menu opens (it needs the overrides too).
+string property		HUD_MENU		= "HUD Menu" autoReadonly
+string property		HUD_ITEMCARD	= "_root.widgetLoaderContainer.widgetLoader" autoReadonly
+
 
 ; PRIVATE VARIABLES -------------------------------------------------------------------------------
 
@@ -46,6 +50,11 @@ event OnGameReload()
 	RegisterForMenu(GIFT_MENU)
 	RegisterForMenu(CRAFTING_MENU)
 	RegisterForModEvent("SKICO_setConfigOverride", "OnSetConfigOverride")
+	RegisterForModEvent("SKIIM_hudItemCardReady", "OnHudItemCardReady")
+endEvent
+
+event OnHudItemCardReady(string a_eventName, string a_strArg, float a_numArg, Form a_sender)
+	PushOverridesToHUD()
 endEvent
 
 
@@ -90,6 +99,7 @@ bool function SetOverride(string a_key, string a_value)
 	int index = _overrideKeys.Find(a_key)
 	if (index != -1)
 		_overrideValues[index] = a_value
+		PushOverridesToHUD()
 
 		return true
 
@@ -107,6 +117,7 @@ bool function SetOverride(string a_key, string a_value)
 		_overrideKeys[index] = a_key
 		_overrideValues[index] = a_value
 		_overrideCount += 1
+		PushOverridesToHUD()
 
 		return true
 	endIf
@@ -127,6 +138,7 @@ bool function ClearOverride(string a_key)
 	_overrideKeys[index] = ""
 	_overrideValues[index] = ""
 	_overrideCount -= 1
+	PushOverridesToHUD()
 
 	return true
 endFunction
@@ -142,4 +154,10 @@ int function NextFreeIndex()
 	endWhile
 
 	return -1
+endFunction
+
+; The HUD widget loader reads the item card overrides (align, offsets, entryWidth) to place the 3D item.
+function PushOverridesToHUD()
+	UI.InvokeStringA(HUD_MENU, HUD_ITEMCARD + ".setItemCardOverrideKeys", _overrideKeys)
+	UI.InvokeStringA(HUD_MENU, HUD_ITEMCARD + ".setItemCardOverrideValues", _overrideValues)
 endFunction
