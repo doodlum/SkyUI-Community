@@ -1,89 +1,100 @@
 class skyui.defines.Item
 {
-   static var OTHER = undefined;
-   static var POTION_HEALTH = 0;
-   static var POTION_HEALRATE = 1;
-   static var POTION_HEALRATEMULT = 2;
-   static var POTION_MAGICKA = 3;
-   static var POTION_MAGICKARATE = 4;
-   static var POTION_MAGICKARATEMULT = 5;
-   static var POTION_STAMINA = 6;
-   static var POTION_STAMINARATE = 7;
-   static var POTION_STAMINARATEMULT = 8;
-   static var POTION_FIRERESIST = 9;
-   static var POTION_ELECTRICRESIST = 10;
-   static var POTION_FROSTRESIST = 11;
-   static var POTION_POTION = 12;
-   static var POTION_DRINK = 13;
-   static var POTION_FOOD = 14;
-   static var POTION_POISON = 15;
-   static var POTION_AYLEIDCRYSTAL = 16;
-   static var MISC_GEM = 0;
-   static var MISC_DRAGONCLAW = 1;
-   static var MISC_ARTIFACT = 2;
-   static var MISC_LEATHER = 3;
-   static var MISC_LEATHERSTRIPS = 4;
-   static var MISC_HIDE = 5;
-   static var MISC_REMAINS = 6;
-   static var MISC_INGOT = 7;
-   static var MISC_TOOL = 8;
-   static var MISC_CHILDRENSCLOTHES = 9;
-   static var MISC_TOY = 10;
-   static var MISC_FIREWOOD = 11;
-   static var MISC_FASTENER = 12;
-   static var MISC_WEAPONRACK = 13;
-   static var MISC_SHELF = 14;
-   static var MISC_FURNITURE = 15;
-   static var MISC_EXTERIOR = 16;
-   static var MISC_CONTAINER = 17;
-   static var MISC_HOUSEPART = 18;
-   static var MISC_CLUTTER = 19;
-   static var MISC_LOCKPICK = 20;
-   static var MISC_GOLD = 21;
-   static var MISC_TROLLSKULL = 22;
-   static var MISC_NETCHLEATHER = 23;
-   static var MISC_AYLEIDCRYSTAL = 24;
-   static var MISC_HORSETACK = 25;
-   static var MISC_BROKENWEAPON = 26;
-   static var MISC_DWARVENSCRAP = 27;
-   static var MISC_INSTRUMENT = 28;
-   static var MISC_BUGJAR = 29;
-   static var MISC_SCROLLSPIDER = 30;
-   static var MISC_ORE = 31;
-   static var MISC_MAP = 32;
-   static var MISC_POTION = 33;
-   static var MISC_POISON = 34;
-   static var MISC_SCROLL = 35;
-   static var MISC_BOOK = 36;
-   static var MISC_RING = 37;
-   static var MISC_INGREDIENT = 38;
-   static var MISC_PETGEAR = 39;
-   static var BOOK_SPELLTOME = 0;
-   static var BOOK_NOTE = 1;
-   static var BOOK_RECIPE = 2;
-   static var BOOK_MAP = 3;
-   static var BOOK_ELDERSCROLL = 4;
-   static var SCROLL_SPIDER = 0;
-   static var BOOKFLAG_SPELL = 1;
-   static var BOOKFLAG_SKILL = 4;
-   static var BOOKFLAG_READ = 8;
-   static var BOOKTYPE_NOTE = 255;
-   static var ALCHFLAG_MANUALCALC = 1;
-   static var ALCHFLAG_FOOD = 2;
-   static var ALCHFLAG_MEDICINE = 65536;
-   static var ALCHFLAG_POISON = 131072;
-   static var SOULGEMSTATUS_EMPTY = 0;
-   static var SOULGEMSTATUS_PARTIAL = 1;
-   static var SOULGEMSTATUS_FULL = 2;
-   static var SOULGEM_NONE = 0;
-   static var SOULGEM_PETTY = 1;
-   static var SOULGEM_LESSER = 2;
-   static var SOULGEM_COMMON = 3;
-   static var SOULGEM_GREATER = 4;
-   static var SOULGEM_GRAND = 5;
-   static var SOULGEM_AZURA = 6;
-   static var SOULGEM_SOULTOMATO = 7;
-   function Item()
-   {
-   }
+    public static var OTHER: Number = undefined;
+
+    public static var POTION_HEALTH: Number          = 0;
+    public static var POTION_HEALRATE: Number        = 1;
+    public static var POTION_HEALRATEMULT: Number    = 2;
+    public static var POTION_MAGICKA: Number         = 3;
+    public static var POTION_MAGICKARATE: Number     = 4;
+    public static var POTION_MAGICKARATEMULT: Number = 5;
+    public static var POTION_STAMINA: Number         = 6;
+    public static var POTION_STAMINARATE: Number     = 7;
+    public static var POTION_STAMINARATEMULT: Number = 8;
+    public static var POTION_FIRERESIST: Number      = 9;
+    public static var POTION_ELECTRICRESIST: Number  = 10;
+    public static var POTION_FROSTRESIST: Number     = 11;
+    public static var POTION_POTION: Number          = 12;
+    public static var POTION_DRINK: Number           = 13;
+    public static var POTION_FOOD: Number            = 14;
+    public static var POTION_POISON: Number          = 15;
+    public static var POTION_AYLEIDCRYSTAL: Number   = 16;
+
+    public static var MISC_GEM: Number              = 0;
+    public static var MISC_DRAGONCLAW: Number       = 1;
+    public static var MISC_ARTIFACT: Number         = 2;
+    public static var MISC_LEATHER: Number          = 3;
+    public static var MISC_LEATHERSTRIPS: Number    = 4;
+    public static var MISC_HIDE: Number             = 5;
+    public static var MISC_REMAINS: Number          = 6;
+    public static var MISC_INGOT: Number            = 7;
+    public static var MISC_TOOL: Number             = 8;
+    public static var MISC_CHILDRENSCLOTHES: Number = 9;
+    public static var MISC_TOY: Number              = 10;
+    public static var MISC_FIREWOOD: Number         = 11;
+    public static var MISC_FASTENER: Number         = 12;
+    public static var MISC_WEAPONRACK: Number       = 13;
+    public static var MISC_SHELF: Number            = 14;
+    public static var MISC_FURNITURE: Number        = 15;
+    public static var MISC_EXTERIOR: Number         = 16;
+    public static var MISC_CONTAINER: Number        = 17;
+    public static var MISC_HOUSEPART: Number        = 18;
+    public static var MISC_CLUTTER: Number          = 19;
+    public static var MISC_LOCKPICK: Number         = 20;
+    public static var MISC_GOLD: Number             = 21;
+    public static var MISC_TROLLSKULL: Number       = 22;
+    public static var MISC_NETCHLEATHER: Number     = 23;
+    public static var MISC_AYLEIDCRYSTAL: Number    = 24;
+    public static var MISC_HORSETACK: Number        = 25;
+    public static var MISC_BROKENWEAPON: Number     = 26;
+    public static var MISC_DWARVENSCRAP: Number     = 27;
+    public static var MISC_INSTRUMENT: Number       = 28;
+    public static var MISC_BUGJAR: Number           = 29;
+    public static var MISC_SCROLLSPIDER: Number     = 30;
+    public static var MISC_ORE: Number              = 31;
+    public static var MISC_MAP: Number              = 32;
+    public static var MISC_POTION: Number           = 33;
+    public static var MISC_POISON: Number           = 34;
+    public static var MISC_SCROLL: Number           = 35;
+    public static var MISC_BOOK: Number             = 36;
+    public static var MISC_RING: Number             = 37;
+    public static var MISC_INGREDIENT: Number       = 38;
+    public static var MISC_PETGEAR: Number          = 39;
+
+    public static var BOOK_SPELLTOME: Number   = 0;
+    public static var BOOK_NOTE: Number        = 1;
+    public static var BOOK_RECIPE: Number      = 2;
+    public static var BOOK_MAP: Number         = 3;
+    public static var BOOK_ELDERSCROLL: Number = 4;
+
+    public static var SCROLL_SPIDER: Number = 0;
+
+    // SKSE
+    
+    // BOOK Flags
+    public static var BOOKFLAG_SPELL: Number = 0x01;
+    public static var BOOKFLAG_SKILL: Number = 0x04;
+    public static var BOOKFLAG_READ: Number  = 0x08;
+
+    // BOOK bookTypes
+    public static var BOOKTYPE_NOTE: Number = 0xFF;
+
+    // ALCH Flags
+    public static var ALCHFLAG_MANUALCALC: Number = 0x00001;
+    public static var ALCHFLAG_FOOD: Number       = 0x00002;
+    public static var ALCHFLAG_MEDICINE: Number   = 0x10000;
+    public static var ALCHFLAG_POISON: Number     = 0x20000;
+
+    public static var SOULGEMSTATUS_EMPTY: Number   = 0;
+    public static var SOULGEMSTATUS_PARTIAL: Number = 1;
+    public static var SOULGEMSTATUS_FULL: Number    = 2;
+
+    public static var SOULGEM_NONE: Number       = 0;
+    public static var SOULGEM_PETTY: Number      = 1;
+    public static var SOULGEM_LESSER: Number     = 2;
+    public static var SOULGEM_COMMON: Number     = 3;
+    public static var SOULGEM_GREATER: Number    = 4;
+    public static var SOULGEM_GRAND: Number      = 5;
+    public static var SOULGEM_AZURA: Number      = 6;
+    public static var SOULGEM_SOULTOMATO: Number = 7;
 }
