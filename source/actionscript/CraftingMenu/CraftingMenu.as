@@ -45,6 +45,7 @@ class CraftingMenu extends MovieClip
    var _lastScrollPos = -1;
    var _lastColIdx = -1;
    var _lastColState = -1;
+   var _pendingRestore;
 
    function CraftingMenu()
    {
@@ -620,26 +621,16 @@ class CraftingMenu extends MovieClip
             this.onItemPress(this.listState.restoredItem,0);
             delete this.onUnsuspend;
          };
-         _loc3_.listState.restoredScrollPosition = _loc2_[2];
-         _loc3_.listState.restoredSelectedIndex = _loc2_[1];
          _loc3_.listState.restoredActiveColumnIndex = _loc2_[3];
          _loc3_.listState.restoredActiveColumnState = _loc2_[4];
          _loc3_.onUnsuspend = function()
          {
-            // CraftingLists listens through itemList.onInvalidate (onItemListInvalidate): chain to it once for the
-            // restore and put it back afterwards, instead of replacing and deleting it
-            var prevInvalidate = this.onInvalidate;
-            this.onInvalidate = function()
-            {
-               if (prevInvalidate != undefined)
-                  prevInvalidate.apply(this, arguments);
-               this.scrollPosition = this.listState.restoredScrollPosition;
-               this.selectedIndex = this.listState.restoredSelectedIndex;
-               this.onInvalidate = prevInvalidate;
-            };
             this.layout.restoreColumnState(this.listState.restoredActiveColumnIndex,this.listState.restoredActiveColumnState);
             delete this.onUnsuspend;
          };
+         // The item and scroll position are applied by onEnterFrame once the restored category's items are listed
+         // (pressing the category clears both). itemList.onInvalidate belongs to CraftingLists and is left alone.
+         this._pendingRestore = {category: _loc2_[0], selectedIndex: _loc2_[1], scrollPosition: _loc2_[2], frames: 0};
       }
       else
       {
@@ -651,8 +642,39 @@ class CraftingMenu extends MovieClip
       }
    }
 
+   // Puts back the saved item and scroll position the way pressing Right does (CraftingLists keeps its own focus
+   // state). Saving waits until this is done, so the empty initial state never overwrites what was stored.
+   function applyPendingRestore()
+   {
+      var p = this._pendingRestore;
+      var list = this.ItemList;
+      var lists = this.CategoryList;
+      p.frames++;
+      if (p.frames > 120)
+      {
+         this._pendingRestore = undefined;
+         return;
+      }
+      if (lists.CategoriesList.selectedIndex != p.category || !(list.itemCount > 0))
+         return;
+      this._pendingRestore = undefined;
+      if (p.scrollPosition >= 0)
+         list.scrollPosition = p.scrollPosition;
+      if (p.selectedIndex >= 0 && p.selectedIndex < list.entryList.length)
+      {
+         lists._savedSelectionIndex = p.selectedIndex;
+         lists._bFocusItemList = true;
+         list.selectedIndex = p.selectedIndex;
+      }
+   }
+
    function onEnterFrame()
    {
+      if (this._pendingRestore != undefined)
+      {
+         this.applyPendingRestore();
+         return;
+      }
       this.saveIndices(false);
    }
 }
