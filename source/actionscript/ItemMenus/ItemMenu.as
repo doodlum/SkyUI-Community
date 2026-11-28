@@ -482,7 +482,14 @@ class ItemMenu extends MovieClip
         var itemCardContainer = this.itemCard._parent;
         var itemcardPosition = this._config.ItemInfo.itemcard;
         var itemiconPosition = this._config.ItemInfo.itemicon;
-        
+
+        // Where the card would be centred with the default layout (entryWidth 530, centre align, no offset). The 3D item
+        // position in SKI_ConfigMenu is calibrated to that spot; the difference is sent so the model follows the card.
+        var entryWidth = Number(this._config.ListLayout.defaults.entryWidth);
+        var refPanelEdge = panelEdge - ((entryWidth > 0) ? (entryWidth - 530) : 0);
+        var refCardWidth = Math.min(itemCardContainer._width, rightEdge - refPanelEdge);
+        var refCenterX = refPanelEdge + (Stage.visibleRect.x + Stage.visibleRect.width - refPanelEdge - refCardWidth) / 2 + refCardWidth / 2;
+
         var scaleMult = (rightEdge - panelEdge) / itemCardContainer._width;
         
         // Scale down if necessary
@@ -500,6 +507,17 @@ class ItemMenu extends MovieClip
             itemCardContainer._x = panelEdge + itemcardPosition.xOffset + (Stage.visibleRect.x + Stage.visibleRect.width - panelEdge - itemCardContainer._width) / 2;
 
         itemCardContainer._y = itemCardContainer._y + itemcardPosition.yOffset;
+
+        // Tell SKI_ConfigMenu where the card's centre is for each alignment with no offset, relative to the default layout
+        // (stage px, "left,right,center"). It adds the MCM align/offsets itself, so an MCM change moves the 3D item on the
+        // very next open; the engine only reads the 3D item position when a menu opens.
+        if (_global.skse != undefined) {
+            var w = itemCardContainer._width;
+            var centerLeft = panelEdge + leftEdge + w / 2 - refCenterX;
+            var centerRight = rightEdge - w / 2 - refCenterX;
+            var centerCenter = (panelEdge + Stage.visibleRect.x + Stage.visibleRect.width) / 2 - refCenterX;
+            skse.SendModEvent("SKIIM_itemCardOffset", centerLeft + "," + centerRight + "," + centerCenter, 0);
+        }
 
         if (this.mouseRotationRect != undefined) {
             MovieClip(this.mouseRotationRect).Lock("T");
