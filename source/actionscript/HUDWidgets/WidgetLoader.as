@@ -31,9 +31,6 @@ class WidgetLoader extends MovieClip
       _root.HUDMovieBaseInstance.ValueTranslated._alpha = 0;
       _root.HUDMovieBaseInstance.QuestUpdateBaseInstance.LevelUpTextInstance._alpha = 0;
       this.loadItemCardConfig();
-      // config.txt can change while the game runs (the item menus re-read it on every open): keep up with it, so the
-      // position applied here never lags behind what the next menu will use.
-      setInterval(this,"loadItemCardConfig",WidgetLoader.ITEMCARD_POLL_MS);
    }
 
    /* 3D ITEM POSITION
@@ -42,16 +39,14 @@ class WidgetLoader extends MovieClip
     * the item menus' measured layout from Papyrus (SKI_SettingsManager / SKI_ConfigMenu), and applies the position
     * skyui.util.ItemCardLayout computes, the same code the item menus place the card with. */
 
-   var _itemCardFile;          // {entryWidth, align, xOffset, yOffset} from config.txt (undefined until loaded)
-   var _itemCardOverrides;     // "Section$key" -> value string, from the MCM
+   // config.txt is read when the HUD loads and again whenever the inventory reports its layout (it re-reads config.txt
+   // on every open), so the HUD never computes from an older config.txt than the menus use.
+   var _itemCardFile;          // {values: name -> value, vars: section -> {var -> value}} from config.txt
+   var _itemCardOverrides;     // name -> value, from the MCM (SKI_SettingsManager)
+   var _itemCardVarOverrides;  // section -> {var -> value}, from the MCM
    var _itemCardOverrideKeys;
-   var _itemCardMetrics;       // reported by the item menus
+   var _itemCardMetrics;       // reported by the inventory menu
    var _itemCardReadySent;
-   var _itemCardRaw;           // config.txt text last parsed
-
-   // Short enough that nobody can edit config.txt, switch back to the game and open a menu in between; unchanged file
-   // text is not parsed again.
-   static var ITEMCARD_POLL_MS = 250;
 
    static var ITEMCARD_KEYS = {
       ListLayout$defaults$entryWidth: "entryWidth",
@@ -69,21 +64,16 @@ class WidgetLoader extends MovieClip
       var lv = new LoadVars();
       lv.onData = function(a_data)
       {
-         if(a_data != undefined && a_data == loader._itemCardRaw && loader._itemCardFile != undefined)
-         {
-            loader.updateItem3D();
-            return undefined;
-         }
-         loader._itemCardRaw = a_data;
          loader.parseItemCardConfig(a_data);
       };
       lv.load("skyui/config.txt");
    }
 
-   // Reads the four keys the item card depends on, the way skyui.util.ConfigManager reads config.txt.
+   // Reads the keys the item card and 3D item depend on, and the section variables they may refer to, the way
+   // skyui.util.ConfigManager reads config.txt (inline "; comments" removed, "name = varName" resolved).
    function parseItemCardConfig(a_data)
    {
-      var file = {};
+      var file = {values:{},vars:{}};
       if(a_data != undefined)
       {
          var lines = a_data.split("\r\n");
@@ -109,10 +99,21 @@ class WidgetLoader extends MovieClip
                continue;
             }
             var key = WidgetLoader.trimItemCardText(line.slice(0,line.indexOf("=")));
-            var name = WidgetLoader.ITEMCARD_KEYS[section + "$" + key.split(".").join("$")];
+            var value = WidgetLoader.parseItemCardValue(line.slice(line.indexOf("=") + 1));
+            var parts = key.split(".");
+            if(parts.length == 3 && parts[0] == "vars" && parts[2] == "value")
+            {
+               if(file.vars[section] == undefined)
+               {
+                  file.vars[section] = {};
+               }
+               file.vars[section][parts[1]] = value;
+               continue;
+            }
+            var name = WidgetLoader.ITEMCARD_KEYS[section + "$" + parts.join("$")];
             if(name != undefined)
             {
-               file[name] = WidgetLoader.parseItemCardValue(line.slice(line.indexOf("=") + 1));
+               file.values[name] = value;
             }
          }
       }
@@ -128,7 +129,13 @@ class WidgetLoader extends MovieClip
 
    static function parseItemCardValue(a_str)
    {
-      var s = WidgetLoader.trimItemCardText(a_str);
+      var raw = String(a_str);
+      // Like GlobalFunctions.clean: drop an inline comment.
+      if(raw.indexOf(";") > 0)
+      {
+         raw = raw.slice(0,raw.indexOf(";"));
+      }
+      var s = WidgetLoader.trimItemCardText(raw);
       if(s == undefined || s == "")
       {
          return undefined;
@@ -177,12 +184,28 @@ class WidgetLoader extends MovieClip
    function setItemCardOverrideValues()
    {
       this._itemCardOverrides = {};
+      this._itemCardVarOverrides = {};
       for(var i = 0; i < arguments.length; i++)
       {
          var k = this._itemCardOverrideKeys[i];
-         if(k != undefined && k != "" && WidgetLoader.ITEMCARD_KEYS[k] != undefined)
+         if(k == undefined || k == "")
+         {
+            continue;
+         }
+         if(WidgetLoader.ITEMCARD_KEYS[k] != undefined)
          {
             this._itemCardOverrides[WidgetLoader.ITEMCARD_KEYS[k]] = WidgetLoader.parseItemCardValue(arguments[i]);
+            continue;
+         }
+         // "Section$vars$name$value": an overridden section variable
+         var p = k.split("$");
+         if(p.length == 4 && p[1] == "vars" && p[3] == "value")
+         {
+            if(this._itemCardVarOverrides[p[0]] == undefined)
+            {
+               this._itemCardVarOverrides[p[0]] = {};
+            }
+            this._itemCardVarOverrides[p[0]][p[2]] = WidgetLoader.parseItemCardValue(arguments[i]);
          }
       }
       this.updateItem3D();
@@ -195,7 +218,7 @@ class WidgetLoader extends MovieClip
          return undefined;
       }
       this._itemCardMetrics = {panel:a_panel,w:a_w,xMin:a_xMin,xMax:a_xMax,yMin:a_yMin,y:a_y,safe:a_safe,ox:a_ox,oy:a_oy,cardX:(isNaN(a_cardX) ? 0 : a_cardX),cardY:(isNaN(a_cardY) ? -24 : a_cardY)};
-      // An item menu just opened with whatever config.txt says now: re-read it before computing, so this never writes
+      // The inventory just opened with whatever config.txt says now: re-read it before computing, so this never writes
       // a position from an older config over the one the menu just set.
       this.loadItemCardConfig();
    }
@@ -210,7 +233,8 @@ class WidgetLoader extends MovieClip
       for(var k in WidgetLoader.ITEMCARD_KEYS)
       {
          var name = WidgetLoader.ITEMCARD_KEYS[k];
-         eff[name] = (this._itemCardOverrides != undefined && this._itemCardOverrides[name] != undefined) ? this._itemCardOverrides[name] : this._itemCardFile[name];
+         var v = (this._itemCardOverrides != undefined && this._itemCardOverrides[name] != undefined) ? this._itemCardOverrides[name] : this._itemCardFile.values[name];
+         eff[name] = this.resolveItemCardVar(k.slice(0,k.indexOf("$")),v);
       }
       var settings = skyui.util.ItemCardLayout.cardSettings(eff.entryWidth,eff.align,eff.xOffset,eff.yOffset);
       var vr = skyui.util.ItemCardLayout.visibleRectForAspect(Stage.visibleRect.width / Stage.visibleRect.height);
@@ -222,13 +246,32 @@ class WidgetLoader extends MovieClip
          return undefined;
       }
       var pos = skyui.util.ItemCardLayout.withOffsets(skyui.util.ItemCardLayout.predictItem3D(settings,vr,m),item3D);
-      // Write when the live values differ (not just when this computation changed), so a value set by anything else,
-      // another mod or an older SkyUI script, is corrected within one poll.
+      // Write when the live values differ (not just when this computation changed), so a value something else set is
+      // replaced too.
       if(!skyui.util.ItemCardLayout.isApplied(pos))
       {
          skyui.util.ItemCardLayout.applyItem3D(pos);
       }
    }
+
+   // A value naming a section variable (vars.<name>.value) resolves to that variable, an MCM override of it first.
+   function resolveItemCardVar(a_section, a_value)
+   {
+      if(typeof a_value != "string")
+      {
+         return a_value;
+      }
+      if(this._itemCardVarOverrides != undefined && this._itemCardVarOverrides[a_section] != undefined && this._itemCardVarOverrides[a_section][a_value] != undefined)
+      {
+         return this._itemCardVarOverrides[a_section][a_value];
+      }
+      if(this._itemCardFile.vars[a_section] != undefined && this._itemCardFile.vars[a_section][a_value] != undefined)
+      {
+         return this._itemCardFile.vars[a_section][a_value];
+      }
+      return a_value;
+   }
+
    function onLoadInit(a_widgetHolder)
    {
       if(a_widgetHolder.widget == undefined)

@@ -507,18 +507,23 @@ class ItemMenu extends MovieClip
         itemCardContainer._y = card.y;
 
         // Centre the 3D item over the card, and report the metrics so the HUD's prediction matches this menu.
-        var item3D = this._config.ItemInfo.item3D;
-        var item3DSettings = skyui.util.ItemCardLayout.item3DSettings(item3D.xOffset, item3D.yOffset, item3D.disabled);
-        var pos3D = skyui.util.ItemCardLayout.withOffsets(
-            skyui.util.ItemCardLayout.item3DPosition(card.centreX + metrics.ox, card.top + metrics.oy, vr), item3DSettings);
-        if (!item3DSettings.disabled)
-            skyui.util.ItemCardLayout.applyItem3D(pos3D);
-        // The applied position goes along too: SKI_ConfigMenu re-applies it at game load in case the HUD widget loader
-        // is missing (replaced by another mod).
-        if (_global.skse != undefined)
-            skse.SendModEvent("SKIIM_itemCardMetrics", [metrics.panel, metrics.w, metrics.xMin, metrics.xMax, metrics.yMin,
-                                                        metrics.y, metrics.safe, metrics.ox, metrics.oy, pos3D.x, pos3D.z,
-                                                        this.itemCard._x, this.itemCard._y].join(","), 0);
+        // The inventory, container, barter and gift menus share one 3D item position, and like SkyUI 5.x it follows the
+        // inventory's layout (the others place the card 29 px higher; same card width and centre). So only the inventory
+        // menu sets and reports it; the others keep the value the HUD and the inventory set.
+        if (this.ownsItem3DPosition()) {
+            var item3D = this._config.ItemInfo.item3D;
+            var item3DSettings = skyui.util.ItemCardLayout.item3DSettings(item3D.xOffset, item3D.yOffset, item3D.disabled);
+            var pos3D = skyui.util.ItemCardLayout.withOffsets(
+                skyui.util.ItemCardLayout.item3DPosition(card.centreX + metrics.ox, card.top + metrics.oy, vr), item3DSettings);
+            if (!item3DSettings.disabled)
+                skyui.util.ItemCardLayout.applyItem3D(pos3D);
+            // The applied position goes along too: SKI_ConfigMenu re-applies it at game load in case the HUD widget
+            // loader is missing (replaced by another mod).
+            if (_global.skse != undefined)
+                skse.SendModEvent("SKIIM_itemCardMetrics", [metrics.panel, metrics.w, metrics.xMin, metrics.xMax, metrics.yMin,
+                                                            metrics.y, metrics.safe, metrics.ox, metrics.oy, pos3D.x, pos3D.z,
+                                                            this.itemCard._x, this.itemCard._y].join(","), 0);
+        }
 
         if (this.mouseRotationRect != undefined) {
             MovieClip(this.mouseRotationRect).Lock("T");
@@ -536,6 +541,12 @@ class ItemMenu extends MovieClip
         }
     }
     
+    // Whether this menu's layout defines the shared 3D item position (the inventory menu overrides this).
+    private function ownsItem3DPosition()
+    {
+        return false;
+    }
+
     private function shouldProcessItemsListInput(abCheckIfOverRect)
    {
       var bCanProcess = this.bFadedIn == true && 
