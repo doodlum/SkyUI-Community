@@ -24,6 +24,8 @@ int			_itemcardAlignIdx			= 2
 float		_itemcardXOffset			= 0.0
 float		_itemcardYOffset			= 0.0
 
+; No longer used: the 3D item is centred on the item card automatically (OnItemCardOffset), so the MCM 3D item
+; offset sliders were removed and values saved by older versions are ignored. Kept so old saves load cleanly.
 float		_3DItemXOffset				= 0.0
 float		_3DItemYOffset				= 0.0
 float		_3DItemScale				= 1.5
@@ -433,8 +435,6 @@ event OnPageReset(string a_page)
 		SetCursorFillMode(TOP_TO_BOTTOM)
 
 		AddHeaderOption("$3D Item")
-		AddSliderOptionST("XD_ITEM_XOFFSET", "$Horizontal Offset", _3DItemXOffset, "{0}", _3DItemFlags)
-		AddSliderOptionST("XD_ITEM_YOFFSET", "$Vertical Offset", _3DItemYOffset, "{0}", _3DItemFlags)
 		AddSliderOptionST("XD_ITEM_SCALE", "$Scale", _3DItemScale, "{1}", _3DItemFlags)
 		AddToggleOptionST("XD_ITEM_POSITIONING", "$Disable Positioning", _3DItemDisablePositioning)
 
@@ -1416,60 +1416,6 @@ endState
 
 ; -------------------------------------------------------
 
-state XD_ITEM_XOFFSET ; SLIDER
-
-	event OnSliderOpenST()
-		SetSliderDialogStartValue(_3DItemXOffset)
-		SetSliderDialogDefaultValue(0)
-		SetSliderDialogRange(-128, 128)
-		SetSliderDialogInterval(1)
-	endEvent
-
-	event OnSliderAcceptST(float a_value)
-		_3DItemXOffset = a_value
-		SetSliderOptionValueST(_3DItemXOffset)
-		Apply3DItemXOffset()
-	endEvent
-
-	event OnDefaultST()
-		_3DItemXOffset = 0.0
-		SetSliderOptionValueST(_3DItemXOffset)
-		Apply3DItemXOffset()
-	endEvent
-
-	event OnHighlightST()
-		SetInfoText("$SKI_INFO1{0}")
-	endEvent
-
-endState
-
-state XD_ITEM_YOFFSET ; SLIDER
-
-	event OnSliderOpenST()
-		SetSliderDialogStartValue(_3DItemYOffset)
-		SetSliderDialogDefaultValue(0)
-		SetSliderDialogRange(-128, 128)
-		SetSliderDialogInterval(1)
-	endEvent
-
-	event OnSliderAcceptST(float a_value)
-		_3DItemYOffset = a_value
-		SetSliderOptionValueST(_3DItemYOffset)
-		Apply3DItemYOffset()
-	endEvent
-
-	event OnDefaultST()
-		_3DItemYOffset = 0.0
-		SetSliderOptionValueST(_3DItemYOffset)
-		Apply3DItemYOffset()
-	endEvent
-
-	event OnHighlightST()
-		SetInfoText("$SKI_INFO1{0}")
-	endEvent
-
-endState
-
 state XD_ITEM_SCALE ; SLIDER
 
 	event OnSliderOpenST()
@@ -1509,8 +1455,6 @@ state XD_ITEM_POSITIONING ; TOGGLE
 			_3DItemFlags = OPTION_FLAG_NONE
 		endIf
 
-		SetOptionFlagsST(_3DItemFlags, true, "XD_ITEM_XOFFSET")
-		SetOptionFlagsST(_3DItemFlags, true, "XD_ITEM_YOFFSET")
 		SetOptionFlagsST(_3DItemFlags, true, "XD_ITEM_SCALE")
 		SetToggleOptionValueST(newVal)
 		Apply3DItemXOffset()
@@ -1521,8 +1465,6 @@ state XD_ITEM_POSITIONING ; TOGGLE
 	event OnDefaultST()
 		_3DItemDisablePositioning = false
 		_3DItemFlags = OPTION_FLAG_NONE
-		SetOptionFlagsST(_3DItemFlags, true, "XD_ITEM_XOFFSET")
-		SetOptionFlagsST(_3DItemFlags, true, "XD_ITEM_YOFFSET")
 		SetOptionFlagsST(_3DItemFlags, true, "XD_ITEM_SCALE")
 		SetToggleOptionValueST(false)
 		Apply3DItemXOffset()
@@ -1644,10 +1586,10 @@ function Apply3DItemXOffset()
 		Utility.SetINIFloat("fMagic3DItemPosXWide:Interface", _fMagic3DItemPosXWide)
 		Utility.SetINIFloat("fMagic3DItemPosX:Interface", _fMagic3DItemPosX)
 	else
-		Utility.SetINIFloat("fInventory3DItemPosXWide:Interface", (_itemXBaseW + _3DItemXOffset - _itemCardOffsetX / 8.0))
-		Utility.SetINIFloat("fInventory3DItemPosX:Interface", (_itemXBase + _3DItemXOffset - _itemCardOffsetX / 8.0))
-		Utility.SetINIFloat("fMagic3DItemPosXWide:Interface", (_itemXBaseW + _3DItemXOffset - _itemCardOffsetX / 8.0))
-		Utility.SetINIFloat("fMagic3DItemPosX:Interface", (_itemXBase + _3DItemXOffset - _itemCardOffsetX / 8.0))
+		Utility.SetINIFloat("fInventory3DItemPosXWide:Interface", (_itemXBaseW - _itemCardOffsetX / 8.0))
+		Utility.SetINIFloat("fInventory3DItemPosX:Interface", (_itemXBase - _itemCardOffsetX / 8.0))
+		Utility.SetINIFloat("fMagic3DItemPosXWide:Interface", (_itemXBaseW - _itemCardOffsetX / 8.0))
+		Utility.SetINIFloat("fMagic3DItemPosX:Interface", (_itemXBase - _itemCardOffsetX / 8.0))
 	endIf
 endFunction
 
@@ -1659,10 +1601,10 @@ function Apply3DItemYOffset()
 		Utility.SetINIFloat("fMagic3DItemPosZWide:Interface", _fMagic3DItemPosZWide)
 		Utility.SetINIFloat("fMagic3DItemPosZ:Interface", _fMagic3DItemPosZ)
 	else
-		Utility.SetINIFloat("fInventory3DItemPosZWide:Interface", (_itemYBaseW + _3DItemYOffset - _itemCardOffsetY / 8.0))
-		Utility.SetINIFloat("fInventory3DItemPosZ:Interface", (_itemYBase + _3DItemYOffset - _itemCardOffsetY / 8.0))
-		Utility.SetINIFloat("fMagic3DItemPosZWide:Interface", (_itemYBaseW + _3DItemYOffset - _itemCardOffsetY / 8.0))
-		Utility.SetINIFloat("fMagic3DItemPosZ:Interface", (_itemYBase + _3DItemYOffset - _itemCardOffsetY / 8.0))
+		Utility.SetINIFloat("fInventory3DItemPosZWide:Interface", (_itemYBaseW - _itemCardOffsetY / 8.0))
+		Utility.SetINIFloat("fInventory3DItemPosZ:Interface", (_itemYBase - _itemCardOffsetY / 8.0))
+		Utility.SetINIFloat("fMagic3DItemPosZWide:Interface", (_itemYBaseW - _itemCardOffsetY / 8.0))
+		Utility.SetINIFloat("fMagic3DItemPosZ:Interface", (_itemYBase - _itemCardOffsetY / 8.0))
 	endIf
 endFunction
 
