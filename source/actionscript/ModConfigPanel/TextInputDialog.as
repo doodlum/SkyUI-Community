@@ -1,76 +1,98 @@
 class TextInputDialog extends OptionDialog
 {
-   var initialText;
-   var platform;
-   var rightButtonPanel;
-   var textInput;
-   function TextInputDialog()
-   {
-      super();
-   }
-   function initButtons()
-   {
-      var _loc2_;
-      var _loc3_;
-      if(this.platform == 0)
-      {
-         _loc2_ = skyui.defines.Input.Enter;
-         _loc3_ = skyui.defines.Input.Tab;
-      }
-      else
-      {
-         _loc2_ = skyui.defines.Input.Accept;
-         _loc3_ = skyui.defines.Input.Cancel;
-      }
-      this.rightButtonPanel.clearButtons();
-      var _loc5_ = this.rightButtonPanel.addButton({text:"$Cancel",controls:_loc3_});
-      _loc5_.addEventListener("press",this,"onCancelPress");
-      var _loc4_ = this.rightButtonPanel.addButton({text:"$Accept",controls:_loc2_});
-      _loc4_.addEventListener("press",this,"onAcceptPress");
-      this.rightButtonPanel.updateButtons();
-   }
-   function initContent()
-   {
-      gfx.managers.FocusHandler.instance.setFocus(this.textInput.textField,0);
-      this.textInput.focused = true;
-      Selection.setFocus(this.textInput.textField);
-      this.textInput.maxChars = 30;
-      this.textInput.text = skyui.util.Translator.translateNested(this.initialText);
-      Selection.setSelection(0,99);
-      skse.AllowTextInput(true);
-   }
-   function handleInput(details, pathToFocus)
-   {
-      var _loc3_ = pathToFocus.shift();
-      if(_loc3_.handleInput(details,pathToFocus))
-      {
-         return true;
-      }
-      if(Shared.GlobalFunc.IsKeyPressed(details,false))
-      {
-         if(details.navEquivalent == gfx.ui.NavigationCode.TAB)
-         {
-            this.onCancelPress();
+  /* PRIVATE VARIABLES */
+
+    private var _acceptControls: Object;
+    private var _cancelControls: Object;
+
+
+  /* STAGE ELEMENTS */
+
+    public var textInput: MovieClip;
+
+
+  /* PUBLIC VARIABLES */
+
+    public var initialText: String;
+
+
+  /* INITIALIZATION */
+
+    public function TextInputDialog()
+    {
+        super();
+    }
+
+
+  /* PUBLIC FUNCTIONS */
+
+    // @override OptionDialog
+    public function initButtons()
+    {	
+        if (this.platform == 0) {
+            this._acceptControls = skyui.defines.Input.Enter;
+            this._cancelControls = skyui.defines.Input.Tab;
+        } else {
+            this._acceptControls = skyui.defines.Input.Accept;
+            this._cancelControls = skyui.defines.Input.Cancel;
+        }
+
+        this.rightButtonPanel.clearButtons();
+        var cancelButton = this.rightButtonPanel.addButton({text: "$Cancel", controls: this._cancelControls});
+        cancelButton.addEventListener("press", this, "onCancelPress");
+        var acceptButton = this.rightButtonPanel.addButton({text: "$Accept", controls: this._acceptControls});
+        acceptButton.addEventListener("press", this, "onAcceptPress");
+        this.rightButtonPanel.updateButtons();
+    }
+
+    // @override OptionDialog
+    public function initContent()
+    {
+        gfx.managers.FocusHandler.instance.setFocus(this.textInput.textField, 0);
+        this.textInput.focused = true;
+        Selection.setFocus(this.textInput.textField);
+        this.textInput.maxChars = 30;
+        this.textInput.text = skyui.util.Translator.translateNested(this.initialText);
+        Selection.setSelection(0, 99);
+        skse.AllowTextInput(true);
+    }
+
+    // @GFx
+    public function handleInput(details, pathToFocus)
+    {
+        var nextClip = pathToFocus.shift();
+        if (nextClip.handleInput(details, pathToFocus))
             return true;
-         }
-         if(details.navEquivalent == gfx.ui.NavigationCode.ENTER)
-         {
-            this.onAcceptPress();
-            return true;
-         }
-      }
-      return true;
-   }
-   function onAcceptPress()
-   {
-      skse.AllowTextInput(false);
-      skse.SendModEvent("SKICP_inputAccepted",this.textInput.text,0);
-      skyui.util.DialogManager.close();
-   }
-   function onCancelPress()
-   {
-      skse.AllowTextInput(false);
-      skse.SendModEvent("SKICP_dialogCanceled");
-      skyui.util.DialogManager.close();
-   }
+        
+        if (Shared.GlobalFunc.IsKeyPressed(details, false)) {
+            if (details.navEquivalent == gfx.ui.NavigationCode.TAB) {
+                this.onCancelPress();
+                return true;
+            }
+            if (details.navEquivalent == gfx.ui.NavigationCode.ENTER) {
+                this.onAcceptPress();
+                return true;
+            }
+        }
+
+        // Don't forward to higher level
+        return true;
+    }
+
+
+  /* PRIVATE FUNCTIONS */
+
+    private function onAcceptPress()
+    {
+        skse.AllowTextInput(false);
+        skse.SendModEvent("SKICP_inputAccepted", this.textInput.text, 0);
+        skyui.util.DialogManager.close();
+    }
+
+    private function onCancelPress()
+    {
+        skse.AllowTextInput(false);
+        skse.SendModEvent("SKICP_dialogCanceled");
+        skyui.util.DialogManager.close();
+    }
 }
